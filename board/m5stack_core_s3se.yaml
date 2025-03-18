@@ -1,0 +1,171 @@
+---
+# https://docs.m5stack.com/en/core/M5CoreS3%20SE
+# Base functions for:
+# M5Stack Core S3SE
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_core_s3se.yaml
+
+i2c:
+# Grove
+  - id: i2c_grove
+    sda: $i2c_grove_sda_pin
+    scl: $i2c_grove_scl_pin
+    scan: true
+# Int
+  - id: i2c_internal
+    sda: $i2c_int_sda_pin
+    scl: $i2c_int_scl_pin
+    scan: true
+    frequency: 400kHz
+# Ext PINs
+#  - id: i2c_bus
+#    sda: $i2c_bus_sda_pin
+#    scl: $i2c_bus_scl_pin
+#    scan: true
+
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/jesserockz/esphome-components
+    components: [file]
+    refresh: 1d
+  - source:
+      type: git
+      url: https://github.com/luka6000/esphome_m5stack_core_s3
+      ref: v202502
+    components: [ esp32_m5stack_core_s3, aw9523 ]
+    refresh: 1d
+  - source:
+      type: git
+      url: https://github.com/gnumpi/esphome_audio
+      ref: dev-next
+    components: [ adf_pipeline, i2s_audio ]
+    refresh: 1d
+  # - source:
+  #     # type: git
+  #     # url: https://github.com/luka6000/M5CoreS3-Esphome
+  #     type: local
+  #     path: ../../M5CoreS3-Esphome/components/
+  #   components: [ m5cores3_display ]
+  #   refresh: 10s
+
+esp32_m5stack_core_s3:
+
+i2c_device:
+  id: axp2101
+  address: 0x34
+
+i2s_audio:
+  - id: i2s_shared
+    i2s_lrclk_pin: GPIO33
+    i2s_bclk_pin: GPIO34
+    i2s_mclk_pin: GPIO0
+    access_mode: exclusive
+
+aw9523:
+  id: aw9523_1
+  address: 0x58
+
+microphone:
+  - platform: i2s_audio
+    id: box_mic
+    i2s_din_pin: $i2s_din_pin
+    pdm: false
+    adc_type: external
+    adc:
+      model: es7210
+      address: 0x40
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    channel: right
+    fixed_settings: true
+speaker:
+  - platform: i2s_audio
+    id: box_speaker
+    i2s_dout_pin: $i2s_dout_pin
+    dac_type: external
+    dac:
+      model: aw88298
+      address: 0x36
+      enable_pin:
+        aw9523: aw9523_1
+        port: 0
+        pin: 2
+        mode:
+          output: true
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    channel: right
+    fixed_settings: true
+
+#display:
+#  - platform: ili9xxx
+#    id: disp_lcd
+#    model: M5Stack
+#    cs_pin: $disp_cs_pin
+#    dc_pin: $disp_dc_pin
+#    dimensions: 240x320
+#    transform:
+#      swap_xy: true
+#      mirror_x: true
+#      mirror_y: false
+#    invert_colors: true
+#    reset_pin:
+#      aw9523: aw9523_1
+#      port: 1
+#      pin: 1
+#      mode:
+#        output: true
+#    update_interval: 1s
+
+touchscreen:
+  - platform: ft63x6
+    i2c_id: i2c_internal
+    update_interval: 20ms
+    on_touch:
+      - logger.log:
+          format: Touch %d at (%d, %d)
+          args: [touch.id, touch.x, touch.y]
+
+binary_sensor:
+  - platform: touchscreen
+    id: touch
+    name: Touchscreen
+    entity_category: diagnostic
+    x_min: 0
+    x_max: 320
+    y_min: 0
+    y_max: 240
+
+output:
+  - platform: template
+    id: backlight_output
+    type: float
+    min_power: 0.20
+    max_power: 0.28
+    write_action:
+      - lambda: >-
+          uint8_t x = state * 100 ;
+          id(axp2101).write_byte(0x99, x );
+
+light:
+  - platform: monochromatic
+    name: Backlight
+    id: backlight_light
+    output: backlight_output
+    icon: "mdi:television"
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_ON
+    default_transition_length: 100ms
+    # on_state:
+    #   - lambda: |-
+    #       uint8_t light;
+    #       if (id(axp2101).read_byte(0x99, &light))
+    #         id(backlight).turn_on().set_brightness( (( light << 5 ) - 641 ) /255 );

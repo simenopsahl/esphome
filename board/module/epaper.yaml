@@ -1,0 +1,79 @@
+---
+# 
+# Common functions for devices with an epaper display
+#
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time:
+      - seconds: 0
+        minutes: /5
+        then:
+          - if:
+              condition:
+                lambda: 'return id(data_updated) == true;'
+              then:
+                - if:
+                    condition:
+                      binary_sensor.is_on: motion_detected
+                    then:
+                      - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
+                      - script.execute: update_screen
+                    else:
+                      - logger.log: "Sensor data updated but no activity in home - skipping display refresh."
+              else:
+                - logger.log: "No sensors updated - skipping display refresh."
+
+script:
+  # Script for updating screen - Refresh display and publish refresh count and time.
+  - id: update_screen
+    then:
+      - lambda: 'id(data_updated) = false;'
+      - component.update: eink_display
+      - lambda: 'id(recorded_display_refresh) += 1;'
+      - lambda: 'id(display_last_update).publish_state(id(time_homeassistant).now().timestamp);'
+
+# Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
+globals:
+  - id: data_updated
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: initial_data_received
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: recorded_display_refresh
+    type: int
+    restore_value: yes
+    initial_value: '0'
+
+# Buttons in Home Assistant
+button:
+  - platform: template
+    name: "Refresh Screen"
+    entity_category: config
+    on_press:
+      - script.execute: update_screen
+  - platform: template
+    name: "Next Screen"
+    entity_category: config
+    on_press:
+      - display.page.show_next: eink_display
+      - component.update: eink_display
+
+sensor:
+  # Create sensors for monitoring remotely.
+  - platform: template
+    name: "Display Last Update"
+    device_class: timestamp
+    entity_category: "diagnostic"
+    id: display_last_update
+  - platform: template
+    name: "Recorded Display Refresh"
+    accuracy_decimals: 0
+    unit_of_measurement: "Refreshes"
+    state_class: "total_increasing"
+    entity_category: "diagnostic"
+    lambda: 'return id(recorded_display_refresh);'

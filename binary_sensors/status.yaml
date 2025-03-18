@@ -1,0 +1,9 @@
+---
+# Status Binary Sensor
+#
+# https://esphome.io/components/binary_sensor/status.html
+#
+platform: status
+name: "Status"
+device_class: "connectivity"
+entity_category: diagnostic

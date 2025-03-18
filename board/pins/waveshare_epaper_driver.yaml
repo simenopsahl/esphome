@@ -1,0 +1,27 @@
+---
+# https://www.waveshare.com/wiki/E-Paper_ESP32_Driver_Board
+# PINs for Waveshare e-paper ESP32 driver board
+
+substitutions:
+  i2c_sda_pin: GPIO21
+  i2c_scl_pin: GPIO22
+  tx0__pin: GPIO1
+  rx0_pin: GPIO3
+  tx1__pin: GPIO10
+  rx1_pin: GPIO9
+  tx2__pin: GPIO17
+  rx2_pin: GPIO16
+  spi_clk_pin: GPIO13
+  spi_mosi_pin: GPIO14
+  disp_cs_pin: GPIO15
+  disp_dc_pin: GPIO27
+  disp_busy_pin: GPIO25
+  disp_reset_pin: GPIO26
+  # Button
+  button_power_pin: GPIO35
+  button_side_pin: GPIO39
+  button_front_pin: GPIO37
+  # LED
+  disp_bl_pin: GPIO27
+  led_pin: GPIO19
+  ir_pin: GPIO19

@@ -1,0 +1,12 @@
+---
+# Status
+#
+# Device status
+# WiFi signal strength, connectivity and uptime
+#
+binary_sensor:
+  - <<: !include ../binary_sensors/status.yaml
+sensor:
+  - <<: !include ../sensors/wifi_signal.yaml
+  - <<: !include ../sensors/uptime.yaml
+#  - <<: !include ../sensors/uptime_timestamp.yaml

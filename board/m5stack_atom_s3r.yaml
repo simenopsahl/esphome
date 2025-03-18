@@ -1,0 +1,162 @@
+---
+# https://docs.m5stack.com/en/core/AtomS3R
+# Base functions for:
+# M5Stack AtomS3R
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3r.yaml
+
+esphome:
+  platformio_options:
+    board_build.arduino.memory_type: qio_opi
+    build_flags:
+      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+      - "-DBOARD_HAS_PSRAM"
+      - "-DARDUINO_USB_CDC_ON_BOOT=1"
+      - "-mfix-esp32-psram-cache-issue"
+psram:
+  mode: octal
+  speed: 80MHz
+
+i2c:
+# Internal
+  - id: i2c_internal
+    sda: $i2c_int_sda_pin
+    scl: $i2c_int_scl_pin
+    scan: true
+
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+
+# IR
+#remote_transmitter:
+#  pin: $ir_pin
+#  carrier_duty_percent: 50%
+#  rmt_symbols: 144
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/ssieb/esphome
+      ref: lp5562
+    components: [ lp5562 ]
+    refresh: 1min
+
+# https://www.reddit.com/r/Esphome/comments/1geelgf/what_would_it_take_to_port_led_driver_lp5562/
+lp5562:
+  - i2c_id: i2c_internal
+
+output:
+  - platform: lp5562
+    id: backlight_red
+    channel: 0
+  - platform: lp5562
+    id: backlight_green
+    channel: 1
+  - platform: lp5562
+    id: backlight_blue
+    channel: 2
+  - platform: lp5562
+    id: backlight_white
+    channel: 3
+
+#switch:
+#  - platform: gpio
+#    id: backlight_white
+#    pin: $backlight_pin
+#    restore_mode: ALWAYS_ON
+#    name: "Backlight"
+#    entity_category: config
+
+light:
+  # White
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_white
+    default_transition_length: 100ms
+    restore_mode: RESTORE_DEFAULT_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+  # RGBW
+#  - platform: rgbw
+#    id: backlight_light
+#    red: backlight_red
+#    green: backlight_green
+#    blue: backlight_blue
+#    white: backlight_white
+#    color_interlock: true
+#    default_transition_length: 100ms
+#    restore_mode: ALWAYS_ON
+#    name: "Backlight"
+#    entity_category: config
+
+color:
+  - id: c_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: c_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+  - id: c_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: c_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: c_gray
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: c_white
+    red: 100%
+    green: 100%
+    blue: 100%
+
+# Button
+binary_sensor:
+  - platform: gpio
+    name: Button
+    entity_category: diagnostic
+    pin:
+      number: $button_pin
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Button Pressed
+        - display.page.show_next: display_ips
+
+#display:
+#  - platform: ili9xxx
+#    model: st7789v
+#    id: display_ips
+#    cs_pin: $disp_cs_pin
+#    dc_pin: $disp_dc_pin
+#    reset_pin: $disp_reset_pin
+#    data_rate: 40Mhz
+#    invert_colors: true
+#    update_interval: 1s
+#    dimensions:
+#      height: 128
+#      width: 128
+#      offset_height: 1
+#      offset_width: 2
+    # Rotate 180deg
+#    transform:
+#      mirror_x: true
+#      mirror_y: true
+#    pages:

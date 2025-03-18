@@ -1,0 +1,43 @@
+---
+# https://docs.m5stack.com/en/core/M5CoreS3%20SE
+# PINs for m5stack Core S3SE
+
+substitutions:
+  # Internal
+  i2c_int_sda_pin: GPIO12
+  i2c_int_scl_pin: GPIO11
+  spi_clk_pin: GPIO36
+  spi_mosi_pin: GPIO37
+  spi_miso_pin: GPIO35
+  disp_cs_pin: GPIO3
+  disp_dc_pin: GPIO35
+  card_cs_pin: GPIO4
+  # M-Bus
+#  i2c_mbus_sda_pin: GPIO21
+#  i2c_mbus_scl_pin: GPIO22
+  tx_mbus_pin: GPIO43
+  rx_mbus_pin: GPIO44
+  # GROVE
+  i2c_grove_sda_pin: GPIO2
+  i2c_grove_scl_pin: GPIO1
+  in_grove_pin: GPIO8
+  out_grove_pin: GPIO9
+  tx_grove_pin: GPIO17
+  rx_grove_pin: GPIO18
+  # Button
+#  button_power_pin: GPIO35
+#  button_side_pin: GPIO39
+#  button_front_pin: GPIO37
+  # LED
+#  tft_bl_pin: GPIO27
+#  led_pin: GPIO19
+#  ir_pin: GPIO19
+  # Mic & Speaker
+  i2s_lrclk_pin: GPIO33
+  i2s_bclk_pin: GPIO34
+  i2s_mclk_pin: GPIO0
+  i2s_din_pin: GPIO14
+  i2s_dout_pin: GPIO13
+  # Power MOS
+#  power_mos_pin: GPIO4
+#  bat_feedback: GPIO38

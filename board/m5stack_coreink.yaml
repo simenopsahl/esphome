@@ -1,0 +1,291 @@
+---
+# https://docs.m5stack.com/en/core/coreink
+# https://www.reddit.com/r/Esphome/comments/1hznwxf/esphome_with_m5_coreink/
+# Base functions for:
+# M5Stack CoreInk
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_coreink.yaml
+
+i2c:
+# Grove
+  - id: i2c_grove
+    sda: $i2c_grove_sda_pin
+    scl: $i2c_grove_scl_pin
+    scan: true
+# HAT
+  - id: i2c_hat
+    sda: $i2c_hat_sda_pin
+    scl: $i2c_hat_scl_pin
+    scan: true
+# Ext PINs
+#  - id: i2c_bus
+#    sda: $i2c_bus_sda_pin
+#    scl: $i2c_bus_scl_pin
+#    scan: true
+
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+
+#time:
+#  - platform: pcf8563
+#    i2c_id: i2c_bus
+#    address: 0x51
+    # repeated synchronization is not necessary unless the external RTC
+    # is much more accurate than the internal clock
+#    update_interval: never
+#  - platform: homeassistant
+#    id: homeassistant_time
+    # instead try to synchronize via network repeatedly ...
+#    on_time_sync:
+#      then:
+        # ... and update the RTC when the synchronization was successful
+#        pcf8563.write_time:
+
+light:
+  # Enable status LED
+  - platform: status_led
+    id: status_light
+    pin: $led_pin
+
+# Buzzer
+output:
+  - platform: ledc
+    id: buzzer
+    pin: $buzzer_pin
+
+binary_sensor:
+  # Power Button
+#  - platform: gpio
+#    id: button_side
+#    name: Side Button
+#    pin:
+#      number: $button_side_pin
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+#    filters:
+#      - delayed_off: 10ms
+#    on_press:
+#      then:
+#        - logger.log: Side Button Pressed
+  # Top Button
+  - platform: gpio
+    id: button_top
+    name: Top Button
+    entity_category: diagnostic
+    pin:
+      number: $button_top_pin
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Top Button Pressed
+        - script.execute: buzzer_beep
+    on_release:
+      then:
+        - output.turn_off: buzzer
+
+  # Stick Up
+  - platform: gpio
+    id: stick_up
+    name: Stick Up
+    entity_category: diagnostic
+    pin:
+      number: $stick_up_pin
+#      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+#        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Stick Up
+        - script.execute: buzzer_beep
+        - display.page.show: page_local
+        - script.execute: update_screen
+    on_release:
+      then:
+        - output.turn_off: buzzer
+  # Stick Press
+  - platform: gpio
+    id: stick_press
+    name: Stick Press
+    entity_category: diagnostic
+    pin:
+      number: $stick_press_pin
+#      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+#        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Stick Press
+        - script.execute: buzzer_beep
+        - script.execute: update_screen
+    on_release:
+      then:
+        - output.turn_off: buzzer
+  # Stick Down
+  - platform: gpio
+    id: stick_down
+    name: Stick Down
+    entity_category: diagnostic
+    pin:
+      number: $stick_down_pin
+#      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+#        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Stick Down
+        - script.execute: buzzer_beep
+        - display.page.show_next: eink_display
+        - script.execute: update_screen
+    on_release:
+      then:
+        - output.turn_off: buzzer
+
+script:
+  # Script for buzzer beep
+  - id: buzzer_on
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+  - id: buzzer_beep
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 50ms
+      - output.turn_off: buzzer
+
+sensor:
+  # Deep Sleep wakeup cause
+#  - platform: template
+#    name: "Wakeup Cause"
+#    entity_category: diagnostic
+#    accuracy_decimals: 0
+#    lambda: return esp_sleep_get_wakeup_cause();
+  
+  # Battery voltage
+  - platform: adc
+    pin: $bat_feedback
+    id: bat_adc
+    update_interval: 2s
+    samples: 10
+    accuracy_decimals: 3
+    filters:
+      - multiply: 4.25
+      - median:
+          window_size: 7
+          send_every: 7
+          send_first_at: 7
+    name: "Battery Voltage"
+    entity_category: diagnostic
+    device_class: voltage
+    unit_of_measurement: V
+    on_value:
+      then:
+        - component.update: bat_percent
+  # Battery Percent
+  - platform: template
+    name: "Battery"
+    id: bat_percent
+    lambda: return id(bat_adc).state;
+    accuracy_decimals: 0
+    filters:
+      - calibrate_linear:
+          method: exact
+          datapoints:
+            - 0.00 -> 0.0
+            - 3.00 -> 1.0
+            - 3.10 -> 10.0
+            - 3.20 -> 50.0
+            - 3.55 -> 85.0
+            - 3.685 -> 100.0
+      - lambda: |-
+          if (x <= 100) {
+            return x;
+          } else {
+            return 100;
+          }
+          if (x <0) {
+            return 0;
+          }
+    entity_category: diagnostic
+    device_class: battery
+    unit_of_measurement: "%"
+
+#deep_sleep:
+#  id: sleep_battery
+#  run_duration: 120s
+#  sleep_duration: 180s
+#  wakeup_pin_mode: KEEP_AWAKE
+#  wakeup_pin:
+#    number: $power_mos_pin
+#    allow_other_uses: true
+#  esp32_ext1_wakeup: 
+#    mode: ANY_HIGH
+#    pins: 
+#      - number: $power_mos_pin
+#        allow_other_uses: true
+#      - number: $stick_up_pin
+#        allow_other_uses: true
+#      - number: $stick_press_pin
+#        allow_other_uses: true
+#      - number: $stick_down_pin
+#        allow_other_uses: true
+
+#switch:
+  # Power MOS battery bypass
+#  - platform: gpio
+#    id: power_mos
+#    name: "Power MOS"
+#    entity_category: config
+#    pin:
+#      number: $power_mos_pin
+#      allow_other_uses: true
+
+#display:
+  # 200 x 200 resolution
+#  - platform: waveshare_epaper
+#    model: 1.54inv2
+#    id: eink_display
+#    cs_pin: $disp_cs_pin
+#    dc_pin: $disp_dc_pin
+#    busy_pin:
+#      number: $disp_busy_pin
+#      inverted: false
+#    reset_pin: $disp_reset_pin
+#    full_update_every: 1
+#    reset_duration: 2ms
+#    update_interval: 15min
+#    rotation: 90
+#    pages:

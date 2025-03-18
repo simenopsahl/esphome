@@ -1,0 +1,54 @@
+packages:
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+substitutions:
+  devicename: ble-relay1
+  location: "1etg, Kjøkken"
+
+esphome:
+  comment: "BLE Relay"
+  name: $devicename
+  friendly_name: $devicename
+  area: $location
+
+esp32:
+    board: upesy_wroom
+    framework:
+      type: esp-idf
+
+i2c:
+  scl: GPIO22
+  sda: GPIO21
+  scan: True
+  frequency: 100kHz
+  id: bus_a
+
+sensor:
+  - platform: bme280_i2c
+    temperature:
+      id: bme_temperature
+      name: "Temperature"
+      oversampling: 1x
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    pressure:
+      id: bme_pressure
+      name: "Pressure"
+      oversampling: 1x
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.1
+    humidity:
+      id: bme_humidity
+      name: "Humidity"
+      oversampling: 1x
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    address: 0x76
+    update_interval: 30s

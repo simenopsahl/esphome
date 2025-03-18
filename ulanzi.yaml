@@ -1,0 +1,468 @@
+# https://blakadder.com/esphome-pixel-clock/
+# https://github.com/lubeda/EspHoMaTriXv2/
+# https://developer.lametric.com/icons
+packages:
+  <<: !include_dir_named common
+
+substitutions:
+  devicename: ulanzi
+  matrix_pin: GPIO32
+  buzzer_pin: GPIO15
+  battery_pin: GPIO34
+  ldr_pin: GPIO35
+  left_button_pin: GPIO26
+  mid_button_pin: GPIO27
+  right_button_pin: GPIO14
+  scl_pin: GPIO22
+  sda_pin: GPIO21
+  location: "1etg, TV Stue"
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/lubeda/EsphoMaTrixv2
+      ref: 2024.12.1
+    refresh: 60s
+    components: [ ehmtxv2 ]
+
+esphome:
+  comment: "Ulanzi TC001 Pixel Display"
+  name: $devicename
+  friendly_name: $devicename
+  area: $location
+  project:
+    name: "Ulanzi.EHMTXv2"
+    version: "2.0.0"
+  on_boot:
+    then:
+      - ds1307.read_time:
+# Initialize CLOCK screen
+      - lambda: |-
+          id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
+# Initialize DATE screen
+      - lambda: |-
+          id(rgb8x32)->date_screen(1440,30,false,160,240,160);
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+    advanced:
+      ignore_efuse_custom_mac: true
+
+api:
+  services:
+    - service: tune
+      variables:
+        tune: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return tune;'
+
+globals:
+  # aab = auto-adjustable brightness
+  - id: aab_enable
+    type: "bool"
+    restore_value: true
+    initial_value: "true"
+  - id: aab_add
+    type: int
+    initial_value: '10'
+  - id: aab_max
+    type: int
+    initial_value: '220'
+  - id: aab_min
+    type: int
+    initial_value: '40'
+
+font: 
+  # adapt the filename to your local settings
+  - file: fonts/MatrixClock-Light8.bdf
+    id: default_font
+    size: 16
+    glyphs:  |
+      ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ[\]^_`abcdefghijklmnopqrstuvwxyzæøå°
+  - file: fonts/MatrixClock-Chunky6.bdf
+    id: special_font
+    size: 16
+    glyphs:  |
+      ! "#$%&'()*+,-./0123456789:APMTapmt
+
+ehmtxv2:
+  id: rgb8x32
+  icons2html: true
+  time_component: ehmtx_time
+  time_format: "%H:%M"    # defaults "%H:%M" (use "%I:%M%p" for the US)
+  date_format: "%d.%m"    # defaults "%d.%m." (use "%m.%d." for the US)
+  show_seconds: false
+  week_start_monday: true # default monday is first day of week, false = sunday
+#  show_dow: true         # draw the day indicator on the bottom of the screen, defaults to true
+#  show_date: true         # show the date for show_screen - show_clock seconds otherwise only shows the clock for show_screen seconds, defaults to true
+  matrix_component: ehmtx_display
+  clock_interval: 60      # show the clock at least each x seconds
+  default_font_id: default_font
+  default_font_yoffset: 8              # the text is aligned BASELINE_LEFT, the baseline defaults to 6
+  special_font_id: special_font
+  special_font_yoffset: 6              # the text is aligned BASELINE_LEFT, the baseline defaults to 6
+  scroll_interval: 96    # the interval in ms to scroll the text (default=80), should be a multiple of the update_interval from the display (default: 16ms)
+  frame_interval: 192     # the interval in ms to display the next anim frame (default=192), should be a multiple of the update_interval from the display (default: 16ms)
+  boot_logo: "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63519,63519,63519,63519,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63519,0,0,0,0,2016,0,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,0,0,0,0,63488,0,63488,0,0,0,63519,0,0,0,0,2016,2016,0,0,0,65514,0,65514,0,0,0,31,0,0,0,64512,0,0,64512,0,63488,63488,0,63488,63488,0,0,63519,63519,63519,0,0,2016,0,2016,0,65514,0,65514,0,65514,0,31,31,31,0,0,0,64512,64512,0,0,63488,63488,63488,63488,63488,0,0,63519,0,0,0,0,2016,0,2016,0,65514,0,65514,0,65514,0,0,31,0,0,0,0,64512,64512,0,0,0,63488,63488,63488,0,0,0,63519,63519,63519,63519,0,2016,0,2016,0,65514,0,65514,0,65514,0,0,0,31,31,0,64512,0,0,64512,0,0,0,63488,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"
+  icons: 
+    - id: error
+      lameid: 33180
+    - id: lightbulb
+      lameid: 52116
+    - id: music
+      lameid: 22046
+    - id: phone
+      lameid: 43641
+    - id: car
+      lameid: 1172
+    - id: cat
+      lameid: 12200
+    - id: sleeping
+      lameid: 4412
+    - id: ha
+      lameid: 7956
+    - id: temp
+      lameid: 2422
+    - id: plug
+      lameid: 48588
+    - id: humidity
+      lameid: 51764
+    - id: electricity
+      lameid: 54077
+    - id: energyprice
+      lameid: 54231
+    - id: codered
+      lameid: 4643
+    - id: codeyellow
+      lameid: 4642
+    - id: codegreen
+      lameid: 4641
+    - id: doorbell
+      lameid: 24800
+    - id: cctv
+      lameid: 15642
+    - id: person
+      lameid: 5869
+    - id: mail
+      lameid: 55030
+    - id: folloren1
+      lameid: 35037
+    - id: folloren2
+      lameid: 35034
+    - id: arrow_up
+      lameid: 20065
+    - id: arrow_down
+      lameid: 20066
+    - id: vol_up
+      lameid: 56194
+    - id: vol_down
+      lameid: 56195
+    - id: vol_mute
+      lameid: 56242
+  on_start_running:
+    then:
+      lambda: |-
+        ESP_LOGD(TAG, "remove default clock and set new color");
+        id(rgb8x32)->set_clock_color(160,240,160);
+        id(rgb8x32)->set_weekday_color(155,155,155);
+        id(rgb8x32)->set_today_color(240,160,160);
+  on_next_screen:
+    - homeassistant.event:
+        event: esphome.new_screen
+        data_template:
+          iconname: !lambda "return icon.c_str();"
+          text: !lambda "return text.c_str();"
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: $left_button_pin
+      inverted: true
+    name: "left button"
+    on_press:
+      then:
+        - number.decrement: screen_brightness
+  - platform: gpio
+    pin: 
+      inverted: true
+      number: $mid_button_pin
+      mode: INPUT_PULLUP
+    name: "middle button"
+    on_press:
+      then:
+        - switch.toggle: displaycontrol
+  - platform: gpio
+    pin: 
+      number: $right_button_pin
+      inverted: true
+    name: "right button"
+    on_press:
+      then:
+        - number.increment: screen_brightness
+# example to switch to next screen
+#        lambda: |-
+#          id(rgb8x32)->skip_screen();
+  - platform: homeassistant
+    id: sonos_amp_mute
+    entity_id: media_player.sonos_amp
+    attribute: is_volume_muted
+    on_state:
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: sonos_amp_mute
+            then:
+              lambda: |-
+                ESP_LOGD(TAG, "Sonos Amp unmuted");
+                id(rgb8x32)->icon_screen("vol_mute", "Lyd", 0, 2, true, 40,240,40);
+                id(rgb8x32)->force_screen("vol_mute");
+        - if:
+            condition:
+              - binary_sensor.is_on: sonos_amp_mute
+            then:
+              lambda: |-
+                ESP_LOGD(TAG, "Sonos Amp muted");
+                id(rgb8x32)->icon_screen("vol_mute", "Dempet", 0, 2, true, 240,40,40);
+                id(rgb8x32)->force_screen("vol_mute");
+
+number:
+  - platform: template
+    name: "brightness"
+    id: screen_brightness
+    min_value: 0
+    max_value: 255
+    update_interval: 1s
+    step: 25
+    lambda: |-
+      return id(rgb8x32)->get_brightness();
+    set_action:
+      lambda: |-
+        id(rgb8x32)->set_brightness(x);
+
+switch:
+  - platform: template
+    name: "Display"
+    id: displaycontrol
+    icon: "mdi:power"
+    restore_mode: ALWAYS_ON
+    lambda: |-
+      return id(rgb8x32)->show_display;
+    turn_on_action:
+      lambda: |-
+        id(rgb8x32)->set_display_on();
+    turn_off_action:
+      lambda: |-
+        id(rgb8x32)->set_display_off();
+  - platform: template
+    name: "Auto-Adjust Brightness"
+    id: switch_autobrightness
+    icon: mdi:brightness-auto
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      if (id(aab_enable)) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        id(aab_enable) = true;
+    turn_off_action:
+      lambda: |-
+        id(aab_enable) = false;
+
+sensor:
+  - platform: sht3xd
+    temperature:
+      name: "Temperature"
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    humidity:
+      name: "Relative Humidity"
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    update_interval: 60s
+  - platform: adc
+    pin: $battery_pin
+    name: "Battery"
+    id: battery_voltage
+    update_interval: 10s
+    device_class: battery
+    accuracy_decimals: 0
+    attenuation: auto
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
+          send_first_at: 1
+      - multiply: 1.6
+      - lambda: |-
+          auto r = ((x - 3) / 0.69 * 100.00);
+          if (r >= 100) return 100;
+          if (r > 0) return r;
+          if (r <= 0) return 1;
+          return 0;
+    unit_of_measurement: '%'
+  - platform: adc
+    id: light_sensor
+    name: "Illuminance"
+    pin: $ldr_pin
+    state_class: measurement
+    device_class: ILLUMINANCE
+    update_interval: 10s
+    attenuation: auto
+    unit_of_measurement: lx
+    accuracy_decimals: 0
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0 - 15 ;
+    on_value:
+      then:
+        - lambda: |-
+            if ( id(aab_enable) ) {
+              int n = x / 4 + id(aab_add); // new_value
+              if (n > id(aab_max)) n = id(aab_max);
+              if (n < id(aab_min)) n = id(aab_min);
+              int c = id(rgb8x32)->get_brightness(); // current value
+              c = c>0?c:1 ; 
+              int d = (n - c) * 100 / c; // diff in %
+              if ( abs(d) > 2 ) id(rgb8x32)->set_brightness(n);
+            }
+  - platform: homeassistant
+    id: sonos_amp_vol
+    entity_id: media_player.sonos_amp
+    attribute: volume_level
+    filters:
+      - multiply: 100
+      - round: 0
+    on_value:
+      then:
+        lambda: |-
+          char text[3];
+          sprintf(text,"%2.0f", id(sonos_amp_vol).state);
+          ESP_LOGD(TAG, "Sonos Amp volume changed");
+          id(rgb8x32)->icon_screen("vol_up", text, 0, 1, true, 240,240,240);
+          id(rgb8x32)->force_screen("vol_up");
+
+text_sensor:
+  - platform: homeassistant
+    id: sonos_amp_source
+    entity_id: media_player.sonos_amp
+    attribute: source
+    on_value:
+      then:
+        - if:
+            condition:
+              text_sensor.state:
+                id: sonos_amp_source
+                state: 'TV'
+            then:
+              lambda: |-
+                ESP_LOGD(TAG, "Sonos Amp source TV");
+                id(rgb8x32)->icon_screen("arrow_up", "TV", 0, 2, true, 40,240,240);
+                id(rgb8x32)->force_screen("arrow_up");
+        - if:
+            condition:
+              text_sensor.state:
+                id: sonos_amp_source
+                state: 'Line-in'
+            then:
+              lambda: |-
+                ESP_LOGD(TAG, "Sonos Amp source Line-in");
+                id(rgb8x32)->icon_screen("arrow_down", "Platespiller", 0, 2, true, 240,240,40);
+                id(rgb8x32)->force_screen("arrow_down");
+        - if:
+            condition:
+              not:
+                or:
+                  - text_sensor.state:
+                      id: sonos_amp_source
+                      state: 'Line-in'
+                  - text_sensor.state:
+                      id: sonos_amp_source
+                      state: 'TV'
+            then:
+              lambda: |-
+                ESP_LOGD(TAG, "Sonos Amp source Other");
+                id(rgb8x32)->icon_screen("vol_mute", "Source ?", 0, 2, true, 240,40,240);
+                id(rgb8x32)->force_screen("vol_mute");
+
+output:
+  - platform: ledc
+    pin: $buzzer_pin
+    id: rtttl_out
+
+rtttl:
+  output: rtttl_out
+
+i2c:
+  sda: $sda_pin
+  scl: $scl_pin
+  scan: true
+  id: i2cbus
+
+light:
+  - platform: neopixelbus
+    variant: ws2812
+    type: GRB
+    id: ehmtx_light
+    pin: $matrix_pin
+    num_leds: 256
+    color_correct: [30%, 30%, 30%]
+    gamma_correct: 2.0
+    restore_mode: ALWAYS_OFF
+    name: "Light"
+    on_turn_on:
+      lambda: |-
+         id(ehmtx_display)->set_enabled(false);
+    on_turn_off:
+       lambda: |-
+         id(ehmtx_display)->set_enabled(true);
+
+time:
+  - platform: homeassistant
+    on_time_sync:
+        - ds1307.write_time:
+        - component.update: sensor_uptime_timestamp
+  - platform: ds1307
+    update_interval: never
+    id: ehmtx_time
+  
+display:
+  - platform: addressable_light
+    id: ehmtx_display
+    addressable_light_id: ehmtx_light
+    width: 32
+    height: 8
+    pixel_mapper: |-
+      if (y % 2 == 0) {
+        return (y * 32) + x;
+      }
+      return (y * 32) + (31 - x);
+    rotation: 0°
+    update_interval: 16ms
+    auto_clear_enabled: true
+    lambda: |-
+      id(rgb8x32)->tick();
+      id(rgb8x32)->draw();
+
+image:
+   - file: img/1pixel.gif
+     id: breaking20237
+
+animation:
+  - file: img/1pixel.gif
+    id: breaking202371

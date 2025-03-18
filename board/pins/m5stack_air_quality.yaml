@@ -1,0 +1,36 @@
+---
+# https://docs.m5stack.com/en/core/AirQ
+# PINs for m5stack PM2.5 Air Qualityy
+
+substitutions:
+  # Internal
+  i2c_int_sda_pin: GPIO11
+  i2c_int_scl_pin: GPIO12
+  spi_clk_pin: GPIO5
+  spi_mosi_pin: GPIO6
+  disp_cs_pin: GPIO4
+  disp_dc_pin: GPIO3
+  disp_rst_pin: GPIO2
+  disp_busy_pin: GPIO1
+  sen55_pwr_pin: GPIO10
+  # GROVE
+  i2c_grove_sda_pin: GPIO13
+  i2c_grove_scl_pin: GPIO15
+  in_grove_pin: GPIO13
+  out_grove_pin: GPIO15
+  tx_grove_pin: GPIO15
+  rx_grove_pin: GPIO13
+  # Button
+  button_pwr_pin: GPIO42
+  button_a_pin: GPIO0
+  button_b_pin: GPIO8
+  # LED
+  led_pin: GPIO21
+  # Mic & Speaker
+  buzzer_pin: GPIO9
+#  i2s_lrclk_pin: GPIO13
+#  mic_pin: GPIO34
+  spk_1_pin: GPIO26
+  # Power
+  pwr_mos_pin: GPIO46
+  bat_feedback: GPIO14

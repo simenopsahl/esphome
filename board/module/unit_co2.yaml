@@ -1,0 +1,67 @@
+---
+# https://docs.m5stack.com/en/unit/co2
+
+substitutions:
+  co2_i2c_bus: i2c_grove
+
+# UNIT CO2
+sensor:
+  - platform: scd4x
+    i2c_id: $co2_i2c_bus
+    id: scd40_sensor
+    co2:
+      id: co2_scd40
+      name: "CO2 SCD40"
+      device_class: "carbon_dioxide"
+    temperature:
+      id: temperature_scd40
+      name: "Temperature SCD40"
+      disabled_by_default: true
+      device_class: "temperature"
+    humidity:
+      id: humidity_scd40
+      name: "Humidity SCD40"
+      disabled_by_default: true
+      device_class: "humidity"
+    altitude_compensation: 145
+#    ambient_pressure_compensation_source:
+    address: 0x62
+    update_interval: 30s
+
+# Offsets
+# number:
+#   - platform: template
+#     id: temperature_offset_co2
+#     name: "Temperature Offset CO2"
+#     entity_category: config
+#     unit_of_measurement: "°C"
+#     disabled_by_default: true
+#     min_value: -20
+#     max_value: 20
+#     step: 0.1
+#     mode: box
+#     update_interval: never
+#     optimistic: true
+#     restore_value: true
+#     initial_value: 0
+#     icon: "mdi:thermometer"
+#     on_value:
+#       - lambda: 'id(scd40_sensor).update();'
+
+#   - platform: template
+#     id: humidity_offset_co2
+#     name: "Humidity Offset CO2"
+#     entity_category: config
+#     unit_of_measurement: "%"
+#     disabled_by_default: true
+#     min_value: -50
+#     max_value: 50
+#     step: 0.1
+#     mode: box
+#     update_interval: never
+#     optimistic: true
+#     restore_value: true
+#     initial_value: 0
+#     icon: "mdi:water-percent"
+#     on_value:
+#       - lambda: 'id(scd40_sensor).update();'

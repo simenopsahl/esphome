@@ -1,0 +1,19 @@
+substitutions:
+  name: everything-presence-lite-aa2aa0
+  friendly_name: EPL-aa2aa0
+  location: "1etg, Kjøkken"
+packages:
+  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha.yaml@main
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  friendly_name: ${friendly_name}
+  area: $location
+api:
+  encryption:
+    key: !secret homeassistant_api
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password

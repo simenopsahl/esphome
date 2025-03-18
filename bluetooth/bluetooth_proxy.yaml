@@ -1,0 +1,8 @@
+---
+#
+# The esp32_ble_tracker component creates a global hub so that you can track
+# bluetooth low energy devices using your ESP32 node.
+# https://esphome.io/components/bluetooth_proxy.html
+#
+bluetooth_proxy:
+  active: false

@@ -1,0 +1,59 @@
+---
+# https://www.waveshare.com/wiki/E-Paper_ESP32_Driver_Board
+# Base functions for Waveshare e-paper ESP32 driver board
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/waveshare_epaper_driver.yaml
+  epaper: !include module/epaper.yaml
+
+esphome:
+  project:
+    name: "Waveshare.EPaper"
+  on_boot:
+      priority: 200.0
+      then:
+        - component.update: eink_display
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) == true;'
+        # Wait a bit longer so all the items are received
+        - delay: 5s
+        - logger.log: "Initial sensor data received: Refreshing display..."
+        - lambda: 'id(initial_data_received) = true;'
+        - display.page.show: page_content
+        - script.execute: update_screen
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Pins for Waveshare ePaper ESP Board
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+
+# Now render everything on the ePaper screen.
+# display:
+#   - platform: waveshare_epaper
+#     id: eink_display
+#     cs_pin: $disp_cs_pin
+#     dc_pin: $disp_dc_pin
+#     busy_pin: $disp_busy_pin
+#     reset_pin: $disp_reset_pin
+#     reset_duration: 2ms
+#     model: 7.50in-bV2
+#     model: 4.20in-v2
+#     update_interval: never
+#     rotation: 90°
+#     pages:
+#       - id: page_black
+#         lambda: |-
+#           // Fill background.
+#           it.fill(COLOR_ON);
+#       - id: page_white
+#         lambda: |-
+#           // Fill background.
+#           it.fill(COLOR_OFF);

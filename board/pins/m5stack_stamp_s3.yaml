@@ -1,0 +1,42 @@
+---
+# https://docs.m5stack.com/en/core/M5StampS3%20PIN1.27
+# PINs for m5stack Stamp-S3 PIN1.27
+
+substitutions:
+  # GPIO + ADC
+  g1: GPIO1
+  g2: GPIO2
+  g3: GPIO3
+  g4: GPIO4
+  g5: GPIO5
+  g6: GPIO6
+  g7: GPIO7
+  g8: GPIO8
+  g9: GPIO9
+  g10: GPIO10
+  # GPIO
+  g11: GPIO11
+  g12: GPIO12
+  g14: GPIO14
+  # i2c
+  g13: GPIO13 # SDA
+  g15: GPIO15 # SCL
+  # UART
+  g43: GPIO43 # Tx
+  g44: GPIO44 # Rx
+  # OTG / Serial
+  spi_clk_pin: GPIO36 # SCK
+  spi_mosi_pin: GPIO35 # DAT
+  disp_cs_pin: GPIO37 # CS
+  disp_dc_pin: GPIO34 # RS
+  disp_rst_pin: GPIO33 # RST
+  disp_bl_pin: GPIO38 # BL
+  g16: GPIO16
+  g17: GPIO17
+  g18: GPIO18
+  # Button
+  button_pin: GPIO0
+  # LED
+  led_pin: GPIO21
+  # Power
+  pwr_mos_pin: GPIO46

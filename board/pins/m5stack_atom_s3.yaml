@@ -1,0 +1,39 @@
+---
+# https://docs.m5stack.com/en/core/AtomS3
+# PINs for m5stack ATOM S3
+
+substitutions:
+  # Internal
+  i2c_int_sda_pin: GPIO38
+  i2c_int_scl_pin: GPIO39
+  spi_clk_pin: GPIO17
+  spi_mosi_pin: GPIO21
+  disp_cs_pin: GPIO15
+  disp_dc_pin: GPIO33
+  disp_reset_pin: GPIO34
+  # GROVE
+  i2c_grove_sda_pin: GPIO2
+  i2c_grove_scl_pin: GPIO1
+  in_grove_pin: GPIO1
+  out_grove_pin: GPIO2
+  tx_grove_pin: GPIO1
+  rx_grove_pin: GPIO2
+  # Mate HAT
+  i2c_hat_sda_pin: GPIO6
+  i2c_hat_scl_pin: GPIO5
+  in_hat_pin: GPIO8
+  out_hat_pin: GPIO7
+  tx_uart_hat_pin: GPIO6
+  rx_uart_hat_pin: GPIO5
+  # Port ABC
+  i2c_port_abc_sda_pin: GPIO38
+  i2c_port_abc_scl_pin: GPIO39
+  in_port_abc_pin: GPIO8
+  out_port_abc_pin: GPIO7
+  tx_port_abc_pin: GPIO6
+  rx_port_abc_pin: GPIO5
+  # Button
+  button_pin: GPIO41
+  # LED
+  disp_bl_pin: GPIO16
+  ir_pin: GPIO4

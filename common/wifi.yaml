@@ -1,0 +1,11 @@
+---
+# Wi-Fi component package
+#
+# Contains my common Wi-Fi setup.
+#
+# https://esphome.io/components/wifi.html
+#
+wifi:
+  id: component_wifi
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password

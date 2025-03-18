@@ -1,0 +1,31 @@
+---
+# https://docs.m5stack.com/en/core/ATOM%20Lite
+# PINs for m5stack ATOM Lite
+
+substitutions:
+  # GROVE
+  i2c_grove_sda_pin: GPIO26
+  i2c_grove_scl_pin: GPIO32
+  in_grove_pin: GPIO32
+  out_grove_pin: GPIO26
+  tx_grove_pin: GPIO32
+  rx_grove_pin: GPIO26
+  # Mate HAT
+  i2c_hat_sda_pin: GPIO22
+  i2c_hat_scl_pin: GPIO19
+  in_hat_pin: GPIO33
+  out_hat_pin: GPIO23
+  tx_uart_hat_pin: GPIO22
+  rx_uart_hat_pin: GPIO19
+  # Port ABC
+  i2c_port_abc_sda_pin: GPIO21
+  i2c_port_abc_scl_pin: GPIO25
+  in_port_abc_pin: GPIO33
+  out_port_abc_pin: GPIO23
+  tx_port_abc_pin: GPIO19
+  rx_port_abc_pin: GPIO22
+  # Button
+  button_pin: GPIO39
+  # LED
+  led_pin: GPIO27
+  ir_pin: GPIO12

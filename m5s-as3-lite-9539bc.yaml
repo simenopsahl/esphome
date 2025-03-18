@@ -1,0 +1,32 @@
+packages:
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+  board: !include board/m5stack_atom_s3_lite_esp_idf.yaml
+  extension: !include board/extension/i2c_hat.yaml
+  env: !include board/module/hat_env_iii.yaml
+
+substitutions:
+  devicename: m5s-as3-lite-9539bc
+
+esphome:
+  comment: "M5Stack Atom S3 Lite 9539bc"
+  name: $devicename
+  friendly_name: $devicename
+  platformio_options:
+    build_flags:
+      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+
+esp32:
+#  board: m5stack-atoms3
+#  variant: esp32s3
+#  framework:
+#    type: arduino
+  board: m5stack-atoms3
+  variant: esp32s3
+  framework:
+    type: esp-idf
+    version: 5.3.1
+    platform_version: 6.9.0
+    # Custom sdkconfig options
+    sdkconfig_options: # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/kconfig.html#config-compiler-disable-gcc12-warnings
+      CONFIG_SPIFFS_DBG: n

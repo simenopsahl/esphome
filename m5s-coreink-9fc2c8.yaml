@@ -1,0 +1,334 @@
+packages:
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+  board: !include board/m5stack_coreink.yaml
+  epaper: !include board/module/epaper.yaml
+  env_iii: !include board/module/hat_env_iii.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
+
+substitutions:
+  devicename: m5s-coreink-9fc2c8
+  location: "2etg, Simen"
+
+esphome:
+  comment: "M5Stack CoreInk 9fc2c8"
+  name: $devicename
+  friendly_name: $devicename
+  area: $location
+  on_boot:
+    then:
+      # Bypass sleep circuit arduino
+#      - lambda: |-
+#          pinMode(GPIO_NUM_12, OUTPUT);
+#          digitalWrite(GPIO_NUM_12, HIGH);
+#          gpio_hold_en(GPIO_NUM_12);
+      # Bypass sleep circuit esp-idf
+      - lambda: |-
+          gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+          gpio_set_level(GPIO_NUM_12, 1);
+          gpio_hold_en(GPIO_NUM_12);
+          gpio_deep_sleep_hold_en();
+      # read the RTC time once when the system boots
+#      - pcf8563.read_time:
+      - component.update: eink_display
+      - wait_until:
+          condition:
+            lambda: 'return id(data_updated) == true;'
+      # Wait a bit longer so all the items are received
+      - delay: 5s
+      - logger.log: "Initial sensor data received: Refreshing display..."
+      - lambda: 'id(initial_data_received) = true;'
+      - display.page.show: page_room
+      - script.execute: update_screen
+  
+esp32:
+  board: m5stack-coreink
+  framework:
+    type: esp-idf
+
+display:
+  # 200 x 200 resolution
+  - platform: waveshare_epaper
+    model: 1.54inv2
+    id: eink_display
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    busy_pin:
+      number: $disp_busy_pin
+      inverted: false
+    reset_pin: $disp_reset_pin
+    full_update_every: 1
+#    reset_duration: 2ms
+    update_interval: 15min
+    rotation: 90
+    pages:
+#      - id: page_black
+#        lambda: |-
+#          // Fill background.
+#          it.fill(COLOR_ON);
+#      - id: page_white
+#        lambda: |-
+#          // Fill background.
+#          it.fill(COLOR_OFF);
+      - id: page_local
+        lambda: |-
+          // Fill background.
+          it.fill(COLOR_ON);
+
+          //it.graph(0, 0, id(graph_temperature_local), COLOR_OFF);
+
+          
+          // Show wifi icon.
+          if (id(component_wifi).is_connected()) {
+            it.image(-2, it.get_height()/2, id(i_wifi), ImageAlign::CENTER_LEFT, COLOR_OFF, COLOR_ON);
+          }
+          // Show HA icon.
+          if (id(component_api).is_connected()) {
+            it.image(it.get_width()+2, it.get_height()/2, id(i_api), ImageAlign::CENTER_RIGHT, COLOR_OFF, COLOR_ON);
+          }
+            
+          it.print(it.get_width()/2, 0, id(f25b), COLOR_OFF, TextAlign::TOP_CENTER, "HAT");
+          it.printf(it.get_width()/2, it.get_height()/2, id(f130b), COLOR_OFF, TextAlign::CENTER, "%2.0f", id(temperature_local).state);
+
+          it.printf(0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_sht3xd).state);
+          it.printf(0, it.get_height() - 19, id(f20), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(temperature_bmp280).state);
+
+          it.printf(it.get_width(), 0, id(f20), COLOR_OFF, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988).state);
+          it.printf(it.get_width(), it.get_height() - 19, id(f20), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature_sht4x).state);
+
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_homeassistant).now().timestamp;
+          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+          it.printf(it.get_width()/2, 200, id(f14), COLOR_OFF, TextAlign::BOTTOM_CENTER, "Oppdatert @ %s", str);
+      - id: page_info
+        lambda: |-
+          // Fill background.
+          it.fill(COLOR_OFF);
+
+          // Show wifi icon.
+          if (id(component_wifi).is_connected()) {
+            it.image(-2, -2, id(i_wifi), ImageAlign::TOP_LEFT, COLOR_ON, COLOR_OFF);
+          }
+          // Show HA icon.
+          if (id(component_api).is_connected()) {
+            it.image(it.get_width()+2, -2, id(i_api), ImageAlign::TOP_RIGHT, COLOR_ON, COLOR_OFF);
+          }
+
+          it.print(0, 25, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Batteri: ");
+          it.print(it.get_width()/2, 55, id(f20), COLOR_ON, TextAlign::TOP_CENTER, "SHT30");
+          it.print(0, 76, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Temperatur: ");
+          it.print(0, 97, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Luftfukt: ");
+          it.print(it.get_width()/2, 127, id(f20), COLOR_ON, TextAlign::TOP_CENTER, "QMP6988");
+          it.print(0, 148, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Temperatur: ");
+          it.print(0, 169, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Lufttrykk: ");
+          
+          it.printf(it.get_width() - 11, 25, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.2f", id(bat_adc).state);
+          it.print(it.get_width(), 27, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "V");
+
+          it.printf(it.get_width() - 15, 76, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_sht3xd).state);
+          it.print(it.get_width(), 78, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
+
+          it.printf(it.get_width() - 13, 97, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(humidity_sht3xd).state);
+          it.print(it.get_width(), 99, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "%");
+
+          it.printf(it.get_width() - 15, 148, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988).state);
+          it.print(it.get_width(), 150, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
+
+          it.printf(it.get_width() - 25, 169, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(pressure_qmp6988).state);
+          it.print(it.get_width(), 171, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "hPa");
+
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_homeassistant).now().timestamp;
+          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+          it.printf(it.get_width()/2, 0, id(f14), COLOR_ON, TextAlign::TOP_CENTER, "Oppdatert @ %s", str);
+      - id: page_room
+        lambda: |-
+          // Fill background.
+          it.fill(COLOR_OFF);
+
+          // Show loading screen before data is received.
+          if (id(initial_data_received) == false) {
+            it.printf(it.get_width()/2, it.get_height()/2, id(f20b), COLOR_ON, TextAlign::CENTER, "Venter på data...");
+          } else {
+
+            it.graph(0, 0, id(graph_temperature_room), COLOR_ON);
+            
+            it.print(0, 45, id(f20), COLOR_ON, TextAlign::TOP_LEFT, "Rom");
+            it.print(it.get_width(), 45, id(f25b), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
+            it.printf(it.get_width()/2, 166, id(f130b), COLOR_ON, TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_homeassistant).state);
+
+            // Show wifi icon.
+            if (id(component_wifi).is_connected()) {
+              it.image(-2, 202, id(i_wifi), ImageAlign::BOTTOM_LEFT, COLOR_ON, COLOR_OFF);
+            }
+            // Show HA icon.
+            if (id(component_api).is_connected()) {
+              it.image(it.get_width()+2, 202, id(i_api), ImageAlign::BOTTOM_RIGHT, COLOR_ON, COLOR_OFF);
+            }
+
+            // Refresh Timestamp
+            // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+            char str[17];
+            time_t currTime = id(time_homeassistant).now().timestamp;
+            strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+            it.printf(it.get_width()/2, 200, id(f14), COLOR_ON, TextAlign::BOTTOM_CENTER, "Oppdatert @ %s", str);
+          }
+
+font:
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f14
+    size: 14
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f18
+    size: 18
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f20
+    size: 20
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 800
+    id: f20b
+    size: 20
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f25b
+    size: 25
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    id: f130b
+    size: 130
+    glyphs: *norwegian-glyphs
+
+image:
+  - id: i_wifi
+    file: mdi:wifi
+    type: binary
+    resize: 28x28
+  - id: i_api
+    file: mdi:home-assistant
+    type: binary
+    resize: 28x28
+
+graph:
+  - id: graph_temperature_room
+    duration: 6h
+#    x_grid: 15min
+#    y_grid: 1.0
+    width: 200
+    height: 50
+    border: false
+    traces:
+      - sensor: temperature_homeassistant
+        line_thickness: 6
+        continuous: true
+#  - id: graph_temperature_local
+#    duration: 6h
+#    x_grid: 15min
+#    y_grid: 1.0
+#    width: 200
+#    height: 70
+#    border: false
+#    traces:
+#      - sensor: temperature_local
+#        line_thickness: 6
+#        continuous: true
+
+# Check if person is home
+binary_sensor:
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_occupancy
+    id: motion_detected
+
+sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: sensor.etg2_simen_temperature
+    id: temperature_homeassistant
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    sources:
+      # ENV III
+      - source: temperature_sht3xd
+      - source: temperature_qmp6988
+      # ENV IV
+      - source: temperature_bmp280
+      - source: temperature_sht4x
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: combination
+    type: median
+    id: humidity_local
+    name: "Humidity"
+    device_class: "humidity"
+    sources:
+      # ENV III
+      - source: humidity_sht3xd
+      # ENV IV
+      - source: humidity_sht4x
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: combination
+    type: median
+    id: pressure_local
+    name: "Pressure"
+    device_class: "atmospheric_pressure"
+    sources:
+      # ENV III
+      - source: pressure_qmp6988
+      # ENV IV
+      - source: pressure_bmp280
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'

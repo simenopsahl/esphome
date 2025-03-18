@@ -1,0 +1,21 @@
+---
+# https://docs.m5stack.com/en/unit/tvoc
+
+substitutions:
+  tvoc_i2c_bus: i2c_grove
+
+# UNIT TVOC/eCO2
+sensor:
+  - platform: sgp30
+    i2c_id: $tvoc_i2c_bus
+    id: sgp_sensor
+    eco2:
+      id: eco2_sgp30
+      name: "eCO2"
+      device_class: "carbon_dioxide"
+    tvoc:
+      id: tvoc_sgp30
+      name: "TVOC"
+      device_class: "volatile_organic_compounds_parts"
+    address: 0x58
+    update_interval: 10s

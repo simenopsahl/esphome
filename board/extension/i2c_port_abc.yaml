@@ -1,0 +1,10 @@
+---
+# https://docs.m5stack.com/en/atom/AtomPortABC
+# m5stack i2c Port ABC
+
+i2c:
+# Port ABC
+  - id: i2c_port_abc
+    sda: $i2c_port_abc_sda_pin
+    scl: $i2c_port_abc_scl_pin
+    scan: true

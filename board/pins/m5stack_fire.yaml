@@ -1,0 +1,39 @@
+---
+# https://docs.m5stack.com/en/core/fire_v2.7
+# PINs for m5stack Fire
+
+substitutions:
+  # Internal
+  i2c_int_sda_pin: GPIO21
+  i2c_int_scl_pin: GPIO22
+  spi_clk_pin: GPIO18
+  spi_mosi_pin: GPIO23
+  spi_miso_pin: GPIO19
+  disp_cs_pin: GPIO14
+  disp_dc_pin: GPIO27
+  disp_rs_pin: GPIO33
+  card_cs_pin: GPIO4
+  # M-Bus
+  i2c_mbus_sda_pin: GPIO21
+  i2c_mbus_scl_pin: GPIO22
+  tx_mbus_pin: GPIO17
+  rx_mbus_pin: GPIO16
+  # GROVE
+  i2c_grove_sda_pin: GPIO21
+  i2c_grove_scl_pin: GPIO22
+  in_grove_pin: GPIO36
+  out_grove_pin: GPIO26
+  tx_grove_pin: GPIO17
+  rx_grove_pin: GPIO16
+  # Button
+  button_a_pin: GPIO39
+  button_b_pin: GPIO38
+  button_c_pin: GPIO37
+  # LED
+  disp_bl_pin: GPIO32
+  led_pin: GPIO15
+  # Mic & Speaker
+  i2s_lrclk_pin: GPIO13
+  mic_pin: GPIO34
+  spk_l_pin: GPIO25
+  spk_r_pin: GPIO26

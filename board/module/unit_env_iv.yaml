@@ -1,0 +1,105 @@
+---
+# https://docs.m5stack.com/en/unit/ENV%E2%85%A3%20Unit
+
+substitutions:
+  env_i2c_bus: i2c_grove
+
+# UNIT ENV IV
+sensor:
+  - platform: bmp280_i2c
+    i2c_id: $env_i2c_bus
+    id: bmp280_sensor
+    temperature:
+      id: temperature_bmp280
+      name: "Temperature BMP280"
+      disabled_by_default: true
+      device_class: "temperature"
+      oversampling: 2x
+    pressure:
+      id: pressure_bmp280
+      name: "Pressure BMP280"
+      disabled_by_default: true
+      device_class: "atmospheric_pressure"
+      oversampling: 2x
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    address: 0x76
+    iir_filter: 2x
+    update_interval: 30s
+
+  - platform: sht4x
+    i2c_id: $env_i2c_bus
+    id: sht4x_sensor
+    temperature:
+      id: temperature_sht4x
+      name: "Temperature SHT4X"
+      disabled_by_default: true
+      device_class: "temperature"
+    humidity:
+      id: humidity_sht4x
+      name: "Humidity SHT4X"
+      disabled_by_default: true
+      device_class: "humidity"
+      filters:
+#        - lambda: "return x + id(humidity_offset_env_iv).state;"
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    address: 0x44
+    update_interval: 30s
+  
+  # Combination
+#   - platform: combination
+#     type: median
+#     id: temperature_env_iv
+#     name: "Temperature ENV.IV"
+#     device_class: "temperature"
+#     sources:
+#       - source: temperature_bmp280
+#       - source: temperature_sht4x
+#     filters:
+#       - lambda: "return x + id(temperature_offset_env_iv).state;"
+#       - or:
+#         - heartbeat: 900s
+#         - delta: 0.15
+
+# Offsets
+# number:
+#   - platform: template
+#     id: temperature_offset_env_iv
+#     name: "Temperature Offset ENV.IV"
+#     entity_category: config
+#     unit_of_measurement: "°C"
+#     disabled_by_default: true
+#     min_value: -20
+#     max_value: 20
+#     step: 0.1
+#     mode: box
+#     update_interval: never
+#     optimistic: true
+#     restore_value: true
+#     initial_value: 0
+#     icon: "mdi:thermometer"
+#     on_value:
+#       - lambda: 'id(bmp280_sensor).update();'
+#       - lambda: 'id(sht4x_sensor).update();'
+
+#   - platform: template
+#     id: humidity_offset_env_iv
+#     name: "Humidity Offset ENV.IV"
+#     entity_category: config
+#     unit_of_measurement: "%"
+#     disabled_by_default: true
+#     min_value: -50
+#     max_value: 50
+#     step: 0.1
+#     mode: box
+#     update_interval: never
+#     optimistic: true
+#     restore_value: true
+#     initial_value: 0
+#     icon: "mdi:water-percent"
+#     on_value:
+#       - lambda: 'id(sht4x_sensor).update();'

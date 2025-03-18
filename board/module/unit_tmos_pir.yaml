@@ -1,0 +1,34 @@
+---
+# https://docs.m5stack.com/en/unit/UNIT-TMOS%20PIR
+
+substitutions:
+  tmos_i2c_bus: i2c_grove
+
+# UNIT TMOS PIR
+#binary_sensor:
+#  - platform: gpio
+#    pin:
+#      number: $pir_in_pin
+#      mode:
+#        input: true
+#    filters:
+#      - delayed_on_off: 1s
+#      - delayed_off: !lambda 'return id(tmos_off_latency).state * 1000;'
+#    name: "TMOS Sensor"
+#    device_class: motion
+
+# Adjustable off delay
+number:
+  - platform: template
+    id: tmos_off_latency
+    name: "TMOS Off Latency"
+    icon: mdi:clock-end
+    entity_category: config
+    unit_of_measurement: s
+    min_value: 0
+    max_value: 120
+    step: 30
+    restore_value: true
+    optimistic: true
+    initial_value: 30
+    mode: slider
