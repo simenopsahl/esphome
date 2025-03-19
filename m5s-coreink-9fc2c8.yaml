@@ -159,7 +159,7 @@ display:
             
             it.print(0, 45, id(f20), COLOR_ON, TextAlign::TOP_LEFT, "Rom");
             it.print(it.get_width(), 45, id(f25b), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
-            it.printf(it.get_width()/2, 166, id(f130b), COLOR_ON, TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_homeassistant).state);
+            it.printf(it.get_width()/2, 166, id(f130b), COLOR_ON, TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_feels_like).state);
 
             // Show wifi icon.
             if (id(component_wifi).is_connected()) {
@@ -239,14 +239,14 @@ image:
 
 graph:
   - id: graph_temperature_room
-    duration: 6h
+    duration: 12h
 #    x_grid: 15min
 #    y_grid: 1.0
     width: 200
     height: 50
     border: false
     traces:
-      - sensor: temperature_homeassistant
+      - sensor: temperature_feels_like
         line_thickness: 6
         continuous: true
 #  - id: graph_temperature_local
@@ -272,6 +272,12 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.etg2_simen_temperature
     id: temperature_homeassistant
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.etg2_simen_tc_heatindex
+    id: temperature_feels_like
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
