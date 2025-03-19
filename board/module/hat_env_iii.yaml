@@ -1,5 +1,7 @@
 ---
 # https://docs.m5stack.com/en/hat/hat_envIII
+# https://esphome.io/components/sensor/sht3xd.html
+# https://esphome.io/components/sensor/qmp6988.html
 
 #ENV.III
 sensor:

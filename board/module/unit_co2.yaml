@@ -1,5 +1,6 @@
 ---
 # https://docs.m5stack.com/en/unit/co2
+# https://esphome.io/components/sensor/scd4x.html
 
 substitutions:
   co2_i2c_bus: i2c_grove

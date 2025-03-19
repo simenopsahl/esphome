@@ -1,5 +1,6 @@
 ---
 # https://docs.m5stack.com/en/unit/tvoc
+# https://esphome.io/components/sensor/sgp30.html
 
 substitutions:
   tvoc_i2c_bus: i2c_grove

@@ -1,5 +1,7 @@
 ---
 # https://docs.m5stack.com/en/unit/ENV%E2%85%A3%20Unit
+# https://esphome.io/components/sensor/bmp280.html
+# https://esphome.io/components/sensor/sht4x.html
 
 substitutions:
   env_i2c_bus: i2c_grove
