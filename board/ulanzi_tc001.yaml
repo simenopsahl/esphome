@@ -1,0 +1,269 @@
+---
+# https://www.ulanzi.com/products/ulanzi-pixel-smart-clock-2882
+#
+# https://blakadder.com/esphome-pixel-clock/
+# https://github.com/lubeda/EspHoMaTriXv2/
+# https://developer.lametric.com/icons
+#
+# Base functions for Ulanzi TC001 Pixel Clock
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/ulanzi_tc001.yaml
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/lubeda/EsphoMaTrixv2
+      ref: 2024.12.1
+    refresh: 60s
+    components: [ ehmtxv2 ]
+
+esphome:
+  project:
+    name: "Ulanzi.EHMTXv2"
+  on_boot:
+    then:
+      - ds1307.read_time:
+# Initialize CLOCK screen
+      - lambda: |-
+          id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
+# Initialize DATE screen
+      - lambda: |-
+          id(rgb8x32)->date_screen(1440,30,false,160,240,160);
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+    advanced:
+      ignore_efuse_custom_mac: true
+
+globals:
+  # aab = auto-adjustable brightness
+  - id: aab_enable
+    type: "bool"
+    restore_value: true
+    initial_value: "true"
+  - id: aab_add
+    type: int
+    initial_value: '10'
+  - id: aab_max
+    type: int
+    initial_value: '220'
+  - id: aab_min
+    type: int
+    initial_value: '40'
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: $button_left_pin
+      inverted: true
+    name: "left button"
+    entity_category: diagnostic
+    on_press:
+      then:
+        - number.decrement: screen_brightness
+  - platform: gpio
+    pin: 
+      inverted: true
+      number: $button_mid_pin
+      mode: INPUT_PULLUP
+    name: "middle button"
+    entity_category: diagnostic
+    on_press:
+      then:
+        - switch.toggle: displaycontrol
+  - platform: gpio
+    pin: 
+      number: $button_right_pin
+      inverted: true
+    name: "right button"
+    entity_category: diagnostic
+    on_press:
+      then:
+        - number.increment: screen_brightness
+# example to switch to next screen
+#        lambda: |-
+#          id(rgb8x32)->skip_screen();
+
+number:
+  - platform: template
+    id: screen_brightness
+    name: "Brightness"
+    entity_category: config
+    min_value: 0
+    max_value: 255
+    update_interval: 1s
+    step: 25
+    lambda: |-
+      return id(rgb8x32)->get_brightness();
+    set_action:
+      lambda: |-
+        id(rgb8x32)->set_brightness(x);
+
+switch:
+  - platform: template
+    id: displaycontrol
+    name: "Display"
+    icon: "mdi:power"
+    entity_category: config
+    restore_mode: ALWAYS_ON
+    lambda: |-
+      return id(rgb8x32)->show_display;
+    turn_on_action:
+      lambda: |-
+        id(rgb8x32)->set_display_on();
+    turn_off_action:
+      lambda: |-
+        id(rgb8x32)->set_display_off();
+  - platform: template
+    id: switch_autobrightness
+    name: "Auto-Adjust Brightness"
+    icon: mdi:brightness-auto
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      if (id(aab_enable)) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        id(aab_enable) = true;
+    turn_off_action:
+      lambda: |-
+        id(aab_enable) = false;
+
+sensor:
+  - platform: sht3xd
+    temperature:
+      id: temperature_sht30
+      name: "Temperature"
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    humidity:
+      id: humidity_sht30
+      name: "Humidity"
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    update_interval: 60s
+  - platform: adc
+    id: battery_voltage
+    pin: $bat_feedback
+    name: "Battery"
+    update_interval: 10s
+    device_class: battery
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    attenuation: auto
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+      - sliding_window_moving_average:
+          window_size: 7
+          send_every: 7
+          send_first_at: 7
+      - multiply: 1.6
+      - lambda: |-
+          auto r = ((x - 3) / 0.69 * 100.00);
+          if (r >= 100) return 100;
+          if (r > 0) return r;
+          if (r <= 0) return 1;
+          return 0;
+    unit_of_measurement: '%'
+  - platform: adc
+    id: light_sensor
+    pin: $light_sensor_pin
+    name: "Illuminance"
+    state_class: measurement
+    device_class: ILLUMINANCE
+    update_interval: 10s
+    attenuation: auto
+    unit_of_measurement: lx
+    accuracy_decimals: 0
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0 - 15 ;
+    on_value:
+      then:
+        - lambda: |-
+            if ( id(aab_enable) ) {
+              int n = x / 4 + id(aab_add); // new_value
+              if (n > id(aab_max)) n = id(aab_max);
+              if (n < id(aab_min)) n = id(aab_min);
+              int c = id(rgb8x32)->get_brightness(); // current value
+              c = c>0?c:1 ; 
+              int d = (n - c) * 100 / c; // diff in %
+              if ( abs(d) > 2 ) id(rgb8x32)->set_brightness(n);
+            }
+
+output:
+  - platform: ledc
+    pin: $buzzer_pin
+    id: rtttl_out
+
+rtttl:
+  output: rtttl_out
+
+i2c:
+  sda: $i2c_int_sda_pin
+  scl: $i2c_int_scl_pin
+  scan: true
+  id: i2c_bus
+
+light:
+  - platform: neopixelbus
+    id: ehmtx_light
+    variant: ws2812
+    type: GRB
+    pin: $led_matrix_pin
+    num_leds: 256
+    color_correct: [30%, 30%, 30%]
+    gamma_correct: 2.0
+    restore_mode: ALWAYS_OFF
+    name: "Light"
+    on_turn_on:
+      lambda: |-
+        id(ehmtx_display)->set_enabled(false);
+    on_turn_off:
+      lambda: |-
+        id(ehmtx_display)->set_enabled(true);
+
+time:
+  - platform: homeassistant
+    on_time_sync:
+        - ds1307.write_time:
+        - component.update: sensor_uptime_timestamp
+  - platform: ds1307
+    update_interval: never
+    id: ehmtx_time
+
+display:
+  - platform: addressable_light
+    id: ehmtx_display
+    addressable_light_id: ehmtx_light
+    width: 32
+    height: 8
+    pixel_mapper: |-
+      if (y % 2 == 0) {
+        return (y * 32) + x;
+      }
+      return (y * 32) + (31 - x);
+    rotation: 0°
+    update_interval: 16ms
+    auto_clear_enabled: true
+    lambda: |-
+      id(rgb8x32)->tick();
+      id(rgb8x32)->draw();

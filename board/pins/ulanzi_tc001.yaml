@@ -1,0 +1,19 @@
+---
+# https://www.ulanzi.com/products/ulanzi-pixel-smart-clock-2882
+# PINs for Ulanzi TC001
+
+substitutions:
+  # Internal
+  i2c_int_sda_pin: GPIO21
+  i2c_int_scl_pin: GPIO22
+  light_sensor_pin: GPIO35
+  # Button
+  button_left_pin: GPIO26
+  button_mid_pin: GPIO27
+  button_right_pin: GPIO14
+  # LED
+  led_matrix_pin: GPIO32
+  # Buzzer
+  buzzer_pin: GPIO15
+  # Power
+  bat_feedback: GPIO34
