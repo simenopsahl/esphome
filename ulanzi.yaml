@@ -11,7 +11,7 @@ substitutions:
   location: "1etg, TV Stue"
 
 esphome:
-  comment: "Ulanzi TC001 Pixel Display"
+  comment: "Ulanzi TC001 Pixel Clock @ Stue"
   name: $devicename
   friendly_name: $devicename
   area: $location
