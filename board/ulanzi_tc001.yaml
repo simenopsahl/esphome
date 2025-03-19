@@ -16,7 +16,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/lubeda/EsphoMaTrixv2
-      ref: 2024.12.1
+      ref: 2025.2.0
     refresh: 60s
     components: [ ehmtxv2 ]
 
@@ -266,3 +266,11 @@ display:
     lambda: |-
       id(rgb8x32)->tick();
       id(rgb8x32)->draw();
+
+#image:
+#  - file: img/1pixel.gif
+#    id: breaking20237
+
+#animation:
+#  - file: img/1pixel.gif
+#    id: breaking202371
