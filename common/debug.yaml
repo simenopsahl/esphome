@@ -1,0 +1,11 @@
+---
+# Debug component
+#
+# The debug component can be used to debug problems with ESPHome.
+# https://esphome.io/components/debug.html
+#
+
+debug:
+
+text_sensor:
+  - <<: !include ../text_sensors/debug.yaml
