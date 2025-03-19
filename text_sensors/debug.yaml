@@ -1,0 +1,11 @@
+---
+# Debug text sensor
+#
+# The debug component can be used to debug problems with ESPHome.
+# https://esphome.io/components/debug.html
+#
+platform: debug
+reset_reason:
+  id: sensor_reset_reason
+  name: "Reset reason"
+  entity_category: diagnostic

@@ -10,3 +10,5 @@ sensor:
   - <<: !include ../sensors/wifi_signal.yaml
   - <<: !include ../sensors/uptime.yaml
 #  - <<: !include ../sensors/uptime_timestamp.yaml
+text_sensor:
+  - <<: !include ../text_sensors/debug.yaml
