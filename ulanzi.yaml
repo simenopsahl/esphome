@@ -211,13 +211,3 @@ text_sensor:
                 ESP_LOGD(TAG, "Sonos Amp source Other");
                 id(rgb8x32)->icon_screen("vol_mute", "Source ?", 0, 2, true, 240,40,240);
                 id(rgb8x32)->force_screen("vol_mute");
-
-image:
-   - file: img/1pixel.gif
-     id: breaking20237
-     type: BINARY
-
-animation:
-  - file: img/1pixel.gif
-    id: breaking202371
-    type: BINARY
