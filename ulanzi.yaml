@@ -220,4 +220,4 @@ image:
 animation:
   - file: img/1pixel.gif
     id: breaking202371
-     type: BINARY
+    type: BINARY
