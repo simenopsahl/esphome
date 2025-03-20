@@ -13,6 +13,19 @@ substitutions:
 packages:
   pins: !include pins/m5stack_stickc_plus2.yaml
 
+esphome:
+  platformio_options:
+#    board_build.arduino.partitions: default_8MB.csv
+#    board_build.f_flash: 80000000L
+    build_flags:
+      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+      - "-DBOARD_HAS_PSRAM"
+      - "-DARDUINO_USB_CDC_ON_BOOT=1"
+      - "-mfix-esp32-psram-cache-issue"
+psram:
+  mode: octal
+  speed: 80MHz
+
 i2c:
 # Internal
   - id: i2c_internal
@@ -20,26 +33,9 @@ i2c:
     scl: $i2c_int_scl_pin
     scan: true
 
-i2s_audio:
-  id: i2s_bus
-  i2s_lrclk_pin:
-    number: $i2s_lrclk_pin
-    allow_other_uses: $hat_shared
-  i2s_bclk_pin:
-    number: $i2s_bclk_pin
-    allow_other_uses: $hat_shared
-
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
-
-microphone:
-  - platform: i2s_audio
-    i2s_din_pin: $mic_pin
-    i2s_audio_id: i2s_bus
-    adc_type: external
-    pdm: true
-    id: mic
 
 light:
   # Enable status LED
@@ -63,32 +59,36 @@ output:
   - platform: ledc
     id: buzzer
     pin: $buzzer_pin
-    inverted: true
   # TFT Backlight
   - platform: ledc
     id: backlight_output
     pin: $disp_bl_pin
-    inverted: true
+    frequency: 256Hz
+    channel: 7
+    min_power: 15%
+    zero_means_zero: true
 
 # 1.14 inch, 135*240 Colorful TFT LCD, ST7789v2
-# display:
-#   - platform:  ili9xxx
-#     model: st7789v
-#     id: display_ips
-#     cs_pin: $disp_cs_pin
-#     dc_pin: $disp_dc_pin
-#     reset_pin: $disp_reset_pin
-#     invert_colors: true
-#     pdate_interval: 1s
-#     dimensions:
-#       height: 135
-#       width: 240
+#display:
+#  - platform:  ili9xxx
+#    model: st7789v
+#    id: display_ips
+#    cs_pin: $disp_cs_pin
+#    dc_pin: $disp_dc_pin
+#    reset_pin: $disp_reset_pin
+#    invert_colors: true
+#    update_interval: 1s
+#    dimensions:
+#      height: 240
+#      width: 135
+#      offset_height: 40
+#      offset_width: 62
     # Rotate 270
-#     transform:
-#       swap_xy: true
-#       mirror_y: true
-#     lambda: |-
-#       it.print(it.get_width()/2, 0, id(roboto), id(my_white), TextAlign::TOP_CENTER, "M5Stick Test");
+#    transform:
+#      swap_xy: true
+#      mirror_y: true
+#    lambda: |-
+#      it.print(it.get_width()/2, 0, id(roboto), id(my_white), TextAlign::TOP_CENTER, "M5Stick Test");
 
 binary_sensor:
   # Side Button
@@ -245,7 +245,6 @@ sensor:
 #    pin:
 #      number: $power_mos_pin
 #      allow_other_uses: true
-
 color:
   - id: c_red
     red: 100%
@@ -271,3 +270,21 @@ color:
     red: 100%
     green: 100%
     blue: 100%
+
+# Audio not tested
+#i2s_audio:
+#  id: i2s_bus
+#  i2s_lrclk_pin:
+#    number: $i2s_lrclk_pin
+#    allow_other_uses: $hat_shared
+#  i2s_bclk_pin:
+#    number: $i2s_bclk_pin
+#    allow_other_uses: $hat_shared
+
+#microphone:
+#  - platform: i2s_audio
+#    i2s_din_pin: $mic_pin
+#    i2s_audio_id: i2s_bus
+#    adc_type: external
+#    pdm: true
+#    id: mic

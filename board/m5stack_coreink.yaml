@@ -198,11 +198,12 @@ sensor:
   - platform: adc
     pin: $bat_feedback
     id: bat_adc
-    update_interval: 5s
+    update_interval: 10s
+    attenuation: 12db
     samples: 10
     accuracy_decimals: 3
     filters:
-      - multiply: 4.25
+      - multiply: 2.0
       - median:
           window_size: 7
           send_every: 7
@@ -225,11 +226,11 @@ sensor:
           method: exact
           datapoints:
             - 0.00 -> 0.0
-            - 3.00 -> 1.0
-            - 3.10 -> 10.0
-            - 3.20 -> 50.0
-            - 3.55 -> 85.0
-            - 3.685 -> 100.0
+            - 3.3 -> 1.0
+            - 3.39 -> 10.0
+            - 3.75 -> 50.0
+            - 4.11 -> 90.0
+            - 4.2 -> 100.0
       - lambda: |-
           if (x <= 100) {
             return x;
