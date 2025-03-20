@@ -29,7 +29,7 @@ sensor:
     temperature:
       id: bme_temperature
       name: "Temperature"
-      oversampling: 2x
+      oversampling: 4x
       filters:
         - or:
           - heartbeat: 900s
@@ -38,7 +38,7 @@ sensor:
       id: bme_pressure
       name: "Pressure"
       device_class: "atmospheric_pressure"
-      oversampling: 2x
+      oversampling: 4x
       filters:
         - or:
           - heartbeat: 900s
@@ -46,7 +46,7 @@ sensor:
     humidity:
       id: bme_humidity
       name: "Humidity"
-      oversampling: 2x
+      oversampling: 4x
       filters:
         - or:
           - heartbeat: 900s
