@@ -2,9 +2,17 @@
 # https://docs.m5stack.com/en/atom/atom_mate
 # m5stack i2c HAT
 
+# HAT Shared pins
+substitutions:
+  hat_shared: "false"
+
 i2c:
 # Mate HAT
   - id: i2c_hat
-    sda: $i2c_hat_sda_pin
-    scl: $i2c_hat_scl_pin
+    sda:
+      number: $i2c_hat_sda_pin
+      allow_other_uses: $hat_shared
+    scl:
+      number: $i2c_hat_scl_pin
+      allow_other_uses: $hat_shared
     scan: true

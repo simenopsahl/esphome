@@ -198,7 +198,7 @@ sensor:
   - platform: adc
     pin: $bat_feedback
     id: bat_adc
-    update_interval: 2s
+    update_interval: 5s
     samples: 10
     accuracy_decimals: 3
     filters:

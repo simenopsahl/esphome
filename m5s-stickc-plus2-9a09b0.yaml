@@ -1,0 +1,118 @@
+packages:
+  <<: !include_dir_named common
+#  <<: !include_dir_named bluetooth
+  board: !include board/m5stack_stickc_plus2.yaml
+  hat: !include board/extension/i2c_hat.yaml
+  env_iii: !include board/module/hat_env_iii.yaml
+
+substitutions:
+  devicename: m5s-stickc-plus2-9a09b0
+  hat_shared: "true"
+
+esphome:
+  comment: "M5Stack StickC Plus2"
+  name: $devicename
+  friendly_name: $devicename
+
+esp32:
+  board: m5stick-c
+  framework:
+    type: esp-idf
+
+# 1.14 inch, 135*240 Colorful TFT LCD, ST7789v2
+display:
+  - platform:  ili9xxx
+    model: st7789v
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
+    color_palette: 8BIT
+    invert_colors: true
+    dimensions:
+      height: 135
+      width: 240
+    # Rotate 270
+    transform:
+      swap_xy: true
+      mirror_y: true
+    lambda: |-
+      it.print(it.get_width()/2, 0, id(f18), id(c_white), TextAlign::TOP_CENTER, "M5Stick Test");
+
+font:
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f14
+    size: 14
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f18
+    size: 18
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f20
+    size: 20
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 800
+    id: f20b
+    size: 20
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f25b
+    size: 25
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    id: f130b
+    size: 130
+    glyphs: *norwegian-glyphs
+
+image:
+  - id: i_wifi
+    file: mdi:wifi
+    type: binary
+    resize: 28x28
+  - id: i_api
+    file: mdi:home-assistant
+    type: binary
+    resize: 28x28
+
+sensor:
+
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    sources:
+      # ENV III
+      - source: temperature_sht3xd
+      - source: temperature_qmp6988
+      # ENV IV
+#      - source: temperature_bmp280
+#      - source: temperature_sht4x
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15

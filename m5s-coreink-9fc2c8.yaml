@@ -239,7 +239,7 @@ image:
 
 graph:
   - id: graph_temperature_room
-    duration: 12h
+    duration: 8h
 #    x_grid: 15min
 #    y_grid: 1.0
     width: 200

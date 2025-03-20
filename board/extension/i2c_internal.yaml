@@ -1,0 +1,9 @@
+---
+# m5stack i2c internal
+
+i2c:
+# Internal
+  - id: i2c_internal
+    sda: $i2c_int_sda_pin
+    scl: $i2c_int_scl_pin
+    scan: true
