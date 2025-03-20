@@ -34,20 +34,20 @@ sensor:
       name: "Temperature QMP6988"
       disabled_by_default: true
       device_class: "temperature"
-      oversampling: 2x
+      oversampling: 4x
     pressure:
       id: pressure_qmp6988
       name: "Pressure SHT3XD"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
-      oversampling: 2x
+      oversampling: 4x
       filters:
         - or:
           - heartbeat: 900s
           - delta: 0.15
     address: 0x70
     update_interval: 30s
-    iir_filter: 2x
+    iir_filter: 8x
 
   # Combination    
 #  - platform: combination

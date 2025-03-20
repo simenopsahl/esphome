@@ -1,6 +1,6 @@
 packages:
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
   board: !include board/m5stack_atom_s3.yaml
   hat: !include board/extension/i2c_hat.yaml
   env: !include board/module/hat_env_iii.yaml
@@ -34,8 +34,8 @@ display:
     dimensions:
       height: 128
       width: 128
-      offset_height: 2
-      offset_width: 1
+      offset_height: 1
+      offset_width: 2
     # Rotate 180deg
     transform:
       mirror_x: true
