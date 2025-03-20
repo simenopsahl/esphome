@@ -30,7 +30,7 @@ script:
   - id: update_screen
     then:
       - lambda: 'id(data_updated) = false;'
-      - component.update: eink_display
+      - component.update: display_eink
       - lambda: 'id(recorded_display_refresh) += 1;'
       - lambda: 'id(display_last_update).publish_state(id(time_homeassistant).now().timestamp);'
 
@@ -60,8 +60,8 @@ button:
     name: "Next Screen"
     entity_category: config
     on_press:
-      - display.page.show_next: eink_display
-      - component.update: eink_display
+      - display.page.show_next: display_eink
+      - component.update: display_eink
 
 sensor:
   # Create sensors for monitoring remotely.

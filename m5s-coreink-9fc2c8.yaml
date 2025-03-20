@@ -30,7 +30,7 @@ esphome:
           gpio_deep_sleep_hold_en();
       # read the RTC time once when the system boots
 #      - pcf8563.read_time:
-      - component.update: eink_display
+      - component.update: display_eink
       - wait_until:
           condition:
             lambda: 'return id(data_updated) == true;'
@@ -50,7 +50,7 @@ display:
   # 200 x 200 resolution
   - platform: waveshare_epaper
     model: 1.54inv2
-    id: eink_display
+    id: display_eink
     cs_pin: $disp_cs_pin
     dc_pin: $disp_dc_pin
     busy_pin:

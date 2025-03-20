@@ -48,9 +48,15 @@ light:
     pin: $led_pin
   # TFT Backlight
   - platform: monochromatic
-    output:  backlight
-    id: display_bl
-    name: Backlight
+    output:  backlight_output
+    id: backlight_light
+    default_transition_length: 100ms
+    restore_mode: ALWAYS_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
 
 output:
   # Buzzer
@@ -60,7 +66,7 @@ output:
     inverted: true
   # TFT Backlight
   - platform: ledc
-    id: backlight
+    id: backlight_output
     pin: $disp_bl_pin
     inverted: true
 
@@ -68,11 +74,12 @@ output:
 # display:
 #   - platform:  ili9xxx
 #     model: st7789v
+#     id: display_ips
 #     cs_pin: $disp_cs_pin
 #     dc_pin: $disp_dc_pin
 #     reset_pin: $disp_reset_pin
-#     color_palette: 8BIT
 #     invert_colors: true
+#     pdate_interval: 1s
 #     dimensions:
 #       height: 135
 #       width: 240
@@ -88,6 +95,7 @@ binary_sensor:
   - platform: gpio
     id: button_side
     name: Side Button
+    entity_category: diagnostic
     pin:
       number: $button_side_pin
       inverted: true
@@ -96,12 +104,11 @@ binary_sensor:
     on_press:
       then:
         - logger.log: Side Button Pressed
-        - script.execute: buzzer_on
-        - script.wait: buzzer_on
+        - script.execute: buzzer_beep
+        - display.page.show: page_local
     on_release:
       then:
-        - script.wait: buzzer_on
-        - script.execute: buzzer_off
+        - output.turn_off: buzzer
   # Front Button
   - platform: gpio
     id: button_front
@@ -109,16 +116,17 @@ binary_sensor:
     entity_category: diagnostic
     pin:
       number: $button_front_pin
-      inverted: false
+      inverted: true
     filters:
       - delayed_off: 10ms
     on_press:
       then:
         - logger.log: Front Button Pressed
-        - light.turn_on: display_bl
+        - script.execute: buzzer_beep
+        - display.page.show_next: display_ips
     on_release:
       then:
-        - light.turn_off: display_bl
+        - output.turn_off: buzzer
 
 # Script for buzzer beep
 script:
@@ -131,9 +139,16 @@ script:
       - output.set_level:
           id: buzzer
           level: "1%"
-      - delay: 50ms
-  - id: buzzer_off
+  - id: buzzer_beep
     then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 50ms
       - output.turn_off: buzzer
 
 sensor:
@@ -141,7 +156,7 @@ sensor:
   - platform: adc
     pin: $bat_feedback
     id: bat_adc
-    update_interval: 2s
+    update_interval: 10s
     attenuation: 12db
     samples: 10
     accuracy_decimals: 3
@@ -169,11 +184,11 @@ sensor:
           method: exact
           datapoints:
             - 0.00 -> 0.0
-            - 3.00 -> 1.0
-            - 3.10 -> 10.0
-            - 3.20 -> 50.0
-            - 3.55 -> 90.0
-            - 3.65 -> 100.0
+            - 3.3 -> 1.0
+            - 3.39 -> 10.0
+            - 3.75 -> 50.0
+            - 4.11 -> 90.0
+            - 4.2 -> 100.0
       - lambda: |-
           if (x <= 100) {
             return x;
@@ -195,24 +210,31 @@ sensor:
     accel_x:
       id: mpu6886_accel_x
       name: "Accel X"
+      disabled_by_default: true
     accel_y:
       id: mpu6886_accel_y
       name: "Accel Y"
+      disabled_by_default: true
     accel_z:
       id: mpu6886_accel_z
       name: "Accel Z"
+      disabled_by_default: true
     gyro_x:
       id: mpu6886_gyro_x
       name: "Gyro X"
+      disabled_by_default: true
     gyro_y:
       id: mpu6886_gyro_y
       name: "Gyro Y"
+      disabled_by_default: true
     gyro_z:
       id: mpu6886_gyro_z
       name: "Gyro Z"
+      disabled_by_default: true
     temperature:
       id: temperature_mpu6886
       name: "Temperature MPU6886"
+      disabled_by_default: true
 
 #switch:
   # Power MOS battery bypass
