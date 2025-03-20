@@ -44,11 +44,11 @@ display:
     invert_colors: true
     update_interval: 1s
     dimensions:
-      height: 240
-      width: 135
-      offset_height: 40
-      offset_width: 52
-    # Rotate 270
+      height: 135
+      width: 240
+      offset_height: 52
+      offset_width: 40
+    # Rotate 270 swap dimensions
     transform:
       swap_xy: true
       mirror_y: true

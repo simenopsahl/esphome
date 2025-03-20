@@ -83,10 +83,10 @@ output:
 #      width: 135
 #      offset_height: 40
 #      offset_width: 62
-    # Rotate 270
-#    transform:
-#      swap_xy: true
-#      mirror_y: true
+    # Rotate 270 swap dimensions
+    #transform:
+      #swap_xy: true
+      #mirror_y: true
 #    lambda: |-
 #      it.print(it.get_width()/2, 0, id(roboto), id(my_white), TextAlign::TOP_CENTER, "M5Stick Test");
 
