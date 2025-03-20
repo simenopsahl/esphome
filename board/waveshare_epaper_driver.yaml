@@ -14,7 +14,7 @@ esphome:
   on_boot:
       priority: 200.0
       then:
-        - component.update: eink_display
+        - component.update: display_eink
         - wait_until:
             condition:
               lambda: 'return id(data_updated) == true;'

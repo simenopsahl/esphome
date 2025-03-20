@@ -1,0 +1,109 @@
+---
+# https://docs.m5stack.com/en/core/AtomS3
+# Base functions for:
+# M5Stack AtomS3
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3.yaml
+
+i2c:
+# Internal
+  - id: i2c_internal
+    sda: $i2c_int_sda_pin
+    scl: $i2c_int_scl_pin
+    scan: true
+
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+
+# IR
+remote_transmitter:
+  pin: $ir_pin
+  carrier_duty_percent: 50%
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: $disp_bl_pin
+    zero_means_zero: true
+
+light:
+  # White
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_DEFAULT_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+# Button
+binary_sensor:
+  - platform: gpio
+    name: Button
+    entity_category: diagnostic
+    pin:
+      number: $button_pin
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Button Pressed
+        - display.page.show_next: display_lcd
+
+#display:
+#  - platform: ili9xxx
+#    model: st7789v
+#    id: display_lcd
+#    cs_pin: $disp_cs_pin
+#    dc_pin: $disp_dc_pin
+#    reset_pin: $disp_reset_pin
+#    data_rate: 40Mhz
+#    invert_colors: true
+#    update_interval: 1s
+#    dimensions:
+#      height: 128
+#      width: 128
+#      offset_height: 2
+#      offset_width: 1
+    # Rotate 180deg
+#    transform:
+#      mirror_x: true
+#      mirror_y: true
+#    pages:
+
+color:
+  - id: c_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: c_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+  - id: c_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: c_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: c_gray
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: c_white
+    red: 100%
+    green: 100%
+    blue: 100%

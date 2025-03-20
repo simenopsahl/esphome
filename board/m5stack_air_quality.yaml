@@ -68,7 +68,7 @@ binary_sensor:
       then:
         - logger.log: Button A Pressed
         - script.execute: buzzer_beep
-        - component.update: eink_display
+        - component.update: display_eink
     on_release:
       then:
         - output.turn_off: buzzer
@@ -163,13 +163,13 @@ script:
   - id: update_screen
     then:
       - lambda: 'id(data_updated) = false;'
-      - component.update: eink_display
+      - component.update: display_eink
       - lambda: 'id(recorded_display_refresh) += 1;'
       - lambda: 'id(display_last_update).publish_state(id(time_homeassistant).now().timestamp);'
 
 # display:
 #   - platform: waveshare_epaper
-#     id: eink_display
+#     id: display_eink
 #     model: 1.54inv2
 #     cs_pin: $disp_cs_pin
 #     dc_pin: $disp_dc_pin
@@ -275,34 +275,3 @@ sensor:
     address: 0x69
     update_interval: 30s
 
-  # Combine sensors
-  - platform: combination
-    type: median
-    id: temperature_local
-    name: "Temperature"
-    device_class: "temperature"
-    sources:
-      - source: temperature_scd40
-      - source: temperature_sen55
-      # ENV IV
-#      - source: temperature_bmp280
-#      - source: temperature_sht4x
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15
-
-  - platform: combination
-    type: median
-    id: humidity_local
-    name: "Humidity"
-    device_class: "humidity"
-    sources:
-      - source: humidity_scd40
-      - source: humidity_sen55
-      # ENV IV
-#      - source: humidity_sht4x
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15

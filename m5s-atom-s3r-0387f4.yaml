@@ -32,7 +32,7 @@ esp32:
 display:
   - platform: ili9xxx
     model: st7789v
-    id: display_ips
+    id: display_lcd
     cs_pin: $disp_cs_pin
     dc_pin: $disp_dc_pin
     reset_pin: $disp_reset_pin

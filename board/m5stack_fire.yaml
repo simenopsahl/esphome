@@ -28,7 +28,7 @@ spi:
 
 #display:
 #  - platform: ili9xxx
-#    id: display_ips
+#    id: display_lcd
 #    model: M5STACK
 #    cs_pin: $disp_cs_pin
 #    dc_pin: $disp_dc_pin

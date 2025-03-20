@@ -27,19 +27,6 @@ api:
         - rtttl.play:
             rtttl: !lambda 'return tune;'
 
-font: 
-  # adapt the filename to your local settings
-  - file: fonts/MatrixClock-Light8.bdf
-    id: default_font
-    size: 16
-    glyphs:  |
-      ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ[\]^_`abcdefghijklmnopqrstuvwxyzæøå°
-  - file: fonts/MatrixClock-Chunky6.bdf
-    id: special_font
-    size: 16
-    glyphs:  |
-      ! "#$%&'()*+,-./0123456789:APMTapmt
-
 ehmtxv2:
   id: rgb8x32
   icons2html: true
@@ -211,3 +198,20 @@ text_sensor:
                 ESP_LOGD(TAG, "Sonos Amp source Other");
                 id(rgb8x32)->icon_screen("vol_mute", "Source ?", 0, 2, true, 240,40,240);
                 id(rgb8x32)->force_screen("vol_mute");
+
+font: 
+  # adapt the filename to your local settings
+  - file: fonts/MatrixClock-Light8.bdf
+    id: default_font
+    size: 8
+    glyphs: &norwegian_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', ',', '.', '/', '[', '\', ']', '^', '`',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', ':', ';', '<', '=', '>', '?', '@', '_', '°',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å' ]
+  - file: fonts/MatrixClock-Chunky6.bdf
+    id: special_font
+    size: 6
+    glyphs: &clock_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', 'A', 'P', 'M', 'T', 'a', 'p', 'm', 't' ]

@@ -25,7 +25,7 @@ esphome:
 # Now render everything on the ePaper screen.
 display:
   - platform: waveshare_epaper
-    id: eink_display
+    id: display_eink
     cs_pin: $disp_cs_pin
     dc_pin: $disp_dc_pin
     busy_pin: $disp_busy_pin
@@ -158,17 +158,17 @@ script:
   - id: repair_script
     then:
       - display.page.show: page_black
-      - component.update: eink_display
+      - component.update: display_eink
       - lambda: 'id(recorded_display_refresh) += 1;'
       - logger.log: "Black screen"
       - delay: 15s
       - display.page.show: page_clear
-      - component.update: eink_display
+      - component.update: display_eink
       - lambda: 'id(recorded_display_refresh) += 1;'
       - logger.log: "Clear screen"
       - delay: 15s
       - display.page.show: page_white
-      - component.update: eink_display
+      - component.update: display_eink
       - lambda: 'id(recorded_display_refresh) += 1;'
       - logger.log: "White screen"
       - delay: 15s
