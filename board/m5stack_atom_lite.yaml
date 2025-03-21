@@ -60,9 +60,6 @@ binary_sensor:
     pin:
       number: $button_pin
       inverted: true
-      mode:
-        input: true
-        pullup: true
     filters:
       - delayed_off: 10ms
     on_press:
@@ -70,7 +67,7 @@ binary_sensor:
         - logger.log: Button Pressed
         - script.execute: led_wifi
         - script.wait: led_wifi
-        - delay: 500ms
+        - delay: 1500ms
         - script.execute: led_homeassistant
         - script.wait: led_homeassistant
 
@@ -88,10 +85,11 @@ script:
                 then:
                   - light.turn_on:
                       id: led
-                      color_brightness: 20%
+                      color_brightness: 5%
                       red: 0%
                       green: 100%
                       blue: 0%
+                  - delay: 250ms
                 else:
                   - light.turn_off:
                       id: led
@@ -110,10 +108,11 @@ script:
                 then:
                   - light.turn_on:
                       id: led
-                      color_brightness: 20%
+                      color_brightness: 5%
                       red: 0%
                       green: 0%
                       blue: 100%
+                  - delay: 250ms
                 else:
                   - light.turn_off:
                       id: led

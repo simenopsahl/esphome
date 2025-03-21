@@ -8,21 +8,22 @@
 # Pins for this model
 packages:
   pins: !include pins/m5stack_coreink.yaml
+  epaper: !include module/epaper.yaml
   
 esp32:
   board: m5stack-coreink
 
-i2c:
+#i2c:
 # Grove
-  - id: i2c_grove
-    sda: $i2c_grove_sda_pin
-    scl: $i2c_grove_scl_pin
-    scan: true
+#  - id: i2c_grove
+#    sda: $i2c_grove_sda_pin
+#    scl: $i2c_grove_scl_pin
+#    scan: true
 # HAT
-  - id: i2c_hat
-    sda: $i2c_hat_sda_pin
-    scl: $i2c_hat_scl_pin
-    scan: true
+#  - id: i2c_hat
+#    sda: $i2c_hat_sda_pin
+#    scl: $i2c_hat_scl_pin
+#    scan: true
 # Ext PINs
 #  - id: i2c_bus
 #    sda: $i2c_bus_sda_pin

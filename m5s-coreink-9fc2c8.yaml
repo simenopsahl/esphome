@@ -2,7 +2,8 @@ packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
   board: !include board/m5stack_coreink.yaml
-  epaper: !include board/module/epaper.yaml
+  hat: !include board/extension/hat_i2c.yaml
+  grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
   env_iv: !include board/module/unit_env_iv.yaml
 

@@ -2,7 +2,7 @@ packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
   board: !include board/m5stack_atom_s3.yaml
-  hat: !include board/extension/i2c_hat.yaml
+  hat: !include board/extension/hat_i2c.yaml
   env: !include board/module/hat_env_iii.yaml
 
 substitutions:
