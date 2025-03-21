@@ -1,0 +1,73 @@
+---
+# https://docs.m5stack.com/en/core/M5NanoC6
+# Base functions for:
+# M5Stack NanoC6
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_nano_c6.yaml
+
+esphome:
+  platformio_options:
+    board_build.f_cpu: 160000000L
+    board_build.f_flash: 80000000L
+    board_build.flash_size: 4MB
+    build_flags: "-DBOARD_HAS_PSRAM"
+    board_build.arduino.memory_type: qio_opi
+
+esp32:
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  flash_size: 4MB
+  framework:
+    sdkconfig_options:
+      CONFIG_ESPTOOLPY_FLASHSIZE_4MB: y
+
+i2c:
+# Grove
+  - id: i2c_grove
+    sda: $i2c_grove_sda_pin
+    scl: $i2c_grove_scl_pin
+    scan: true
+
+# Enable status LED
+status_led:
+  id: status_light
+  pin: $led_pin
+
+switch:
+  - platform: gpio
+    id: rgb_switch
+    pin: $rgb_pin
+    restore_mode: RESTORE_DEFAULT_ON
+    name: "RGB on/off"
+    entity_category: config
+
+# Configuration of onboard RGB LED
+light:
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    rgb_order: GRB
+    pin: $rgb_pin
+    num_leds: 1
+    chipset: WS2812
+    is_rgbw: true
+    effects:
+      - random:
+      - flicker:
+      - addressable_rainbow:
+
+# Button
+binary_sensor:
+  - platform: gpio
+    name: Button
+    entity_category: diagnostic
+    pin:
+      number: $button_pin
+      inverted: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Button Pressed

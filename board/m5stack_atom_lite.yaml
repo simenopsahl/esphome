@@ -1,0 +1,122 @@
+---
+# https://docs.m5stack.com/en/core/ATOM%20Lite
+# Base functions for:
+# M5Stack Atom Lite
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_lite.yaml
+
+esp32:
+  board: m5stack-atom
+
+# Output that blinks the LED
+#output:
+#  - platform: template
+#    id: status_output
+#    type: binary
+#    write_action:
+#    - if:
+#        condition:
+#          lambda: return (state);
+#        then:
+#          - light.turn_on:
+#              id: led
+#              transition_length: 50ms
+#              brightness: 30%
+#              red: 100%
+#              green: 0%
+#              blue: 0%
+#        else:
+#          - light.turn_off:
+#              id: led
+#              transition_length: 50ms
+
+# IR
+#remote_transmitter:
+#  pin: $ir_pin
+#  carrier_duty_percent: 50%
+#  rmt_symbols: 144
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: led
+    rgb_order: GRB
+    pin: $rgb_pin
+    num_leds: 1
+    rmt_symbols: 384
+    chipset: sk6812
+    effects:
+      - pulse:
+      - strobe:
+      - flicker:
+
+# Button
+binary_sensor:
+  - platform: gpio
+    name: Button
+    entity_category: diagnostic
+    pin:
+      number: $button_pin
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: Button Pressed
+        - script.execute: led_wifi
+        - script.wait: led_wifi
+        - delay: 500ms
+        - script.execute: led_homeassistant
+        - script.wait: led_homeassistant
+
+# Script for status LED
+script:
+  - id: led_wifi
+    then:
+      - if:
+          condition:
+            light.is_off: led
+          then:
+            - if:
+                condition:
+                  wifi.connected:
+                then:
+                  - light.turn_on:
+                      id: led
+                      color_brightness: 20%
+                      red: 0%
+                      green: 100%
+                      blue: 0%
+                else:
+                  - light.turn_off:
+                      id: led
+          else:
+            - light.turn_off:
+                id: led
+  - id: led_homeassistant
+    then:
+      - if:
+          condition:
+            light.is_off: led
+          then:
+            - if:
+                condition:
+                  api.connected:
+                then:
+                  - light.turn_on:
+                      id: led
+                      color_brightness: 20%
+                      red: 0%
+                      green: 0%
+                      blue: 100%
+                else:
+                  - light.turn_off:
+                      id: led
+          else:
+            - light.turn_off:
+                id: led
