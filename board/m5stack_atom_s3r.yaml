@@ -20,6 +20,10 @@ psram:
   mode: octal
   speed: 80MHz
 
+esp32:
+  board: m5stack-atoms3
+  variant: esp32s3
+
 i2c:
 # Internal
   - id: i2c_internal

@@ -13,6 +13,10 @@ substitutions:
 packages:
   pins: !include pins/m5stack_stickc_plus2.yaml
 
+esp32:
+  board: m5stick-c
+  flash_size: 8MB
+
 esphome:
   platformio_options:
 #    board_build.arduino.partitions: default_8MB.csv

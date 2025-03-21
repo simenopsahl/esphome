@@ -1,12 +1,12 @@
 ---
-# https://docs.m5stack.com/en/core/AtomS3%20Lite
+# https://docs.m5stack.com/en/core/AtomS3U
 # Base functions for:
-# M5Stack AtomS3 Lite
+# M5Stack AtomS3U
 #
 
 # Pins for this model
 packages:
-  pins: !include pins/m5stack_atom_s3_lite.yaml
+  pins: !include pins/m5stack_atom_s3u.yaml
 
 esp32:
   board: m5stack-atoms3

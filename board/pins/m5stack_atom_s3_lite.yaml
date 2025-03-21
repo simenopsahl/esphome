@@ -27,5 +27,5 @@ substitutions:
   # Button
   button_pin: GPIO41
   # LED
-  led_pin: GPIO35
+  rgb_pin: GPIO35
   ir_pin: GPIO4

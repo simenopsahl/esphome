@@ -17,12 +17,8 @@ esphome:
       - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
 
 esp32:
-#  board: m5stack-atoms3
-#  variant: esp32s3
 #  framework:
 #    type: arduino
-  board: m5stack-atoms3
-  variant: esp32s3
   framework:
     type: esp-idf
     version: 5.3.1

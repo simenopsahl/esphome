@@ -15,12 +15,6 @@ esphome:
   friendly_name: $devicename
 
 esp32:
-#  board: m5stack-atoms3
-#  variant: esp32s3
-#  framework:
-#    type: arduino
-  board: m5stack-atoms3
-  variant: esp32s3
   framework:
     type: esp-idf
 #    version: 5.3.1

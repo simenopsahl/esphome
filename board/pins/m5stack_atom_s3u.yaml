@@ -1,0 +1,26 @@
+---
+# https://docs.m5stack.com/en/core/AtomS3U
+# PINs for m5stack ATOM S3U
+
+substitutions:
+  # Internal
+  i2s_bclk_pin: GPIO38
+  # GROVE
+  i2c_grove_sda_pin: GPIO2
+  i2c_grove_scl_pin: GPIO1
+  in_grove_pin: GPIO1
+  out_grove_pin: GPIO2
+  tx_grove_pin: GPIO1
+  rx_grove_pin: GPIO2
+  # HAT
+  hat_g14_adc_pin: GPIO14
+  hat_g17_adc_pin: GPIO17
+  hat_g42_pin: GPIO42
+  hat_g40_clk_out_pin: GPIO40
+  # Button
+  button_pin: GPIO41
+  # LED
+  rgb_pin: GPIO35
+  ir_pin: GPIO12
+  # Mic
+  mic_pin: GPIO39

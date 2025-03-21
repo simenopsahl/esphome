@@ -14,8 +14,6 @@ esphome:
   friendly_name: $devicename
 
 esp32:
-  board: m5stack-atoms3
-  variant: esp32s3
   framework:
     type: esp-idf
     sdkconfig_options: # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/kconfig.html#config-compiler-disable-gcc12-warnings

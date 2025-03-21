@@ -8,6 +8,9 @@
 # Pins for this model
 packages:
   pins: !include pins/m5stack_coreink.yaml
+  
+esp32:
+  board: m5stack-coreink
 
 i2c:
 # Grove

@@ -42,7 +42,6 @@ esphome:
       - script.execute: update_screen
   
 esp32:
-  board: m5stack-coreink
   framework:
     type: esp-idf
 
