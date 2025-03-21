@@ -1,0 +1,49 @@
+---
+# https://docs.m5stack.com/en/atom/atom_mate
+# https://esphome.io/components/uart#uart
+# m5stack UART HAT
+
+# HAT Shared pins
+substitutions:
+  hat_shared: "false"
+
+uart:
+# Mate HAT
+  - id: uart_hat
+    tx_pin:
+      number: $tx_uart_hat_pin
+      allow_other_uses: $hat_shared
+    rx_pin:
+      number: $rx_uart_hat_pin
+      allow_other_uses: $hat_shared
+    baud_rate: 115200
+    rx_buffer_size: 256
+
+select:
+  - id: uart_hat_baud_rate
+    name: Baud rate
+    platform: template
+    options:
+      - "2400"
+      - "9600"
+      - "38400"
+      - "57600"
+      - "115200"
+      - "256000"
+      - "512000"
+      - "921600"
+    initial_option: "115200"
+    optimistic: true
+    restore_value: true
+    entity_category: config
+    disabled_by_default: true
+    icon: mdi:swap-horizontal
+    set_action:
+      - lambda: |-
+          id(uart_hat).flush();
+          uint32_t new_baud_rate = stoi(x);
+          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_hat).get_baud_rate(), new_baud_rate);
+          if (id(uart_hat).get_baud_rate() != new_baud_rate) {
+            id(uart_hat).set_baud_rate(new_baud_rate);
+            id(uart_hat).load_settings();
+          }

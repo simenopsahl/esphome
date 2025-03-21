@@ -1,0 +1,147 @@
+---
+# https://docs.m5stack.com/en/unit/ENV%20Pro%20Unit
+# https://esphome.io/components/sensor/bme68x_bsec2.html
+# https://github.com/Chill-Division/M5Stack-ESPHome/blob/
+
+substitutions:
+  env_i2c_bus: i2c_grove
+
+# UNIT ENV Pro
+bme68x_bsec_i2c:
+  id: bme68x_bsec_component
+  address: 0x77
+  model: BME688
+  sample_rate: LP
+  operating_age: 28d
+  state_save_interval: 30m
+sensor:
+  - platform: bme68x_bsec2
+    i2c_id: $env_i2c_bus
+    bme68x_bsec_id: bme68x_bsec_component
+    id: bme688_sensor
+    temperature:
+      id: temperature_bme688
+      sample_rate: LP
+      name: "Temperature BME688"
+      disabled_by_default: true
+      device_class: "temperature"
+    pressure:
+      id: pressure_bme688
+      sample_rate: ULP
+      name: "Pressure BME688"
+      disabled_by_default: true
+      device_class: "atmospheric_pressure"
+    humidity:
+      id: humidity_bme688
+      sample_rate: ULP
+      name: "Humidity BME688"
+      disabled_by_default: true
+      device_class: "humidity"
+    iaq:
+      id: iaq_bme688
+      sample_rate: LP
+      name: "IAQ BME688"
+      device_class: "aqi"
+      on_value:
+        - component.update: iaq_classification_bme688
+    iaq_static:
+      id: static_iaq_bme688
+      sample_rate: LP
+      name: "Static IAQ BME688"
+      device_class: "aqi"
+      on_value:
+        - component.update: static_iaq_classification_bme688
+    co2_equivalent:
+      id: eco2_bme688
+      sample_rate: LP
+      name: "CO2 equivalent BME688"
+      device_class: "carbon_dioxide"
+    breath_voc_equivalent:
+      id: evoc_bme688
+      sample_rate: LP
+      name: "VOC equivalent BME688"
+      device_class: "volatile_organic_compounds_parts"
+    gas_resistance:
+      id: gas_resistance_bme688
+      sample_rate: LP
+      # Gas resistance in Ω
+      name: "Gas resistance"
+
+text_sensor:
+  - platform: template
+    id: iaq_classification_bme688
+    name: "IAQ classification"
+    icon: "mdi:checkbox-marked-circle-outline"
+    lambda: |-
+      auto iaq_ = int(id(iaq_bme688).state);
+      if (iaq_ < 0) {
+        // No IAQ sensor.
+        return {"unknown"};
+      }
+      if (iaq_ <= 50) {
+        return {"excellent"};
+      }
+      else if (iaq_ <= 100) {
+        return {"good"};
+      }
+      else if (iaq_ <= 150) {
+        return {"lightly polluted"};
+      }
+      else if (iaq_ <= 200) {
+        return {"moderately polluted"};
+      }
+      else if (iaq_ <= 250) {
+        return {"heavily polluted"};
+      }
+      else if (iaq_ <= 350) {
+        return {"severely polluted"};
+      }
+      else if (iaq_ <= 500) {
+        return {"extremely polluted"};
+      }
+      else {
+        // ESP_LOGD("iaq-classification", "IAQ not yet established: %s", id(static_iaq_bme688).state);
+        return {"unknown"};
+      }
+    update_interval: never
+
+  - platform: template
+    id: static_iaq_classification_bme688
+    name: "Static IAQ classification"
+    icon: "mdi:checkbox-marked-circle-outline"
+    lambda: |-
+      auto iaq_ = int(id(static_iaq_bme688).state);
+      if (iaq_ < 0) {
+        // No IAQ sensor.
+        return {"unknown"};
+      }
+      if (iaq_ <= 50) {
+        return {"excellent"};
+      }
+      else if (iaq_ <= 100) {
+        return {"good"};
+      }
+      else if (iaq_ <= 150) {
+        return {"lightly polluted"};
+      }
+      else if (iaq_ <= 200) {
+        return {"moderately polluted"};
+      }
+      else if (iaq_ <= 250) {
+        return {"heavily polluted"};
+      }
+      else if (iaq_ <= 350) {
+        return {"severely polluted"};
+      }
+      else if (iaq_ <= 500) {
+        return {"extremely polluted"};
+      }
+      else {
+        // ESP_LOGD("iaq-classification", "IAQ not yet established: %s", id(static_iaq_bme688).state);
+        return {"unknown"};
+      }
+    update_interval: never
+  - platform: bme68x_bsec2
+    iaq_accuracy: 
+      name: "IAQ accuracy"
+      entity_category: diagnostic

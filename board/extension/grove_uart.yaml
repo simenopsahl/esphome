@@ -1,0 +1,39 @@
+---
+# m5stack uart Grove Port
+
+uart:
+# Grove port
+  - id: uart_grove
+    tx_pin: $tx_uart_grove_pin
+    rx_pin: $rx_uart_grove_pin
+    baud_rate: 115200
+    rx_buffer_size: 256
+
+select:
+  - id: uart_grove_baud_rate
+    name: Baud rate
+    platform: template
+    options:
+      - "2400"
+      - "9600"
+      - "38400"
+      - "57600"
+      - "115200"
+      - "256000"
+      - "512000"
+      - "921600"
+    initial_option: "115200"
+    optimistic: true
+    restore_value: true
+    entity_category: config
+    disabled_by_default: true
+    icon: mdi:swap-horizontal
+    set_action:
+      - lambda: |-
+          id(uart_grove).flush();
+          uint32_t new_baud_rate = stoi(x);
+          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_grove).get_baud_rate(), new_baud_rate);
+          if (id(uart_grove).get_baud_rate() != new_baud_rate) {
+            id(uart_grove).set_baud_rate(new_baud_rate);
+            id(uart_grove).load_settings();
+          }
