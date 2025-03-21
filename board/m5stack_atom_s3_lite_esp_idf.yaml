@@ -65,6 +65,7 @@ light:
       - addressable_color_wipe:
       - addressable_scan:
       - addressable_twinkle:
+    default_transition_length: 50ms
     name: "LED"
     entity_category: config
   - platform: partition

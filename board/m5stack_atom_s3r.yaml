@@ -80,11 +80,11 @@ light:
   - platform: monochromatic
     id: backlight_light
     output: backlight_white
-    default_transition_length: 100ms
     restore_mode: RESTORE_DEFAULT_ON
     initial_state:
       state: on
       brightness: 25%
+    default_transition_length: 50ms
     name: "Backlight"
     entity_category: config
   # RGBW

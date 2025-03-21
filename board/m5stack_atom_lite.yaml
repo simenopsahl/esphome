@@ -51,6 +51,7 @@ light:
       - pulse:
       - strobe:
       - flicker:
+    default_transition_length: 50ms
     name: "LED"
     entity_category: config
 
