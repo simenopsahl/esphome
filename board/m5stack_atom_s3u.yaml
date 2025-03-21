@@ -65,6 +65,8 @@ light:
       - addressable_color_wipe:
       - addressable_scan:
       - addressable_twinkle:
+    name: "LED"
+    entity_category: config
   - platform: partition
     id: led1
     segments: 
@@ -108,6 +110,7 @@ binary_sensor:
         - logger.log: Button Pressed
         - script.execute: led_wifi
         - script.wait: led_wifi
+        - delay: 1500ms
         - script.execute: led_homeassistant
         - script.wait: led_homeassistant
 
@@ -127,10 +130,11 @@ script:
                       id: led
                       range_from: 0
                       range_to: 1
-                      color_brightness: 20%
+                      color_brightness: 10%
                       red: 0%
                       green: 100%
                       blue: 0%
+                  - delay: 250ms
                 else:
                   - light.addressable_set:
                       id: led
@@ -157,10 +161,11 @@ script:
                       id: led
                       range_from: 2
                       range_to: 3
-                      color_brightness: 20%
+                      color_brightness: 10%
                       red: 0%
                       green: 0%
                       blue: 100%
+                  - delay: 250ms
                 else:
                   - light.addressable_set:
                       id: led

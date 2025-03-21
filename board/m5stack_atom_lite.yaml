@@ -51,6 +51,8 @@ light:
       - pulse:
       - strobe:
       - flicker:
+    name: "LED"
+    entity_category: config
 
 # Button
 binary_sensor:
@@ -85,7 +87,7 @@ script:
                 then:
                   - light.turn_on:
                       id: led
-                      color_brightness: 5%
+                      color_brightness: 10%
                       red: 0%
                       green: 100%
                       blue: 0%
@@ -108,7 +110,7 @@ script:
                 then:
                   - light.turn_on:
                       id: led
-                      color_brightness: 5%
+                      color_brightness: 10%
                       red: 0%
                       green: 0%
                       blue: 100%
