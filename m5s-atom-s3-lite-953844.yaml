@@ -1,0 +1,49 @@
+packages:
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+  board: !include board/m5stack_atom_s3_lite_esp_idf.yaml
+  hat: !include board/extension/hat_i2c.yaml
+  grove: !include board/extension/grove_i2c.yaml
+  env1: !include board/module/hat_env_iii.yaml
+  env2: !include board/module/unit_env_iv.yaml
+
+substitutions:
+  devicename: m5s-as3-lite-953844
+
+esphome:
+  comment: "M5Stack Atom S3 Lite 953844"
+  name: $devicename
+  friendly_name: $devicename
+  platformio_options:
+    build_flags:
+      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+
+esp32:
+#  framework:
+#    type: arduino
+  framework:
+    type: esp-idf
+#    version: 5.3.1
+#    platform_version: 6.9.0
+    # Custom sdkconfig options
+    sdkconfig_options: # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/kconfig.html#config-compiler-disable-gcc12-warnings
+      CONFIG_SPIFFS_DBG: n
+
+sensor:
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    sources:
+      # ENV III
+      - source: temperature_sht3xd
+      - source: temperature_qmp6988
+      # ENV IV
+      - source: temperature_bmp280
+      - source: temperature_sht4x
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
