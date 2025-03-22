@@ -40,9 +40,9 @@ light:
     id: backlight_light
     output: backlight_output
     default_transition_length: 100ms
-    restore_mode: RESTORE_DEFAULT_ON
+#    restore_mode: RESTORE_DEFAULT_ON
     initial_state:
-      state: on
+      state: true
       brightness: 25%
     name: "Backlight"
     entity_category: config

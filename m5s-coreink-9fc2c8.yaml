@@ -59,7 +59,7 @@ display:
     reset_pin: $disp_reset_pin
     full_update_every: 1
 #    reset_duration: 2ms
-    update_interval: 15min
+    update_interval: never
     rotation: 90
     pages:
 #      - id: page_black

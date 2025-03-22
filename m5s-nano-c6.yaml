@@ -1,25 +1,27 @@
 packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
-  board: !include board/m5stack_atom_s3_lite_esp_idf.yaml
-  hat: !include board/extension/hat_i2c.yaml
-  grove: !include board/extension/grove_i2c.yaml
-  env_iii: !include board/module/hat_env_iii.yaml
-  env_iv: !include board/module/unit_env_iv.yaml
+  board: !include board/m5stack_nano_c6.yaml
+  env: !include board/module/unit_env_iv.yaml
 
 substitutions:
-  devicename: m5s-as3-lite-953844
+  devicename: m5s-nano-c6
 
 esphome:
-  comment: "M5Stack Atom S3 Lite 953844"
+  comment: "M5Stack NanoC6"
   name: $devicename
   friendly_name: $devicename
 
 esp32:
-#  framework:
-#    type: arduino
   framework:
     type: esp-idf
+    version: 5.3.1
+    platform_version: 6.9.0
+
+# https://github.com/esphome/issues/issues/6567
+external_components:
+  - source: github://pr#8283
+    components: [ i2c ]
 
 sensor:
   # Combine sensors
@@ -30,8 +32,8 @@ sensor:
     device_class: "temperature"
     sources:
       # ENV III
-      - source: temperature_sht3xd
-      - source: temperature_qmp6988
+#      - source: temperature_sht3xd
+#      - source: temperature_qmp6988
       # ENV IV
       - source: temperature_bmp280
       - source: temperature_sht4x

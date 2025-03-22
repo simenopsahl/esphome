@@ -16,8 +16,6 @@ esphome:
 esp32:
   framework:
     type: esp-idf
-    sdkconfig_options: # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/kconfig.html#config-compiler-disable-gcc12-warnings
-      CONFIG_SPIFFS_DBG: n
 
 display:
   - platform: ili9xxx

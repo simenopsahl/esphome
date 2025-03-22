@@ -29,7 +29,7 @@ i2c:
   - id: i2c_grove
     sda: $i2c_grove_sda_pin
     scl: $i2c_grove_scl_pin
-    scan: true
+    scan: false
 
 # Enable status LED
 status_led:
@@ -39,7 +39,7 @@ status_led:
 switch:
   - platform: gpio
     id: rgb_switch
-    pin: $rgb_pin
+    pin: $rgb_pwr_pin
     restore_mode: RESTORE_DEFAULT_ON
     name: "RGB on/off"
     entity_category: config
@@ -54,9 +54,36 @@ light:
     chipset: WS2812
     is_rgbw: true
     effects:
-      - random:
-      - flicker:
-      - addressable_rainbow:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 200ms on, 1500ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+#      - addressable_flicker:
+#      - addressable_rainbow:
+#      - addressable_color_wipe:
+#      - addressable_scan:
+#      - addressable_twinkle:
+    default_transition_length: 100ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "LED"
+    entity_category: config
 
 # Button
 binary_sensor:
@@ -71,3 +98,84 @@ binary_sensor:
     on_press:
       then:
         - logger.log: Button Pressed
+        - script.execute: led_wifi
+        - script.wait: led_wifi
+        - delay: 1000ms
+        - script.execute: led_homeassistant
+        - script.wait: led_homeassistant
+        - delay: 1000ms
+        - script.execute: led_default_state
+    on_click:
+      min_length: 1000ms
+      max_length: 5000ms
+      then:
+        - logger.log: Button Held
+        - light.turn_off:
+            id: rgb_led
+
+# Script for status LED
+script:
+  - id: led_wifi
+    then:
+      - if:
+          condition:
+            wifi.connected:
+          then:
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 100%
+                blue: 0%
+            - delay: 400ms
+            - light.turn_off:
+                id: rgb_led
+            - delay: 200ms
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 100%
+                blue: 0%
+            - delay: 400ms
+          else:
+            - light.turn_off:
+                id: rgb_led
+  - id: led_homeassistant
+    then:
+      - if:
+          condition:
+            api.connected:
+          then:
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 10%
+                blue: 100%
+            - delay: 400ms
+            - light.turn_off:
+                id: rgb_led
+            - delay: 200ms
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 10%
+                blue: 100%
+            - delay: 400ms
+          else:
+            - light.turn_off:
+                id: rgb_led
+  - id: led_default_state
+    then:
+      - light.turn_on:
+          id: rgb_led
+          brightness: 25%
+          red: 100%
+          green: 0%
+          blue: 0%
+      - delay: 200ms
+      - light.turn_on:
+          id: rgb_led
+          effect: "Slow Blink"
