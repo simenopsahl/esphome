@@ -1,14 +1,16 @@
 packages:
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+# might be too weak for BLE ?
+#  <<: !include_dir_named bluetooth
   board: !include board/m5stack_nano_c6.yaml
+  grove: !include board/extension/grove_i2c.yaml
   env: !include board/module/unit_env_iv.yaml
 
 substitutions:
-  devicename: m5s-nano-c6
+  devicename: m5s-nano-c6-1d8ec8
 
 esphome:
-  comment: "M5Stack NanoC6"
+  comment: "M5Stack NanoC6 1d8ec8"
   name: $devicename
   friendly_name: $devicename
 

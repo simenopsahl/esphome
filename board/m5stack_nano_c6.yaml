@@ -24,13 +24,6 @@ esp32:
     sdkconfig_options:
       CONFIG_ESPTOOLPY_FLASHSIZE_4MB: y
 
-i2c:
-# Grove
-  - id: i2c_grove
-    sda: $i2c_grove_sda_pin
-    scl: $i2c_grove_scl_pin
-    scan: false
-
 # Enable status LED
 status_led:
   id: status_light

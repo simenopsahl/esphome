@@ -29,6 +29,7 @@ i2c:
   - id: i2c_internal
     sda: $i2c_int_sda_pin
     scl: $i2c_int_scl_pin
+    frequency: 400kHz
     scan: true
 
 spi:

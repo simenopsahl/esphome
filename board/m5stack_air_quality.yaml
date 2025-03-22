@@ -22,11 +22,7 @@ i2c:
   - id: i2c_internal
     sda: $i2c_int_sda_pin
     scl: $i2c_int_scl_pin
-    scan: true
-  # Internal
-  - id: i2c_grove
-    sda: $i2c_grove_sda_pin
-    scl: $i2c_grove_scl_pin
+    frequency: 400kHz
     scan: true
 
 spi:

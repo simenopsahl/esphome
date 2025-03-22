@@ -40,6 +40,13 @@ esp32:
     advanced:
       ignore_efuse_custom_mac: true
 
+i2c:
+  id: i2c_bus
+  sda: $i2c_int_sda_pin
+  scl: $i2c_int_scl_pin
+  frequency: 200kHz
+  scan: true
+
 globals:
   # aab = auto-adjustable brightness
   - id: aab_enable
@@ -216,12 +223,6 @@ output:
 
 rtttl:
   output: rtttl_out
-
-i2c:
-  sda: $i2c_int_sda_pin
-  scl: $i2c_int_scl_pin
-  scan: true
-  id: i2c_bus
 
 light:
   - platform: neopixelbus
