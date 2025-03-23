@@ -13,6 +13,8 @@ esphome:
   comment: "M5Stack NanoC6 1d8ec8"
   name: $devicename
   friendly_name: $devicename
+  project:
+    version: "1.0.0"
 
 esp32:
   framework:

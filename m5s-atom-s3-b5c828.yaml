@@ -12,6 +12,8 @@ esphome:
   comment: "M5Stack Atom S3 b5c828"
   name: $devicename
   friendly_name: $devicename
+  project:
+    version: "1.0.0"
 
 esp32:
   framework:

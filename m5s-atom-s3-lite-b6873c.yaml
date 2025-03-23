@@ -15,17 +15,9 @@ esphome:
   comment: "M5Stack Atom S3 Lite b6873c"
   name: $devicename
   friendly_name: $devicename
-  platformio_options:
-    build_flags:
-      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+  project:
+    version: "1.0.0"
 
 esp32:
-#  framework:
-#    type: arduino
   framework:
     type: esp-idf
-    version: 5.3.1
-    platform_version: 6.9.0
-    # Custom sdkconfig options
-    sdkconfig_options: # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/kconfig.html#config-compiler-disable-gcc12-warnings
-      CONFIG_SPIFFS_DBG: n

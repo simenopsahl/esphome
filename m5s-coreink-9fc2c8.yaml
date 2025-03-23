@@ -16,6 +16,8 @@ esphome:
   name: $devicename
   friendly_name: $devicename
   area: $location
+  project: 
+    version: "1.0.0"
   on_boot:
     then:
       # Bypass sleep circuit arduino

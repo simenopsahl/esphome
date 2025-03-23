@@ -13,6 +13,8 @@ esphome:
   comment: "M5Stack StickC Plus2"
   name: $devicename
   friendly_name: $devicename
+  project: 
+    version: "1.0.0"
   on_boot:
     then:
       # Bypass sleep circuit arduino
