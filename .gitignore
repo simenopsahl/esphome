@@ -10,5 +10,6 @@
 /trash/
 /secrets.yaml
 *.bak
+*.html
 !common/
 !docs/
