@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/m5stack_fire.yaml
 
+esphome:
+  project:
+    name: "M5Stack.Fire"
+    version: "2.7"
+
 i2c:
 # Internal
   - id: i2c_internal
@@ -82,6 +87,7 @@ light:
     restore_mode: RESTORE_DEFAULT_OFF
     default_transition_length: 0s
     name: "Side Light"
+    entity_category: config
 
 # Microphone and Speaker
 i2s_audio:

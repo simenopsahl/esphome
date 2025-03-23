@@ -9,6 +9,10 @@ packages:
   pins: !include pins/m5stack_atom_s3r.yaml
 
 esphome:
+  project:
+    name: "M5Stack.AtomS3R"
+
+esphome:
   platformio_options:
     board_build.arduino.memory_type: qio_opi
     build_flags:

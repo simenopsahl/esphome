@@ -8,6 +8,10 @@
 packages:
   pins: !include pins/m5stack_atom_lite.yaml
 
+esphome:
+  project:
+    name: "M5Stack.Atom-Lite"
+
 esp32:
   board: m5stack-atom
 

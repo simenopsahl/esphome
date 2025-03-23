@@ -8,6 +8,10 @@
 packages:
   pins: !include pins/m5stack_core_s3se.yaml
 
+esphome:
+  project:
+    name: "M5Stack.CoreS3-SE"
+
 i2c:
 # Int
   - id: i2c_internal

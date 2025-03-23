@@ -13,6 +13,10 @@ substitutions:
 packages:
   pins: !include pins/m5stack_stickc_plus2.yaml
 
+esphome:
+  project:
+    name: "M5Stack.StickC-Plus2"
+
 esp32:
   board: m5stick-c
   flash_size: 8MB

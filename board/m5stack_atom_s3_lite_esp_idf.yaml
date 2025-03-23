@@ -8,6 +8,10 @@
 packages:
   pins: !include pins/m5stack_atom_s3_lite.yaml
 
+esphome:
+  project:
+    name: "M5Stack.AtomS3-Lite"
+
 esp32:
   board: m5stack-atoms3
   variant: esp32s3

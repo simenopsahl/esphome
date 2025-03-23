@@ -9,6 +9,10 @@
 packages:
   pins: !include pins/m5stack_coreink.yaml
   epaper: !include module/epaper.yaml
+
+esphome:
+  project:
+    name: "M5Stack.CoreInk"
   
 esp32:
   board: m5stack-coreink

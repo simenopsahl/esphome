@@ -11,6 +11,8 @@ packages:
   epaper: !include module/epaper.yaml
 
 esphome:
+  project:
+    name: "M5Stack.Air_Quality"
   platformio_options:
     board_build.mcu: esp32s3
     board_build.name: "M5Stack StampS3"
