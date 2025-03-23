@@ -8,6 +8,7 @@
 # Pins for this model
 packages:
   pins: !include pins/m5stack_air_quality.yaml
+  epaper: !include module/epaper.yaml
 
 esphome:
   platformio_options:

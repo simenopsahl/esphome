@@ -8,3 +8,14 @@
 #
 logger:
   id: component_logger
+  level: DEBUG
+  initial_level: DEBUG
+  logs:
+    light: INFO
+
+select:
+  - platform: logger
+    id: logger_select
+    name: "Logger Select"
+    entity_category: config
+    disabled_by_default: true
