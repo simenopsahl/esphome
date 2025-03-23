@@ -8,4 +8,14 @@
 debug:
 
 text_sensor:
-  - <<: !include ../text_sensors/debug.yaml
+  - platform: debug
+    reset_reason:
+      id: sensor_debug_reset_reason
+      name: "Reset reason"
+      entity_category: diagnostic
+      disabled_by_default: true
+    device:
+      id: sensor_debug_device
+      name: "Debug INFO"
+      entity_category: diagnostic
+      disabled_by_default: true

@@ -1,3 +1,0 @@
-# Binary sensor
- 
-Node status

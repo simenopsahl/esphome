@@ -4,9 +4,32 @@
 # Device status
 # WiFi signal strength, connectivity and uptime
 #
+
+# https://esphome.io/components/binary_sensor/status.html
 binary_sensor:
-  - <<: !include ../binary_sensors/status.yaml
+  - platform: status
+    name: "Status"
+    device_class: "connectivity"
+    entity_category: diagnostic
+
 sensor:
-  - <<: !include ../sensors/wifi_signal.yaml
-  - <<: !include ../sensors/uptime.yaml
-#  - <<: !include ../sensors/uptime_timestamp.yaml
+  # https://esphome.io/components/sensor/wifi_signal.html
+  - platform: wifi_signal
+    id: sensor_wifi_signal
+    name: "WiFi Signal dB"
+    entity_category: diagnostic
+    device_class: "signal_strength"
+    state_class: measurement
+    update_interval: 60s
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 1
+
+  # https://esphome.io/components/sensor/uptime.html
+  - platform: uptime
+    id: sensor_uptime
+    type: timestamp
+    name: "Uptime"
+    device_class: timestamp
+    entity_category: diagnostic

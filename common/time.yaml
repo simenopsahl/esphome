@@ -10,10 +10,12 @@ substitutions:
   time_timezone: "Europe/Oslo"
 
 time:
-  - <<: !include ../time/homeassistant.yaml
+  # https://esphome.io/components/time.html#home-assistant-time-source
+  - platform: homeassistant
+    id: time_homeassistant
     timezone: "${time_timezone}"
-#    on_time_sync:
-#      - component.update: sensor_uptime_timestamp
 
-  - <<: !include ../time/sntp.yaml
+  # https://esphome.io/components/time.html#sntp-time-source
+  - platform: sntp
+    id: time_sntp
     timezone: "${time_timezone}"
