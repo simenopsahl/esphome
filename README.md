@@ -13,6 +13,7 @@ WaveShare ePaper driver board
 PINout for board variants
 
 ### [board/extension](board/extension)
+i2c, SPI, UART & GPIO  
 HAT, Grove and breakout extension functions  
 M5Stack: ATOM Mate HAT, ATOM Port ABC, Unit pA Hub and more
  
