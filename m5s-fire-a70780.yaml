@@ -1,11 +1,12 @@
 packages:
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
   board: !include board/m5stack_fire.yaml
   grove_i2c: !include board/extension/grove_i2c.yaml
   grove_uart: !include board/extension/grove_uart.yaml
   air_quality: !include board/module/module_air_quality.yaml
   co2: !include board/module/unit_co2.yaml
+  color: !include gui/colors.yaml
 
 substitutions:
   devicename: m5s-fire-a70780
@@ -20,6 +21,126 @@ esphome:
 esp32:
   framework:
     type: esp-idf
+
+# 320x240 ILI9342C LCD
+display:
+  - platform: ili9xxx
+    id: display_lcd
+    model: M5STACK
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_rs_pin
+    data_rate: 40Mhz
+    invert_colors: true
+    color_palette: 8BIT
+    update_interval: 1s
+    dimensions:
+      height: 240
+      width: 320
+#      offset_height: 2
+#      offset_width: 1
+    # Rotate 180deg
+#    transform:
+#      mirror_x: true
+#      mirror_y: true
+    pages:
+      - id: page_home
+        lambda: |-
+          // Bottom Nav BG
+          it.filled_rectangle( 0, it.get_height()-36, it.get_width(), it.get_height(), id(c_bg_s) );
+
+          // Left Icon
+          it.image( ( it.get_width()/4 )-10, it.get_height(), id(i_airq), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+          // Mid Icon
+          it.image( it.get_width()/4*2, it.get_height(), id(i_home), ImageAlign::BOTTOM_CENTER, id(c_purple), id(c_bg_s) );
+          // Right Icon
+          it.image( ( it.get_width()/4*3 )+10, it.get_height(), id(i_power), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+
+          // Show wifi icon.
+          if (id(component_wifi).is_connected()) {
+            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), id(c_bg_s) );
+          }
+          // Show HA icon.
+          if (id(component_api).is_connected()) {
+            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
+          }
+
+          // Temperature value
+          it.printf( it.get_width()/2, ( it.get_height()/2 )-20, id(f120b), id(c_text_p), TextAlign::CENTER, "%2.0f", id(temperature_local).state );
+          it.image( 0, 0, id(i_temp_l), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.print( it.get_width(), 0, id(f60), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
+      - id: page_airq
+        lambda: |-
+          // Bottom Nav BG
+          it.filled_rectangle( 0, it.get_height()-36, it.get_width(), it.get_height(), id(c_bg_s) );
+
+          // Left Icon
+          it.image( ( it.get_width()/4 )-10 , it.get_height(), id(i_airq), ImageAlign::BOTTOM_CENTER, id(c_purple), id(c_bg_s) );
+          // Mid Icon
+          it.image( it.get_width()/4*2, it.get_height(), id(i_home), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+          // Right Icon
+          it.image( ( it.get_width()/4*3 )+10, it.get_height(), id(i_power), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+
+          // Show wifi icon.
+          if (id(component_wifi).is_connected()) {
+            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), id(c_bg_s) );
+          }
+          // Show HA icon.
+          if (id(component_api).is_connected()) {
+            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
+          }
+
+          it.image( 0, 0, id(i_temp_s), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 62, id(i_co2), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 96, id(i_pm1), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 130, id(i_pm25), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 164, id(i_pm10), ImageAlign::TOP_LEFT, id(c_text_s) );
+          
+          it.print( 38, 64, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Karbondioksid: " );
+          it.print( 38, 98, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 1.0: " );
+          it.print( 38, 132, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 2.5: " );
+          it.print( 38, 166, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 10.0: " );
+
+          it.printf( it.get_width()/2, 0, id(f32b), id(c_text_p), TextAlign::TOP_CENTER, "%2.0f", id(temperature_local).state );
+          it.printf( 275, 62, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(co2_scd40).state );
+          it.printf( 275, 96, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm1_pmsa003).state );
+          it.printf( 275, 130, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_25_pmsa003).state );
+          it.printf( 275, 164, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_10_pmsa003).state );
+          
+          it.print( it.get_width(), 0, id(f24), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
+          it.print( it.get_width(), 66, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "ppm" );
+          it.print( it.get_width(), 100, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+          it.print( it.get_width(), 134, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+          it.print( it.get_width(), 168, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+      - id: page_power
+        lambda: |-
+          // Bottom Nav BG
+          it.filled_rectangle( 0, it.get_height()-36, it.get_width(), it.get_height(), id(c_bg_s) );
+
+          // Left Icon
+          it.image( ( it.get_width()/4 )-10, it.get_height(), id(i_airq), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+          // Mid Icon
+          it.image( it.get_width()/4*2, it.get_height(), id(i_home), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+          // Right Icon
+          it.image( ( it.get_width()/4*3 )+10, it.get_height(), id(i_power), ImageAlign::BOTTOM_CENTER, id(c_purple), id(c_bg_s) );
+
+          // Show wifi icon.
+          if (id(component_wifi).is_connected()) {
+            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), id(c_bg_s) );
+          }
+          // Show HA icon.
+          if (id(component_api).is_connected()) {
+            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
+          }
+
+            // NordPool Section
+            it.printf (1, 2, id(f14), id(c_text_p), TextAlign::TOP_LEFT, "%s", id(nordpool_time_0).state.c_str() );
+            it.printf( it.get_width()/2, 2, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", id(nordpool_time_4).state.c_str() );
+            it.printf( it.get_width()-1, 2, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "%s", id(nordpool_time_8).state.c_str() );
+            it.graph( 0, 22, id(graph_nordpool), id(c_bg_s) );
+            it.printf( 1, 172, id(f18), id(c_text_p), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state );
+            it.printf( it.get_width()/2, 172, id(f18), id(c_text_s), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state );
+            it.printf( it.get_width()-1, 172, id(f18), id(c_text_s), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state );
 
 sensor:
   # Combine sensors
@@ -41,3 +162,221 @@ sensor:
       - or:
         - heartbeat: 900s
         - delta: 0.15
+#    on_value:
+#      then:
+#        - lvgl.label.update:
+#            id: lbl_home_temp_value
+#            text:
+#              format: "%.0f °C"
+#              args: [ 'id(temperature_local).get_state()' ]
+#        - lvgl.label.update:
+#            id: lbl_aq_temp_value
+#            text:
+#              format: "%.0f °C"
+#              args: [ 'id(temperature_local).get_state()' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    id: nordpool_sensor
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    id: nordpool_price_0
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    id: nordpool_price_4
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price8
+    id: nordpool_price_8
+
+# Strings from Home Assistant
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time0
+    id: nordpool_time_0
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time4
+    id: nordpool_time_4
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time8
+    id: nordpool_time_8
+
+graph:
+  - id: graph_nordpool
+    duration: 9h
+    border: false
+    x_grid: 1h
+    y_grid: 10.0
+    width: 320
+    height: 150
+    traces:
+      - sensor: nordpool_sensor
+        line_thickness: 8
+        color: c_green
+
+font:
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f14
+    size: 14
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/', 'µ', '³',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+    extras:
+      - file: "gui/fonts/materialdesignicons-webfont.ttf"
+        glyphs: [
+          "\U000F05A9", # mdi:wifi
+          "\U000F07D0", # mdi:home-assistant
+          "\U000F0D43", # mdi:air-filter
+          "\U000F050F", # mdi:thermometer
+          "\U000F07E4", # mdi:molecule-co2
+          "\U000F013B" # mdi:chemical-weapon
+        ]
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f18
+    size: 18
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f20
+    size: 20
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f20b
+    size: 20
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f24
+    size: 24
+    glyphs: *norwegian-glyphs
+    extras:
+      - file: "gui/fonts/materialdesignicons-webfont.ttf"
+        glyphs: [
+          "\U000F05A9", # mdi:wifi
+          "\U000F07D0" # mdi:home-assistant
+        ]
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f24b
+    size: 24
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f32
+    size: 32
+    glyphs: *norwegian-glyphs
+    extras:
+      - file: "gui/fonts/materialdesignicons-webfont.ttf"
+        glyphs: [
+          "\U000F050F", # mdi:thermometer
+          "\U000F07E4", # mdi:molecule-co2
+          "\U000F013B" # mdi:chemical-weapon
+        ]
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f32b
+    size: 32
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f60
+    size: 60
+    glyphs: *norwegian-glyphs
+    extras:
+      - file: "gui/fonts/materialdesignicons-webfont.ttf"
+        glyphs: [
+          "\U000F050F", # mdi:thermometer
+          "\U000F02DC", # mdi:home
+          "\U000F0D43", # mdi:air-filter
+          "\U000F1B5A", # mdi:weather-dust
+          "\U000F140B" # mdi:lightning-bolt
+        ]
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f60b
+    size: 60
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f120b
+    size: 120
+    glyphs: *norwegian-glyphs
+
+image:
+  - id: i_wifi
+    file: mdi:wifi
+    type: binary
+    resize: 24x24
+  - id: i_api
+    file: mdi:home-assistant
+    type: binary
+    resize: 24x24
+  - id: i_home
+    file: mdi:home
+    type: binary
+    resize: 36x36
+  - id: i_airq
+    file: mdi:weather-dust
+    type: binary
+    resize: 36x36
+  - id: i_power
+    file: mdi:lightning-bolt
+    type: binary
+    resize: 36x36
+  - id: i_temp_l
+    file: mdi:thermometer
+    type: binary
+    resize: 56x56
+  - id: i_temp_s
+    file: mdi:thermometer
+    type: binary
+    resize: 28x28
+  - id: i_co2
+    file: mdi:molecule-co2
+    type: binary
+    resize: 28x28
+  - id: i_pm1
+    file: mdi:grain
+    type: binary
+    resize: 28x28
+  - id: i_pm25
+    file: mdi:chemical-weapon
+    type: binary
+    resize: 28x28
+  - id: i_pm10
+    file: mdi:molecule
+    type: binary
+    resize: 28x28

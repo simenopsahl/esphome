@@ -19,6 +19,7 @@ esphome:
 #      - "-DARDUINO_USB_CDC_ON_BOOT=1"
 #      - "-mfix-esp32-psram-cache-issue"
 #      - "-mfix-esp32-psram-cache-strategy=memw"
+# PSRAM is shared with UART bus
 #psram:
 #  mode: octal
 #  speed: 80MHz
@@ -38,7 +39,7 @@ esp32:
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
-  miso_pin: $spi_miso_pin
+#  miso_pin: $spi_miso_pin
 
 # IR
 #remote_transmitter:
@@ -54,6 +55,18 @@ spi:
 #    cs_pin: $disp_cs_pin
 #    dc_pin: $disp_dc_pin
 #    reset_pin: $disp_rs_pin
+#    data_rate: 40Mhz
+#    invert_colors: true
+#    update_interval: 1s
+#    dimensions:
+#      height: 128
+#      width: 128
+#      offset_height: 2
+#      offset_width: 1
+    # Rotate 180deg
+#    transform:
+#      mirror_x: true
+#      mirror_y: true
 #    lambda: |-
 #      it.print(80, 0, id(roboto), Color(255, 255, 255), TextAlign::TOP_CENTER, "M5Stack Fire Test");
 
@@ -125,6 +138,7 @@ binary_sensor:
       then:
         - logger.log: Button A Pressed
         - script.execute: buzzer_beep
+        - display.page.show: page_airq
     on_release:
       then:
         - output.turn_off: buzzer
@@ -142,6 +156,7 @@ binary_sensor:
       then:
         - logger.log: Button B Pressed
         - script.execute: buzzer_beep
+        - display.page.show: page_home
     on_release:
       then:
         - output.turn_off: buzzer
@@ -159,6 +174,7 @@ binary_sensor:
       then:
         - logger.log: Button C Pressed
         - script.execute: buzzer_beep
+        - display.page.show: page_power
     on_release:
       then:
         - output.turn_off: buzzer

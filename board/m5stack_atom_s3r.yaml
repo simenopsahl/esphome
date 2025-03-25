@@ -103,32 +103,6 @@ light:
 #    name: "Backlight"
 #    entity_category: config
 
-color:
-  - id: c_red
-    red: 100%
-    green: 0%
-    blue: 0%
-  - id: c_yellow
-    red: 100%
-    green: 100%
-    blue: 0%
-  - id: c_green
-    red: 0%
-    green: 100%
-    blue: 0%
-  - id: c_blue
-    red: 0%
-    green: 0%
-    blue: 100%
-  - id: c_gray
-    red: 50%
-    green: 50%
-    blue: 50%
-  - id: c_white
-    red: 100%
-    green: 100%
-    blue: 100%
-
 # Button
 binary_sensor:
   - platform: gpio

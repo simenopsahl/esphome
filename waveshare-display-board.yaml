@@ -213,7 +213,7 @@ font:
 #    glyphs: &norwegian-glyphs [ ',', '-', '.', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
   - id: font_small
     #file: 'fonts/segoeui.ttf'
-    file: 'fonts/GothamRnd-Bold.ttf'
+    file: 'gui/fonts/GothamRnd-Bold.ttf'
     size: 20
     glyphs: &norwegian-glyphs [ ' ', ',', '-', '.', ':', '%', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
 #  - id: font_small_bold
@@ -223,7 +223,7 @@ font:
 #    glyphs: *norwegian-glyphs
   - id: font_medium
     #file: 'fonts/segoeui.ttf'
-    file: 'fonts/GothamRnd-Bold.ttf'
+    file: 'gui/fonts/GothamRnd-Bold.ttf'
     size: 26
     glyphs: *norwegian-glyphs
 #  - id: font_medium_bold
@@ -233,7 +233,7 @@ font:
 #    glyphs: *norwegian-glyphs
   - id: font_large
     #file: 'fonts/segoeui.ttf'
-    file: 'fonts/GothamRnd-Bold.ttf'
+    file: 'gui/fonts/GothamRnd-Bold.ttf'
     size: 28
     glyphs: *norwegian-glyphs
 #  - id: font_large_bold
@@ -253,7 +253,7 @@ font:
 #    glyphs: *norwegian-glyphs
   # Include Material Design Icons font
   # Thanks to https://community.home-assistant.io/t/display-materialdesign-icons-on-esphome-attached-to-screen/199790/16
-  - file: 'fonts/materialdesignicons-webfont.ttf'
+  - file: 'gui/fonts/materialdesignicons-webfont.ttf'
     id: font_mdi_large
     size: 100
     glyphs: &mdi-weather-glyphs
@@ -287,26 +287,26 @@ font:
       - "\U000F0F38" # mdi-weather-tornado
       - "\U000F059D" # mdi-weather-windy
       - "\U000F059E" # mdi-weather-windy-variant
-  - file: 'fonts/materialdesignicons-webfont.ttf'
+  - file: 'gui/fonts/materialdesignicons-webfont.ttf'
     id: font_mdi_medium
     size: 70
     glyphs: *mdi-weather-glyphs
 
 # Include Images
 image:
-  - file: 'img/car.png'
+  - file: 'gui/img/car.png'
     id: i_car
     type: BINARY
 #  - file: 'img/bus-clock.png'
 #    id: i_bus_clock
 #    ype: BINARY
-  - file: 'img/newspaper.png'
+  - file: 'gui/img/newspaper.png'
     id: i_newspaper
     type: BINARY
-  - file: 'img/recycle.png'
+  - file: 'gui/img/recycle.png'
     id: i_recycle
     type: BINARY
-  - file: 'img/trash-can.png'
+  - file: 'gui/img/trash-can.png'
     id: i_trash_can
     type: BINARY
 

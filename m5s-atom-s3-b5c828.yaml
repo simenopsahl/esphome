@@ -4,6 +4,7 @@ packages:
   board: !include board/m5stack_atom_s3.yaml
   hat: !include board/extension/hat_i2c.yaml
   env: !include board/module/hat_env_iii.yaml
+  color: !include gui/colors.yaml
 
 substitutions:
   devicename: m5s-as3-b5c828

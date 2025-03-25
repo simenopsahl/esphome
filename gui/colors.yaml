@@ -1,0 +1,38 @@
+---
+# https://esphome.io/components/display/#color
+# Global colors
+
+color:
+  - id: c_bg_p
+    hex: "011627"
+  - id: c_bg_s
+    hex: "1D3B53"
+  - id: c_text_p
+    hex: "FDF6E3"
+  - id: c_text_s
+    hex: "EEE8D5"
+
+  - id: c_red
+    hex: "ef5350"
+  - id: c_green
+    hex: "22da6e"
+  - id: c_blue
+    hex: "82aaff"
+  - id: c_yellow
+    hex: "ecc48d"
+  - id: c_pink
+    hex: "c792ea"
+  - id: c_purple
+    hex: "ff2c83"
+  - id: c_gray
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: c_white
+    red: 100%
+    green: 100%
+    blue: 100%
+  - id: c_black
+    red: 0%
+    green: 0%
+    blue: 0%

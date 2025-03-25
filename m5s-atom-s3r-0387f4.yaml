@@ -5,6 +5,7 @@ packages:
   hat: !include board/extension/hat_i2c.yaml
   portabc: !include board/extension/port_abc_i2c.yaml
   env: !include board/module/hat_env_iii.yaml
+  color: !include gui/colors.yaml
 
 substitutions:
   devicename: m5s-as3r-0387f4
