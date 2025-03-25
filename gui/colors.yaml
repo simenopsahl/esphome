@@ -24,6 +24,7 @@ color:
     hex: "c792ea"
   - id: c_purple
     hex: "ff2c83"
+
   - id: c_gray
     red: 50%
     green: 50%

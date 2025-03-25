@@ -111,7 +111,7 @@ light:
     name: "Backlight"
     entity_category: config
 
-# Speaker
+# Speaker (only got buzzer to work)
 #i2s_audio:
 #  i2s_lrclk_pin: $i2s_lrclk_pin
 
