@@ -1,0 +1,24 @@
+---
+# https://docs.m5stack.com/en/base/m5go_bottom
+# M5Stack Go Bottom
+#
+
+# RGB Side LED light strip
+light:
+  - platform: esp32_rmt_led_strip
+    id: side_light
+    rgb_order: GRB
+    pin: $led_pin
+    num_leds: 10
+    rmt_channel: 1
+    chipset: SK6812
+    restore_mode: RESTORE_DEFAULT_OFF
+    default_transition_length: 0s
+    name: "Side Light"
+    entity_category: config
+
+microphone:
+  - platform: i2s_audio
+    id: adc_mic
+    adc_pin: $mic_pin
+    adc_type: internal

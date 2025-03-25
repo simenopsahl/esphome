@@ -24,7 +24,7 @@ sensor:
       name: "Humidity SCD40"
       disabled_by_default: true
       device_class: "humidity"
-    altitude_compensation: 145
+    altitude_compensation: 145m
 #    ambient_pressure_compensation_source:
     address: 0x62
     update_interval: 30s

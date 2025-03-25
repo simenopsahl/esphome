@@ -7,11 +7,13 @@ packages:
 
 substitutions:
   devicename: m5s-as3u-b62a18
+  location: "1etg, Kjøkken"
 
 esphome:
   comment: "M5Stack Atom S3U b62a18"
   name: $devicename
   friendly_name: $devicename
+  area: $location
   project:
     version: "1.0.0"
 

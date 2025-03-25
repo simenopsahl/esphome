@@ -1,0 +1,43 @@
+packages:
+  <<: !include_dir_named common
+#  <<: !include_dir_named bluetooth
+  board: !include board/m5stack_fire.yaml
+  grove_i2c: !include board/extension/grove_i2c.yaml
+  grove_uart: !include board/extension/grove_uart.yaml
+  air_quality: !include board/module/module_air_quality.yaml
+  co2: !include board/module/unit_co2.yaml
+
+substitutions:
+  devicename: m5s-fire-a70780
+#  location: "2etg, Simen"
+
+esphome:
+  comment: "M5Stack Fire a70780"
+  name: $devicename
+  friendly_name: $devicename
+#  area: $location
+
+esp32:
+  framework:
+    type: esp-idf
+
+sensor:
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    sources:
+      # ENV III
+#      - source: temperature_sht3xd
+#      - source: temperature_qmp6988
+      # ENV IV
+#      - source: temperature_bmp280
+#      - source: temperature_sht4x
+      # CO2
+      - source: temperature_scd40
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
