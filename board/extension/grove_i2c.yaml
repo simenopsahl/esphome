@@ -6,5 +6,5 @@ i2c:
   - id: i2c_grove
     sda: $i2c_grove_sda_pin
     scl: $i2c_grove_scl_pin
-    frequency: 400kHz
+    frequency: 100kHz
     scan: true

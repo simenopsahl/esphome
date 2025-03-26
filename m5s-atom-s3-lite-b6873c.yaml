@@ -1,7 +1,7 @@
 packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
-  board: !include board/m5stack_atom_s3_lite_esp_idf.yaml
+  board: !include board/m5stack_atom_s3_lite.yaml
   portabc: !include board/extension/port_abc_i2c.yaml
   env: !include board/module/unit_env_iv.yaml
   pir: !include board/module/unit_pir.yaml

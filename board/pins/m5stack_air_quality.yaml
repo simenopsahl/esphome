@@ -25,7 +25,7 @@ substitutions:
   button_a_pin: GPIO0
   button_b_pin: GPIO8
   # LED
-  led_pin: GPIO21
+  rgb_pin: GPIO21
   # Mic & Speaker
   buzzer_pin: GPIO9
 #  i2s_lrclk_pin: GPIO13

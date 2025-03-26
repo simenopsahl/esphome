@@ -10,8 +10,8 @@ logger:
   id: component_logger
   level: DEBUG
   initial_level: DEBUG
-  logs:
-    light: INFO
+#  logs:
+#    light: INFO
 
 select:
   - platform: logger

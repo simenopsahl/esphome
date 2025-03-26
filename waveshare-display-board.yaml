@@ -16,6 +16,9 @@ esphome:
   project:
     version: "1.0.0"
 
+logger:
+  initial_level: INFO
+
 # Now render everything on the ePaper screen.
 display:
   - platform: waveshare_epaper

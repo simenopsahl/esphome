@@ -8,6 +8,7 @@ i2c:
   - id: i2c_pa_hub
     sda: $i2c_grove_sda_pin
     scl: $i2c_grove_scl_pin
+    frequency: 50kHz
     scan: true
 
 tca9548a:

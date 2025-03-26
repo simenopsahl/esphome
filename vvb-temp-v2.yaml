@@ -20,6 +20,9 @@ esp32:
   framework: 
     type: esp-idf
 
+logger:
+  initial_level: INFO
+
 #i2c:
 #  scl: GPIO22
 #  sda: GPIO21

@@ -1,0 +1,107 @@
+---
+# https://docs.m5stack.com/en/unit/envIII
+# https://esphome.io/components/sensor/sht3xd.html
+# https://esphome.io/components/sensor/qmp6988.html
+
+substitutions:
+  env_i2c_bus: i2c_grove
+
+#ENV.III
+sensor:
+  - platform: sht3xd
+    i2c_id: $env_i2c_bus
+    id: sht3xd_sensor
+    temperature:
+      id: temperature_sht3xd
+      name: "Temperature SHT3XD"
+      disabled_by_default: true
+      device_class: "temperature"
+    humidity:
+      id: humidity_sht3xd
+      name: "Humidity SHT3XD"
+      disabled_by_default: true
+      device_class: "humidity"
+      filters:
+#        - lambda: "return x + id(humidity_offset_env_iii).state;"
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    address: 0x44
+    update_interval: 30s
+
+  - platform: qmp6988
+    i2c_id: $env_i2c_bus
+    id: qmp6988_sensor
+    temperature:
+      id: temperature_qmp6988
+      name: "Temperature QMP6988"
+      disabled_by_default: true
+      device_class: "temperature"
+      oversampling: 4x
+    pressure:
+      id: pressure_qmp6988
+      name: "Pressure SHT3XD"
+      disabled_by_default: true
+      device_class: "atmospheric_pressure"
+      oversampling: 4x
+      filters:
+        - or:
+          - heartbeat: 900s
+          - delta: 0.15
+    address: 0x70
+    update_interval: 30s
+    iir_filter: 8x
+
+  # Combination    
+#  - platform: combination
+#    type: median
+#    id: temperature_env_iii
+#    name: "Temperature ENV.III"
+#    device_class: "temperature"
+#    sources:
+#      - source: temperature_sht3xd
+#      - source: temperature_qmp6988
+#    filters:
+#      - lambda: "return x + id(temperature_offset_env_iii).state;"
+#      - or:
+#        - heartbeat: 900s
+#        - delta: 0.15
+
+# Offsets
+#number:
+#  - platform: template
+#    id: temperature_offset_env_iii
+#    name: "Temperature Offset ENV.III"
+#    entity_category: config
+#    unit_of_measurement: "°C"
+#    disabled_by_default: true
+#    min_value: -20
+#    max_value: 20
+#    step: 0.1
+#    mode: box
+#    update_interval: never
+#    optimistic: true
+#    restore_value: true
+#    initial_value: 0
+#    icon: "mdi:thermometer"
+#    on_value:
+#      - lambda: 'id(sht3xd_sensor).update();'
+#      - lambda: 'id(qmp6988_sensor).update();'
+
+#  - platform: template
+#    id: humidity_offset_env_iii
+#    name: "Humidity Offset ENV.III"
+#    entity_category: config
+#    unit_of_measurement: "%"
+#    disabled_by_default: true
+#    min_value: -50
+#    max_value: 50
+#    step: 0.1
+#    mode: box
+#    update_interval: never
+#    optimistic: true
+#    restore_value: true
+#    initial_value: 0
+#    icon: "mdi:water-percent"
+#    on_value:
+#      - lambda: 'id(sht3xd_sensor).update();'

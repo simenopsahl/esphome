@@ -5,6 +5,9 @@
 # M5Stack CoreInk
 #
 
+substitutions:
+  time_timezone: "Europe/Oslo"
+
 # Pins for this model
 packages:
   pins: !include pins/m5stack_coreink.yaml
@@ -13,36 +16,29 @@ packages:
 esphome:
   project:
     name: "M5Stack.CoreInk"
+  on_boot:
+    - priority: 800
+      then:
+        - pcf8563.read_time
   
 esp32:
   board: m5stack-coreink
-
-#i2c:
-# Ext PINs
-#  - id: i2c_bus
-#    sda: $i2c_bus_sda_pin
-#    scl: $i2c_bus_scl_pin
-#    frequency: 400kHz
-#    scan: true
 
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
 
-#time:
-#  - platform: pcf8563
-#    i2c_id: i2c_bus
-#    address: 0x51
-    # repeated synchronization is not necessary unless the external RTC
-    # is much more accurate than the internal clock
-#    update_interval: never
-#  - platform: homeassistant
-#    id: homeassistant_time
-    # instead try to synchronize via network repeatedly ...
-#    on_time_sync:
-#      then:
-        # ... and update the RTC when the synchronization was successful
-#        pcf8563.write_time:
+time:
+  - platform: pcf8563
+    i2c_id: i2c_internal
+    address: 0x51
+    update_interval: 10min
+  - platform: sntp
+    id: sntp_time
+    timezone: $time_timezone
+    on_time_sync:
+      then:
+        pcf8563.write_time:
 
 light:
   # Enable status LED
@@ -55,6 +51,11 @@ output:
   - platform: ledc
     id: buzzer
     pin: $buzzer_pin
+  - platform: gpio
+    id: power_hold
+    pin:
+      number: $pwr_mos_pin
+      allow_other_uses: true
 
 binary_sensor:
   # Power Button
@@ -161,6 +162,18 @@ binary_sensor:
     on_release:
       then:
         - output.turn_off: buzzer
+
+  - platform: gpio
+    id: pwr_hold
+    name: Power Hold
+    entity_category: diagnostic
+    pin:
+      number: $pwr_mos_pin
+      allow_other_uses: true
+      ignore_strapping_warning: true
+    on_press:
+      then:
+        - logger.log: Power Hold
 
 # Script for buzzer beep
 script:

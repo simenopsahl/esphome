@@ -15,5 +15,5 @@ i2c:
     scl:
       number: $i2c_hat_scl_pin
       allow_other_uses: $hat_shared
-    frequency: 400kHz
+    frequency: 200kHz
     scan: true

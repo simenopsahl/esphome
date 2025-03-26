@@ -18,6 +18,9 @@ esphome:
   project:
     version: "2.0.0"
 
+logger:
+  initial_level: INFO
+
 api:
   services:
     - service: tune

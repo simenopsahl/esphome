@@ -2,6 +2,7 @@ packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
   board: !include board/m5stack_coreink.yaml
+  internal_i2c: !include board/extension/internal_i2c.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
@@ -19,34 +20,38 @@ esphome:
   project: 
     version: "1.0.0"
   on_boot:
-    then:
-      # Bypass sleep circuit arduino
-#      - lambda: |-
-#          pinMode(GPIO_NUM_12, OUTPUT);
-#          digitalWrite(GPIO_NUM_12, HIGH);
-#          gpio_hold_en(GPIO_NUM_12);
-      # Bypass sleep circuit esp-idf
-      - lambda: |-
-          gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
-          gpio_set_level(GPIO_NUM_12, 1);
-          gpio_hold_en(GPIO_NUM_12);
-          gpio_deep_sleep_hold_en();
-      # read the RTC time once when the system boots
-#      - pcf8563.read_time:
-      - component.update: display_eink
-      - wait_until:
-          condition:
-            lambda: 'return id(data_updated) == true;'
-      # Wait a bit longer so all the items are received
-      - delay: 5s
-      - logger.log: "Initial sensor data received: Refreshing display..."
-      - lambda: 'id(initial_data_received) = true;'
-      - display.page.show: page_room
-      - script.execute: update_screen
+    - priority: 800
+      then:
+        # Bypass sleep circuit arduino
+  #      - lambda: |-
+  #          pinMode(GPIO_NUM_12, OUTPUT);
+  #          digitalWrite(GPIO_NUM_12, HIGH);
+  #          gpio_hold_en(GPIO_NUM_12);
+        # Bypass sleep circuit esp-idf
+        - lambda: |-
+            gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+            gpio_set_level(GPIO_NUM_12, 1);
+            gpio_hold_en(GPIO_NUM_12);
+            gpio_deep_sleep_hold_en();
+    - priority: -100
+      then:
+        - component.update: display_eink
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) == true;'
+        # Wait a bit longer so all the items are received
+        - delay: 5s
+        - logger.log: "Initial sensor data received: Refreshing display..."
+        - lambda: 'id(initial_data_received) = true;'
+        - display.page.show: page_room
+        - script.execute: update_screen
   
 esp32:
   framework:
     type: esp-idf
+
+logger:
+  initial_level: INFO
 
 display:
   # 200 x 200 resolution
