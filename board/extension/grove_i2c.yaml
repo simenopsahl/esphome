@@ -1,10 +1,13 @@
 ---
 # m5stack i2c Grove Port
 
+substitutions:
+  i2c_grove_frequency: 100kHz
+
 i2c:
 # Grove port
   - id: i2c_grove
     sda: $i2c_grove_sda_pin
     scl: $i2c_grove_scl_pin
-    frequency: 100kHz
+    frequency: $i2c_grove_frequency
     scan: true

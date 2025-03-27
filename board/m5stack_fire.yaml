@@ -28,14 +28,6 @@ esp32:
   board: m5stack-fire
   flash_size: 16MB
 
-#i2c:
-# Internal
-#  - id: i2c_internal
-#    sda: $i2c_int_sda_pin
-#    scl: $i2c_int_scl_pin
-#    frequency: 400kHz
-#    scan: true
-
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
@@ -70,25 +62,6 @@ spi:
 #    lambda: |-
 #      it.print(80, 0, id(roboto), Color(255, 255, 255), TextAlign::TOP_CENTER, "M5Stack Fire Test");
 
-# Battery base
-#external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/ssieb/custom_components
-#    components: [ip5306]
-#ip5306:
-#  battery_level:
-#    id: bat_percent
-#    name: "Battery"
-#    entity_category: diagnostic
-#    device_class: battery
-#    unit_of_measurement: "%"
-#  charger_connected:
-#    id: bat_connected
-#  charge_full:
-#    id: bat_full
-
-# Internal LEDS
 output:
   # backlight output
   - platform: ledc

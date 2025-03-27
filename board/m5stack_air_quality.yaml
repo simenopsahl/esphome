@@ -32,6 +32,7 @@ spi:
 
 time:
   - platform: pcf8563
+    i2c_id: i2c_internal
     address: 0x51
     update_interval: 10min
   - platform: sntp
@@ -173,6 +174,7 @@ binary_sensor:
       number: $pwr_mos_pin
       allow_other_uses: true
       ignore_strapping_warning: true
+      inverted: true
     on_press:
       then:
         - logger.log: Power Hold On
@@ -345,6 +347,7 @@ script:
 sensor:
   - platform: scd4x
     id: scd40_sensor
+    i2c_id: i2c_internal
     co2:
       id: co2_scd40
       name: "CO2"
@@ -370,6 +373,7 @@ sensor:
 
   - platform: sen5x
     id: sen55_sensor
+    i2c_id: i2c_internal
     pm_1_0:
       id: pm1_0_sen55
       name: "PM 1"

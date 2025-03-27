@@ -3,16 +3,20 @@ packages:
 #  <<: !include_dir_named bluetooth
   board: !include board/m5stack_air_quality.yaml
   internal_i2c: !include board/extension/internal_i2c.yaml
+  grove_i2c: !include board/extension/grove_i2c.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
 
 substitutions:
   devicename: m5s-air-quality-b62db0
+  location: "Trapp"
 
 esphome:
   comment: "M5Stack AirQuality b62db0"
-  project:
-    version: "1.0.0"
   name: $devicename
   friendly_name: $devicename
+  area: $location
+  project:
+    version: "1.0.0"
   on_boot:
     - priority: 800
       then:
@@ -44,7 +48,11 @@ esp32:
   framework:
     type: esp-idf
 
+logger:
+  initial_level: INFO
+
 display:
+  # 200 x 200 resolution
   - platform: waveshare_epaper
     id: display_eink
     model: 1.54inv2
@@ -65,7 +73,7 @@ display:
 
           //it.graph( 0, 0, id(graph_temperature_local), COLOR_OFF );
             
-          it.print( it.get_width()/2, 0, id(f26b), COLOR_OFF, TextAlign::TOP_CENTER, "Device" );
+          it.print( it.get_width()/2, 0, id(f26b), COLOR_OFF, TextAlign::TOP_CENTER, "Enhet" );
           it.printf( it.get_width()/2, it.get_height()/2, id(f130b), COLOR_OFF, TextAlign::CENTER, "%2.0f", id(temperature_local).state );
 
           it.printf( 0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_scd40).state );
@@ -146,11 +154,11 @@ display:
             it.printf(it.get_width()/2, it.get_height()/2, id(f20b), COLOR_ON, TextAlign::CENTER, "Venter på data...");
           } else {
 
-            //it.graph(0, 0, id(graph_temperature_room), COLOR_ON);
+            it.graph(0, 0, id(graph_temperature_room), COLOR_ON);
             
             it.print(0, 45, id(f20), COLOR_ON, TextAlign::TOP_LEFT, "Rom");
             it.print(it.get_width(), 45, id(f26b), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
-            it.printf(it.get_width()/2, 166, id(f130b), COLOR_ON, TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_local).state);
+            it.printf(it.get_width()/2, 166, id(f130b), COLOR_ON, TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_feels_like).state);
 
             // Show wifi icon.
             if (id(component_wifi).is_connected()) {
@@ -234,7 +242,45 @@ binary_sensor:
     entity_id: binary_sensor.etg2_occupancy
     id: motion_detected
 
+graph:
+  - id: graph_temperature_room
+    duration: 8h
+#    x_grid: 15min
+#    y_grid: 1.0
+    width: 200
+    height: 50
+    border: false
+    traces:
+      - sensor: temperature_feels_like
+        line_thickness: 6
+        continuous: true
+#  - id: graph_temperature_local
+#    duration: 6h
+#    x_grid: 15min
+#    y_grid: 1.0
+#    width: 200
+#    height: 50
+#    border: false
+#    traces:
+#      - sensor: temperature_local
+#        line_thickness: 6
+#        continuous: true
+
 sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: sensor.etg2_gang_temperature
+    id: temperature_homeassistant
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.etg2_ellen_svein_tc_heatindex
+    id: temperature_feels_like
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
   # Combine sensors
   - platform: combination
     type: median
@@ -247,7 +293,7 @@ sensor:
 #      - source: temperature_qmp6988
       # ENV IV
 #      - source: temperature_bmp280
-#      - source: temperature_sht4x
+      - source: temperature_sht4x
       # CO2
       - source: temperature_scd40
       # AirQuality
@@ -269,7 +315,7 @@ sensor:
       # ENV III
 #      - source: humidity_sht3xd
       # ENV IV
-#      - source: humidity_sht4x
+      - source: humidity_sht4x
       # CO2
       - source: humidity_scd40
       # AirQuality

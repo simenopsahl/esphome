@@ -51,7 +51,7 @@ display:
           // Frame
           //it.rectangle(0,  0, it.get_width(), it.get_height(), id(c_yellow));
 
-          it.print(-1, -2, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "HAT");
+          it.print(-1, -2, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "Enhet");
           it.print(it.get_width()+1, -2, id(f24b), id(c_gray), TextAlign::TOP_RIGHT, "°C");
           
           it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_white), TextAlign::CENTER, "%2.0f", id(temperature_local).state);

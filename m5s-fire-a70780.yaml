@@ -5,12 +5,15 @@ packages:
   grove_i2c: !include board/extension/grove_i2c.yaml
   grove_uart: !include board/extension/grove_uart.yaml
   air_quality: !include board/module/module_air_quality.yaml
+  base_btc: !include board/module/base_btc.yaml
   co2: !include board/module/unit_co2.yaml
   color: !include gui/colors.yaml
 
 substitutions:
   devicename: m5s-fire-a70780
 #  location: "2etg, Simen"
+  i2c_internal_frequency: 100kHz
+  i2c_grove_frequency: 50kHz
 
 esphome:
   comment: "M5Stack Fire a70780"
@@ -22,6 +25,9 @@ esp32:
   framework:
     type: esp-idf
 
+logger:
+  initial_level: INFO
+
 # 320x240 ILI9342C LCD
 display:
   - platform: ili9xxx
@@ -30,7 +36,7 @@ display:
     cs_pin: $disp_cs_pin
     dc_pin: $disp_dc_pin
     reset_pin: $disp_rs_pin
-    data_rate: 40Mhz
+    data_rate: 20Mhz
     invert_colors: true
     color_palette: 8BIT
     update_interval: 1s
@@ -150,8 +156,8 @@ sensor:
     name: "Temperature"
     device_class: "temperature"
     sources:
-      # ENV III
-#      - source: temperature_sht3xd
+      # ENV III / Base BTC
+      - source: temperature_sht3xd
 #      - source: temperature_qmp6988
       # ENV IV
 #      - source: temperature_bmp280
@@ -174,6 +180,22 @@ sensor:
 #            text:
 #              format: "%.0f °C"
 #              args: [ 'id(temperature_local).get_state()' ]
+  - platform: combination
+    type: median
+    id: humidity_local
+    name: "Humidity"
+    device_class: "humidity"
+    sources:
+      # ENV III
+      - source: humidity_sht3xd
+      # ENV IV
+#      - source: humidity_sht4x
+      # CO2
+      - source: humidity_scd40
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
 
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset

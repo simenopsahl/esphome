@@ -5,6 +5,7 @@
 # HAT Shared pins
 substitutions:
   hat_shared: "false"
+  i2c_hat_frequency: 200kHz
 
 i2c:
 # Mate HAT
@@ -15,5 +16,5 @@ i2c:
     scl:
       number: $i2c_hat_scl_pin
       allow_other_uses: $hat_shared
-    frequency: 200kHz
+    frequency: $i2c_hat_frequency
     scan: true

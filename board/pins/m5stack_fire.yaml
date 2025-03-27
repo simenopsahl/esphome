@@ -31,7 +31,7 @@ substitutions:
   button_c_pin: GPIO37
   # LED
   disp_bl_pin: GPIO32
-  led_pin: GPIO15
+  rgb_pin: GPIO15
   # Mic & Speaker
   i2s_lrclk_pin: GPIO13
   mic_pin: GPIO34

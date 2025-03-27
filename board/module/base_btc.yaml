@@ -1,0 +1,24 @@
+---
+# https://docs.m5stack.com/en/base/btc_base
+# https://esphome.io/components/sensor/sht3xd.html
+
+substitutions:
+  base_btc_i2c_bus: i2c_grove
+
+# SHT30
+sensor:
+  - platform: sht3xd
+    i2c_id: $base_btc_i2c_bus
+    id: sht3xd_sensor
+    temperature:
+      id: temperature_sht3xd
+      name: "Temperature SHT3XD"
+      disabled_by_default: true
+      device_class: "temperature"
+    humidity:
+      id: humidity_sht3xd
+      name: "Humidity SHT3XD"
+      disabled_by_default: true
+      device_class: "humidity"
+    address: 0x44
+    update_interval: 30s

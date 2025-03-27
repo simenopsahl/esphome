@@ -56,14 +56,14 @@ logger:
 display:
   # 200 x 200 resolution
   - platform: waveshare_epaper
-    model: 1.54inv2
     id: display_eink
+    model: 1.54inv2
     cs_pin: $disp_cs_pin
     dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
     busy_pin:
       number: $disp_busy_pin
       inverted: false
-    reset_pin: $disp_reset_pin
     full_update_every: 1
 #    reset_duration: 2ms
     update_interval: never
@@ -94,7 +94,7 @@ display:
             it.image(it.get_width()+2, it.get_height()/2, id(i_api), ImageAlign::CENTER_RIGHT, COLOR_OFF, COLOR_ON);
           }
             
-          it.print(it.get_width()/2, 0, id(f25b), COLOR_OFF, TextAlign::TOP_CENTER, "HAT");
+          it.print(it.get_width()/2, 0, id(f25b), COLOR_OFF, TextAlign::TOP_CENTER, "Enhet");
           it.printf(it.get_width()/2, it.get_height()/2, id(f130b), COLOR_OFF, TextAlign::CENTER, "%2.0f", id(temperature_local).state);
 
           it.printf(0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_sht3xd).state);
@@ -108,7 +108,7 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf(it.get_width()/2, 200, id(f14), COLOR_OFF, TextAlign::BOTTOM_CENTER, "Oppdatert @ %s", str);
+          it.printf(it.get_width()/2, 200, id(f14), COLOR_OFF, TextAlign::BOTTOM_CENTER, "@ %s", str);
       - id: page_info
         lambda: |-
           // Fill background.
@@ -151,7 +151,7 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf(it.get_width()/2, 0, id(f14), COLOR_ON, TextAlign::TOP_CENTER, "Oppdatert @ %s", str);
+          it.printf(it.get_width()/2, 0, id(f14), COLOR_ON, TextAlign::TOP_CENTER, "@ %s", str);
       - id: page_room
         lambda: |-
           // Fill background.
@@ -182,7 +182,7 @@ display:
             char str[17];
             time_t currTime = id(time_homeassistant).now().timestamp;
             strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-            it.printf(it.get_width()/2, 200, id(f14), COLOR_ON, TextAlign::BOTTOM_CENTER, "Oppdatert @ %s", str);
+            it.printf(it.get_width()/2, 200, id(f14), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str);
           }
 
 font:

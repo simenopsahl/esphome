@@ -43,5 +43,5 @@ substitutions:
   # Buzzer
   buzzer_pin: GPIO2
   # Power MOS
-  power_mos_pin: GPIO12
+  pwr_mos_pin: GPIO12
   bat_feedback: GPIO35
