@@ -1,0 +1,14 @@
+---
+# https://www.waveshare.com/wiki/E-Paper_ESP32_Driver_Board
+# Base functions for Waveshare e-paper ESP32 driver board
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/upesy_wroom.yaml
+
+esp32:
+  board: upesy_wroom
+
+status_led:
+  pin: $led_pin

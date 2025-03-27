@@ -1,10 +1,14 @@
 packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
+  board: !include board/upesy_wroom.yaml
+  i2c_internal: !include board/extension/internal_i2c.yaml
+  bme280: !include board/module/bme280_i2c.yaml
 
 substitutions:
   devicename: ble-relay1
   location: "1etg, Kjøkken"
+  i2c_internal_frequency: 100kHz
 
 esphome:
   comment: "BLE Relay"
@@ -13,46 +17,8 @@ esphome:
   area: $location
 
 esp32:
-    board: upesy_wroom
     framework:
       type: esp-idf
 
 logger:
   initial_level: INFO
-
-i2c:
-  scl: GPIO22
-  sda: GPIO21
-  scan: True
-  frequency: 100kHz
-  id: bus_a
-
-sensor:
-  - platform: bme280_i2c
-    temperature:
-      id: bme_temperature
-      name: "Temperature"
-      oversampling: 4x
-      filters:
-        - or:
-          - heartbeat: 900s
-          - delta: 0.15
-    pressure:
-      id: bme_pressure
-      name: "Pressure"
-      device_class: "atmospheric_pressure"
-      oversampling: 4x
-      filters:
-        - or:
-          - heartbeat: 900s
-          - delta: 0.1
-    humidity:
-      id: bme_humidity
-      name: "Humidity"
-      oversampling: 4x
-      filters:
-        - or:
-          - heartbeat: 900s
-          - delta: 0.15
-    address: 0x76
-    update_interval: 30s

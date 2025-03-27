@@ -1,0 +1,30 @@
+---
+# https://esphome.io/components/sensor/bme280.html
+# BME280
+
+substitutions:
+  bme280_i2c_bus: i2c_internal
+  bme280_address: "0x76"
+
+sensor:
+  - platform: bme280_i2c
+    i2c_id: $bme280_i2c_bus
+    id: bme280_sensor
+    temperature:
+      id: temperature_bme280
+      name: "Temperature BME280"
+      device_class: "temperature"
+      oversampling: 4x
+    pressure:
+      id: pressure_bme280
+      name: "Pressure BME280"
+      device_class: "atmospheric_pressure"
+      oversampling: 4x
+    humidity:
+      id: humidity_bme280
+      name: "Humidity BME280"
+      device_class: "humidity"
+      oversampling: 4x
+    address: $bme280_address
+    iir_filter: 8x
+    update_interval: 30s
