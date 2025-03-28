@@ -16,10 +16,11 @@ packages:
 esphome:
   project:
     name: "M5Stack.CoreInk"
-  on_boot:
-    - priority: 800
-      then:
-        - pcf8563.read_time
+# i2c RTC only with one additional i2c bus
+#  on_boot:
+#    - priority: 800
+#      then:
+#        - pcf8563.read_time
   
 esp32:
   board: m5stack-coreink
@@ -28,17 +29,18 @@ spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
 
-time:
-  - platform: pcf8563
-    i2c_id: i2c_internal
-    address: 0x51
-    update_interval: 10min
-  - platform: sntp
-    id: sntp_time
-    timezone: $time_timezone
-    on_time_sync:
-      then:
-        pcf8563.write_time:
+# i2c RTC only with one additional i2c bus
+#time:
+#  - platform: pcf8563
+#    i2c_id: i2c_internal
+#    address: 0x51
+#    update_interval: 10min
+#  - platform: sntp
+#    id: sntp_time
+#    timezone: $time_timezone
+#    on_time_sync:
+#      then:
+#        pcf8563.write_time:
 
 light:
   # Enable status LED

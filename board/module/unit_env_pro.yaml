@@ -25,18 +25,21 @@ sensor:
       name: "Temperature BME688"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
     pressure:
       id: pressure_bme688
       sample_rate: ULP
       name: "Pressure BME688"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
+      state_class: "measurement"
     humidity:
       id: humidity_bme688
       sample_rate: ULP
       name: "Humidity BME688"
       disabled_by_default: true
       device_class: "humidity"
+      state_class: "measurement"
     iaq:
       id: iaq_bme688
       sample_rate: LP
@@ -56,6 +59,7 @@ sensor:
       sample_rate: LP
       name: "CO2 equivalent BME688"
       device_class: "carbon_dioxide"
+      state_class: "measurement"
     breath_voc_equivalent:
       id: evoc_bme688
       sample_rate: LP

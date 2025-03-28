@@ -1,8 +1,9 @@
 packages:
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
   board: !include board/m5stack_fire.yaml
   grove_i2c: !include board/extension/grove_i2c.yaml
+#  alt_uart: !include board/extension/alt_uart.yaml
   grove_uart: !include board/extension/grove_uart.yaml
   air_quality: !include board/module/module_air_quality.yaml
   base_btc: !include board/module/base_btc.yaml
@@ -12,8 +13,9 @@ packages:
 substitutions:
   devicename: m5s-fire-a70780
 #  location: "2etg, Simen"
-  i2c_internal_frequency: 100kHz
+  i2c_internal_frequency: 50kHz
   i2c_grove_frequency: 50kHz
+#  module_air_quality_uart_bus: uart_alt
 
 esphome:
   comment: "M5Stack Fire a70780"
@@ -26,7 +28,7 @@ esp32:
     type: esp-idf
 
 logger:
-  initial_level: INFO
+  tx_buffer_size: 256
 
 # 320x240 ILI9342C LCD
 display:
@@ -75,6 +77,13 @@ display:
           it.printf( it.get_width()/2, ( it.get_height()/2 )-20, id(f120b), id(c_text_p), TextAlign::CENTER, "%2.0f", id(temperature_local).state );
           it.image( 0, 0, id(i_temp_l), ImageAlign::TOP_LEFT, id(c_text_s) );
           it.print( it.get_width(), 0, id(f60), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
+          
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_homeassistant).now().timestamp;
+          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+          it.printf(it.get_width()/2, 0, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", str);
       - id: page_airq
         lambda: |-
           // Bottom Nav BG
@@ -139,14 +148,14 @@ display:
             it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
           }
 
-            // NordPool Section
-            it.printf (1, 2, id(f14), id(c_text_p), TextAlign::TOP_LEFT, "%s", id(nordpool_time_0).state.c_str() );
-            it.printf( it.get_width()/2, 2, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", id(nordpool_time_4).state.c_str() );
-            it.printf( it.get_width()-1, 2, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "%s", id(nordpool_time_8).state.c_str() );
-            it.graph( 0, 22, id(graph_nordpool), id(c_bg_s) );
-            it.printf( 1, 172, id(f18), id(c_text_p), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state );
-            it.printf( it.get_width()/2, 172, id(f18), id(c_text_s), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state );
-            it.printf( it.get_width()-1, 172, id(f18), id(c_text_s), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state );
+          // NordPool Section
+          it.printf (1, 2, id(f14), id(c_text_p), TextAlign::TOP_LEFT, "%s", id(nordpool_time_0).state.c_str() );
+          it.printf( it.get_width()/2, 2, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", id(nordpool_time_4).state.c_str() );
+          it.printf( it.get_width()-1, 2, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "%s", id(nordpool_time_8).state.c_str() );
+          it.graph( 0, 22, id(graph_nordpool), id(c_bg_s) );
+          it.printf( 1, 172, id(f18), id(c_text_p), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state );
+          it.printf( it.get_width()/2, 172, id(f18), id(c_text_s), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state );
+          it.printf( it.get_width()-1, 172, id(f18), id(c_text_s), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state );
 
 sensor:
   # Combine sensors
@@ -155,6 +164,7 @@ sensor:
     id: temperature_local
     name: "Temperature"
     device_class: "temperature"
+    state_class: "measurement"
     sources:
       # ENV III / Base BTC
       - source: temperature_sht3xd
@@ -185,6 +195,7 @@ sensor:
     id: humidity_local
     name: "Humidity"
     device_class: "humidity"
+    state_class: "measurement"
     sources:
       # ENV III
       - source: humidity_sht3xd

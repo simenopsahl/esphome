@@ -14,16 +14,19 @@ sensor:
       id: co2_scd40
       name: "CO2 SCD40"
       device_class: "carbon_dioxide"
+      state_class: "measurement"
     temperature:
       id: temperature_scd40
       name: "Temperature SCD40"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
     humidity:
       id: humidity_scd40
       name: "Humidity SCD40"
       disabled_by_default: true
       device_class: "humidity"
+      state_class: "measurement"
     altitude_compensation: 145m
 #    ambient_pressure_compensation_source:
     address: 0x62

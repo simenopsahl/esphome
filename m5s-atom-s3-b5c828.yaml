@@ -86,6 +86,7 @@ sensor:
     id: temperature_local
     name: "Temperature"
     device_class: "temperature"
+    state_class: "measurement"
     sources:
       # ENV III
       - source: temperature_sht3xd
@@ -93,6 +94,8 @@ sensor:
       # ENV IV
 #      - source: temperature_bmp280
 #      - source: temperature_sht4x
+      # CO2
+#      - source: temperature_scd40
     filters:
       - or:
         - heartbeat: 900s

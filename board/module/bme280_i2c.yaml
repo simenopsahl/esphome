@@ -14,16 +14,19 @@ sensor:
       id: temperature_bme280
       name: "Temperature BME280"
       device_class: "temperature"
+      state_class: "measurement"
       oversampling: 4x
     pressure:
       id: pressure_bme280
       name: "Pressure BME280"
       device_class: "atmospheric_pressure"
+      state_class: "measurement"
       oversampling: 4x
     humidity:
       id: humidity_bme280
       name: "Humidity BME280"
       device_class: "humidity"
+      state_class: "measurement"
       oversampling: 4x
     address: $bme280_address
     iir_filter: 8x

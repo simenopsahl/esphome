@@ -19,7 +19,7 @@ esphome:
 #      - "-DARDUINO_USB_CDC_ON_BOOT=1"
 #      - "-mfix-esp32-psram-cache-issue"
 #      - "-mfix-esp32-psram-cache-strategy=memw"
-# PSRAM is shared with UART bus
+# PSRAM is shared with UART bus tx17/rx16
 #psram:
 #  mode: octal
 #  speed: 80MHz

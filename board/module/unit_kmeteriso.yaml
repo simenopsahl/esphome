@@ -14,7 +14,9 @@ sensor:
       id: temperature_kmeteriso
       name: "Temperature KMeterISO"
       device_class: "temperature"
+      state_class: "measurement"
     internal_temperature:
       id: temperature_kmeteriso_internal
       name: "Temperature KMeterISO Internal"
       device_class: "temperature"
+      state_class: "measurement"

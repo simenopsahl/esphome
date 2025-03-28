@@ -16,15 +16,17 @@ sensor:
       name: "Temperature BMP280"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
       oversampling: 4x
     pressure:
       id: pressure_bmp280
       name: "Pressure BMP280"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
+      state_class: "measurement"
       oversampling: 4x
     address: 0x76
-    iir_filter: 8x
+    iir_filter: 4x
     update_interval: 30s
 
   - platform: sht4x
@@ -35,11 +37,13 @@ sensor:
       name: "Temperature SHT4X"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
     humidity:
       id: humidity_sht4x
       name: "Humidity SHT4X"
       disabled_by_default: true
       device_class: "humidity"
+      state_class: "measurement"
     address: 0x44
     update_interval: 30s
   

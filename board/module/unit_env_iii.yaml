@@ -16,16 +16,13 @@ sensor:
       name: "Temperature SHT3XD"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
     humidity:
       id: humidity_sht3xd
       name: "Humidity SHT3XD"
       disabled_by_default: true
       device_class: "humidity"
-      filters:
-#        - lambda: "return x + id(humidity_offset_env_iii).state;"
-        - or:
-          - heartbeat: 900s
-          - delta: 0.15
+      state_class: "measurement"
     address: 0x44
     update_interval: 30s
 
@@ -37,17 +34,15 @@ sensor:
       name: "Temperature QMP6988"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
       oversampling: 4x
     pressure:
       id: pressure_qmp6988
       name: "Pressure SHT3XD"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
+      state_class: "measurement"
       oversampling: 4x
-      filters:
-        - or:
-          - heartbeat: 900s
-          - delta: 0.15
     address: 0x70
     update_interval: 30s
     iir_filter: 8x

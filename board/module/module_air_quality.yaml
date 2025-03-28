@@ -17,6 +17,7 @@ sensor:
       id: pm1_pmsa003
       name: "PM1 PMSA003"
       device_class: "pm1"
+      state_class: "measurement"
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -25,6 +26,7 @@ sensor:
       id: pm_25_pmsa003
       name: "PM2.5 PMSA003"
       device_class: "pm25"
+      state_class: "measurement"
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -33,6 +35,7 @@ sensor:
       id: pm_10_pmsa003
       name: "PM10 PMSA003"
       device_class: "pm10"
+      state_class: "measurement"
       filters:
         - sliding_window_moving_average:
             window_size: 3

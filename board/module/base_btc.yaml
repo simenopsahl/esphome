@@ -15,10 +15,12 @@ sensor:
       name: "Temperature SHT3XD"
       disabled_by_default: true
       device_class: "temperature"
+      state_class: "measurement"
     humidity:
       id: humidity_sht3xd
       name: "Humidity SHT3XD"
       disabled_by_default: true
       device_class: "humidity"
+      state_class: "measurement"
     address: 0x44
     update_interval: 30s

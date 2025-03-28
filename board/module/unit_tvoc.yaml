@@ -14,9 +14,11 @@ sensor:
       id: eco2_sgp30
       name: "eCO2 SGP30"
       device_class: "carbon_dioxide"
+      state_class: "measurement"
     tvoc:
       id: tvoc_sgp30
       name: "TVOC SGP30"
       device_class: "volatile_organic_compounds_parts"
+      state_class: "measurement"
     address: 0x58
     update_interval: 10s
