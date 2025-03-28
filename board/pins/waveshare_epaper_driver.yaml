@@ -3,25 +3,63 @@
 # PINs for Waveshare e-paper ESP32 driver board
 
 substitutions:
+  # i2c
   i2c_sda_pin: GPIO21
   i2c_scl_pin: GPIO22
+  # UART
   tx0__pin: GPIO1
   rx0_pin: GPIO3
   tx1__pin: GPIO10
   rx1_pin: GPIO9
   tx2__pin: GPIO17
   rx2_pin: GPIO16
+  # SPI
   spi_clk_pin: GPIO13
   spi_mosi_pin: GPIO14
   disp_cs_pin: GPIO15
   disp_dc_pin: GPIO27
   disp_busy_pin: GPIO25
   disp_reset_pin: GPIO26
-  # Button
-  button_power_pin: GPIO35
-  button_side_pin: GPIO39
-  button_front_pin: GPIO37
-  # LED
-  disp_bl_pin: GPIO27
-  led_pin: GPIO19
-  ir_pin: GPIO19
+  vspi_clk_pin: GPIO18
+  vspi_mosi_pin: GPIO23
+  vspi_miso_pin: GPIO19
+  vspi_cs_pin: GPIO5
+
+  # DAC
+  dac1_pin: GPIO25
+  dac2_pin: GPIO26
+  # ADC
+  adc0_pin: GPIO36
+  adc3_pin: GPIO39
+  adc4_pin: GPIO32
+  adc5_pin: GPIO33
+  adc6_pin: GPIO34
+  adc7_pin: GPIO35
+  adc10_pin: GPIO4
+  adc11_pin: GPIO0
+  adc12_pin: GPIO2
+  adc13_pin: GPIO15
+  adc14_pin: GPIO13
+  adc15_pin: GPIO12
+  adc16_pin: GPIO14
+  adc17_pin: GPIO27
+  adc18_pin: GPIO25
+  adc19_pin: GPIO26
+  # Flash
+  flash_cmd_pin: GPIO11
+  flash_clk_pin: GPIO6
+  flash_dat0_pin: GPIO7
+  flash_dat1_pin: GPIO8
+  flash_dat2_pin: GPIO9
+  flash_dat3_pin: GPIO10
+  # Touch
+  touch0_pin: GPIO4
+  touch1_pin: GPIO0
+  touch2_pin: GPIO2
+  touch3_pin: GPIO15
+  touch4_pin: GPIO13
+  touch5_pin: GPIO12
+  touch6_pin: GPIO14
+  touch7_pin: GPIO27
+  touch8_pin: GPIO33
+  touch9_pin: GPIO32
