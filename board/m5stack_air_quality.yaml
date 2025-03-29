@@ -402,12 +402,10 @@ sensor:
     voc:
       id: voc_sen55
       name: VOC
-      unit_of_measurement: "ppb"
-      device_class: "volatile_organic_compounds_parts"
     nox:
       id: nox_sen55
       name: "NOX"
-      unit_of_measurement: "ppb"
+    auto_cleaning_interval: 48h
     address: 0x69
     update_interval: 30s
 

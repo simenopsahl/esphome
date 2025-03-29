@@ -21,8 +21,8 @@ esp32:
   framework:
     type: esp-idf
 
-logger:
-  initial_level: INFO
+#logger:
+#  initial_level: INFO
 
 sensor:
   # Combine sensors

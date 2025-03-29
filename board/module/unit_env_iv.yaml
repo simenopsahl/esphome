@@ -45,6 +45,8 @@ sensor:
       device_class: "humidity"
       state_class: "measurement"
     address: 0x44
+    heater_power: Low
+    heater_time: Short
     update_interval: 30s
   
   # Combination
