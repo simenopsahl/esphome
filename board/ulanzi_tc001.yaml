@@ -63,6 +63,15 @@ globals:
     type: int
     initial_value: '40'
 
+api:
+  services:
+    - service: tune
+      variables:
+        tune: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return tune;'
+
 binary_sensor:
   - platform: gpio
     pin:
@@ -249,6 +258,18 @@ time:
   - platform: ds1307
     update_interval: never
     id: ehmtx_time
+    on_time: 
+      # Every day at 08:00
+      - seconds: 0
+        minutes: 0
+        hours: 8
+        then:
+          # Initialize CLOCK screen
+          - lambda: |-
+              id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
+          # Initialize DATE screen
+          - lambda: |-
+              id(rgb8x32)->date_screen(1440,30,false,160,240,160);
 
 display:
   - platform: addressable_light

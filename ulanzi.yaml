@@ -21,15 +21,6 @@ esphome:
 logger:
   initial_level: INFO
 
-api:
-  services:
-    - service: tune
-      variables:
-        tune: string
-      then:
-        - rtttl.play:
-            rtttl: !lambda 'return tune;'
-
 ehmtxv2:
   id: rgb8x32
   icons2html: true
@@ -204,7 +195,7 @@ text_sensor:
 
 font: 
   # adapt the filename to your local settings
-  - file: fonts/MatrixClock-Light8.bdf
+  - file: gui/fonts/MatrixClock-Light8.bdf
     id: default_font
     size: 8
     glyphs: &norwegian_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', ',', '.', '/', '[', '\', ']', '^', '`',
@@ -213,7 +204,7 @@ font:
       'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
       'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
       'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å' ]
-  - file: fonts/MatrixClock-Chunky6.bdf
+  - file: gui/fonts/MatrixClock-Chunky6.bdf
     id: special_font
     size: 6
     glyphs: &clock_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',

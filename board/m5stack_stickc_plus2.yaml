@@ -19,7 +19,7 @@ esp32:
 
 esphome:
   project:
-    name: "M5Stack.StickC-Plus2"
+    name: "M5Stack.StickC Plus2"
   platformio_options:
 #    board_build.arduino.partitions: default_8MB.csv
 #    board_build.f_flash: 80000000L

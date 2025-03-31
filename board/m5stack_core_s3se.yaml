@@ -10,7 +10,7 @@ packages:
 
 esphome:
   project:
-    name: "M5Stack.CoreS3-SE"
+    name: "M5Stack.Core S3 SE"
 
 i2c:
 # Int

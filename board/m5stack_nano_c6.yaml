@@ -10,7 +10,7 @@ packages:
 
 esphome:
   project:
-    name: "M5Stack.NanoC6"
+    name: "M5Stack.Nano C6"
   platformio_options:
     board_build.f_cpu: 160000000L
     board_build.f_flash: 80000000L

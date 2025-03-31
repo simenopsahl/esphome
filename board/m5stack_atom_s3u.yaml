@@ -10,7 +10,7 @@ packages:
 
 esphome:
   project:
-    name: "M5Stack.AtomS3U"
+    name: "M5Stack.Atom S3U"
 
 esp32:
   board: m5stack-atoms3

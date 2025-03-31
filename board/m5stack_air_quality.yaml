@@ -15,7 +15,7 @@ packages:
 
 esphome:
   project:
-    name: "M5Stack.Air_Quality"
+    name: "M5Stack.Air Quality"
   on_boot:
     - priority: 800
       then:
