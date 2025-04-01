@@ -21,4 +21,7 @@ sensor:
       device_class: "volatile_organic_compounds_parts"
       state_class: "measurement"
     address: 0x58
-    update_interval: 10s
+    update_interval: 5s
+    compensation:
+      temperature_source: temperature_local
+      humidity_source: humidity_local
