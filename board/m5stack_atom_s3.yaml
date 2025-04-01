@@ -19,14 +19,6 @@ esp32:
 substitutions:
   gyro_i2c_bus: i2c_internal
 
-#i2c:
-# Internal
-#  - id: i2c_internal
-#    sda: $i2c_int_sda_pin
-#    scl: $i2c_int_scl_pin
-#    frequency: 400kHz
-#    scan: true
-
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
@@ -41,7 +33,8 @@ output:
     id: backlight_output
     pin: $disp_bl_pin
     frequency: 500Hz
-    min_power: 0.3
+    min_power: 0.1
+    max_power: 1.0
     zero_means_zero: true
 
 light:

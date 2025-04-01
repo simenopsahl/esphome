@@ -74,15 +74,15 @@ display:
           it.print(0, 0, id(f20b), id(c_text_p), TextAlign::TOP_LEFT, "Rom");
           it.print(it.get_width(), 0, id(f24b), id(c_text_s), TextAlign::TOP_RIGHT, "°C");
           
-          it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_text_p), TextAlign::CENTER, "%2.0f", id(temperature_local).state);
+          it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_text_p), TextAlign::CENTER, "%2.0f", id(temperature_feels_like).state);
 
           // Fridge.
-          it.image(0, it.get_height()-30, id(i_fridge), ImageAlign::BOTTOM_LEFT, id(c_bg_s), COLOR_OFF);
-          it.printf(0, it.get_height()-50, id(f18), id(c_text_p), TextAlign::BOTTOM_LEFT, "%2.0f", id(temperature_fridge).state);
+          it.image(0, it.get_height()-32, id(i_fridge), ImageAlign::BOTTOM_LEFT, id(c_bg_s), COLOR_OFF);
+          it.printf(0, it.get_height()-50, id(f14), id(c_text_p), TextAlign::BOTTOM_LEFT, "%2.0f", id(temperature_fridge).state);
 
           // Freezer.
-          it.image(it.get_width(), it.get_height()-30, id(i_freezer), ImageAlign::BOTTOM_RIGHT, Color(c_bg_s), COLOR_OFF);
-          it.printf(it.get_width(), it.get_height()-50, id(f18), id(c_text_p), TextAlign::BOTTOM_RIGHT, "%2.0f", id(temperature_freezer).state);
+          it.image(it.get_width(), it.get_height()-32, id(i_freezer), ImageAlign::BOTTOM_RIGHT, Color(c_bg_s), COLOR_OFF);
+          it.printf(it.get_width(), it.get_height()-50, id(f14), id(c_text_p), TextAlign::BOTTOM_RIGHT, "%2.0f", id(temperature_freezer).state);
 
           // Show wifi icon.
           if (id(component_wifi).is_connected()) {
