@@ -33,7 +33,7 @@ output:
     id: backlight_output
     pin: $disp_bl_pin
     frequency: 500Hz
-    min_power: 0.1
+    min_power: 0.2
     max_power: 1.0
     zero_means_zero: true
 
