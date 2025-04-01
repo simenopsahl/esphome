@@ -37,8 +37,8 @@ sensor:
 #      - source: temperature_sht3xd
 #      - source: temperature_qmp6988
       # ENV IV
-      - source: temperature_bmp280
-      - source: temperature_sht4x
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
     filters:
       - or:
         - heartbeat: 900s

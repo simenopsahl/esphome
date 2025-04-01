@@ -97,11 +97,11 @@ display:
           it.print(it.get_width()/2, 0, id(f25b), COLOR_OFF, TextAlign::TOP_CENTER, "Enhet");
           it.printf(it.get_width()/2, it.get_height()/2, id(f130b), COLOR_OFF, TextAlign::CENTER, "%2.0f", id(temperature_local).state);
 
-          it.printf(0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_sht3xd).state);
-          it.printf(0, it.get_height() - 19, id(f20), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(temperature_bmp280).state);
+          it.printf(0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_sht30_hat_env).state);
+          it.printf(0, it.get_height() - 19, id(f20), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(temperature_bmp280_unit_env).state);
 
-          it.printf(it.get_width(), 0, id(f20), COLOR_OFF, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988).state);
-          it.printf(it.get_width(), it.get_height() - 19, id(f20), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature_sht4x).state);
+          it.printf(it.get_width(), 0, id(f20), COLOR_OFF, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988_hat_env).state);
+          it.printf(it.get_width(), it.get_height() - 19, id(f20), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature_sht40_unit_env).state);
 
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
@@ -134,16 +134,16 @@ display:
           it.printf(it.get_width() - 11, 25, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.2f", id(bat_adc).state);
           it.print(it.get_width(), 27, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "V");
 
-          it.printf(it.get_width() - 15, 76, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_sht3xd).state);
+          it.printf(it.get_width() - 15, 76, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_sht30_hat_env).state);
           it.print(it.get_width(), 78, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
 
-          it.printf(it.get_width() - 13, 97, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(humidity_sht3xd).state);
+          it.printf(it.get_width() - 13, 97, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(humidity_sht30_hat_env).state);
           it.print(it.get_width(), 99, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "%");
 
-          it.printf(it.get_width() - 15, 148, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988).state);
+          it.printf(it.get_width() - 15, 148, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988_hat_env).state);
           it.print(it.get_width(), 150, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
 
-          it.printf(it.get_width() - 25, 169, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(pressure_qmp6988).state);
+          it.printf(it.get_width() - 25, 169, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(pressure_qmp6988_hat_env).state);
           it.print(it.get_width(), 171, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "hPa");
 
           // Refresh Timestamp
@@ -298,11 +298,11 @@ sensor:
     state_class: "measurement"
     sources:
       # ENV III
-      - source: temperature_sht3xd
-      - source: temperature_qmp6988
+      - source: temperature_sht30_hat_env
+      - source: temperature_qmp6988_hat_env
       # ENV IV
-      - source: temperature_bmp280
-      - source: temperature_sht4x
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
     filters:
       - or:
         - heartbeat: 900s
@@ -319,9 +319,9 @@ sensor:
     state_class: "measurement"
     sources:
       # ENV III
-      - source: humidity_sht3xd
+      - source: humidity_sht30_hat_env
       # ENV IV
-      - source: humidity_sht4x
+      - source: humidity_sht40_unit_env
     filters:
       - or:
         - heartbeat: 900s
@@ -338,9 +338,9 @@ sensor:
     state_class: "measurement"
     sources:
       # ENV III
-      - source: pressure_qmp6988
+      - source: pressure_qmp6988_hat_env
       # ENV IV
-      - source: pressure_bmp280
+      - source: pressure_bmp280_unit_env
     filters:
       - or:
         - heartbeat: 900s

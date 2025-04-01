@@ -95,8 +95,8 @@ sensor:
     state_class: "measurement"
     sources:
       # ENV III
-      - source: temperature_sht3xd
-      - source: temperature_qmp6988
+      - source: temperature_sht30_hat_env
+      - source: temperature_qmp6988_hat_env
       # ENV IV
 #      - source: temperature_bmp280
 #      - source: temperature_sht4x

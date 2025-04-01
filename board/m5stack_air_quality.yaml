@@ -346,24 +346,20 @@ script:
 
 sensor:
   - platform: scd4x
-    id: scd40_sensor
+    id: aq_scd40_sensor
     i2c_id: i2c_internal
     co2:
-      id: co2_scd40
-      name: "CO2"
+      id: co2_scd40_aq
+      name: "AirQuality SCD40 CO2"
       device_class: "carbon_dioxide"
-      filters:
-        - or:
-          - heartbeat: 900s
-          - delta: 0.15
     temperature:
-      id: temperature_scd40
-      name: "Temperature SCD40"
+      id: temperature_scd40_aq
+      name: "AirQuality SCD40 Temperature"
       disabled_by_default: true
       device_class: "temperature"
     humidity:
-      id: humidity_scd40
-      name: "Humidity SCD40"
+      id: humidity_scd40_aq
+      name: "AirQuality SCD40 Humidity"
       disabled_by_default: true
       device_class: "humidity"
     altitude_compensation: 145m
