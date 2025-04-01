@@ -97,26 +97,32 @@ sensor:
     accel_x:
       id: accel_x_mpu6886
       name: "MPU6886 Accel X"
+      disabled_by_default: true
       entity_category: diagnostic
     accel_y:
       id: accel_y_mpu6886
       name: "MPU6886 Accel Y"
+      disabled_by_default: true
       entity_category: diagnostic
     accel_z:
       id: accel_z_mpu6886
       name: "MPU6886 Accel z"
+      disabled_by_default: true
       entity_category: diagnostic
     gyro_x:
       id: gyro_x_mpu6886
       name: "MPU6886 Gyro X"
+      disabled_by_default: true
       entity_category: diagnostic
     gyro_y:
       id: gyro_y_mpu6886
       name: "MPU6886 Gyro Y"
+      disabled_by_default: true
       entity_category: diagnostic
     gyro_z:
       id: gyro_z_mpu6886
       name: "MPU6886 Gyro z"
+      disabled_by_default: true
       entity_category: diagnostic
     temperature:
       id: temperature_mpu6886
