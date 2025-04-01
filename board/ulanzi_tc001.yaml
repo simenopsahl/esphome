@@ -31,7 +31,7 @@ esphome:
           id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
 # Initialize DATE screen
       - lambda: |-
-          id(rgb8x32)->date_screen(1440,30,false,160,240,160);
+          id(rgb8x32)->date_screen(1440,15,false,160,240,160);
 
 esp32:
   board: esp32dev
@@ -269,7 +269,7 @@ time:
               id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
           # Initialize DATE screen
           - lambda: |-
-              id(rgb8x32)->date_screen(1440,30,false,160,240,160);
+              id(rgb8x32)->date_screen(1440,15,false,160,240,160);
 
 display:
   - platform: addressable_light

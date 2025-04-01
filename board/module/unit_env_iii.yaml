@@ -10,16 +10,16 @@ substitutions:
 sensor:
   - platform: sht3xd
     i2c_id: $env_i2c_bus
-    id: sht3xd_sensor
+    id: unit_env_sht30_sensor
     temperature:
-      id: temperature_sht3xd
-      name: "Temperature SHT3XD"
+      id: temperature_sht3xd_unit_env
+      name: "Unit Env SHT30 Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
     humidity:
-      id: humidity_sht3xd
-      name: "Humidity SHT3XD"
+      id: humidity_sht30_unit_env
+      name: "Unit Env SHT30 Humidity"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
@@ -28,17 +28,17 @@ sensor:
 
   - platform: qmp6988
     i2c_id: $env_i2c_bus
-    id: qmp6988_sensor
+    id: unit_env_qmp6988_sensor
     temperature:
-      id: temperature_qmp6988
-      name: "Temperature QMP6988"
+      id: temperature_qmp6988_unit_env
+      name: "Unit Env QMP6988 Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
       oversampling: 4x
     pressure:
-      id: pressure_qmp6988
-      name: "Pressure SHT3XD"
+      id: pressure_qmp6988_unit_env
+      name: "Unit Env QMP6988 Pressure"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
       state_class: "measurement"
@@ -54,8 +54,8 @@ sensor:
 #    name: "Temperature ENV.III"
 #    device_class: "temperature"
 #    sources:
-#      - source: temperature_sht3xd
-#      - source: temperature_qmp6988
+#      - source: temperature_sht3xd_unit_env
+#      - source: temperature_qmp6988_unit_env
 #    filters:
 #      - lambda: "return x + id(temperature_offset_env_iii).state;"
 #      - or:
@@ -81,7 +81,7 @@ sensor:
 #    icon: "mdi:thermometer"
 #    on_value:
 #      - lambda: 'id(sht3xd_sensor).update();'
-#      - lambda: 'id(qmp6988_sensor).update();'
+#      - lambda: 'id(unit_env_sht30_sensor).update();'
 
 #  - platform: template
 #    id: humidity_offset_env_iii
@@ -99,4 +99,4 @@ sensor:
 #    initial_value: 0
 #    icon: "mdi:water-percent"
 #    on_value:
-#      - lambda: 'id(sht3xd_sensor).update();'
+#      - lambda: 'id(unit_env_sht30_sensor).update();'

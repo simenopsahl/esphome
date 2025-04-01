@@ -10,17 +10,17 @@ substitutions:
 sensor:
   - platform: bmp280_i2c
     i2c_id: $env_i2c_bus
-    id: bmp280_sensor
+    id: unit_env_bmp280_sensor
     temperature:
-      id: temperature_bmp280
-      name: "Temperature BMP280"
+      id: temperature_bmp280_unit_env
+      name: "Unit Env BMP280 Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
       oversampling: 4x
     pressure:
-      id: pressure_bmp280
-      name: "Pressure BMP280"
+      id: pressure_bmp280_unit_env
+      name: "Unit Env BMP280 Pressure"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
       state_class: "measurement"
@@ -31,16 +31,16 @@ sensor:
 
   - platform: sht4x
     i2c_id: $env_i2c_bus
-    id: sht4x_sensor
+    id: unit_env_sht40_sensor
     temperature:
-      id: temperature_sht4x
-      name: "Temperature SHT4X"
+      id: temperature_sht40_unit_env
+      name: "Unit Env SHT40 Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
     humidity:
-      id: humidity_sht4x
-      name: "Humidity SHT4X"
+      id: humidity_sht40_unit_env
+      name: "Unit Env SHT40 Humidity"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
@@ -56,8 +56,8 @@ sensor:
 #     name: "Temperature ENV.IV"
 #     device_class: "temperature"
 #     sources:
-#       - source: temperature_bmp280
-#       - source: temperature_sht4x
+#       - source: temperature_bmp280_unit_env
+#       - source: temperature_sht40_unit_env
 #     filters:
 #       - lambda: "return x + id(temperature_offset_env_iv).state;"
 #       - or:
@@ -82,8 +82,8 @@ sensor:
 #     initial_value: 0
 #     icon: "mdi:thermometer"
 #     on_value:
-#       - lambda: 'id(bmp280_sensor).update();'
-#       - lambda: 'id(sht4x_sensor).update();'
+#       - lambda: 'id(unit_env_bmp280_sensor).update();'
+#       - lambda: 'id(temperature_sht40_unit_env).update();'
 
 #   - platform: template
 #     id: humidity_offset_env_iv
@@ -101,4 +101,4 @@ sensor:
 #     initial_value: 0
 #     icon: "mdi:water-percent"
 #     on_value:
-#       - lambda: 'id(sht4x_sensor).update();'
+#       - lambda: 'id(temperature_sht40_unit_env).update();'

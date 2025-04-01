@@ -9,21 +9,21 @@ substitutions:
 sensor:
   - platform: scd4x
     i2c_id: $co2_i2c_bus
-    id: scd40_sensor
+    id: unit_co2_scd40_sensor
     co2:
-      id: co2_scd40
-      name: "CO2 SCD40"
+      id: co2_scd40_unit_co2
+      name: "Unit CO2 SCD40 Co2"
       device_class: "carbon_dioxide"
       state_class: "measurement"
     temperature:
-      id: temperature_scd40
-      name: "Temperature SCD40"
+      id: temperature_scd40_unit_co2
+      name: "Unit CO2 SCD40 Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
     humidity:
-      id: humidity_scd40
-      name: "Humidity SCD40"
+      id: humidity_scd40_unit_co2
+      name: "Unit CO2 SCD40 Humidity"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"

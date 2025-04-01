@@ -9,16 +9,16 @@ substitutions:
 sensor:
   - platform: sht3xd
     i2c_id: $base_btc_i2c_bus
-    id: sht3xd_sensor
+    id: base_btc_sht30_sensor
     temperature:
-      id: temperature_sht3xd
-      name: "Temperature SHT3XD"
+      id: temperature_sht30_base_btc
+      name: "SHT30 Base BTC Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
     humidity:
-      id: humidity_sht3xd
-      name: "Humidity SHT3XD"
+      id: humidity_sht30_base_btc
+      name: "SHT30 Base BTC Humidity"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
