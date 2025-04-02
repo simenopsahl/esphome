@@ -38,7 +38,7 @@ display:
     reset_pin: $disp_reset_pin
     data_rate: 40Mhz
     invert_colors: true
-    update_interval: 1s
+    update_interval: 5s
     dimensions:
       height: 128
       width: 128
@@ -109,8 +109,7 @@ binary_sensor:
 
 script:
   - id: display_on_off
-    mode: queued
-    max_runs: 5
+    mode: restart
     then:
       - if:
           condition: 
@@ -126,6 +125,7 @@ script:
                 condition: 
                   - binary_sensor.is_off: motion_detected
                 then:
+                  - delay: 15s
                   - light.turn_on:
                       id: backlight_light
                       brightness: 50%
@@ -135,7 +135,7 @@ script:
                       condition: 
                         - binary_sensor.is_off: motion_detected
                       then:
-                        - delay: 15s
+                        - delay: 30s
                         - light.turn_on:
                             id: backlight_light
                             brightness: 25%
@@ -145,7 +145,7 @@ script:
                             condition: 
                               - binary_sensor.is_off: motion_detected
                             then:
-                              - delay: 20s
+                              - delay: 45s
                               - light.turn_on:
                                   id: backlight_light
                                   brightness: 1%
@@ -155,7 +155,7 @@ script:
                                   condition: 
                                     - binary_sensor.is_off: motion_detected
                                   then:
-                                    - delay: 25s
+                                    - delay: 1min
                                     - light.turn_off: backlight_light
                                     - logger.log: "Motion NOT detected. Display off"
 

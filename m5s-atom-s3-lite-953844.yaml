@@ -21,10 +21,11 @@ esphome:
     version: "1.0.0"
 
 esp32:
-#  framework:
-#    type: arduino
   framework:
     type: esp-idf
+
+logger:
+  initial_level: INFO
 
 sensor:
   # Combine sensors

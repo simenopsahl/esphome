@@ -72,32 +72,32 @@ text_sensor:
       auto iaq_ = int(id(iaq_bme688).state);
       if (iaq_ < 0) {
         // No IAQ sensor.
-        return {"unknown"};
+        return {"ukjent"}; // "unknown" in Norwegian
       }
       if (iaq_ <= 50) {
-        return {"excellent"};
+        return {"utmerket"}; // "excellent" in Norwegian
       }
       else if (iaq_ <= 100) {
-        return {"good"};
+        return {"bra"}; // "good" in Norwegian
       }
       else if (iaq_ <= 150) {
-        return {"lightly polluted"};
+        return {"lite forurenset"}; // "lightly polluted" in Norwegian
       }
       else if (iaq_ <= 200) {
-        return {"moderately polluted"};
+        return {"moderat forurenset"}; // "moderately polluted" in Norwegian
       }
       else if (iaq_ <= 250) {
-        return {"heavily polluted"};
+        return {"høyt forurenset"}; // "heavily polluted" in Norwegian
       }
       else if (iaq_ <= 350) {
-        return {"severely polluted"};
+        return {"sterkt forurenset"}; // "severely polluted" in Norwegian
       }
       else if (iaq_ <= 500) {
-        return {"extremely polluted"};
+        return {"ekstremt forurenset"}; // "extremely polluted" in Norwegian
       }
       else {
         // ESP_LOGD("iaq-classification", "IAQ not yet established: %s", id(static_iaq_bme688).state);
-        return {"unknown"};
+        return {"ukjent"}; // "unknown" in Norwegian
       }
     update_interval: never
 
@@ -109,32 +109,32 @@ text_sensor:
       auto iaq_ = int(id(static_iaq_bme688).state);
       if (iaq_ < 0) {
         // No IAQ sensor.
-        return {"unknown"};
+        return {"ukjent"}; // "unknown" in Norwegian
       }
       if (iaq_ <= 50) {
-        return {"excellent"};
+        return {"utmerket"}; // "excellent" in Norwegian
       }
       else if (iaq_ <= 100) {
-        return {"good"};
+        return {"bra"}; // "good" in Norwegian
       }
       else if (iaq_ <= 150) {
-        return {"lightly polluted"};
+        return {"lite forurenset"}; // "lightly polluted" in Norwegian
       }
       else if (iaq_ <= 200) {
-        return {"moderately polluted"};
+        return {"moderat forurenset"}; // "moderately polluted" in Norwegian
       }
       else if (iaq_ <= 250) {
-        return {"heavily polluted"};
+        return {"høyt forurenset"}; // "heavily polluted" in Norwegian
       }
       else if (iaq_ <= 350) {
-        return {"severely polluted"};
+        return {"sterkt forurenset"}; // "severely polluted" in Norwegian
       }
       else if (iaq_ <= 500) {
-        return {"extremely polluted"};
+        return {"ekstremt forurenset"}; // "extremely polluted" in Norwegian
       }
       else {
         // ESP_LOGD("iaq-classification", "IAQ not yet established: %s", id(static_iaq_bme688).state);
-        return {"unknown"};
+        return {"ukjent"}; // "unknown" in Norwegian
       }
     update_interval: never
   - platform: bme68x_bsec2

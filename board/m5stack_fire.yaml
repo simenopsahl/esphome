@@ -77,7 +77,7 @@ light:
     id: backlight_light
     output: backlight_output
     default_transition_length: 100ms
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: RESTORE_AND_ON
     initial_state:
       state: on
       brightness: 25%
@@ -112,6 +112,7 @@ binary_sensor:
         - logger.log: Button A Pressed
         - script.execute: buzzer_beep
         - display.page.show: page_airq
+        - component.update: display_lcd
     on_release:
       then:
         - output.turn_off: buzzer
@@ -130,6 +131,7 @@ binary_sensor:
         - logger.log: Button B Pressed
         - script.execute: buzzer_beep
         - display.page.show: page_home
+        - component.update: display_lcd
     on_release:
       then:
         - output.turn_off: buzzer
@@ -148,6 +150,7 @@ binary_sensor:
         - logger.log: Button C Pressed
         - script.execute: buzzer_beep
         - display.page.show: page_power
+        - component.update: display_lcd
     on_release:
       then:
         - output.turn_off: buzzer

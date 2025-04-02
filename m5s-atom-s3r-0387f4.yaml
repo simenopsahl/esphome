@@ -35,7 +35,7 @@ display:
     reset_pin: $disp_reset_pin
 #    data_rate: 40Mhz
     invert_colors: true
-    update_interval: 1s
+    update_interval: 5s
     dimensions:
       height: 128
       width: 128

@@ -1,21 +1,20 @@
 packages:
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
   board: !include board/m5stack_coreink.yaml
 #  internal_i2c: !include board/extension/internal_i2c.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
-  env_pro: !include board/module/unit_env_pro.yaml
-  co2: !include board/module/unit_co2.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
+  tvoc: !include board/module/unit_tvoc.yaml
 
 substitutions:
-  devicename: m5s-coreink-9fc2c8
-  location: "2etg, Simen"
-  i2c_grove_frequency: 40kHz
+  devicename: m5s-coreink-9fc390
+  location: "1etg, Inngang"
 
 esphome:
-  comment: "M5Stack CoreInk @ Simen"
+  comment: "M5Stack CoreInk @ Inngang"
   name: $devicename
   friendly_name: $devicename
   area: $location
@@ -50,7 +49,7 @@ esphome:
   
 esp32:
   framework:
-    type: arduino
+    type: esp-idf
 
 logger:
   initial_level: INFO
@@ -69,7 +68,7 @@ display:
     full_update_every: 1
 #    reset_duration: 2ms
     update_interval: never
-    rotation: 90
+    rotation: 0
     pages:
 #      - id: page_black
 #        lambda: |-
@@ -101,8 +100,8 @@ display:
 
           it.printf(0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_sht30_hat_env).state);
           it.printf(it.get_width(), 0, id(f20), COLOR_OFF, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988_hat_env).state);
-          it.printf(it.get_width(), it.get_height(), id(f20), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature_bme688).state);
-          it.printf(0, it.get_height(), id(f20), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(temperature_scd40_unit_co2).state);
+          it.printf(it.get_width(), it.get_height(), id(f20), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature_sht40_unit_env).state);
+          it.printf(0, it.get_height(), id(f20), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(temperature_bmp280_unit_env).state);
 
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
@@ -272,19 +271,19 @@ graph:
 # Check if person is home
 binary_sensor:
   - platform: homeassistant
-    entity_id: binary_sensor.etg2_occupancy
+    entity_id: binary_sensor.etg1_occupancy
     id: motion_detected
 
 sensor:
   # Call sensors from HA.
 #  - platform: homeassistant
-#    entity_id: sensor.etg2_simen_temperature
+#    entity_id: sensor.etg1_gang_temperature
 #    id: temperature_homeassistant
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.etg2_simen_tc_heatindex
+    entity_id: sensor.etg1_gang_tc_heatindex
     id: temperature_feels_like
     on_value:
       then:
@@ -302,12 +301,12 @@ sensor:
       - source: temperature_sht30_hat_env
       - source: temperature_qmp6988_hat_env
       # ENV IV
-#      - source: temperature_bmp280_unit_env
-#      - source: temperature_sht40_unit_env
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
       # ENV Pro
-      - source: temperature_bme688
+#      - source: temperature_bme688
       # CO2
-      - source: temperature_scd40_unit_co2
+#      - source: temperature_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s
@@ -326,11 +325,11 @@ sensor:
       # ENV III
       - source: humidity_sht30_hat_env
       # ENV IV
-#      - source: humidity_sht40_unit_env
+      - source: humidity_sht40_unit_env
       # ENV Pro
-      - source: humidity_bme688
+#      - source: humidity_bme688
       # CO2
-      - source: humidity_scd40_unit_co2
+#      - source: humidity_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s
@@ -349,9 +348,9 @@ sensor:
       # ENV III
       - source: pressure_qmp6988_hat_env
       # ENV IV
-#      - source: pressure_bmp280_unit_env
+      - source: pressure_bmp280_unit_env
       # ENV Pro
-      - source: pressure_bme688
+#      - source: pressure_bme688
     filters:
       - or:
         - heartbeat: 900s

@@ -120,6 +120,7 @@ binary_sensor:
       then:
         - logger.log: Button Pressed
         - display.page.show_next: display_lcd
+        - component.update: display_lcd
 
 #display:
 #  - platform: ili9xxx

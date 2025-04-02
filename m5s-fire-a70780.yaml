@@ -7,27 +7,28 @@ packages:
   grove_uart: !include board/extension/grove_uart.yaml
   air_quality: !include board/module/module_air_quality.yaml
   base_btc: !include board/module/base_btc.yaml
-  co2: !include board/module/unit_co2.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
   color: !include gui/colors.yaml
 
 substitutions:
   devicename: m5s-fire-a70780
-#  location: "2etg, Simen"
+  location: "2etg, Stue"
   i2c_internal_frequency: 50kHz
   i2c_grove_frequency: 50kHz
 #  module_air_quality_uart_bus: uart_alt
 
 esphome:
-  comment: "M5Stack Fire a70780"
+  comment: "M5Stack Fire @ Stue"
   name: $devicename
   friendly_name: $devicename
-#  area: $location
+  area: $location
 
 esp32:
   framework:
     type: esp-idf
 
 logger:
+  initial_level: INFO
   tx_buffer_size: 256
 
 # 320x240 ILI9342C LCD
@@ -41,7 +42,7 @@ display:
     data_rate: 20Mhz
     invert_colors: true
     color_palette: 8BIT
-    update_interval: 1s
+    update_interval: 5s
     dimensions:
       height: 240
       width: 320
@@ -73,10 +74,13 @@ display:
             it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
           }
 
+          // Temperature graph
+          it.graph(0, 20, id(graph_temperature_room));
+
           // Temperature value
-          it.printf( it.get_width()/2, ( it.get_height()/2 )-20, id(f120b), id(c_text_p), TextAlign::CENTER, "%2.0f", id(temperature_local).state );
-          it.image( 0, 0, id(i_temp_l), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.print( it.get_width(), 0, id(f60), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
+          it.image( 0, it.get_height()-48, id(i_temp_l), ImageAlign::BOTTOM_LEFT, id(c_text_s) );
+          it.printf( it.get_width()/2, it.get_height()-50, id(f120b), id(c_text_p), TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_feels_like).state );
+          it.print( it.get_width(), it.get_height()-50, id(f60), id(c_text_s), TextAlign::BASELINE_RIGHT, "°C" );
           
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
@@ -105,28 +109,31 @@ display:
             it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
           }
 
-          it.image( 0, 0, id(i_temp_s), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 62, id(i_co2), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 96, id(i_pm1), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 130, id(i_pm25), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 164, id(i_pm10), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 0, 36, id(i_temp_s), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 94, id(i_pm1), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 128, id(i_pm25), ImageAlign::TOP_LEFT, id(c_text_s) );
+          it.image( 4, 162, id(i_pm10), ImageAlign::TOP_LEFT, id(c_text_s) );
           
-          it.print( 38, 64, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Karbondioksid: " );
-          it.print( 38, 98, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 1.0: " );
-          it.print( 38, 132, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 2.5: " );
-          it.print( 38, 166, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 10.0: " );
+          it.print( 38, 94, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 1.0: " );
+          it.print( 38, 128, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 2.5: " );
+          it.print( 38, 162, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 10.0: " );
 
-          it.printf( it.get_width()/2, 0, id(f32b), id(c_text_p), TextAlign::TOP_CENTER, "%2.0f", id(temperature_local).state );
-          it.printf( 275, 62, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(co2_scd40_unit_co2).state );
-          it.printf( 275, 96, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm1_pmsa003).state );
-          it.printf( 275, 130, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_25_pmsa003).state );
-          it.printf( 275, 164, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_10_pmsa003).state );
+          it.printf( it.get_width()/2, 16, id(f60b), id(c_text_p), TextAlign::TOP_CENTER, "%2.0f", id(temperature_local).state );
+          it.printf( 275, 90, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm1_pmsa003).state );
+          it.printf( 275, 124, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_25_pmsa003).state );
+          it.printf( 275, 158, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_10_pmsa003).state );
           
-          it.print( it.get_width(), 0, id(f24), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
-          it.print( it.get_width(), 66, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "ppm" );
-          it.print( it.get_width(), 100, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
-          it.print( it.get_width(), 134, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
-          it.print( it.get_width(), 168, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+          it.print( it.get_width(), 25, id(f24), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
+          it.print( it.get_width(), 92, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+          it.print( it.get_width(), 128, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+          it.print( it.get_width(), 162, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
+
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_homeassistant).now().timestamp;
+          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+          it.printf(it.get_width()/2, 0, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", str);
       - id: page_power
         lambda: |-
           // Bottom Nav BG
@@ -157,6 +164,79 @@ display:
           it.printf( it.get_width()/2, 172, id(f18), id(c_text_s), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state );
           it.printf( it.get_width()-1, 172, id(f18), id(c_text_s), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state );
 
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_stue_occupancy
+    id: motion_stue
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: motion_gang
+  # Turn on display while room is occupied
+  - platform: template
+    id: motion_detected
+    lambda: !lambda |-
+      if ( (id(motion_stue).state) and (id(motion_gang).state) ) {
+        return true;
+      } else {
+        return false;
+      }
+    on_state: 
+      then:
+        - script.execute: display_on_off
+
+script:
+  - id: display_on_off
+    mode: restart
+    then:
+      - if:
+          condition: 
+            - binary_sensor.is_on: motion_detected
+          then:
+            - light.turn_on:
+                id: backlight_light
+                brightness: 75%
+                transition_length: 1s
+            - logger.log: "Motion detected. Display on"
+          else:
+            - if:
+                condition: 
+                  - binary_sensor.is_off: motion_detected
+                then:
+                  - delay: 15s
+                  - light.turn_on:
+                      id: backlight_light
+                      brightness: 50%
+                      transition_length: 10s
+                  - logger.log: "Motion NOT detected. Display 50%"
+                  - if:
+                      condition: 
+                        - binary_sensor.is_off: motion_detected
+                      then:
+                        - delay: 30s
+                        - light.turn_on:
+                            id: backlight_light
+                            brightness: 25%
+                            transition_length: 10s
+                        - logger.log: "Motion NOT detected. Display 25%"
+                        - if:
+                            condition: 
+                              - binary_sensor.is_off: motion_detected
+                            then:
+                              - delay: 45s
+                              - light.turn_on:
+                                  id: backlight_light
+                                  brightness: 10%
+                                  transition_length: 10s
+                              - logger.log: "Motion NOT detected. Display 10%"
+                              - if:
+                                  condition: 
+                                    - binary_sensor.is_off: motion_detected
+                                  then:
+                                    - delay: 1min
+                                    - light.turn_off: backlight_light
+                                    - logger.log: "Motion NOT detected. Display off"
+
 sensor:
   # Combine sensors
   - platform: combination
@@ -170,26 +250,15 @@ sensor:
       - source: temperature_sht30_base_btc
 #      - source: temperature_qmp6988
       # ENV IV
-#      - source: temperature_bmp280
-#      - source: temperature_sht4x
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
       # CO2
-      - source: temperature_scd40_unit_co2
+#      - source: temperature_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s
         - delta: 0.15
-#    on_value:
-#      then:
-#        - lvgl.label.update:
-#            id: lbl_home_temp_value
-#            text:
-#              format: "%.0f °C"
-#              args: [ 'id(temperature_local).get_state()' ]
-#        - lvgl.label.update:
-#            id: lbl_aq_temp_value
-#            text:
-#              format: "%.0f °C"
-#              args: [ 'id(temperature_local).get_state()' ]
+
   - platform: combination
     type: median
     id: humidity_local
@@ -200,13 +269,18 @@ sensor:
       # ENV III
       - source: humidity_sht30_base_btc
       # ENV IV
-#      - source: humidity_sht4x
+      - source: humidity_sht40_unit_env
       # CO2
-      - source: humidity_scd40_unit_co2
+#      - source: humidity_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s
         - delta: 0.15
+
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: sensor.etg2_stue_tc_heatindex
+    id: temperature_feels_like
 
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -251,6 +325,18 @@ graph:
       - sensor: nordpool_sensor
         line_thickness: 8
         color: c_green
+  - id: graph_temperature_room
+    duration: 8h
+#    x_grid: 15min
+#    y_grid: 1.0
+    width: 320
+    height: 70
+    border: false
+    traces:
+      - sensor: temperature_feels_like
+        line_thickness: 6
+        color: c_blue
+        continuous: true
 
 font:
   - file:
@@ -397,10 +483,10 @@ image:
     file: mdi:thermometer
     type: binary
     resize: 28x28
-  - id: i_co2
-    file: mdi:molecule-co2
-    type: binary
-    resize: 28x28
+#  - id: i_co2
+#    file: mdi:molecule-co2
+#    type: binary
+#    resize: 28x28
   - id: i_pm1
     file: mdi:grain
     type: binary
