@@ -21,7 +21,7 @@ esphome:
 #    - priority: 800
 #      then:
 #        - pcf8563.read_time
-  
+
 esp32:
   board: m5stack-coreink
 
@@ -173,9 +173,13 @@ binary_sensor:
       number: $pwr_mos_pin
       allow_other_uses: true
       ignore_strapping_warning: true
+      inverted: true
     on_press:
       then:
         - logger.log: Power Hold
+    on_release:
+      then:
+        - logger.log: Power Hold Off
 
 # Script for buzzer beep
 script:

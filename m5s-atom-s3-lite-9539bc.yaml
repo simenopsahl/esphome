@@ -24,7 +24,9 @@ esphome:
 esp32:
   framework:
     type: arduino
-    version: latest
+
+logger:
+  initial_level: INFO
 
 sensor:
   # Combine sensors

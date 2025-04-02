@@ -14,7 +14,7 @@ bme68x_bsec2_i2c:
   model: BME688
   sample_rate: ULP
   operating_age: 28d
-  state_save_interval: 3h
+  state_save_interval: 6h
 sensor:
   - platform: bme68x_bsec2
     bme68x_bsec2_id: bme68x_bsec_component
