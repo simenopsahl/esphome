@@ -10,7 +10,7 @@ substitutions:
   location: "1etg, Kjøkken"
 
 esphome:
-  comment: "M5Stack Atom S3U b62a18"
+  comment: "M5Stack Atom S3U @ Kjøkken"
   name: $devicename
   friendly_name: $devicename
   area: $location

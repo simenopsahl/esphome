@@ -23,4 +23,4 @@ sensor:
       device_class: "humidity"
       state_class: "measurement"
     address: 0x44
-    update_interval: 10s
+    update_interval: 20s

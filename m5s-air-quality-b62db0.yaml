@@ -8,10 +8,10 @@ packages:
 
 substitutions:
   devicename: m5s-air-quality-b62db0
-  location: "Trapp"
+  location: "2etg, Gang"
 
 esphome:
-  comment: "M5Stack AirQuality b62db0"
+  comment: "M5Stack AirQuality @ Trapp"
   name: $devicename
   friendly_name: $devicename
   area: $location

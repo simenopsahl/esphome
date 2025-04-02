@@ -26,8 +26,8 @@ sensor:
       state_class: "measurement"
       oversampling: 4x
     address: 0x76
-    iir_filter: 4x
-    update_interval: 10s
+    iir_filter: 8x
+    update_interval: 20s
 
   - platform: sht4x
     i2c_id: $env_i2c_bus
@@ -47,7 +47,7 @@ sensor:
     address: 0x44
     heater_power: Low
     heater_time: Short
-    update_interval: 10s
+    update_interval: 20s
   
   # Combination
 #   - platform: combination

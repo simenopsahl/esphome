@@ -30,4 +30,4 @@ sensor:
       oversampling: 4x
     address: $bme280_address
     iir_filter: 8x
-    update_interval: 30s
+    update_interval: 20s

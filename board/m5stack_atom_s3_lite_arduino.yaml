@@ -6,7 +6,16 @@
 
 # Pins for this model
 packages:
-  pins: !include pins/m5stack_atom_lite.yaml
+  pins: !include pins/m5stack_atom_s3_lite.yaml
+
+esphome:
+  project:
+    name: "M5Stack.Atom S3 Lite"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 8MB
 
 # Output that blinks the LED
 #output:
@@ -19,18 +28,18 @@ packages:
 #          lambda: return (state);
 #        then:
 #          - light.turn_on:
-#              id: led
-#              transition_length: 50ms
+#              id: rgb_led
+#              transition_length: 0ms
 #              brightness: 30%
 #              red: 100%
 #              green: 0%
 #              blue: 0%
 #        else:
 #          - light.turn_off:
-#              id: led
-#              transition_length: 50ms
+#              id: rgb_led
+#              transition_length: 0ms
 
-#G4=IR
+# IR
 #remote_transmitter:
 #  pin: $ir_pin
 #  carrier_duty_percent: 50%
@@ -39,16 +48,15 @@ packages:
 light:
   # Enable status LED
 #  - platform: status_led
+#    id: status_light
 #    output: status_output
-#    name: "Status Led"
-#    internal: True
 
-  #G35=RGB WS2812C-2020
+  # RGB WS2812C-2020
   - platform: esp32_rmt_led_strip
-    id: led
+    id: rgb_led
     rgb_order: GRB
-    pin: $led_pin
-    num_leds: 4
+    pin: $rgb_pin
+    num_leds: 1
     # RMT 0 channels will be occupied by IR
     rmt_channel: 1
 #    rmt_symbols: 384
@@ -56,17 +64,40 @@ light:
     effects:
       - pulse:
       - strobe:
-      - addressable_flicker:
-      - addressable_rainbow:
-      - addressable_color_wipe:
-      - addressable_scan:
-      - addressable_twinkle:
-  - platform: partition
-    id: led1
-    segments: 
-      id: led
-      from: 0
-      to: 1
+      - strobe:
+          name: "Slow Blink" # 500ms on, 2000ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+#      - addressable_flicker:
+#      - addressable_rainbow:
+#      - addressable_color_wipe:
+#      - addressable_scan:
+#      - addressable_twinkle:
+    default_transition_length: 100ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "LED"
+    entity_category: config
+#  - platform: partition
+#    id: led1
+#    segments: 
+#      id: led
+#      from: 0
+#      to: 1
 #  - platform: partition
 #    id: led2
 #    segments: 
@@ -79,14 +110,14 @@ light:
 #      id: led
 #      from: 2
 #      to: 2
-  - platform: partition
-    id: led4
-    segments: 
-      id: led
-      from: 2
-      to: 3
+#  - platform: partition
+#    id: led4
+#    segments: 
+#      id: led
+#      from: 2
+#      to: 3
 
-#G41=Button
+# Button
 binary_sensor:
   - platform: gpio
     name: Button
@@ -94,9 +125,9 @@ binary_sensor:
     pin:
       number: $button_pin
       inverted: true
-      mode:
-        input: true
-        pullup: true
+#      mode:
+#        input: true
+#        pullup: true
     filters:
       - delayed_off: 10ms
     on_press:
@@ -104,8 +135,18 @@ binary_sensor:
         - logger.log: Button Pressed
         - script.execute: led_wifi
         - script.wait: led_wifi
+        - delay: 1000ms
         - script.execute: led_homeassistant
         - script.wait: led_homeassistant
+        - delay: 1000ms
+        - script.execute: led_default_state
+    on_click:
+      min_length: 1000ms
+      max_length: 5000ms
+      then:
+        - logger.log: Button Held
+        - light.turn_off:
+            id: rgb_led
 
 # Script for status LED
 script:
@@ -113,43 +154,63 @@ script:
     then:
       - if:
           condition:
-            light.is_off: led1
+            wifi.connected:
           then:
-            - if:
-                condition:
-                  wifi.connected:
-                then:
-                  - light.turn_on:
-                      id: led1
-                      brightness: 20%
-                      red: 0%
-                      green: 100%
-                      blue: 0%
-                else:
-                  - light.turn_off:
-                      id: led1
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 100%
+                blue: 0%
+            - delay: 400ms
+            - light.turn_off:
+                id: rgb_led
+            - delay: 200ms
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 100%
+                blue: 0%
+            - delay: 400ms
           else:
             - light.turn_off:
-                id: led1
+                id: rgb_led
   - id: led_homeassistant
     then:
       - if:
           condition:
-            light.is_off: led4
+            api.connected:
           then:
-            - if:
-                condition:
-                  api.connected:
-                then:
-                  - light.turn_on:
-                      id: led4
-                      brightness: 20%
-                      red: 0%
-                      green: 0%
-                      blue: 100%
-                else:
-                  - light.turn_off:
-                      id: led4
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 10%
+                blue: 100%
+            - delay: 400ms
+            - light.turn_off:
+                id: rgb_led
+            - delay: 200ms
+            - light.turn_on:
+                id: rgb_led
+                brightness: 30%
+                red: 0%
+                green: 10%
+                blue: 100%
+            - delay: 400ms
           else:
             - light.turn_off:
-                id: led4
+                id: rgb_led
+  - id: led_default_state
+    then:
+      - light.turn_on:
+          id: rgb_led
+          brightness: 25%
+          red: 100%
+          green: 0%
+          blue: 0%
+      - delay: 200ms
+      - light.turn_on:
+          id: rgb_led
+          effect: "Slow Blink"

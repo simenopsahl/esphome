@@ -30,4 +30,4 @@ sensor:
     altitude_compensation: 145m
 #    ambient_pressure_compensation_source:
     address: 0x62
-    update_interval: 5s
+    update_interval: 20s

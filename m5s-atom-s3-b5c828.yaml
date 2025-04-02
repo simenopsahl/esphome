@@ -15,7 +15,7 @@ substitutions:
   gyro_i2c_bus: i2c_port_abc
 
 esphome:
-  comment: "M5Stack Atom S3 b5c828"
+  comment: "M5Stack Atom S3 @ Bod"
   name: $devicename
   friendly_name: $devicename
   area: $location
@@ -25,6 +25,9 @@ esphome:
 esp32:
   framework:
     type: esp-idf
+
+logger:
+  initial_level: INFO
 
 display:
   - platform: ili9xxx
@@ -94,6 +97,67 @@ display:
           }
 
           it.strftime(it.get_width()/2, it.get_height(), id(f18), id(c_text_p), TextAlign::BOTTOM_CENTER, "%H:%M", id(time_homeassistant).now());
+
+binary_sensor:
+  # Turn on display while room is occupied
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_bod_occupancy
+    id: motion_detected
+    on_state: 
+      then:
+        - script.execute: display_on_off
+
+script:
+  - id: display_on_off
+    mode: queued
+    max_runs: 5
+    then:
+      - if:
+          condition: 
+            - binary_sensor.is_on: motion_detected
+          then:
+            - light.turn_on:
+                id: backlight_light
+                brightness: 75%
+                transition_length: 1s
+            - logger.log: "Motion detected. Display on"
+          else:
+            - if:
+                condition: 
+                  - binary_sensor.is_off: motion_detected
+                then:
+                  - light.turn_on:
+                      id: backlight_light
+                      brightness: 50%
+                      transition_length: 10s
+                  - logger.log: "Motion NOT detected. Display 50%"
+                  - if:
+                      condition: 
+                        - binary_sensor.is_off: motion_detected
+                      then:
+                        - delay: 15s
+                        - light.turn_on:
+                            id: backlight_light
+                            brightness: 25%
+                            transition_length: 10s
+                        - logger.log: "Motion NOT detected. Display 25%"
+                        - if:
+                            condition: 
+                              - binary_sensor.is_off: motion_detected
+                            then:
+                              - delay: 20s
+                              - light.turn_on:
+                                  id: backlight_light
+                                  brightness: 1%
+                                  transition_length: 10s
+                              - logger.log: "Motion NOT detected. Display 1%"
+                              - if:
+                                  condition: 
+                                    - binary_sensor.is_off: motion_detected
+                                  then:
+                                    - delay: 25s
+                                    - light.turn_off: backlight_light
+                                    - logger.log: "Motion NOT detected. Display off"
 
 sensor:
   # Call sensors from HA.
