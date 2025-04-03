@@ -2,19 +2,49 @@ packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
   board: !include board/m5stack_atom_s3_lite.yaml
-  hat: !include board/extension/hat_i2c.yaml
-  env: !include board/module/hat_env_iii.yaml
+  extension: !include board/extension/port_abc_i2c.yaml
+  env: !include board/module/unit_env_iv.yaml
+  pir: !include board/module/unit_pir.yaml
 
 substitutions:
   devicename: m5s-as3-lite-b63eb8
+  location: "Ute, Bod"
+  pir_in_pin: $in_port_abc_pin
+  env_i2c_bus: i2c_port_abc
+  gyro_i2c_bus: i2c_port_abc
 
 esphome:
-  comment: "M5Stack Atom S3 Lite b63eb8"
+  comment: "M5Stack Atom S3 Lite @ Ute, Bod"
   name: $devicename
   friendly_name: $devicename
+  area: $location
   project:
     version: "1.0.0"
 
 esp32:
   framework:
     type: esp-idf
+
+sensor:
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    state_class: "measurement"
+    sources:
+      # ENV III
+#      - source: temperature_sht30_hat_env
+#      - source: temperature_qmp6988_hat_env
+      # ENV IV
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
+      # CO2
+#      - source: temperature_scd40
+      # Gyro
+#      - source: temperature_mpu6886
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
