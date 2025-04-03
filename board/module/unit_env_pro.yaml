@@ -12,7 +12,7 @@ bme68x_bsec2_i2c:
   i2c_id: $env_i2c_bus
   address: 0x77
   model: BME688
-  sample_rate: ULP
+  sample_rate: LP
   operating_age: 28d
   state_save_interval: 6h
 sensor:
@@ -20,33 +20,52 @@ sensor:
     bme68x_bsec2_id: bme68x_bsec_component
     temperature:
       id: temperature_bme688
-#      sample_rate: LP
       name: "Temperature BME688"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
     pressure:
       id: pressure_bme688
       name: "Pressure BME688"
       disabled_by_default: true
       device_class: "atmospheric_pressure"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
     humidity:
       id: humidity_bme688
       name: "Humidity BME688"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
     iaq:
       id: iaq_bme688
       name: "IAQ BME688"
       device_class: "aqi"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 10
       on_value:
         - component.update: iaq_classification_bme688
     iaq_static:
       id: static_iaq_bme688
       name: "Static IAQ BME688"
       device_class: "aqi"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 10
       on_value:
         - component.update: static_iaq_classification_bme688
     co2_equivalent:
@@ -54,14 +73,26 @@ sensor:
       name: "CO2 equivalent BME688"
       device_class: "carbon_dioxide"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 10
     breath_voc_equivalent:
       id: evoc_bme688
       name: "VOC equivalent BME688"
       device_class: "volatile_organic_compounds_parts"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 10
     gas_resistance:
       id: gas_resistance_bme688
       # Gas resistance in Ω
       name: "Gas resistance"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 10
 
 text_sensor:
   - platform: template

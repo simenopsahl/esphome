@@ -352,20 +352,32 @@ sensor:
       id: co2_scd40_aq
       name: "AirQuality SCD40 CO2"
       device_class: "carbon_dioxide"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 6
     temperature:
       id: temperature_scd40_aq
       name: "AirQuality SCD40 Temperature"
       disabled_by_default: true
       device_class: "temperature"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 12
+            send_every: 6
     humidity:
       id: humidity_scd40_aq
       name: "AirQuality SCD40 Humidity"
       disabled_by_default: true
       device_class: "humidity"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 12
+            send_every: 6
     altitude_compensation: 145m
 #    ambient_pressure_compensation_source:
     address: 0x62
-    update_interval: 30s
+    update_interval: 5s
 
   - platform: sen5x
     id: sen55_sensor
@@ -374,36 +386,68 @@ sensor:
       id: pm1_0_sen55
       name: "PM 1"
       device_class: "pm1"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 3
     pm_2_5:
       id: pm2_5_sen55
       name: "PM 2.5"
       device_class: "pm25"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 3
     pm_4_0:
       id: pm4_0_sen55
       name: "PM 4"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 3
     pm_10_0:
       id: pm10_0_sen55
       name: "PM 10"
       device_class: "pm10"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 3
     temperature:
       id: temperature_sen55
       name: "Temperature SEN55"
       disabled_by_default: true
       device_class: "temperature"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
     humidity:
       id: humidity_sen55
       name: "Humidity SEN55"
       disabled_by_default: true
       device_class: "humidity"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
     voc:
       id: voc_sen55
       name: VOC
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 3
     nox:
       id: nox_sen55
       name: "NOX"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 3
     auto_cleaning_interval: 48h
     address: 0x69
-    update_interval: 30s
+    update_interval: 10s
 
 # Doens't support ADC on pin14 when WIFI is configured
   # Battery voltage

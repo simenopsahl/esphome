@@ -15,13 +15,21 @@ sensor:
       name: "eCO2 SGP30"
       device_class: "carbon_dioxide"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 30
+            send_every: 30
     tvoc:
       id: tvoc_sgp30
       name: "TVOC SGP30"
       device_class: "volatile_organic_compounds_parts"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 30
+            send_every: 30
     address: 0x58
-    update_interval: 20s
+    update_interval: 1s
     compensation:
       temperature_source: temperature_local
       humidity_source: humidity_local

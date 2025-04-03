@@ -15,19 +15,31 @@ sensor:
       name: "Unit CO2 SCD40 Co2"
       device_class: "carbon_dioxide"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 6
     temperature:
       id: temperature_scd40_unit_co2
       name: "Unit CO2 SCD40 Temperature"
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 12
+            send_every: 6
     humidity:
       id: humidity_scd40_unit_co2
       name: "Unit CO2 SCD40 Humidity"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 12
+            send_every: 6
     altitude_compensation: 145m
 #    ambient_pressure_compensation_source:
     address: 0x62
-    update_interval: 20s
+    update_interval: 5s

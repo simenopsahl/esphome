@@ -14,14 +14,22 @@ sensor:
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
     humidity:
       id: humidity_sht30_hat_env
       name: "Hat Env SHT30 Humidity"
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
     address: 0x44
-    update_interval: 20s
+    update_interval: 10s
 
   - platform: qmp6988
     i2c_id: i2c_hat
@@ -33,6 +41,10 @@ sensor:
       device_class: "temperature"
       state_class: "measurement"
       oversampling: 4x
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
     pressure:
       id: pressure_qmp6988_hat_env
       name: "Hat Env QMP6988 Pressure"
@@ -40,8 +52,12 @@ sensor:
       device_class: "atmospheric_pressure"
       state_class: "measurement"
       oversampling: 4x
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
     address: 0x70
-    update_interval: 20s
+    update_interval: 10s
     iir_filter: 8x
 
   # Combination    

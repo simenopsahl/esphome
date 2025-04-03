@@ -15,8 +15,17 @@ sensor:
       name: "Temperature KMeterISO"
       device_class: "temperature"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 6
     internal_temperature:
       id: temperature_kmeteriso_internal
       name: "Temperature KMeterISO Internal"
       device_class: "temperature"
       state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 6
+    update_interval: 5s
