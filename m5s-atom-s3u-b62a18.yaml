@@ -1,9 +1,9 @@
 packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
-  board: !include board/m5stack_atom_s3u.yaml
+  board: !include board/m5stack_atom_s3u_arduino.yaml
   grove: !include board/extension/grove_i2c.yaml
-  env_iv: !include board/module/unit_env_iv.yaml
+  env: !include board/module/unit_env_pro.yaml
 
 substitutions:
   devicename: m5s-as3u-b62a18
@@ -19,27 +19,7 @@ esphome:
 
 esp32:
   framework:
-    type: esp-idf
+    type: arduino
 
 #logger:
 #  initial_level: INFO
-
-sensor:
-  # Combine sensors
-  - platform: combination
-    type: median
-    id: temperature_local
-    name: "Temperature"
-    device_class: "temperature"
-    state_class: "measurement"
-    sources:
-      # ENV III
-#      - source: temperature_sht3xd
-#      - source: temperature_qmp6988
-      # ENV IV
-      - source: temperature_bmp280_unit_env
-      - source: temperature_sht40_unit_env
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15

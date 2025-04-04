@@ -12,7 +12,7 @@ sensor:
     i2c_id: $env_i2c_bus
     id: unit_env_sht30_sensor
     temperature:
-      id: temperature_sht3xd_unit_env
+      id: temperature_sht30_unit_env
       name: "Unit Env SHT30 Temperature"
       disabled_by_default: true
       device_class: "temperature"

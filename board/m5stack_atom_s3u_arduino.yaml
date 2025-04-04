@@ -13,7 +13,7 @@ esphome:
     name: "M5Stack.Atom S3U"
 
 esp32:
-  board: m5stack-atoms3
+  board: esp32-s3-devkitc-1
   variant: esp32s3
   flash_size: 8MB
 
@@ -58,8 +58,8 @@ light:
     pin: $rgb_pin
     num_leds: 1
     # RMT 0 channels will be occupied by IR
-#    rmt_channel: 1
-    rmt_symbols: 384
+    rmt_channel: 1
+#    rmt_symbols: 384
     chipset: ws2812
     effects:
       - pulse:
