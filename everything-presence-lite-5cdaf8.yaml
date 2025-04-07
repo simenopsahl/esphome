@@ -1,6 +1,7 @@
 substitutions:
   name: everything-presence-lite-5cdaf8
   friendly_name: EPL-5cdaf8
+  log_level: INFO
   location: "2etg, Gang"
 
 packages:

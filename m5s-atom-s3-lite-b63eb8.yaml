@@ -25,6 +25,10 @@ esp32:
   framework:
     type: esp-idf
 
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
 logger:
   initial_level: INFO
 

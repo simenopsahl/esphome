@@ -1,6 +1,7 @@
 substitutions:
   name: everything-presence-lite-5b92f4
   friendly_name: EPL-5b92f4
+  log_level: INFO
   location: "2etg, Stue"
 
 packages:

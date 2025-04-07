@@ -1,6 +1,7 @@
 substitutions:
   name: everything-presence-lite-aa2aa0
   friendly_name: EPL-aa2aa0
+  log_level: INFO
   location: "1etg, Kjøkken"
 
 packages:

@@ -51,6 +51,10 @@ esp32:
   framework:
     type: esp-idf
 
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
 logger:
   initial_level: INFO
 
@@ -68,7 +72,7 @@ display:
     full_update_every: 1
 #    reset_duration: 2ms
     update_interval: never
-    rotation: 0
+    rotation: 90
     pages:
 #      - id: page_black
 #        lambda: |-
