@@ -4,17 +4,12 @@
 # https://community.home-assistant.io/t/m5-atoms3-lite-with-i2c-hub-pahub-2-m5-relay-kmeteriso-and-ext-io-gpio-extender-peripherals-in-esphome/737727/7
 # m5stack Unit PaHub
 
-i2c:
-# Unit PaHub
-  - id: i2c_pa_hub
-    sda: $i2c_grove_sda_pin
-    scl: $i2c_grove_scl_pin
-    frequency: 50kHz
-    scan: true
+substitutions:
+  multiplexer_i2c_bus: i2c_grove
 
 # i2c Multiplexer
 tca9548a:
-  - i2c_id: i2c0
+  - i2c_id: $multiplexer_i2c_bus
     id: multiplex_pa_hub
     address: 0x70
     channels:

@@ -4,15 +4,20 @@ packages:
   board: !include board/m5stack_stickc_plus2.yaml
   hat: !include board/extension/hat_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
+  grove: !include board/extension/grove_i2c.yaml
+  co2: !include board/module/unit_co2.yaml
+  multiplexer: !include board/extension/unit_pa_hub.yaml
+  color: !include gui/colors.yaml
 
 substitutions:
   devicename: m5s-stickc-plus2-9a09b0
-  hat_shared: "false"
+  location: "1etg, Bad"
 
 esphome:
-  comment: "M5Stack StickC Plus2"
+  comment: "M5Stack StickC Plus2 @ Bad"
   name: $devicename
   friendly_name: $devicename
+  area: $location
   project: 
     version: "1.0.0"
   on_boot:
@@ -42,26 +47,34 @@ display:
     dc_pin: $disp_dc_pin
     reset_pin: $disp_reset_pin
     invert_colors: true
-    update_interval: 1s
+    update_interval: 5s
     dimensions:
-      height: 135
-      width: 240
-      offset_height: 52
-      offset_width: 40
+      height: 240
+      width: 135
+      offset_height: 40
+      offset_width: 52
     # Rotate 270 swap dimensions
-    transform:
-      swap_xy: true
-      mirror_y: true
+#      height: 135
+#      width: 240
+#      offset_height: 52
+#      offset_width: 40
+#    transform:
+#      swap_xy: true
+#      mirror_y: true
     pages:
       - id: page_local
         lambda: |-
           // Frame
           //it.rectangle(0,  0, it.get_width(), it.get_height(), id(c_yellow));
 
-          it.print(0, 0, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "Enhet");
+          it.print(0, 0, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "VVB");
           it.print(it.get_width(), 0, id(f24b), id(c_gray), TextAlign::TOP_RIGHT, "°C");
           
-          it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_white), TextAlign::CENTER, "%2.0f", id(temperature_local).state);
+          it.printf(it.get_width()/2, it.get_height()/3, id(f32b), id(c_red), TextAlign::BASELINE_CENTER, "%.1f", id(temperature_kmeteriso_0).state);
+
+          it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_white), TextAlign::CENTER, "%.1f", id(temperature_kmeteriso_mix).state);
+
+          it.printf(it.get_width()/2, (it.get_height()/3)*2, id(f32b), id(c_blue), TextAlign::TOP_CENTER, "%.1f", id(temperature_kmeteriso_1).state);
 
           // Show wifi icon.
           if (id(component_wifi).is_connected()) {
@@ -81,6 +94,8 @@ display:
           it.print(0, 0, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "Rom");
           it.print(it.get_width(), 0, id(f24b), id(c_gray), TextAlign::TOP_RIGHT, "°C");
 
+          it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_white), TextAlign::CENTER, "%2.0f", id(temperature_local).state);
+
           // Show wifi icon.
           if (id(component_wifi).is_connected()) {
             it.image(0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), COLOR_OFF);
@@ -97,8 +112,8 @@ font:
       type: gfonts
       family: Noto Sans Display
       weight: 500
-    id: f14
-    size: 14
+    id: f18
+    size: 18
     glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
       'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
@@ -108,30 +123,9 @@ font:
   - file:
       type: gfonts
       family: Noto Sans Display
-      weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f20
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
       weight: 700
     id: f20b
     size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f24
-    size: 24
     glyphs: *norwegian-glyphs
   - file:
       type: gfonts
@@ -143,23 +137,9 @@ font:
   - file:
       type: gfonts
       family: Noto Sans Display
-      weight: 500
-    id: f32
-    size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
       weight: 700
     id: f32b
     size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f60
-    size: 60
     glyphs: *norwegian-glyphs
   - file:
       type: gfonts
@@ -180,7 +160,71 @@ image:
     resize: 24x24
 
 sensor:
+  # UNIT KMeterISO
+  - platform: kmeteriso
+    i2c_id: i2c_pa_hub_c0
+    id: kmeteriso_0_sensor
+    temperature:
+      id: temperature_kmeteriso_0
+      name: "Temperature KMeterISO 0"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 5
+    internal_temperature:
+      id: temperature_kmeteriso_0_internal
+      name: "Temperature KMeterISO 0 Internal"
+      device_class: "temperature"
+      state_class: "measurement"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
+    update_interval: 3s
+
+  - platform: kmeteriso
+    i2c_id: i2c_pa_hub_c1
+    id: kmeteriso_1_sensor
+    temperature:
+      id: temperature_kmeteriso_1
+      name: "Temperature KMeterISO 1"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 5
+    internal_temperature:
+      id: temperature_kmeteriso_1_internal
+      name: "Temperature KMeterISO 1 Internal"
+      device_class: "temperature"
+      state_class: "measurement"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
+    update_interval: 3s
+
   # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_kmeteriso_mix
+    name: "Temperature KMeterISO Mix"
+    device_class: "temperature"
+    state_class: "measurement"
+    sources:
+      # KMeterISO
+      - source: temperature_kmeteriso_0
+      - source: temperature_kmeteriso_1
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
   - platform: combination
     type: median
     id: temperature_local
@@ -192,8 +236,32 @@ sensor:
       - source: temperature_sht30_hat_env
       - source: temperature_qmp6988_hat_env
       # ENV IV
-#      - source: temperature_bmp280
-#      - source: temperature_sht4x
+#      - source: temperature_bmp280_unit_env
+#      - source: temperature_sht40_unit_env
+      # ENV Pro
+#      - source: temperature_bme688
+      # CO2
+      - source: temperature_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
+  - platform: combination
+    type: median
+    id: humidity_local
+    name: "Humidity"
+    device_class: "humidity"
+    state_class: "measurement"
+    sources:
+      # ENV III
+      - source: humidity_sht30_hat_env
+      # ENV IV
+#      - source: humidity_sht40_unit_env
+      # ENV Pro
+#      - source: humidity_bme688
+      # CO2
+      - source: humidity_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s

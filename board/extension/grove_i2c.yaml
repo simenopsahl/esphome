@@ -2,13 +2,18 @@
 # m5stack i2c Grove Port
 
 substitutions:
+  grove_shared: "false"
   i2c_grove_frequency: 50kHz
 
 i2c:
 # Grove port
   - id: i2c_grove
-    sda: $i2c_grove_sda_pin
-    scl: $i2c_grove_scl_pin
+    sda:
+      number: $i2c_grove_sda_pin
+      allow_other_uses: $grove_shared
+    scl:
+      number: $i2c_grove_scl_pin
+      allow_other_uses: $grove_shared
     frequency: $i2c_grove_frequency
 #    timeout: 5ms
     scan: true
