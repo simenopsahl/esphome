@@ -300,18 +300,22 @@ image:
   - file: 'gui/img/car.png'
     id: i_car
     type: BINARY
+    invert_alpha: true
 #  - file: 'img/bus-clock.png'
 #    id: i_bus_clock
 #    ype: BINARY
   - file: 'gui/img/newspaper.png'
     id: i_newspaper
     type: BINARY
+    invert_alpha: true
   - file: 'gui/img/recycle.png'
     id: i_recycle
     type: BINARY
+    invert_alpha: true
   - file: 'gui/img/trash-can.png'
     id: i_trash_can
     type: BINARY
+    invert_alpha: true
 
 # Check if person is home
 binary_sensor:

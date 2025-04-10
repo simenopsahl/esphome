@@ -9,7 +9,7 @@ substitutions:
 sensor:
   - platform: sgp30
     i2c_id: $tvoc_i2c_bus
-    id: sgp_sensor
+    id: unit_tvoc_sgp30_sensor
     eco2:
       id: eco2_sgp30
       name: "eCO2 SGP30"
