@@ -1,7 +1,7 @@
 substitutions:
   name: everything-presence-lite-aa3b78
   friendly_name: EPL-aa3b78
-  log_level: INFO
+  log_level: WARN
   location: "2etg, Simen"
 
 packages:

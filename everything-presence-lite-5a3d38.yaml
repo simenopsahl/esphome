@@ -1,7 +1,7 @@
 substitutions:
   name: everything-presence-lite-5a3d38
   friendly_name: EPL-5a3d38
-  log_level: INFO
+  log_level: WARN
   location: "1etg, Bad"
 
 packages:

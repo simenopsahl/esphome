@@ -1,7 +1,7 @@
 substitutions:
   name: everything-presence-lite-aa2a1c
   friendly_name: EPL-aa2a1c
-  log_level: INFO
+  log_level: WARN
   location: "1etg, TV Stue"
 
 packages:
