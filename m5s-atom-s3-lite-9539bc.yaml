@@ -12,6 +12,7 @@ substitutions:
   devicename: m5s-as3-lite-9539bc
   location: "2etg, Ellen & Svein"
   i2c_grove_frequency: 40kHz
+  log_level: WARN
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Ellen & Svein"
@@ -24,9 +25,6 @@ esphome:
 esp32:
   framework:
     type: arduino
-
-logger:
-  initial_level: INFO
 
 sensor:
   # Combine sensors

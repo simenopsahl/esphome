@@ -16,6 +16,7 @@ substitutions:
   i2c_internal_frequency: 50kHz
   i2c_grove_frequency: 50kHz
 #  module_air_quality_uart_bus: uart_alt
+  log_level: WARN
 
 esphome:
   comment: "M5Stack Fire @ Stue"
@@ -30,10 +31,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-logger:
-  initial_level: INFO
-  tx_buffer_size: 256
 
 # 320x240 ILI9342C LCD
 display:

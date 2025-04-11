@@ -12,6 +12,7 @@ packages:
 substitutions:
   devicename: m5s-coreink-9fc390
   location: "1etg, Inngang"
+  log_level: WARN
 
 esphome:
   comment: "M5Stack CoreInk @ Inngang"
@@ -54,9 +55,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-logger:
-  initial_level: INFO
 
 display:
   # 200 x 200 resolution

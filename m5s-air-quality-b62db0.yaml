@@ -9,6 +9,7 @@ packages:
 substitutions:
   devicename: m5s-air-quality-b62db0
   location: "2etg, Gang"
+  log_level: WARN
 
 esphome:
   comment: "M5Stack AirQuality @ Trapp"
@@ -51,9 +52,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-logger:
-  initial_level: INFO
 
 display:
   # 200 x 200 resolution

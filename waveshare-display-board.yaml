@@ -7,6 +7,7 @@ packages:
 substitutions:
   devicename: waveshare-display-board
   location: "1etg, Kjøkken"
+  log_level: WARN
 
 esphome:
   comment: "E-Ink Kjøkken Display"
@@ -15,9 +16,6 @@ esphome:
   area: $location
   project:
     version: "1.0.0"
-
-logger:
-  initial_level: INFO
 
 # Now render everything on the ePaper screen.
 display:

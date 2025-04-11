@@ -11,6 +11,7 @@ packages:
 substitutions:
   devicename: m5s-as3-lite-953844
   location: "1etg, TV Stue"
+  log_level: WARN
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ TV Stue"
@@ -27,9 +28,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-logger:
-  initial_level: INFO
 
 sensor:
   # Combine sensors

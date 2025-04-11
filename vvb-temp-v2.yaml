@@ -6,6 +6,7 @@ packages:
 substitutions:
   devicename: vvb-temp-v2
   location: "1etg, Bad"
+  log_level: WARN
 
 #external_components:
 #  - source: github://nrandell/dallasng
@@ -23,9 +24,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-logger:
-  initial_level: INFO
 
 #i2c:
 #  scl: GPIO22

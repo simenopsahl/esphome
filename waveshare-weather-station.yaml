@@ -5,6 +5,7 @@ packages:
 substitutions:
   devicename: waveshare-weather-station
   location: "2etg, Ellen & Svein"
+  log_level: WARN
 
 #external_components:
 #  - source: github://pr#6209
@@ -17,9 +18,6 @@ esphome:
   area: $location
   project:
     version: "1.0"
-
-logger:
-  initial_level: INFO
 
 # Now render everything on the ePaper screen.
 display:

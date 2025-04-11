@@ -8,6 +8,7 @@ packages:
 substitutions:
   devicename: m5s-as3u-b62a18
   location: "1etg, Kjøkken"
+  log_level: WARN
 
 esphome:
   comment: "M5Stack Atom S3U @ Kjøkken"
@@ -20,6 +21,3 @@ esphome:
 esp32:
   framework:
     type: arduino
-
-logger:
-  initial_level: INFO

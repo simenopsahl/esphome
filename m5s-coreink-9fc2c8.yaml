@@ -13,6 +13,7 @@ substitutions:
   devicename: m5s-coreink-9fc2c8
   location: "2etg, Simen"
   i2c_grove_frequency: 40kHz
+  log_level: WARN
 
 esphome:
   comment: "M5Stack CoreInk @ Simen"
@@ -51,9 +52,6 @@ esphome:
 esp32:
   framework:
     type: arduino
-
-logger:
-  initial_level: INFO
 
 display:
   # 200 x 200 resolution

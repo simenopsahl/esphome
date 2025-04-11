@@ -10,6 +10,7 @@ packages:
 substitutions:
   devicename: m5s-as3-b5c828
   location: "2etg, Bod"
+  log_level: WARN
   pir_in_pin: $in_port_abc_pin
   env_i2c_bus: i2c_port_abc
   gyro_i2c_bus: i2c_port_abc
@@ -29,9 +30,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-logger:
-  initial_level: INFO
 
 display:
   - platform: ili9xxx

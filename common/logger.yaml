@@ -14,7 +14,7 @@ logger:
   id: component_logger
   level: DEBUG
   initial_level: $log_level
-  baus_rate: 0
+  baud_rate: 0
 #  logs:
 #    light: INFO
 
