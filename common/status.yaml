@@ -13,20 +13,6 @@ binary_sensor:
     entity_category: diagnostic
 
 sensor:
-  # https://esphome.io/components/sensor/wifi_signal.html
-  - platform: wifi_signal
-    id: sensor_wifi_signal
-    name: "WiFi Signal dB"
-    entity_category: diagnostic
-    device_class: "signal_strength"
-    state_class: measurement
-    disabled_by_default: true
-    update_interval: 60s
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 1
-
   # https://esphome.io/components/sensor/uptime.html
   - platform: uptime
     id: sensor_uptime

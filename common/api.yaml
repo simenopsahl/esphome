@@ -9,6 +9,6 @@
 #
 api:
   id: component_api
-  reboot_timeout: 45min
+  reboot_timeout: 90min
   encryption:
     key: !secret homeassistant_api

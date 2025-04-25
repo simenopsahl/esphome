@@ -1,0 +1,18 @@
+---
+# https://github.com/GeekMagicClock/smalltv-pro
+# https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/
+# PINs for GeekMagic SmallTV Pro
+
+substitutions:
+  # Internal
+  spi_clk_pin: GPIO18
+  spi_mosi_pin: GPIO23
+  disp_dc_pin: GPIO2
+  disp_reset_pin: GPIO4
+  # Button
+  touch1_pin: GPIO32
+  touch2_pin: GPIO33
+  # LED
+  disp_bl_pin: GPIO25
+  # Buzzer
+  buzzer_pin: GPIO12

@@ -253,6 +253,7 @@ light:
 
 time:
   - platform: homeassistant
+    id: !extend time_homeassistant
     on_time_sync:
         - ds1307.write_time:
   - platform: ds1307

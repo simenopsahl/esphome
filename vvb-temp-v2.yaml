@@ -1,7 +1,7 @@
 packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
-  board: !include board/esp32doit-devkit-v1.yaml
+  board: !include board/esp32doit_devkit_v1.yaml
 
 substitutions:
   devicename: vvb-temp-v2

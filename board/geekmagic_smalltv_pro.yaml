@@ -1,0 +1,97 @@
+---
+# https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/
+# Base functions for:
+# GeekMagic SmallTV Pro
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/geekmagic_smalltv_pro.yaml
+
+esphome:
+  project:
+    name: "GeekMagic.SmallTV Pro"
+
+esp32:
+  board: esp32dev
+
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+  interface: hardware
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: $disp_bl_pin
+    inverted: true
+  - platform: ledc
+    pin: $buzzer_pin
+    id: buzzer
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+# Button
+esp32_touch:
+
+binary_sensor:
+  - platform: esp32_touch
+    id: touch_pad
+    pin: $touch1_pin
+    threshold: 1250
+    name: "Touchpad"
+    entity_category: diagnostic
+    filters:
+      # Small filter, to debounce the spurious events.
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_click:
+    - min_length: 50ms
+      max_length: 500ms
+      then:
+        - lvgl.page.next:
+            animation: MOVE_LEFT
+            time: 300ms
+        - logger.log: "Short Touch"
+    - min_length: 500ms
+      max_length: 2000ms
+      then:
+        - if:
+            condition:
+            - light.is_off: backlight_light
+            then:
+            - light.turn_on: 
+                id: backlight_light
+        - if:
+            condition:
+            - light.is_on: backlight_light
+            then:
+            - lvgl.widget.redraw
+        - logger.log: "Long Touch"
+
+display:
+  - platform: ili9xxx
+    id: display_lcd
+    model: st7789v
+    data_rate: 40MHz
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
+    spi_mode: MODE3
+    dimensions:
+      width: 240
+      height: 240
+      offset_height: 0
+      offset_width: 0
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: never
