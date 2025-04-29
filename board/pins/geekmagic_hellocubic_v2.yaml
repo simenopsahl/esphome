@@ -1,0 +1,14 @@
+---
+# https://github.com/GeekMagicClock/HelloCubic-V2
+# https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/156
+# PINs for GeekMagic HelloCubic Lite
+
+substitutions:
+  # Internal
+  spi_clk_pin: GPIO
+  spi_mosi_pin: GPIO
+  disp_cs_pin: GPIO
+  disp_dc_pin: GPIO
+  disp_reset_pin: GPIO
+  # LED
+  disp_bl_pin: GPIO

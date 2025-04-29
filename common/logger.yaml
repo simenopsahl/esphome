@@ -9,12 +9,13 @@
 
 substitutions:
   log_level: DEBUG
+  log_baud_rate: "0"
 
 logger:
   id: component_logger
   level: DEBUG
   initial_level: $log_level
-  baud_rate: 0
+  baud_rate: $log_baud_rate
 #  logs:
 #    light: INFO
 

@@ -8,7 +8,8 @@ packages:
   air_quality: !include board/module/module_air_quality.yaml
   base_btc: !include board/module/base_btc.yaml
   env_iv: !include board/module/unit_env_iv.yaml
-  color: !include gui/colors.yaml
+  co2: !include board/module/unit_co2.yaml
+  color: !include gui/colors_night_owl.yaml
 
 substitutions:
   devicename: m5s-fire-a70780
@@ -17,153 +18,779 @@ substitutions:
   i2c_grove_frequency: 50kHz
 #  module_air_quality_uart_bus: uart_alt
   log_level: WARN
+  default_font: f20
 
 esphome:
   comment: "M5Stack Fire @ Stue"
   name: $devicename
   friendly_name: $devicename
   area: $location
+  on_boot:
+    - delay: 5s
+    - lvgl.widget.hide: boot_screen
 
 esp32:
   framework:
     type: esp-idf
 
+api:
+  on_client_connected:
+    then:
+      - lvgl.widget.show: img_hastatus
+  on_client_disconnected:
+    then:
+      - lvgl.widget.hide: img_hastatus
+
 wifi:
   enable_btm: true
   enable_rrm: true
+  on_connect:
+    then:
+      - lvgl.widget.show: img_wifistatus
+  on_disconnect:
+    then:
+      - lvgl.widget.hide: img_wifistatus
 
-# 320x240 ILI9342C LCD
-display:
-  - platform: ili9xxx
-    id: display_lcd
-    model: M5STACK
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_rs_pin
-    data_rate: 20Mhz
-    invert_colors: true
-    color_palette: 8BIT
-    update_interval: 5s
-    dimensions:
-      height: 240
-      width: 320
-#      offset_height: 2
-#      offset_width: 1
-    # Rotate 180deg
-#    transform:
-#      mirror_x: true
-#      mirror_y: true
-    pages:
-      - id: page_home
-        lambda: |-
-          // Bottom Nav BG
-          it.filled_rectangle( 0, it.get_height()-36, it.get_width(), it.get_height(), id(c_bg_s) );
+lvgl:
+  log_level: WARN
+  color_depth: 16
+  disp_bg_color: 0x000000
+  bg_color: 0x000000
+  default_font: $default_font
 
-          // Left Icon
-          it.image( ( it.get_width()/4 )-10, it.get_height(), id(i_airq), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
-          // Mid Icon
-          it.image( it.get_width()/4*2, it.get_height(), id(i_home), ImageAlign::BOTTOM_CENTER, id(c_purple), id(c_bg_s) );
-          // Right Icon
-          it.image( ( it.get_width()/4*3 )+10, it.get_height(), id(i_power), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
+  buffer_size: 25%
+  style_definitions:
+    - id: header_footer
+      bg_color: c_bg_s
+      bg_opa: COVER
+      border_opa: TRANSP
+      radius: 0
+      pad_all: 0
+      pad_row: 0
+      pad_column: 0
+      border_color: c_dark_gray
+      text_color: c_text_p
+      width: 100%
+      height: 30
+    - id: date_style
+      align: center
+      text_color: c_gray
+      radius: 4
+      pad_all: 2
+  top_layer:
+    widgets:
+      # Status icons
+      - image:
+          id: img_wifistatus
+          align: bottom_left
+          y: -2
+          x: 2
+          hidden: true
+          src: i_wifi
+          image_recolor: c_green
+          image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
+      - image:
+          id: img_hastatus
+          align: bottom_right
+          y: -2
+          x: -2
+          hidden: true
+          src: i_api
+          image_recolor: 0x00daff
+          image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
+      # Footer icons
+      - obj:
+          align: BOTTOM_MID
+          width: 100%
+          height: 30
+          pad_all: 0
+          bg_color: 0x000000
+          border_opa: TRANSP
+          layout: # enable the GRID layout for the children widgets
+            type: GRID # split the rows and the columns proportionally
+            grid_columns: [FR(1), FR(2), FR(3), FR(2), FR(1)]
+            grid_rows: [FR(1)]
+          widgets:
+            - image:
+                id: img_prev
+                grid_cell_column_pos: 1 # place the widget in
+                grid_cell_row_pos: 0 # the corresponding cell
+                grid_cell_x_align: STRETCH
+                grid_cell_y_align: STRETCH
+                src: i_prev
+                image_recolor: c_text_s
+                image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
+            - image:
+                id: img_next
+                grid_cell_column_pos: 3
+                grid_cell_row_pos: 0
+                grid_cell_x_align: STRETCH
+                grid_cell_y_align: STRETCH
+                src: i_next
+                image_recolor: c_text_s
+                image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
+      # Boot screen
+      - obj:
+          id: boot_screen
+          width: 320
+          height: 210
+          align: TOP_MID
+          radius: 0
+          pad_all: 0
+          border_width: 0
+          bg_color: 0x000000
+          widgets:
+            - image:
+                align: CENTER
+                src: boot_logo
+                y: -20
+            - spinner:
+                align: BOTTOM_MID
+                y: -15
+                height: 50
+                width: 50
+                spin_time: 1s
+                arc_length: 60deg
+                arc_width: 8
+                indicator:
+                  arc_color: c_purple
+                  arc_width: 8
+  pages:
+    - id: temp_page
+      widgets:
+        - obj:
+            align: BOTTOM_MID
+            styles: header_footer
+            widgets:
+              - image:
+                  src: i_temp_s
+                  align: bottom_mid
+                  y: -2
+                  image_recolor: c_text_p
+                  image_recolor_opa: 100%
+        - obj:
+            align: TOP_MID
+            width: 320
+            height: 210
+            pad_all: 6
+            #pad_row: 6
+            #pad_column: 6
+            bg_color: 0x000000
+            border_opa: TRANSP
+            layout:
+              type: GRID
+              grid_columns: [FR(1), FR(2), FR(1)]
+              grid_rows: [FR(20), FR(80)]
+            widgets:
+              - label:
+                  id: graph_temp_room
+                  text: "?"
+                  grid_cell_column_pos: 0
+                  grid_cell_column_span: 3
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+              - image:
+                  src: i_temp_l
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  image_recolor: c_text_s
+                  image_recolor_opa: 100%
+              - label:
+                  id: lbl_temp_room_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f120b
+                  text_color: c_text_p
+              - label:
+                  id: lbl_temp_room_unit
+                  text: "°C"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f60b
+                  text_color: c_text_s
 
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), id(c_bg_s) );
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
-          }
+    - id: airq_page
+      widgets:
+        - obj:
+            align: BOTTOM_MID
+            styles: header_footer
+            widgets:
+              - image:
+                  src: i_airq
+                  align: bottom_mid
+                  y: -2
+                  image_recolor: c_text_p
+                  image_recolor_opa: 100%
+        - obj:
+            align: TOP_MID
+            width: 320
+            height: 210
+            pad_all: 6
+            #pad_row: 6
+            #pad_column: 6
+            bg_color: 0x000000
+            border_opa: TRANSP
+            layout:
+              type: GRID
+              grid_columns: [FR(3), FR(2), FR(1)]
+              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
+            widgets:
+              - label:
+                  id: lbl_temp_local_l
+                  text: "Temperatur: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f18
+                  text_color: c_text_s
+              - label:
+                  id: lbl_temp_local_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24b
+                  text_color: c_text_p
+              - label:
+                  id: lbl_temp_local_unit
+                  text: "°C"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24
+                  text_color: c_text_s
 
-          // Temperature graph
-          it.graph(0, 20, id(graph_temperature_room));
+              - label:
+                  id: lbl_co2_l
+                  text: "Karbondioksid: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f18
+                  text_color: c_text_s
+              - label:
+                  id: lbl_co2_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24b
+                  text_color: c_text_p
+              - label:
+                  id: lbl_co2_unit
+                  text: "ppm"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24
+                  text_color: c_text_s
 
-          // Temperature value
-          it.image( 0, it.get_height()-48, id(i_temp_l), ImageAlign::BOTTOM_LEFT, id(c_text_s) );
-          it.printf( it.get_width()/2, it.get_height()-50, id(f120b), id(c_text_p), TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_feels_like).state );
-          it.print( it.get_width(), it.get_height()-50, id(f60), id(c_text_s), TextAlign::BASELINE_RIGHT, "°C" );
+              - label:
+                  id: lbl_pm1_l
+                  text: "Svevestøv 1.0: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f18
+                  text_color: c_text_s
+              - label:
+                  id: lbl_pm1_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24b
+                  text_color: c_text_p
+              - label:
+                  id: lbl_pm1_unit
+                  text: "µg/m³"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24
+                  text_color: c_text_s
+
+              - label:
+                  id: lbl_pm25_l
+                  text: "Svevestøv 2.5: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f18
+                  text_color: c_text_s
+              - label:
+                  id: lbl_pm25_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24b
+                  text_color: c_text_p
+              - label:
+                  id: lbl_pm25_unit
+                  text: "µg/m³"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24
+                  text_color: c_text_s
+
+              - label:
+                  id: lbl_pm10_l
+                  text: "Svevestøv 10.0: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f18
+                  text_color: c_text_s
+              - label:
+                  id: lbl_pm10_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24b
+                  text_color: c_text_p
+              - label:
+                  id: lbl_pm10_unit
+                  text: "µg/m³"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f24
+                  text_color: c_text_s
+
+    - id: power_page
+      widgets:
+        - obj:
+            align: BOTTOM_MID
+            styles: header_footer
+            widgets:
+              - image:
+                  src: i_power
+                  align: bottom_mid
+                  y: -2
+                  image_recolor: c_text_p
+                  image_recolor_opa: 100%
+        - obj:
+            align: TOP_MID
+            width: 320
+            height: 210
+            pad_all: 5
+            #pad_row: 6
+            #pad_column: 6
+            bg_color: 0x000000
+            border_opa: TRANSP
+            layout:
+              type: GRID
+              grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
+              grid_rows: [FR(18), FR(168), FR(14)]
+            widgets:
+              - label:
+                  id: lbl_nordpool_price_0
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: left
+                  text_font: f18
+                  text_color: c_text_p
+              - label:
+                  id: lbl_nordpool_time_0
+                  text: "?"
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: left
+                  text_font: f14
+                  text_color: c_text_s
+
+              - label:
+                  id: lbl_nordpool_price_4
+                  text: "?"
+                  grid_cell_column_pos: 4
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: center
+                  text_font: f18
+                  text_color: c_text_p
+              - label:
+                  id: lbl_nordpool_time_4
+                  text: "?"
+                  grid_cell_column_pos: 4
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: center
+                  text_font: f14
+                  text_color: c_text_s
+
+              - label:
+                  id: lbl_nordpool_price_8
+                  text: "?"
+                  grid_cell_column_pos: 8
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f18
+                  text_color: c_text_p
+              - label:
+                  id: lbl_nordpool_time_8
+                  text: "?"
+                  grid_cell_column_pos: 8
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: right
+                  text_font: f14
+                  text_color: c_text_s
+
+              - bar:
+                  id: bar_nordpool_price_0
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_1
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_2
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_3
+                  grid_cell_column_pos: 3
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_4
+                  grid_cell_column_pos: 4
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_5
+                  grid_cell_column_pos: 5
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_6
+                  grid_cell_column_pos: 6
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_7
+                  grid_cell_column_pos: 7
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+              - bar:
+                  id: bar_nordpool_price_8
+                  grid_cell_column_pos: 8
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  width: 34
+                  height: 100%
+                  value: 150
+                  min_value: 0
+                  max_value: 300
+
+    - id: clock_page
+      widgets:
+        - obj:
+            align: BOTTOM_MID
+            styles: header_footer
+            widgets:
+              - image:
+                  src: i_home
+                  align: bottom_mid
+                  y: -2
+                  image_recolor: c_text_p
+                  image_recolor_opa: 100%
+        - obj: # clock container
+            height: 210
+            width: 320
+            align: TOP_MID
+            bg_color: 0x000000
+            pad_all: 0
+            border_width: 0
+            widgets:
+              - meter: # clock face
+                  height: 200
+                  width: 200
+                  align: CENTER
+                  border_width: 0
+                  bg_opa: TRANSP
+                  scales:
+                    - range_from: 0 # minutes scale
+                      range_to: 60
+                      angle_range: 360
+                      rotation: 270
+                      ticks:
+                        width: 1
+                        count: 61
+                        length: 10
+                        color: c_bg_s
+                      indicators:
+                        - line:
+                            id: minute_hand
+                            width: 3
+                            color: c_text_s
+                            r_mod: -4
+                            value: 0
+                    - range_from: 1 # hours scale for labels
+                      range_to: 12
+                      angle_range: 330
+                      rotation: 300
+                      ticks:
+                        width: 1
+                        count: 12
+                        length: 1
+                        major:
+                          stride: 1
+                          width: 4
+                          length: 10
+                          color: c_dark_gray
+                          label_gap: 12
+                    - range_from: 0 # hi-res hours scale for hand
+                      range_to: 720
+                      angle_range: 360
+                      rotation: 270
+                      ticks:
+                        count: 0
+                      indicators:
+                        - line:
+                            id: hour_hand
+                            width: 5
+                            color: c_purple
+                            r_mod: -30
+                            value: 0
+              - label:
+                  styles: date_style
+                  id: day_label
+                  text_font: f18b
+                  y: -30
+              - label:
+                  id: date_label
+                  styles: date_style
+                  text_font: f18b
+                  y: 30
+
+    - id: status_page
+      widgets:
+        - obj:
+            align: BOTTOM_MID
+            styles: header_footer
+            widgets:
+              - image:
+                  src: i_information
+                  align: bottom_mid
+                  y: -2
+                  image_recolor: c_text_p
+                  image_recolor_opa: 100%
+        - obj:
+            align: BOTTOM_MID
+            width: 320
+            height: 210
+            pad_all: 6
+            #pad_row: 6
+            #pad_column: 6
+            bg_color: 0x000000
+            border_opa: TRANSP
+            layout:
+              type: GRID
+              grid_columns: [FR(1), FR(4)]
+              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
+            widgets:
+              - label:
+                  id: lbl_name_l
+                  text: "Name: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: RIGHT
+                  text_font: f14
+                  text_color: c_text_s
+              - label:
+                  id: lbl_name
+                  text: "M5Stack Fire"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+                  text_color: c_text_p
+
+              - label:
+                  id: lbl_build_l
+                  text: "Build: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: RIGHT
+                  text_font: f14
+                  text_color: c_text_s
+              - label:
+                  id: lbl_build
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+                  text_color: c_text_p
+                  text:
+                    format: "%s - %s"
+                    args: [__DATE__, __TIME__]
+
+              - label:
+                  id: lbl_ssid_l
+                  text: "SSID: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: RIGHT
+                  text_font: f14
+                  text_color: c_text_s
+              - label:
+                  id: lbl_ssid
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+                  text_color: c_text_p
           
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf(it.get_width()/2, 0, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", str);
-      - id: page_airq
-        lambda: |-
-          // Bottom Nav BG
-          it.filled_rectangle( 0, it.get_height()-36, it.get_width(), it.get_height(), id(c_bg_s) );
-
-          // Left Icon
-          it.image( ( it.get_width()/4 )-10 , it.get_height(), id(i_airq), ImageAlign::BOTTOM_CENTER, id(c_purple), id(c_bg_s) );
-          // Mid Icon
-          it.image( it.get_width()/4*2, it.get_height(), id(i_home), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
-          // Right Icon
-          it.image( ( it.get_width()/4*3 )+10, it.get_height(), id(i_power), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
-
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), id(c_bg_s) );
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
-          }
-
-          it.image( 0, 36, id(i_temp_s), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 94, id(i_pm1), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 128, id(i_pm25), ImageAlign::TOP_LEFT, id(c_text_s) );
-          it.image( 4, 162, id(i_pm10), ImageAlign::TOP_LEFT, id(c_text_s) );
+              - label:
+                  id: lbl_ip_l
+                  text: "IP: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: RIGHT
+                  text_font: f14
+                  text_color: c_text_s
+              - label:
+                  id: lbl_ip
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+                  text_color: c_text_p
           
-          it.print( 38, 94, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 1.0: " );
-          it.print( 38, 128, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 2.5: " );
-          it.print( 38, 162, id(f18), id(c_text_s), TextAlign::TOP_LEFT, "Svevestøv 10.0: " );
-
-          it.printf( it.get_width()/2, 16, id(f60b), id(c_text_p), TextAlign::TOP_CENTER, "%2.0f", id(temperature_local).state );
-          it.printf( 275, 90, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm1_pmsa003).state );
-          it.printf( 275, 124, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_25_pmsa003).state );
-          it.printf( 275, 158, id(f24b), id(c_text_p), TextAlign::TOP_RIGHT, "%.0f", id(pm_10_pmsa003).state );
-          
-          it.print( it.get_width(), 25, id(f24), id(c_text_s), TextAlign::TOP_RIGHT, "°C" );
-          it.print( it.get_width(), 92, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
-          it.print( it.get_width(), 128, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
-          it.print( it.get_width(), 162, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "µg/m³" );
-
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf(it.get_width()/2, 0, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", str);
-      - id: page_power
-        lambda: |-
-          // Bottom Nav BG
-          it.filled_rectangle( 0, it.get_height()-36, it.get_width(), it.get_height(), id(c_bg_s) );
-
-          // Left Icon
-          it.image( ( it.get_width()/4 )-10, it.get_height(), id(i_airq), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
-          // Mid Icon
-          it.image( it.get_width()/4*2, it.get_height(), id(i_home), ImageAlign::BOTTOM_CENTER, id(c_text_s), id(c_bg_s) );
-          // Right Icon
-          it.image( ( it.get_width()/4*3 )+10, it.get_height(), id(i_power), ImageAlign::BOTTOM_CENTER, id(c_purple), id(c_bg_s) );
-
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), id(c_bg_s) );
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), id(c_bg_s) );
-          }
-
-          // NordPool Section
-          it.printf (1, 2, id(f14), id(c_text_p), TextAlign::TOP_LEFT, "%s", id(nordpool_time_0).state.c_str() );
-          it.printf( it.get_width()/2, 2, id(f14), id(c_text_s), TextAlign::TOP_CENTER, "%s", id(nordpool_time_4).state.c_str() );
-          it.printf( it.get_width()-1, 2, id(f14), id(c_text_s), TextAlign::TOP_RIGHT, "%s", id(nordpool_time_8).state.c_str() );
-          it.graph( 0, 22, id(graph_nordpool), id(c_bg_s) );
-          it.printf( 1, 172, id(f18), id(c_text_p), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state );
-          it.printf( it.get_width()/2, 172, id(f18), id(c_text_s), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state );
-          it.printf( it.get_width()-1, 172, id(f18), id(c_text_s), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state );
+              - label:
+                  id: lbl_mac_l
+                  text: "MAC: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_align: RIGHT
+                  text_font: f14
+                  text_color: c_text_s
+              - label:
+                  id: lbl_mac
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+                  text_color: c_text_p
 
 binary_sensor:
   # Call sensors from HA.
@@ -177,7 +804,7 @@ binary_sensor:
   - platform: template
     id: motion_detected
     lambda: !lambda |-
-      if ( (id(motion_stue).state) and (id(motion_gang).state) ) {
+      if ( (id(motion_stue).state) or (id(motion_gang).state) ) {
         return true;
       } else {
         return false;
@@ -185,6 +812,13 @@ binary_sensor:
     on_state: 
       then:
         - script.execute: display_on_off
+
+switch:
+  - platform: template
+    id: display_auto
+    optimistic: true
+    name: "Display auto off"
+    entity_category: config
 
 script:
   - id: display_on_off
@@ -233,10 +867,46 @@ script:
                               - if:
                                   condition: 
                                     - binary_sensor.is_off: motion_detected
+                                    - switch.is_off: display_auto
                                   then:
                                     - delay: 1min
                                     - light.turn_off: backlight_light
                                     - logger.log: "Motion NOT detected. Display off"
+  - id: time_update
+    then:
+      - lvgl.indicator.update:
+          id: minute_hand
+          value: !lambda |-
+            return id(time_homeassistant).now().minute;
+      - lvgl.indicator.update:
+          id: hour_hand
+          value: !lambda |-
+            auto now = id(time_homeassistant).now();
+            return std::fmod(now.hour, 12) * 60 + now.minute;
+      - lvgl.label.update:
+          id: date_label
+          text: !lambda |-
+            static const char * const mon_names[] = {"JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEC"};
+            static char date_buf[8];
+            auto now = id(time_homeassistant).now();
+            snprintf(date_buf, sizeof(date_buf), "%s %2d", mon_names[now.month-1], now.day_of_month);
+            return date_buf;
+      - lvgl.label.update:
+          id: day_label
+          text: !lambda |-
+            static const char * const day_names[] = {"SØN", "MAN", "TIR", "ONS", "TOR", "FRE", "LØR"};
+            return day_names[id(time_homeassistant).now().day_of_week - 1];
+
+time:
+  - platform: homeassistant
+    id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: time_update
 
 sensor:
   # Combine sensors
@@ -254,11 +924,18 @@ sensor:
       - source: temperature_bmp280_unit_env
       - source: temperature_sht40_unit_env
       # CO2
-#      - source: temperature_scd40_unit_co2
+      - source: temperature_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s
         - delta: 0.15
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_temp_local_value
+            text:
+              format: "%.1f"
+              args: [ 'x' ]
 
   - platform: combination
     type: median
@@ -272,7 +949,7 @@ sensor:
       # ENV IV
       - source: humidity_sht40_unit_env
       # CO2
-#      - source: humidity_scd40_unit_co2
+      - source: humidity_scd40_unit_co2
     filters:
       - or:
         - heartbeat: 900s
@@ -282,22 +959,166 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.etg2_stue_tc_heatindex
     id: temperature_feels_like
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_temp_room_value
+            text:
+              format: "%.1f"
+              args: [ 'x' ]
 
-  - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
-    id: nordpool_sensor
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price0
     id: nordpool_price_0
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_nordpool_price_0
+            text:
+              format: "%.0f"
+              args: [ 'x' ]
+        - lvgl.bar.update:
+            id: bar_nordpool_price_0
+            value: !lambda return (int)x;
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    id: nordpool_price_1
+    on_value:
+      then:
+        - lvgl.bar.update:
+            id: bar_nordpool_price_1
+            value: !lambda return (int)x;
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    id: nordpool_price_2
+    on_value:
+      then:
+        - lvgl.bar.update:
+            id: bar_nordpool_price_2
+            value: !lambda return (int)x;
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    id: nordpool_price_3
+    on_value:
+      then:
+        - lvgl.bar.update:
+            id: bar_nordpool_price_3
+            value: !lambda return (int)x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price4
     id: nordpool_price_4
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_nordpool_price_4
+            text:
+              format: "%.0f"
+              args: [ 'x' ]
+        - lvgl.bar.update:
+            id: bar_nordpool_price_4
+            value: !lambda return (int)x;
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    id: nordpool_price_5
+    on_value:
+      then:
+        - lvgl.bar.update:
+            id: bar_nordpool_price_5
+            value: !lambda return (int)x;
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    id: nordpool_price_6
+    on_value:
+      then:
+        - lvgl.bar.update:
+            id: bar_nordpool_price_6
+            value: !lambda return (int)x;
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    id: nordpool_price_7
+    on_value:
+      then:
+        - lvgl.bar.update:
+            id: bar_nordpool_price_7
+            value: !lambda return (int)x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price8
     id: nordpool_price_8
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_nordpool_price_8
+            text:
+              format: "%.0f"
+              args: [ 'x' ]
+        - lvgl.bar.update:
+            id: bar_nordpool_price_8
+            value: !lambda return (int)x;
+  - platform: combination
+    id: nordpool_price_max
+    type: max
+    sources:
+      - source: nordpool_price_0
+      - source: nordpool_price_1
+      - source: nordpool_price_2
+      - source: nordpool_price_3
+      - source: nordpool_price_4
+      - source: nordpool_price_5
+      - source: nordpool_price_6
+      - source: nordpool_price_7
+      - source: nordpool_price_8
+#    on_value:
+#      then:
+#        - lvgl.bar.update:
+#            id:
+#              - bar_nordpool_price_0
+#              - bar_nordpool_price_1
+#              - bar_nordpool_price_2
+#              - bar_nordpool_price_3
+#              - bar_nordpool_price_4
+#              - bar_nordpool_price_5
+#              - bar_nordpool_price_6
+#              - bar_nordpool_price_7
+#              - bar_nordpool_price_8
+#            max_value: !lambda return (int)x + 10;
+#            min_value: !lambda return id(nordpool_price_min).state;
+  - platform: combination
+    id: nordpool_price_min
+    type: min
+    sources:
+      - source: nordpool_price_0
+      - source: nordpool_price_1
+      - source: nordpool_price_2
+      - source: nordpool_price_3
+      - source: nordpool_price_4
+      - source: nordpool_price_5
+      - source: nordpool_price_6
+      - source: nordpool_price_7
+      - source: nordpool_price_8
+#    on_value:
+#      then:
+#        - lvgl.bar.update:
+#            id:
+#              - bar_nordpool_price_0
+#              - bar_nordpool_price_1
+#              - bar_nordpool_price_2
+#              - bar_nordpool_price_3
+#              - bar_nordpool_price_4
+#              - bar_nordpool_price_5
+#              - bar_nordpool_price_6
+#              - bar_nordpool_price_7
+#              - bar_nordpool_price_8
+#            min_value: !lambda return (int)x - 10;
+#            max_value: !lambda return id(nordpool_price_max).state;
 
 # Strings from Home Assistant
 text_sensor:
@@ -305,14 +1126,29 @@ text_sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time0
     id: nordpool_time_0
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_nordpool_time_0
+            text: !lambda return id(nordpool_time_0).state;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time4
     id: nordpool_time_4
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_nordpool_time_0
+            text: !lambda return id(nordpool_time_4).state;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time8
     id: nordpool_time_8
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_nordpool_time_0
+            text: !lambda return id(nordpool_time_8).state;
 
 graph:
   - id: graph_nordpool
@@ -365,8 +1201,36 @@ font:
   - file:
       type: gfonts
       family: Noto Sans Display
+      weight: 700
+    id: f14b
+    size: 14
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    id: f16
+    size: 16
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f16b
+    size: 16
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
       weight: 500
     id: f18
+    size: 18
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 700
+    id: f18b
     size: 18
     glyphs: *norwegian-glyphs
   - file:
@@ -459,31 +1323,40 @@ image:
   - id: i_wifi
     file: mdi:wifi
     type: binary
-    resize: 24x24
+    resize: 26x26
   - id: i_api
     file: mdi:home-assistant
     type: binary
-    resize: 24x24
+    resize: 26x26
+
+  - id: i_prev
+    file: mdi:arrow-left-thick
+    type: binary
+    resize: 26x26
+  - id: i_next
+    file: mdi:arrow-right-thick
+    type: binary
+    resize: 26x26
   - id: i_home
     file: mdi:home
     type: binary
-    resize: 36x36
+    resize: 26x26
   - id: i_airq
     file: mdi:weather-dust
     type: binary
-    resize: 36x36
+    resize: 26x26
   - id: i_power
     file: mdi:lightning-bolt
     type: binary
-    resize: 36x36
-  - id: i_temp_l
-    file: mdi:thermometer
-    type: binary
-    resize: 56x56
+    resize: 26x26
   - id: i_temp_s
     file: mdi:thermometer
     type: binary
-    resize: 28x28
+    resize: 26x26
+  - id: i_information
+    file: mdi:information
+    type: binary
+    resize: 26x26
 #  - id: i_co2
 #    file: mdi:molecule-co2
 #    type: binary
@@ -491,12 +1364,22 @@ image:
   - id: i_pm1
     file: mdi:grain
     type: binary
-    resize: 28x28
+    resize: 26x26
   - id: i_pm25
     file: mdi:chemical-weapon
     type: binary
-    resize: 28x28
+    resize: 26x26
   - id: i_pm10
     file: mdi:molecule
     type: binary
-    resize: 28x28
+    resize: 26x26
+
+  - id: i_temp_l
+    file: mdi:thermometer
+    type: binary
+    resize: 56x56
+  - file: https://esphome.io/_static/favicon-512x512.png
+    id: boot_logo
+    resize: 150x150
+    type: RGB565
+    transparency: alpha_channel

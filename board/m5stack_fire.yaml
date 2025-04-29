@@ -19,6 +19,7 @@ esphome:
 #      - "-DARDUINO_USB_CDC_ON_BOOT=1"
 #      - "-mfix-esp32-psram-cache-issue"
 #      - "-mfix-esp32-psram-cache-strategy=memw"
+
 # PSRAM is shared with UART bus tx17/rx16
 #psram:
 #  mode: octal
@@ -40,27 +41,26 @@ spi:
 #  rmt_symbols: 144
 
 # 320x240 ILI9342C LCD
-#display:
-#  - platform: ili9xxx
-#    id: display_lcd
-#    model: M5STACK
-#    cs_pin: $disp_cs_pin
-#    dc_pin: $disp_dc_pin
-#    reset_pin: $disp_rs_pin
-#    data_rate: 40Mhz
-#    invert_colors: true
-#    update_interval: 1s
-#    dimensions:
-#      height: 128
-#      width: 128
+display:
+  - platform: ili9xxx
+    id: display_lcd
+    model: M5STACK
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_rs_pin
+    data_rate: 20Mhz
+    invert_colors: true
+    color_palette: 8BIT
+    update_interval: 5s
+    dimensions:
+      height: 240
+      width: 320
 #      offset_height: 2
 #      offset_width: 1
     # Rotate 180deg
 #    transform:
 #      mirror_x: true
-#      mirror_y: true
-#    lambda: |-
-#      it.print(80, 0, id(roboto), Color(255, 255, 255), TextAlign::TOP_CENTER, "M5Stack Fire Test");
+#      mirror_y: true      it.print(80, 0, id(roboto), Color(255, 255, 255), TextAlign::TOP_CENTER, "M5Stack Fire Test");
 
 output:
   # backlight output
@@ -111,8 +111,9 @@ binary_sensor:
       then:
         - logger.log: Button A Pressed
         - script.execute: buzzer_beep
-        - display.page.show: page_airq
-        - component.update: display_lcd
+        - lvgl.page.next:
+            animation: MOVE_LEFT
+            time: 100ms
     on_release:
       then:
         - output.turn_off: buzzer
@@ -130,8 +131,10 @@ binary_sensor:
       then:
         - logger.log: Button B Pressed
         - script.execute: buzzer_beep
-        - display.page.show: page_home
-        - component.update: display_lcd
+        - lvgl.page.show:
+            id: temp_page
+            animation: MOVE_TOP
+            time: 100ms
     on_release:
       then:
         - output.turn_off: buzzer
@@ -149,8 +152,9 @@ binary_sensor:
       then:
         - logger.log: Button C Pressed
         - script.execute: buzzer_beep
-        - display.page.show: page_power
-        - component.update: display_lcd
+        - lvgl.page.next:
+            animation: MOVE_RIGHT
+            time: 100ms
     on_release:
       then:
         - output.turn_off: buzzer

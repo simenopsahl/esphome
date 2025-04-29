@@ -1,53 +1,146 @@
 packages:
   <<: !include_dir_named common
 #  <<: !include_dir_named bluetooth
-  board: !include board/geekmagic_smalltv_pro.yaml
+#  board: !include board/geekmagic_smalltv_s3.yaml
   color: !include gui/colors_night_owl.yaml
-#  lvgl_theme: !include gui/lvgl_night_owl_dark.yaml
 
 substitutions:
-  devicename: gm-smalltv-pro-ee703c
+  devicename: gm-smalltv-s3-d0c8bc
   log_level: WARN
+  log_baud_rate: "115200"
   default_font: f20
 
 esphome:
-  comment: "GeekMagic SmallTV Pro"
+  comment: "GeekMagic SmallTV S3"
   name: $devicename
   friendly_name: $devicename
-  project:
-    version: "1.0.0"
-  on_boot:
-    - delay: 5s
-    - lvgl.widget.hide: boot_screen
+  platformio_options:
+#    board_build.arduino.memory_type: qio #https://github.com/GeekMagicClock/GeekMagic-S3/pull/8
+    board_build.arduino.memory_type: qio_opi # https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/156
+#    board_build.flash_mode: qio # AliExpress review
+    board_build.flash_mode: dio # HA Forum
+#    board_build.psram_type: opi # AliExpress review
+    board_upload.maximum_ram_size: 524288
+    build_flags:
+#      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+      - "-DBOARD_HAS_PSRAM"
+#      - "-DARDUINO_USB_CDC_ON_BOOT=0"
+#      - "-DARDUINO_USB_CDC_ON_BOOT=1"
+#      - "-mfix-esp32-psram-cache-issue"
 
 esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
+  partitions: board/partitions/gm-s3-16MB.csv
   framework:
     type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
 
 api:
   on_client_connected:
     then:
-      - lvgl.widget.show: img_hastatus
+      - lvgl.widget.show: lbl_hastatus
   on_client_disconnected:
     then:
-      - lvgl.widget.hide: img_hastatus
+      - lvgl.widget.hide: lbl_hastatus
 
 wifi:
   on_connect:
     then:
-      - lvgl.widget.show: img_wifistatus
+      - lvgl.widget.show: lbl_wifistatus
   on_disconnect:
     then:
-      - lvgl.widget.hide: img_wifistatus
+      - lvgl.widget.hide: lbl_wifistatus
+
+spi:
+  clk_pin: GPIO12
+  mosi_pin: GPIO11
+
+output:
+  - platform: ledc
+    pin: GPIO14
+    inverted: true
+    id: backlight_output
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+esp32_touch:
+  #setup_mode: True
+  measurement_duration: 0.25ms
+
+binary_sensor:
+  - platform: esp32_touch
+    id: touch_pad
+    pin: GPIO9
+    threshold: 120000
+##    filters:
+##      # Small filter, to debounce the spurious events.
+##      - delayed_on: 10ms
+##      - delayed_off: 10ms
+    name: "Touchpad"
+    entity_category: diagnostic
+    on_click:
+    - min_length: 10ms
+      max_length: 500ms
+      # Short touch to cycle through brightnesses
+      then:
+        - lvgl.page.next:
+            animation: MOVE_LEFT
+            time: 300ms
+        - logger.log: "Short Touch"
+    - min_length: 500ms
+      max_length: 2000ms
+      then:
+        - if:
+            condition:
+            - light.is_off: backlight_light
+            then:
+            - light.turn_on: 
+                id: backlight_light
+        - if:
+            condition:
+            - light.is_on: backlight_light
+            then:
+            - lvgl.widget.redraw
+        - logger.log: "Long Touch"
+
+display:
+  - platform: ili9xxx
+    id: display_lcd
+    model: st7789v #gc9a01a
+    #data_rate: 80MHz
+    #cs_pin: GPIO1
+    dc_pin: GPIO7
+    reset_pin: GPIO6
+    spi_mode: MODE3
+    dimensions:
+      width: 240
+      height: 240
+    invert_colors: true
+    update_interval: never
+    auto_clear_enabled: false
 
 lvgl:
   log_level: WARN
   color_depth: 16
+  buffer_size: 50%
   disp_bg_color: 0x000000
   bg_color: 0x000000
   default_font: $default_font
-
-  buffer_size: 25%
   style_definitions:
     - id: header_footer
       bg_color: c_bg_s
@@ -66,32 +159,32 @@ lvgl:
       text_color: c_gray
       radius: 4
       pad_all: 2
+
   top_layer:
     widgets:
       - image:
-          id: img_wifistatus
-          align: top_left
-          y: 2
-          x: 2
-          hidden: true
           src: i_wifi
+          id: lbl_wifistatus
+          align: top_left
           image_recolor: c_green
           image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-      - image:
-          id: img_hastatus
-          align: top_right
           y: 2
-          x: -2
-          hidden: true
+          x: 2
+      - image:
           src: i_api
+          id: lbl_hastatus
+          align: top_right
           image_recolor: 0x00daff
           image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
+          y: 2
+          x: -2
       # Boot screen
       - obj:
           id: boot_screen
           width: 240
           height: 210
           align: BOTTOM_MID
+          radius: 0
           pad_all: 0
           border_width: 0
           bg_color: 0x000000
@@ -176,19 +269,19 @@ lvgl:
                       indicators:
                         - line:
                             id: hour_hand
-                            width: 6
-                            color: c_text_p
+                            width: 5
+                            color: c_purple
                             r_mod: -30
                             value: 0
               - label:
-                  id: day_label
                   styles: date_style
-                  text_font: f18
+                  id: day_label
+                  text_font: f18b
                   y: -30
               - label:
                   id: date_label
                   styles: date_style
-                  text_font: f18
+                  text_font: f18b
                   y: 30
 
     - id: status_page
@@ -430,32 +523,3 @@ font:
       weight: 700
     id: f20b
     size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f24
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f24b
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f32
-    size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f32b
-    size: 32
-    glyphs: *norwegian-glyphs

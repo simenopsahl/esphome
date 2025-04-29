@@ -18,7 +18,11 @@ lvgl:
       text_color: 0xFDF6EB
     obj:
       bg_color: 0x000000
-      bg_opa: TRANSP
+      bg_opa: TRANS
+    bar:
+      bg_color: 0x1D3B53
+      indicator:
+        bg_color: 0xc792ea
     button:
       bg_color: 0x1D3B53
       bg_opa: COVER
