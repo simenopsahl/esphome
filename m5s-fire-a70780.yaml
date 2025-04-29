@@ -9,7 +9,10 @@ packages:
   base_btc: !include board/module/base_btc.yaml
   env_iv: !include board/module/unit_env_iv.yaml
   co2: !include board/module/unit_co2.yaml
+  theme: !include gui/lvgl_night_owl_dark.yaml
   color: !include gui/colors_night_owl.yaml
+  boot_screen: !include gui/lvgl/boot_screen.yaml
+  auto_display: !include gui/lvgl/auto_display.yaml
 
 substitutions:
   devicename: m5s-fire-a70780
@@ -25,9 +28,6 @@ esphome:
   name: $devicename
   friendly_name: $devicename
   area: $location
-  on_boot:
-    - delay: 5s
-    - lvgl.widget.hide: boot_screen
 
 esp32:
   framework:
@@ -54,29 +54,12 @@ wifi:
 lvgl:
   log_level: WARN
   color_depth: 16
+  buffer_size: 25%
+
   disp_bg_color: 0x000000
   bg_color: 0x000000
   default_font: $default_font
 
-  buffer_size: 25%
-  style_definitions:
-    - id: header_footer
-      bg_color: c_bg_s
-      bg_opa: COVER
-      border_opa: TRANSP
-      radius: 0
-      pad_all: 0
-      pad_row: 0
-      pad_column: 0
-      border_color: c_dark_gray
-      text_color: c_text_p
-      width: 100%
-      height: 30
-    - id: date_style
-      align: center
-      text_color: c_gray
-      radius: 4
-      pad_all: 2
   top_layer:
     widgets:
       # Status icons
@@ -105,7 +88,7 @@ lvgl:
           height: 30
           pad_all: 0
           bg_color: 0x000000
-          border_opa: TRANSP
+          bg_opa: TRANSP
           layout: # enable the GRID layout for the children widgets
             type: GRID # split the rows and the columns proportionally
             grid_columns: [FR(1), FR(2), FR(3), FR(2), FR(1)]
@@ -115,8 +98,8 @@ lvgl:
                 id: img_prev
                 grid_cell_column_pos: 1 # place the widget in
                 grid_cell_row_pos: 0 # the corresponding cell
-                grid_cell_x_align: STRETCH
-                grid_cell_y_align: STRETCH
+                grid_cell_x_align: center
+                grid_cell_y_align: end
                 src: i_prev
                 image_recolor: c_text_s
                 image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
@@ -124,37 +107,11 @@ lvgl:
                 id: img_next
                 grid_cell_column_pos: 3
                 grid_cell_row_pos: 0
-                grid_cell_x_align: STRETCH
-                grid_cell_y_align: STRETCH
+                grid_cell_x_align: center
+                grid_cell_y_align: end
                 src: i_next
                 image_recolor: c_text_s
                 image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-      # Boot screen
-      - obj:
-          id: boot_screen
-          width: 320
-          height: 210
-          align: TOP_MID
-          radius: 0
-          pad_all: 0
-          border_width: 0
-          bg_color: 0x000000
-          widgets:
-            - image:
-                align: CENTER
-                src: boot_logo
-                y: -20
-            - spinner:
-                align: BOTTOM_MID
-                y: -15
-                height: 50
-                width: 50
-                spin_time: 1s
-                arc_length: 60deg
-                arc_width: 8
-                indicator:
-                  arc_color: c_purple
-                  arc_width: 8
   pages:
     - id: temp_page
       widgets:
@@ -194,8 +151,8 @@ lvgl:
                   src: i_temp_l
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   image_recolor: c_text_s
                   image_recolor_opa: 100%
               - label:
@@ -203,8 +160,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 1
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: center
+                  grid_cell_y_align: center
                   text_font: f120b
                   text_color: c_text_p
               - label:
@@ -212,10 +169,10 @@ lvgl:
                   text: "°C"
                   grid_cell_column_pos: 2
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
-                  text_font: f60b
+                  text_font: f32b
                   text_color: c_text_s
 
     - id: airq_page
@@ -241,7 +198,7 @@ lvgl:
             border_opa: TRANSP
             layout:
               type: GRID
-              grid_columns: [FR(3), FR(2), FR(1)]
+              grid_columns: [FR(4), FR(3), FR(2)]
               grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
             widgets:
               - label:
@@ -249,8 +206,8 @@ lvgl:
                   text: "Temperatur: "
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_font: f18
                   text_color: c_text_s
               - label:
@@ -258,8 +215,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 1
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f24b
                   text_color: c_text_p
@@ -268,10 +225,10 @@ lvgl:
                   text: "°C"
                   grid_cell_column_pos: 2
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
-                  text_font: f24
+                  text_font: f20
                   text_color: c_text_s
 
               - label:
@@ -279,8 +236,8 @@ lvgl:
                   text: "Karbondioksid: "
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_font: f18
                   text_color: c_text_s
               - label:
@@ -288,8 +245,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 1
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f24b
                   text_color: c_text_p
@@ -298,10 +255,10 @@ lvgl:
                   text: "ppm"
                   grid_cell_column_pos: 2
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
-                  text_font: f24
+                  text_font: f20
                   text_color: c_text_s
 
               - label:
@@ -309,8 +266,8 @@ lvgl:
                   text: "Svevestøv 1.0: "
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_font: f18
                   text_color: c_text_s
               - label:
@@ -318,8 +275,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 1
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f24b
                   text_color: c_text_p
@@ -328,10 +285,10 @@ lvgl:
                   text: "µg/m³"
                   grid_cell_column_pos: 2
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
-                  text_font: f24
+                  text_font: f20
                   text_color: c_text_s
 
               - label:
@@ -339,8 +296,8 @@ lvgl:
                   text: "Svevestøv 2.5: "
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_font: f18
                   text_color: c_text_s
               - label:
@@ -348,8 +305,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 1
                   grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f24b
                   text_color: c_text_p
@@ -358,10 +315,10 @@ lvgl:
                   text: "µg/m³"
                   grid_cell_column_pos: 2
                   grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
-                  text_font: f24
+                  text_font: f20
                   text_color: c_text_s
 
               - label:
@@ -369,8 +326,8 @@ lvgl:
                   text: "Svevestøv 10.0: "
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_font: f18
                   text_color: c_text_s
               - label:
@@ -378,8 +335,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 1
                   grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f24b
                   text_color: c_text_p
@@ -388,10 +345,10 @@ lvgl:
                   text: "µg/m³"
                   grid_cell_column_pos: 2
                   grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
-                  text_font: f24
+                  text_font: f20
                   text_color: c_text_s
 
     - id: power_page
@@ -423,10 +380,10 @@ lvgl:
               - label:
                   id: lbl_nordpool_price_0
                   text: "?"
-                  grid_cell_column_pos: 1
+                  grid_cell_column_pos: 0
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_align: left
                   text_font: f18
                   text_color: c_text_p
@@ -435,8 +392,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
                   text_align: left
                   text_font: f14
                   text_color: c_text_s
@@ -446,8 +403,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 4
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: center
+                  grid_cell_y_align: center
                   text_align: center
                   text_font: f18
                   text_color: c_text_p
@@ -456,8 +413,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 4
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: center
+                  grid_cell_y_align: center
                   text_align: center
                   text_font: f14
                   text_color: c_text_s
@@ -467,8 +424,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 8
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f18
                   text_color: c_text_p
@@ -477,8 +434,8 @@ lvgl:
                   text: "?"
                   grid_cell_column_pos: 8
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
                   text_align: right
                   text_font: f14
                   text_color: c_text_s
@@ -677,7 +634,7 @@ lvgl:
                   image_recolor: c_text_p
                   image_recolor_opa: 100%
         - obj:
-            align: BOTTOM_MID
+            align: TOP_MID
             width: 320
             height: 210
             pad_all: 6
@@ -813,65 +770,7 @@ binary_sensor:
       then:
         - script.execute: display_on_off
 
-switch:
-  - platform: template
-    id: display_auto
-    optimistic: true
-    name: "Display auto off"
-    entity_category: config
-
 script:
-  - id: display_on_off
-    mode: restart
-    then:
-      - if:
-          condition: 
-            - binary_sensor.is_on: motion_detected
-          then:
-            - light.turn_on:
-                id: backlight_light
-                brightness: 75%
-                transition_length: 1s
-            - logger.log: "Motion detected. Display on"
-          else:
-            - if:
-                condition: 
-                  - binary_sensor.is_off: motion_detected
-                then:
-                  - delay: 15s
-                  - light.turn_on:
-                      id: backlight_light
-                      brightness: 50%
-                      transition_length: 10s
-                  - logger.log: "Motion NOT detected. Display 50%"
-                  - if:
-                      condition: 
-                        - binary_sensor.is_off: motion_detected
-                      then:
-                        - delay: 30s
-                        - light.turn_on:
-                            id: backlight_light
-                            brightness: 25%
-                            transition_length: 10s
-                        - logger.log: "Motion NOT detected. Display 25%"
-                        - if:
-                            condition: 
-                              - binary_sensor.is_off: motion_detected
-                            then:
-                              - delay: 45s
-                              - light.turn_on:
-                                  id: backlight_light
-                                  brightness: 10%
-                                  transition_length: 10s
-                              - logger.log: "Motion NOT detected. Display 10%"
-                              - if:
-                                  condition: 
-                                    - binary_sensor.is_off: motion_detected
-                                    - switch.is_off: display_auto
-                                  then:
-                                    - delay: 1min
-                                    - light.turn_off: backlight_light
-                                    - logger.log: "Motion NOT detected. Display off"
   - id: time_update
     then:
       - lvgl.indicator.update:
@@ -955,6 +854,48 @@ sensor:
         - heartbeat: 900s
         - delta: 0.15
 
+  # Copy sensors to update lvgl
+  - platform: copy
+    source_id: co2_scd40_unit_co2
+    id: co2_scd40_unit_co2_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_co2_value
+            text:
+              format: "%.0f"
+              args: [ 'x' ]
+  - platform: copy
+    source_id: pm1_pmsa003
+    id: pm1_pmsa003_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_pm1_value
+            text:
+              format: "%.1f"
+              args: [ 'x' ]
+  - platform: copy
+    source_id: pm_25_pmsa003
+    id: pm_25_pmsa003_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_pm25_value
+            text:
+              format: "%.1f"
+              args: [ 'x' ]
+  - platform: copy
+    source_id: pm_10_pmsa003
+    id: pm_10_pmsa003_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_pm10_value
+            text:
+              format: "%.1f"
+              args: [ 'x' ]
+
   # Call sensors from HA.
   - platform: homeassistant
     entity_id: sensor.etg2_stue_tc_heatindex
@@ -967,6 +908,9 @@ sensor:
               format: "%.1f"
               args: [ 'x' ]
 
+#  - platform: homeassistant
+#    entity_id: sensor.waveshare_nordpool_future_offset
+#    id: nordpool_sensor
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price0
@@ -980,7 +924,7 @@ sensor:
               args: [ 'x' ]
         - lvgl.bar.update:
             id: bar_nordpool_price_0
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price0
@@ -989,7 +933,7 @@ sensor:
       then:
         - lvgl.bar.update:
             id: bar_nordpool_price_1
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price0
@@ -998,7 +942,7 @@ sensor:
       then:
         - lvgl.bar.update:
             id: bar_nordpool_price_2
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price0
@@ -1007,7 +951,7 @@ sensor:
       then:
         - lvgl.bar.update:
             id: bar_nordpool_price_3
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price4
@@ -1021,7 +965,7 @@ sensor:
               args: [ 'x' ]
         - lvgl.bar.update:
             id: bar_nordpool_price_4
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price4
@@ -1030,7 +974,7 @@ sensor:
       then:
         - lvgl.bar.update:
             id: bar_nordpool_price_5
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price4
@@ -1039,7 +983,7 @@ sensor:
       then:
         - lvgl.bar.update:
             id: bar_nordpool_price_6
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price4
@@ -1048,7 +992,7 @@ sensor:
       then:
         - lvgl.bar.update:
             id: bar_nordpool_price_7
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price8
@@ -1062,7 +1006,7 @@ sensor:
               args: [ 'x' ]
         - lvgl.bar.update:
             id: bar_nordpool_price_8
-            value: !lambda return (int)x;
+            value: !lambda return x;
   - platform: combination
     id: nordpool_price_max
     type: max
@@ -1120,8 +1064,8 @@ sensor:
 #            min_value: !lambda return (int)x - 10;
 #            max_value: !lambda return id(nordpool_price_max).state;
 
-# Strings from Home Assistant
 text_sensor:
+  # Strings from Home Assistant
   - platform: homeassistant
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time0
@@ -1150,18 +1094,44 @@ text_sensor:
             id: lbl_nordpool_time_0
             text: !lambda return id(nordpool_time_8).state;
 
+  # Copy sensors to update lvgl
+  - platform: copy
+    source_id: sensor_ip_address
+    id: sensor_ip_address_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_ip
+            text: !lambda return x;
+  - platform: copy
+    source_id: sensor_ssid
+    id: sensor_ssid_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_ssid
+            text: !lambda return x;
+  - platform: copy
+    source_id: sensor_mac_address
+    id: sensor_mac_address_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_mac
+            text: !lambda return x;
+
 graph:
-  - id: graph_nordpool
-    duration: 9h
-    border: false
-    x_grid: 1h
-    y_grid: 10.0
-    width: 320
-    height: 150
-    traces:
-      - sensor: nordpool_sensor
-        line_thickness: 20
-        color: c_green
+#  - id: graph_nordpool
+#    duration: 9h
+#    border: false
+#    x_grid: 1h
+#    y_grid: 10.0
+#    width: 320
+#    height: 150
+#    traces:
+#      - sensor: nordpool_sensor
+#        line_thickness: 20
+#        color: c_green
   - id: graph_temperature_room
     duration: 8h
 #    x_grid: 15min
@@ -1377,9 +1347,4 @@ image:
   - id: i_temp_l
     file: mdi:thermometer
     type: binary
-    resize: 56x56
-  - file: https://esphome.io/_static/favicon-512x512.png
-    id: boot_logo
-    resize: 150x150
-    type: RGB565
-    transparency: alpha_channel
+    resize: 32x32

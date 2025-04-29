@@ -9,16 +9,13 @@ substitutions:
   default_font: MONSERRAT_16
 
 lvgl:
-  disp_bg_color: 0x000000
-  bg_color: 0x000000
-  default_font: $default_font
   theme:
     label:
       text_font: $default_font
       text_color: 0xFDF6EB
     obj:
-      bg_color: 0x000000
-      bg_opa: TRANS
+      bg_opa: TRANSP
+      border_opa: TRANSP
     bar:
       bg_color: 0x1D3B53
       indicator:
@@ -101,6 +98,5 @@ lvgl:
     - id: date_style
       align: center
       text_color: 0x637777
-      color: 0x637777
       radius: 4
       pad_all: 2

@@ -1,0 +1,47 @@
+---
+# https://esphome.io/cookbook/lvgl#esphome-boot-screen
+# LVGL boot screen
+
+# Hide after 5 seconds
+esphome:
+  on_boot:
+    - delay: 5s
+    - lvgl.widget.hide: boot_screen
+
+# ESPHome image for boot screen
+image:
+  - file: https://esphome.io/_static/favicon-512x512.png
+    id: boot_logo
+    resize: 150x150
+    type: RGB565
+    transparency: alpha_channel
+
+# Boot screen top layer
+lvgl:
+  top_layer:
+    widgets:
+      - obj:
+          id: boot_screen
+          width: 100%
+          height: 100%
+          align: center
+          radius: 0
+          pad_all: 0
+          border_width: 0
+          bg_color: 0x000000
+          widgets:
+            - image:
+                align: CENTER
+                src: boot_logo
+                y: -20
+            - spinner:
+                align: BOTTOM_MID
+                y: -15
+                height: 50
+                width: 50
+                spin_time: 1s
+                arc_length: 60deg
+                arc_width: 8
+                indicator:
+                  arc_color: c_purple
+                  arc_width: 8
