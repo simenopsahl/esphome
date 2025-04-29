@@ -45,90 +45,96 @@ script:
 lvgl:
   pages:
     - id: clock_page
+      layout:
+        type: GRID
+        grid_columns: [FR(1)]
+        grid_rows: [FR(1), 30px]
       widgets:
         - obj:
-            layout:
-              type: GRID
-              grid_columns: [CONTENT]
-              grid_rows: [CONTENT, 30px]
+            align: BOTTOM_MID
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 1
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            styles: header_footer
+            bg_color: c_bg_s
+            bg_opa: COVER
             widgets:
-              - obj:
-                  align: BOTTOM_MID
-									grid_cell_column_pos: 0
-									grid_cell_row_pos: 1
-                  styles: header_footer
-                  widgets:
-                    - image:
-                        src: i_home
-                        align: bottom_mid
-                        y: -2
-                        image_recolor: c_text_p
-                        image_recolor_opa: 100%
-              - obj: # clock container
-                  align: TOP_MID
-									grid_cell_column_pos: 0
-									grid_cell_row_pos: 0
-                  bg_color: 0x000000
-                  pad_all: 0
+              - image:
+                  src: i_home
+                  align: bottom_mid
+                  y: -2
+                  image_recolor: c_text_p
+                  image_recolor_opa: 100%
+        - obj: # clock container
+            align: TOP_MID
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 0
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            height: 100%
+            width: 100%
+            bg_color: 0x000000
+            pad_all: 0
+            border_width: 0
+            widgets:
+              - meter: # clock face
+                  height: 95%
+                  width: 95%
+                  align: CENTER
                   border_width: 0
-                  widgets:
-                    - meter: # clock face
-                        height: 200
-                        width: 200
-                        align: CENTER
-                        border_width: 0
-                        bg_opa: TRANSP
-                        scales:
-                          - range_from: 0 # minutes scale
-                            range_to: 60
-                            angle_range: 360
-                            rotation: 270
-                            ticks:
-                              width: 1
-                              count: 61
-                              length: 10
-                              color: c_bg_s
-                            indicators:
-                              - line:
-                                  id: minute_hand
-                                  width: 3
-                                  color: c_text_s
-                                  r_mod: -4
-                                  value: 0
-                          - range_from: 1 # hours scale for labels
-                            range_to: 12
-                            angle_range: 330
-                            rotation: 300
-                            ticks:
-                              width: 1
-                              count: 12
-                              length: 1
-                              major:
-                                stride: 1
-                                width: 4
-                                length: 10
-                                color: c_dark_gray
-                                label_gap: 12
-                          - range_from: 0 # hi-res hours scale for hand
-                            range_to: 720
-                            angle_range: 360
-                            rotation: 270
-                            ticks:
-                              count: 0
-                            indicators:
-                              - line:
-                                  id: hour_hand
-                                  width: 5
-                                  color: c_purple
-                                  r_mod: -30
-                                  value: 0
-                    - label:
-                        styles: date_style
-                        id: day_label
-                        text_font: f18b
-                        y: -30
-                    - label:
-                        id: date_label
-                        styles: date_style
-                        text_font: f18b
-                        y: 30
+                  bg_opa: TRANSP
+                  scales:
+                    - range_from: 0 # minutes scale
+                      range_to: 60
+                      angle_range: 360
+                      rotation: 270
+                      ticks:
+                        width: 1
+                        count: 61
+                        length: 10
+                        color: c_bg_s
+                      indicators:
+                        - line:
+                            id: minute_hand
+                            width: 3
+                            color: c_text_s
+                            r_mod: -4
+                            value: 0
+                    - range_from: 1 # hours scale for labels
+                      range_to: 12
+                      angle_range: 330
+                      rotation: 300
+                      ticks:
+                        width: 1
+                        count: 12
+                        length: 1
+                        major:
+                          stride: 1
+                          width: 4
+                          length: 10
+                          color: c_dark_gray
+                          label_gap: 12
+                    - range_from: 0 # hi-res hours scale for hand
+                      range_to: 720
+                      angle_range: 360
+                      rotation: 270
+                      ticks:
+                        count: 0
+                      indicators:
+                        - line:
+                            id: hour_hand
+                            width: 5
+                            color: c_purple
+                            r_mod: -30
+                            value: 0
+              - label:
+                  styles: date_style
+                  id: day_label
+                  text_font: f18b
+                  y: -30
+              - label:
+                  id: date_label
+                  styles: date_style
+                  text_font: f18b
+                  y: 30

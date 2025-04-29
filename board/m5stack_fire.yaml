@@ -132,7 +132,7 @@ binary_sensor:
         - logger.log: Button B Pressed
         - script.execute: buzzer_beep
         - lvgl.page.show:
-            id: temp_page
+            id: home_page
             animation: MOVE_TOP
             time: 100ms
     on_release:

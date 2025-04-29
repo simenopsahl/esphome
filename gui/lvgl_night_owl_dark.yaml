@@ -9,6 +9,24 @@ substitutions:
   default_font: MONSERRAT_16
 
 lvgl:
+  style_definitions:
+    - id: header_footer
+      bg_color: 0x1D3B53
+      bg_opa: COVER
+      border_opa: 25%
+      radius: 0
+      pad_all: 0
+      pad_row: 0
+      pad_column: 0
+      border_color: 0x0B253A
+      text_color: 0xFDF6EB
+      width: 100%
+      height: 30
+    - id: date_style
+      align: center
+      text_color: 0x637777
+      radius: 4
+      pad_all: 2
   theme:
     label:
       text_font: $default_font
@@ -82,21 +100,3 @@ lvgl:
       border_color: 0x0B253A
 #      items:
 #        text_color: 0xFDF6EB
-  style_definitions:
-    - id: header_footer
-      bg_color: 0x1D3B53
-      bg_opa: COVER
-      border_opa: TRANSP
-      radius: 0
-      pad_all: 0
-      pad_row: 0
-      pad_column: 0
-      border_color: 0x0B253A
-      text_color: 0xFDF6EB
-      width: 100%
-      height: 30
-    - id: date_style
-      align: center
-      text_color: 0x637777
-      radius: 4
-      pad_all: 2

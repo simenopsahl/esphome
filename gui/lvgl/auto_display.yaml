@@ -26,7 +26,7 @@ switch:
   - platform: template
     id: display_auto
     optimistic: true
-    restore_mode: ALWAYS_OFF
+    restore_mode: ALWAYS_ON
     name: "Display auto off"
     entity_category: config
 
