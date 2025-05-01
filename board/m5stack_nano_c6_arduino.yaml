@@ -1,60 +1,51 @@
 ---
-# https://docs.m5stack.com/en/core/ATOM%20Lite
+# https://docs.m5stack.com/en/core/M5NanoC6
 # Base functions for:
-# M5Stack Atom Lite
+# M5Stack NanoC6
 #
 
 # Pins for this model
 packages:
-  pins: !include pins/m5stack_atom_lite.yaml
+  pins: !include pins/m5stack_nano_c6.yaml
 
 esphome:
   project:
-    name: "M5Stack.Atom Lite"
+    name: "M5Stack.Nano C6"
+#  platformio_options:
+#    board_build.f_cpu: 160000000L
+#    board_build.f_flash: 80000000L
+#    board_build.flash_size: 4MB
+#    build_flags: "-DBOARD_HAS_PSRAM"
+#    board_build.arduino.memory_type: qio_opi
 
 esp32:
-  board: m5stack-atom
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  flash_size: 4MB
 
-wifi:
-  enable_btm: true
-  enable_rrm: true
+# Enable status LED
+status_led:
+  id: status_light
+  pin: $led_pin
 
-# Output that blinks the LED
-#output:
-#  - platform: template
-#    id: status_output
-#    type: binary
-#    write_action:
-#    - if:
-#        condition:
-#          lambda: return (state);
-#        then:
-#          - light.turn_on:
-#              id: rgb_led
-#              transition_length: 50ms
-#              brightness: 30%
-#              red: 100%
-#              green: 0%
-#              blue: 0%
-#        else:
-#          - light.turn_off:
-#              id: rgb_led
-#              transition_length: 50ms
+switch:
+  - platform: gpio
+    id: rgb_switch
+    pin: $rgb_pwr_pin
+    restore_mode: RESTORE_DEFAULT_ON
+    name: "RGB on/off"
+    entity_category: config
 
-# IR
-#remote_transmitter:
-#  pin: $ir_pin
-#  carrier_duty_percent: 50%
-#  rmt_symbols: 144
-
+# Configuration of onboard RGB LED
 light:
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
     pin: $rgb_pin
     num_leds: 1
-    rmt_symbols: 384
-    chipset: sk6812
+    chipset: WS2812
+    rmt_channel: 1
+    is_rgbw: true
     effects:
       - pulse:
       - strobe:
@@ -71,6 +62,11 @@ light:
             - state: false
               duration: 2000ms
               transition_length: 1000ms
+#      - addressable_flicker:
+#      - addressable_rainbow:
+#      - addressable_color_wipe:
+#      - addressable_scan:
+#      - addressable_twinkle:
     default_transition_length: 100ms
     initial_state:
       state: true

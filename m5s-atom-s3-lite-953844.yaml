@@ -1,12 +1,12 @@
 packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
-  board: !include board/m5stack_atom_s3_lite.yaml
+  board: !include board/m5stack_atom_s3_lite_arduino.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
+  env_pro: !include board/module/unit_env_pro.yaml
   co2: !include board/module/unit_co2.yaml
-  tvoc: !include board/module/unit_tvoc.yaml
 
 substitutions:
   devicename: m5s-as3-lite-953844
@@ -23,11 +23,7 @@ esphome:
 
 esp32:
   framework:
-    type: esp-idf
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
+    type: arduino
 
 sensor:
   # Combine sensors
@@ -41,6 +37,11 @@ sensor:
       # ENV III
       - source: temperature_sht30_hat_env
       - source: temperature_qmp6988_hat_env
+      # ENV IV
+#      - source: temperature_bmp280_unit_env
+#      - source: temperature_sht40_unit_env
+      # ENV Pro
+      - source: temperature_bme688
       # CO2
       - source: temperature_scd40_unit_co2
     filters:
@@ -57,8 +58,30 @@ sensor:
     sources:
       # ENV III
       - source: humidity_sht30_hat_env
+      # ENV IV
+#      - source: humidity_sht40_unit_env
+      # ENV Pro
+      - source: humidity_bme688
       # CO2
       - source: humidity_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
+  - platform: combination
+    type: median
+    id: pressure_local
+    name: "Pressure"
+    device_class: "atmospheric_pressure"
+    state_class: "measurement"
+    sources:
+      # ENV III
+      - source: pressure_qmp6988_hat_env
+      # ENV IV
+#      - source: pressure_bmp280_unit_env
+      # ENV Pro
+      - source: pressure_bme688
     filters:
       - or:
         - heartbeat: 900s

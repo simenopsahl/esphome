@@ -26,6 +26,10 @@ esp32:
   board: m5stack-stamps3
   variant: esp32s3
 
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin

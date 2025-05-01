@@ -98,8 +98,50 @@ sensor:
       - source: temperature_sht30_hat_env
       - source: temperature_qmp6988_hat_env
       # ENV IV
-#      - source: temperature_bmp280
-#      - source: temperature_sht4x
+#      - source: temperature_bmp280_unit_env
+#      - source: temperature_sht40_unit_env
+      # ENV Pro
+#      - source: temperature_bme688
+      # CO2
+#      - source: temperature_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
+  - platform: combination
+    type: median
+    id: humidity_local
+    name: "Humidity"
+    device_class: "humidity"
+    state_class: "measurement"
+    sources:
+      # ENV III
+      - source: humidity_sht30_hat_env
+      # ENV IV
+#      - source: humidity_sht40_unit_env
+      # ENV Pro
+#      - source: humidity_bme688
+      # CO2
+#      - source: humidity_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
+  - platform: combination
+    type: median
+    id: pressure_local
+    name: "Pressure"
+    device_class: "atmospheric_pressure"
+    state_class: "measurement"
+    sources:
+      # ENV III
+      - source: pressure_qmp6988_hat_env
+      # ENV IV
+#      - source: pressure_bmp280_unit_env
+      # ENV Pro
+#      - source: pressure_bme688
     filters:
       - or:
         - heartbeat: 900s

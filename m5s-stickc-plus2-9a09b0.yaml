@@ -266,3 +266,21 @@ sensor:
       - or:
         - heartbeat: 900s
         - delta: 0.15
+
+  - platform: combination
+    type: median
+    id: pressure_local
+    name: "Pressure"
+    device_class: "atmospheric_pressure"
+    state_class: "measurement"
+    sources:
+      # ENV III
+      - source: pressure_qmp6988_hat_env
+      # ENV IV
+#      - source: pressure_bmp280_unit_env
+      # ENV Pro
+#      - source: pressure_bme688
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15

@@ -11,7 +11,7 @@ substitutions:
 lvgl:
   style_definitions:
     - id: header_footer
-      bg_color: 0x1D3B53
+      bg_color: 0x011627
       bg_opa: COVER
       border_opa: 25%
       radius: 0
@@ -34,6 +34,7 @@ lvgl:
     obj:
       bg_opa: TRANSP
       border_opa: TRANSP
+      scrollable: false
     bar:
       bg_color: 0x1D3B53
       indicator:

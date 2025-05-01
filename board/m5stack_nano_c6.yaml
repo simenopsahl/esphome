@@ -11,20 +11,17 @@ packages:
 esphome:
   project:
     name: "M5Stack.Nano C6"
-  platformio_options:
-    board_build.f_cpu: 160000000L
-    board_build.f_flash: 80000000L
-    board_build.flash_size: 4MB
-    build_flags: "-DBOARD_HAS_PSRAM"
-    board_build.arduino.memory_type: qio_opi
+#  platformio_options:
+#    board_build.f_cpu: 160000000L
+#    board_build.f_flash: 80000000L
+#    board_build.flash_size: 4MB
+#    build_flags: "-DBOARD_HAS_PSRAM"
+#    board_build.arduino.memory_type: qio_opi
 
 esp32:
   board: esp32-c6-devkitm-1
   variant: esp32c6
   flash_size: 4MB
-  framework:
-    sdkconfig_options:
-      CONFIG_ESPTOOLPY_FLASHSIZE_4MB: y
 
 # Enable status LED
 status_led:

@@ -44,7 +44,7 @@ lvgl:
             grid_cell_x_align: STRETCH
             grid_cell_y_align: STRETCH
             styles: header_footer
-            bg_color: c_bg_s
+            bg_color: c_bg_p
             bg_opa: COVER
             widgets:
               - image:

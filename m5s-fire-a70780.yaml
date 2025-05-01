@@ -120,7 +120,7 @@ lvgl:
         - obj:
             align: BOTTOM_MID
             styles: header_footer
-            bg_color: c_bg_s
+            bg_color: c_bg_p
             bg_opa: COVER
             widgets:
               - image:
@@ -184,7 +184,7 @@ lvgl:
         - obj:
             align: BOTTOM_MID
             styles: header_footer
-            bg_color: c_bg_s
+            bg_color: c_bg_p
             bg_opa: COVER
             widgets:
               - image:
@@ -362,7 +362,7 @@ lvgl:
         - obj:
             align: BOTTOM_MID
             styles: header_footer
-            bg_color: c_bg_s
+            bg_color: c_bg_p
             bg_opa: COVER
             widgets:
               - image:

@@ -40,6 +40,7 @@ lvgl:
                 y: -15
                 height: 50
                 width: 50
+                bg_color: c_bg_s
                 spin_time: 1s
                 arc_length: 60deg
                 arc_width: 8

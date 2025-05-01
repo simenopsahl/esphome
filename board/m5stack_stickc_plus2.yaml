@@ -15,7 +15,8 @@ packages:
   pins: !include pins/m5stack_stickc_plus2.yaml
 
 esp32:
-  board: m5stick-c
+#  board: m5stick-c
+  board: esp32-pico-devkitm-2
   flash_size: 8MB
 
 esphome:
@@ -30,7 +31,7 @@ esphome:
       - "-DARDUINO_USB_CDC_ON_BOOT=1"
       - "-mfix-esp32-psram-cache-issue"
 psram:
-  mode: octal
+  mode: quad
   speed: 80MHz
 
 spi:
