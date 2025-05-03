@@ -1,0 +1,18 @@
+---
+# https://docs.m5stack.com/en/hat/hat_dlight
+# https://esphome.io/components/sensor/bh1750.html
+
+# HAT DLight
+sensor:
+  - platform: bh1750
+    i2c_id: i2c_hat
+    id: light_bh1750_hat
+    name: "Hat Illuminance"
+    device_class: "illuminance"
+    state_class: "measurement"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 6
+          send_every: 3
+    address: 0x23
+    update_interval: 5s

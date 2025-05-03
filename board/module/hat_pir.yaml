@@ -1,0 +1,35 @@
+---
+# https://docs.m5stack.com/en/hat/hat-pir
+
+substitutions:
+  pir_in_pin: $in_hat_pin
+
+# HAT PIR
+binary_sensor:
+  - platform: gpio
+    id: pir_sensor
+    pin:
+      number: $pir_in_pin
+      mode:
+        input: true
+    filters:
+      - delayed_on_off: 1s
+      - delayed_off: !lambda 'return id(pir_off_latency).state * 1000;'
+    name: "PIR Sensor"
+    device_class: motion
+
+# Adjustable off delay
+number:
+  - platform: template
+    id: pir_off_latency
+    name: "PIR Off Latency"
+    icon: mdi:clock-end
+    entity_category: config
+    unit_of_measurement: s
+    min_value: 0
+    max_value: 120
+    step: 30
+    restore_value: true
+    optimistic: true
+    initial_value: 30
+    mode: slider
