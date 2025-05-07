@@ -11,6 +11,7 @@ text_sensor:
         - lvgl.label.update:
             id: lbl_ip
             text: !lambda return x;
+        - lambda: 'id(data_updated) = true;'
   - platform: copy
     source_id: sensor_ssid
     id: sensor_ssid_copy
@@ -19,6 +20,7 @@ text_sensor:
         - lvgl.label.update:
             id: lbl_ssid
             text: !lambda return x;
+        - lambda: 'id(data_updated) = true;'
   - platform: copy
     source_id: sensor_mac_address
     id: sensor_mac_address_copy
@@ -27,6 +29,7 @@ text_sensor:
         - lvgl.label.update:
             id: lbl_mac
             text: !lambda return x;
+        - lambda: 'id(data_updated) = true;'
 
 # status page
 lvgl:
@@ -40,7 +43,7 @@ lvgl:
         - obj:
             align: top_mid
             grid_cell_column_pos: 0
-            grid_cell_row_pos: 2
+            grid_cell_row_pos: 0
             grid_cell_x_align: STRETCH
             grid_cell_y_align: STRETCH
             styles: header_footer
@@ -68,107 +71,57 @@ lvgl:
             border_opa: TRANSP
             layout:
               type: GRID
-              grid_columns: [FR(1), FR(5)]
+              grid_columns: [FR(1)]
               grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
             widgets:
               - label:
-                  id: lbl_name_l
-                  text: "Nm: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: RIGHT
-                  text_font: f16
-                  text_color: paper_black
-              - label:
                   id: lbl_name
                   text: $devicename
-                  grid_cell_column_pos: 1
+                  grid_cell_column_pos: 0
                   grid_cell_row_pos: 0
-                  grid_cell_x_align: start
+                  grid_cell_x_align: center
                   grid_cell_y_align: center
                   text_font: f18
                   text_color: paper_black
 
               - label:
-                  id: lbl_build_l
-                  text: "Bld: "
+                  id: lbl_build
                   grid_cell_column_pos: 0
                   grid_cell_row_pos: 1
-                  grid_cell_x_align: end
+                  grid_cell_x_align: center
                   grid_cell_y_align: center
-                  text_align: RIGHT
                   text_font: f16
-                  text_color: paper_black
-              - label:
-                  id: lbl_build
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  text_font: f18
                   text_color: paper_black
                   text:
                       format: "%s - %s"
                       args: [__DATE__, __TIME__]
 
               - label:
-                  id: lbl_ssid_l
-                  text: "SSID: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: RIGHT
-                  text_font: f16
-                  text_color: paper_black
-              - label:
                   id: lbl_ssid
                   text: "?"
-                  grid_cell_column_pos: 1
+                  grid_cell_column_pos: 0
                   grid_cell_row_pos: 2
-                  grid_cell_x_align: start
+                  grid_cell_x_align: center
                   grid_cell_y_align: center
                   text_font: f18
                   text_color: paper_black
 
-              - label:
-                  id: lbl_ip_l
-                  text: "IP: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: RIGHT
-                  text_font: f16
-                  text_color: paper_black
               - label:
                   id: lbl_ip
                   text: "?"
-                  grid_cell_column_pos: 1
+                  grid_cell_column_pos: 0
                   grid_cell_row_pos: 3
-                  grid_cell_x_align: start
+                  grid_cell_x_align: center
                   grid_cell_y_align: center
-                  text_font: f18
+                  text_font: f18b
                   text_color: paper_black
 
               - label:
-                  id: lbl_mac_l
-                  text: "MAC: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: RIGHT
-                  text_font: f16
-                  text_color: paper_black
-              - label:
                   id: lbl_mac
                   text: "?"
-                  grid_cell_column_pos: 1
+                  grid_cell_column_pos: 0
                   grid_cell_row_pos: 4
-                  grid_cell_x_align: start
+                  grid_cell_x_align: center
                   grid_cell_y_align: center
-                  text_font: f18
+                  text_font: f18b
                   text_color: paper_black
