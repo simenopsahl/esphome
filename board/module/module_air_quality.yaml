@@ -1,7 +1,7 @@
 ---
 # https://docs.m5stack.com/en/module/PM2.5%20AIR%20QUALITY%20KIT%20(Excluding%20Core)
 # https://esphome.io/components/sensor/pmsx003.html
-# https://github.com/Chill-Division/M5Stack-ESPHome/blob/
+# https://github.com/Chill-Division/M5Stack-ESPHome/
 
 substitutions:
   module_air_quality_uart_bus: uart_grove
@@ -21,7 +21,7 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 2
+            send_every: 1
     pm_2_5:
       id: pm_25_pmsa003
       name: "PM2.5 PMSA003"
@@ -30,7 +30,7 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 2
+            send_every: 1
     pm_10_0:
       id: pm_10_pmsa003
       name: "PM10 PMSA003"
@@ -39,4 +39,4 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 2
+            send_every: 1

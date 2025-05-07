@@ -393,7 +393,7 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 3
+            send_every: 2
     pm_2_5:
       id: pm2_5_sen55
       name: "PM 2.5"
@@ -401,14 +401,14 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 3
+            send_every: 2
     pm_4_0:
       id: pm4_0_sen55
       name: "PM 4"
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 3
+            send_every: 2
     pm_10_0:
       id: pm10_0_sen55
       name: "PM 10"
@@ -416,7 +416,7 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 3
+            send_every: 2
     temperature:
       id: temperature_sen55
       name: "Temperature SEN55"
@@ -434,21 +434,21 @@ sensor:
       filters:
         - sliding_window_moving_average:
             window_size: 6
-            send_every: 3
+            send_every: 2
     voc:
       id: voc_sen55
       name: VOC
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 3
+            send_every: 2
     nox:
       id: nox_sen55
       name: "NOX"
       filters:
         - sliding_window_moving_average:
             window_size: 3
-            send_every: 3
+            send_every: 2
     auto_cleaning_interval: 48h
     address: 0x69
     update_interval: 10s

@@ -6,11 +6,10 @@ packages:
   grove: !include board/extension/grove_i2c.yaml
   env_iv: !include board/module/unit_env_iv.yaml
   env_pro: !include board/module/unit_env_pro.yaml
-  pir: !include board/module/hat_pir.yaml
 
 substitutions:
   devicename: m5s-as3-lite-970dec
-  location: "2etg, Bad"
+  location: "2etg, Toalett"
   log_level: WARN
 
 esphome:

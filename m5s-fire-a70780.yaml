@@ -9,12 +9,12 @@ packages:
   base_btc: !include board/module/base_btc.yaml
   env_iv: !include board/module/unit_env_iv.yaml
   co2: !include board/module/unit_co2.yaml
-  theme: !include gui/lvgl_night_owl_dark.yaml
+  theme: !include gui/lvgl/theme_night_owl_dark.yaml
   color: !include gui/colors_night_owl.yaml
-  boot_screen: !include gui/lvgl/boot_screen.yaml
-  auto_display: !include gui/lvgl/auto_display.yaml
-  clock_page: !include gui/lvgl/clock_page.yaml
-  status_page: !include gui/lvgl/status_page.yaml
+  boot_screen: !include gui/lvgl/top_layer_boot_screen.yaml
+  auto_display: !include gui/lvgl/control_auto_display.yaml
+  clock_page: !include gui/lvgl/page_clock.yaml
+  status_page: !include gui/lvgl/page_status.yaml
 
 substitutions:
   devicename: m5s-fire-a70780

@@ -8,12 +8,14 @@ packages:
   env_iii: !include board/module/hat_env_iii.yaml
   env_iv: !include board/module/unit_env_iv.yaml
   co2: !include board/module/unit_co2.yaml
+  <<: !include_dir_named gui/lvgl/epaper
 
 substitutions:
   devicename: m5s-coreink-9fc2c8
   location: "2etg, Simen"
   i2c_grove_frequency: 40kHz
   log_level: WARN
+  default_font: f20
 
 esphome:
   comment: "M5Stack CoreInk @ Simen"
@@ -46,157 +48,293 @@ esphome:
         - delay: 5s
         - logger.log: "Initial sensor data received: Refreshing display..."
         - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: page_room
+        - lvgl.page.show: page_home
         - script.execute: update_screen
-  
+
 esp32:
   framework:
     type: esp-idf
 
-display:
-  # 200 x 200 resolution
-  - platform: waveshare_epaper
-    id: display_eink
-    model: 1.54inv2
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_reset_pin
-    busy_pin:
-      number: $disp_busy_pin
-      inverted: false
-    full_update_every: 1
-#    reset_duration: 2ms
-    update_interval: never
-    rotation: 90
-    pages:
-#      - id: page_black
-#        lambda: |-
-#          // Fill background.
-#          it.fill(COLOR_ON);
-#      - id: page_white
-#        lambda: |-
-#          // Fill background.
-#          it.fill(COLOR_OFF);
-      - id: page_local
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_ON);
+api:
+  on_client_connected:
+    then:
+      - lvgl.widget.show: img_hastatus
+  on_client_disconnected:
+    then:
+      - lvgl.widget.hide: img_hastatus
 
-          //it.graph(0, 0, id(graph_temperature_local), COLOR_OFF);
+wifi:
+  enable_btm: true
+  enable_rrm: true
+  on_connect:
+    then:
+      - lvgl.widget.show: img_wifistatus
+  on_disconnect:
+    then:
+      - lvgl.widget.hide: img_wifistatus
 
-          
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image(0, it.get_height()/2, id(i_wifi), ImageAlign::CENTER_LEFT, COLOR_OFF, COLOR_ON);
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image(it.get_width(), it.get_height()/2, id(i_api), ImageAlign::CENTER_RIGHT, COLOR_OFF, COLOR_ON);
-          }
-            
-          it.print(it.get_width()/2, 0, id(f25b), COLOR_OFF, TextAlign::TOP_CENTER, "Enhet");
-          it.printf(it.get_width()/2, it.get_height()/2, id(f130b), COLOR_OFF, TextAlign::CENTER, "%2.0f", id(temperature_local).state);
+lvgl:
+  log_level: WARN
+  buffer_size: 25%
 
-          it.printf(0, 0, id(f20), COLOR_OFF, TextAlign::TOP_LEFT, "%.1f", id(temperature_sht30_hat_env).state);
-          it.printf(it.get_width(), 0, id(f20), COLOR_OFF, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988_hat_env).state);
-          it.printf(it.get_width(), it.get_height(), id(f20), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature_bmp280_unit_env).state);
-          it.printf(0, it.get_height(), id(f20), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(temperature_scd40_unit_co2).state);
+  bg_color: paper_white
+  disp_bg_color: paper_white
+  default_font: $default_font
 
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf(it.get_width()/2, it.get_height(), id(f14), COLOR_OFF, TextAlign::BOTTOM_CENTER, "@ %s", str);
-      - id: page_info
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_OFF);
+  top_layer:
+    widgets:
+      # Status icons
+#      - image:
+#          id: img_wifistatus
+#          align: bottom_left
+#          y: -1
+#          x: 1
+#          hidden: true
+#          src: i_wifi
+      - label:
+          id: img_wifistatus
+          text: "\U000F05A9" # mdi-wifi
+          text_font: f_mdi_s
+          align: bottom_left
+#      - image:
+#          id: img_hastatus
+#          align: bottom_right
+#          y: -1
+#          x: -1
+#          hidden: true
+#          src: i_api
+      - label:
+          id: img_hastatus
+          text: "\U000F07D0" # mdi-home-assistant
+          text_font: f_mdi_s
+          align: bottom_right
+      # Display update timestamp
+      - label:
+          id: lbl_disp_updated
+          align: bottom_mid
+          text: "?"
+          text_font: f20b
+      # Header nav
+      - obj:
+          align: top_mid
+          width: 100%
+          height: 32
+          bg_color: paper_white
+          bg_opa: TRANSP
+          layout:
+            type: GRID
+            grid_columns: [ FR(2), FR(2), FR(2), FR(5) ]
+            grid_rows: [ FR(1) ]
+          widgets:
+#            - image:
+#                id: img_home
+#                grid_cell_column_pos: 0
+#                grid_cell_row_pos: 0
+#                grid_cell_x_align: center
+#                grid_cell_y_align: center
+#                src: i_home
+            - label:
+                text: "\U000F02DC" # mdi-home
+                text_font: f_mdi_s
+                text_align: center
+                grid_cell_column_pos: 0
+                grid_cell_row_pos: 0
+                grid_cell_x_align: center
+                grid_cell_y_align: center
+#            - image:
+#                id: img_refresh
+#                grid_cell_column_pos: 1
+#                grid_cell_row_pos: 0
+#                grid_cell_x_align: center
+#                grid_cell_y_align: center
+#                src: i_refresh
+            - label:
+                text: "\U000F0450" # mdi-refresh
+                text_font: f_mdi_s
+                text_align: center
+                grid_cell_column_pos: 1
+                grid_cell_row_pos: 0
+                grid_cell_x_align: center
+                grid_cell_y_align: center
+#            - image:
+#                id: img_next
+#                grid_cell_column_pos: 2
+#                grid_cell_row_pos: 0
+#                grid_cell_x_align: center
+#                grid_cell_y_align: center
+#                src: i_next
+            - label:
+                text: "\U000F0055" # mdi-arrow-right-thick
+                text_font: f_mdi_s
+                text_align: center
+                grid_cell_column_pos: 2
+                grid_cell_row_pos: 0
+                grid_cell_x_align: center
+                grid_cell_y_align: center
 
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image(0, 0, id(i_wifi), ImageAlign::TOP_LEFT, COLOR_ON, COLOR_OFF);
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image(it.get_width(), 0, id(i_api), ImageAlign::TOP_RIGHT, COLOR_ON, COLOR_OFF);
-          }
+  pages:
+    - id: page_home
+      widgets:
+        - obj:
+            align: top_mid
+            styles: header_footer
+#            bg_color: paper_white
+#            bg_opa: COVER
+            widgets:
+#              - image:
+#                  src: i_temp_room
+#                  align: top_right
+#                  y: 1
+#                  x: -1
+              - label:
+                  text: "Rom"
+                  text_font: f25b
+                  text_align: right
+                  align: top_right
+        - obj:
+            align: center
+            width: 100%
+            height: 136
+#            bg_color: paper_white
+            pad_all: 0
+            layout:
+              type: GRID
+              grid_columns: [ FR(1), FR(3), FR(1) ]
+              grid_rows: [ 6px, 130px ]
+            widgets:
+              - label:
+                  id: graph_temp_room
+                  text: "?"
+                  grid_cell_column_pos: 0
+                  grid_cell_column_span: 3
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+#              - image:
+#                  src: i_temp_l
+#                  grid_cell_column_pos: 0
+#                  grid_cell_row_pos: 1
+#                  grid_cell_x_align: start
+#                  grid_cell_y_align: center
+              - label:
+                  text: "\U000F050F" # mdi-thermometer
+                  text_font: f_mdi_m
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+              - label:
+                  id: lbl_temp_room_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: center
+                  grid_cell_y_align: center
+                  text_font: f100b
+                  text_color: paper_black
+              - label:
+                  id: lbl_temp_room_unit
+                  text: "°C"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: right
+                  text_font: f32b
+                  text_color: paper_black
 
-          it.print(0, 25, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Batteri: ");
-          it.print(it.get_width()/2, 55, id(f20), COLOR_ON, TextAlign::TOP_CENTER, "SHT30");
-          it.print(0, 76, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Temperatur: ");
-          it.print(0, 97, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Luftfukt: ");
-          it.print(it.get_width()/2, 127, id(f20), COLOR_ON, TextAlign::TOP_CENTER, "QMP6988");
-          it.print(0, 148, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Temperatur: ");
-          it.print(0, 169, id(f18), COLOR_ON, TextAlign::TOP_LEFT, "Lufttrykk: ");
-          
-          it.printf(it.get_width() - 11, 25, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.2f", id(bat_adc).state);
-          it.print(it.get_width(), 27, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "V");
-
-          it.printf(it.get_width() - 15, 76, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_sht30_hat_env).state);
-          it.print(it.get_width(), 78, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
-
-          it.printf(it.get_width() - 13, 97, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(humidity_sht30_hat_env).state);
-          it.print(it.get_width(), 99, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "%");
-
-          it.printf(it.get_width() - 15, 148, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(temperature_qmp6988_hat_env).state);
-          it.print(it.get_width(), 150, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
-
-          it.printf(it.get_width() - 25, 169, id(f20b), COLOR_ON, TextAlign::TOP_RIGHT, "%.1f", id(pressure_qmp6988_hat_env).state);
-          it.print(it.get_width(), 171, id(f14), COLOR_ON, TextAlign::TOP_RIGHT, "hPa");
-
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf(it.get_width()/2, 0, id(f14), COLOR_ON, TextAlign::TOP_CENTER, "@ %s", str);
-      - id: page_room
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_OFF);
-
-          // Show loading screen before data is received.
-          if (id(initial_data_received) == false) {
-            it.printf(it.get_width()/2, it.get_height()/2, id(f20b), COLOR_ON, TextAlign::CENTER, "Venter på data...");
-          } else {
-
-            it.graph(0, 0, id(graph_temperature_room), COLOR_ON);
-            
-            it.print(0, 45, id(f20), COLOR_ON, TextAlign::TOP_LEFT, "Rom");
-            it.print(it.get_width(), 45, id(f25b), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
-            it.printf(it.get_width()/2, 166, id(f130b), COLOR_ON, TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_feels_like).state);
-
-            // Show wifi icon.
-            if (id(component_wifi).is_connected()) {
-              it.image(0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, COLOR_ON, COLOR_OFF);
-            }
-            // Show HA icon.
-            if (id(component_api).is_connected()) {
-              it.image(it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, COLOR_ON, COLOR_OFF);
-            }
-
-            // Refresh Timestamp
-            // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-            char str[17];
-            time_t currTime = id(time_homeassistant).now().timestamp;
-            strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-            it.printf(it.get_width()/2, it.get_height(), id(f14), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str);
-          }
+    - id: page_temp
+      widgets:
+        - obj:
+            align: top_mid
+            styles: header_footer
+#            bg_color: paper_white
+#            bg_opa: COVER
+            widgets:
+#              - image:
+#                  src: i_temp_s
+#                  align: top_right
+#                  y: 1
+#                  x: -1
+              - label:
+                  text: "Enhet"
+                  text_font: f25b
+                  text_align: right
+                  align: top_right
+        - obj:
+            align: center
+            width: 100%
+            height: 136
+#            bg_color: paper_white
+            pad_all: 0
+            layout:
+              type: GRID
+              grid_columns: [ FR(1), FR(3), FR(1) ]
+              grid_rows: [ 6px, 130px ]
+            widgets:
+              - label:
+                  id: graph_temp_local
+                  text: "?"
+                  grid_cell_column_pos: 0
+                  grid_cell_column_span: 3
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  text_font: f16
+#              - image:
+#                  src: i_temp_l
+#                  grid_cell_column_pos: 0
+#                  grid_cell_row_pos: 1
+#                  grid_cell_x_align: start
+#                  grid_cell_y_align: center
+              - label:
+                  text: "\U000F050F" # mdi-thermometer
+                  text_font: f_mdi_m
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+              - label:
+                  id: lbl_temp_local_value
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: center
+                  grid_cell_y_align: center
+                  text_font: f100b
+                  text_color: paper_black
+              - label:
+                  id: lbl_temp_local_unit
+                  text: "°C"
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: right
+                  text_font: f32b
+                  text_color: paper_black
 
 font:
   - file:
       type: gfonts
       family: Noto Sans Display
       weight: 500
-    id: f14
-    size: 14
+    id: f16
+    size: 16
     glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
       'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
       'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
       'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
       'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 800
+    id: f16b
+    size: 16
+    glyphs: *norwegian-glyphs
   - file:
       type: gfonts
       family: Noto Sans Display
@@ -228,33 +366,95 @@ font:
   - file:
       type: gfonts
       family: Noto Sans Display
+      weight: 700
+    id: f32b
+    size: 32
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
       weight: 600
-    id: f130b
-    size: 130
+    id: f100b
+    size: 100
     glyphs: *norwegian-glyphs
 
-image:
-  - id: i_wifi
-    file: mdi:wifi
-    type: binary
-    resize: 28x28
-  - id: i_api
-    file: mdi:home-assistant
-    type: binary
-    resize: 28x28
+  # icons
+  - file: gui/fonts/materialdesignicons-webfont.ttf
+    id: f_mdi_s
+    size: 32
+    glyphs: [
+      "\U000F05A9", # mdi-wifi
+      "\U000F07D0", # mdi-home-assistant
 
-graph:
-  - id: graph_temperature_room
-    duration: 8h
+      "\U000F0450", # mdi-refresh
+      "\U000F0055", # mdi-arrow-right-thick
+      "\U000F02DC", # mdi-home
+      
+      "\U000F02FC", # mdi-information
+      "\U000F0F54", # mdi-home-thermometer
+
+      "\U000F050F", # mdi-thermometer
+      ]
+  - file: gui/fonts/materialdesignicons-webfont.ttf
+    id: f_mdi_m
+    size: 36
+    glyphs: [
+      "\U000F050F", # mdi-thermometer
+      ]
+
+#image:
+#  - id: i_wifi
+#    file: mdi:wifi
+#    type: binary
+#    resize: 28x28
+#  - id: i_api
+#    file: mdi:home-assistant
+#    type: binary
+#    resize: 28x28
+
+#  - id: i_refresh
+#    file: mdi:refresh
+#    type: binary
+#    resize: 28x28
+#  - id: i_next
+#    file: mdi:arrow-right-thick
+#    type: binary
+#    resize: 28x28
+#  - id: i_home
+#    file: mdi:home
+#    type: binary
+#    resize: 28x28
+
+#  - id: i_information
+#    file: mdi:information
+#    type: binary
+#    resize: 28x28
+#  - id: i_temp_room
+#    file: mdi:home-thermometer
+#    type: binary
+#    resize: 28x28
+
+#  - id: i_temp_s
+#    file: mdi:thermometer
+#    type: binary
+#    resize: 28x28
+#  - id: i_temp_l
+#    file: mdi:thermometer
+#    type: binary
+#    resize: 32x32
+
+#graph:
+#  - id: graph_temperature_room
+#    duration: 8h
 #    x_grid: 15min
 #    y_grid: 1.0
-    width: 200
-    height: 50
-    border: false
-    traces:
-      - sensor: temperature_feels_like
-        line_thickness: 6
-        continuous: true
+#    width: 200
+#    height: 50
+#    border: false
+#    traces:
+#      - sensor: temperature_feels_like
+#        line_thickness: 6
+#        continuous: true
 #  - id: graph_temperature_local
 #    duration: 6h
 #    x_grid: 15min
@@ -286,6 +486,16 @@ sensor:
     id: temperature_feels_like
     on_value:
       then:
+        - lvgl.label.update:
+            id: lbl_temp_room_value
+            text:
+              format: "%.0f"
+              args: [ 'x' ]
+        - lvgl.label.update:
+            id: lbl_disp_updated
+            text:
+              time_format: "%H:%M"
+              time: !lambda return id(time_homeassistant).now();
         - lambda: 'id(data_updated) = true;'
 
   # Combine sensors
@@ -312,6 +522,16 @@ sensor:
         - delta: 0.15
     on_value:
       then:
+        - lvgl.label.update:
+            id: lbl_temp_local_value
+            text:
+              format: "%.0f"
+              args: [ 'x' ]
+        - lvgl.label.update:
+            id: lbl_disp_updated
+            text:
+              time_format: "%H:%M"
+              time: !lambda return id(time_homeassistant).now();
         - lambda: 'id(data_updated) = true;'
 
   - platform: combination
@@ -333,9 +553,6 @@ sensor:
       - or:
         - heartbeat: 900s
         - delta: 0.15
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
 
   - platform: combination
     type: median
@@ -354,6 +571,3 @@ sensor:
       - or:
         - heartbeat: 900s
         - delta: 0.15
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'

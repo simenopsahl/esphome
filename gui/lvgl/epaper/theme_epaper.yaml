@@ -1,0 +1,109 @@
+---
+# https://esphome.io/cookbook/lvgl#theme-and-style-definitions
+# LVGL Night Owl
+#
+# DARK
+#
+
+substitutions:
+  default_font: MONSERRAT_16
+
+color:
+  - id: paper_white # Really black, but will appear white on e-paper
+    hex: "000000"
+  - id: paper_black # Really white, but will appear black on e-paper
+    hex: "FFFFFF"
+
+lvgl:
+  bg_color: paper_white
+  style_definitions:
+    - id: header_footer
+      bg_color: paper_white
+      bg_opa: COVER
+      border_width: 0
+      radius: 0
+      pad_all: 0
+      pad_row: 0
+      pad_column: 0
+      text_color: paper_black
+      width: 100%
+      height: 32
+  theme:
+    label:
+      bg_color: paper_white
+      bg_opa: TRANSP
+      text_font: $default_font
+      text_color: paper_black
+    obj:
+      bg_opa: TRANSP
+      border_opa: TRANSP
+      scrollable: false
+      pad_all: 0
+      radius: 0
+    bar:
+      bg_color: paper_white
+      border_color: paper_black
+      border_width: 2
+      indicator:
+        bg_color: paper_black
+    button:
+      bg_color: paper_black
+      bg_opa: COVER
+      border_width: 1
+      border_color: paper_black
+      text_color: paper_white
+      pressed: # set some button colors to be different in pressed state
+        bg_color: paper_white
+        text_color: paper_black
+      checked: # set some button colors to be different in checked state
+        bg_color: paper_white
+        text_color: paper_black
+    buttonmatrix:
+      bg_color: paper_white
+      bg_opa: TRANSP
+      border_width: 0
+      text_color: paper_black
+      pad_all: 0
+      items: # set all your buttonmatrix buttons to use your custom defined styles and font
+        bg_color: paper_black
+        bg_opa: COVER
+        border_color: paper_black
+        border_width: 1
+        text_color: paper_white
+        text_font: $default_font
+        pressed:
+          bg_color: paper_white
+          text_color: paper_black
+        checked:
+          bg_color: paper_white
+          text_color: paper_black
+    switch:
+      bg_color: paper_white
+      bg_opa: COVER
+      border_width: 1
+      border_color: paper_black
+      checked:
+        bg_color: paper_white
+        bg_opa: COVER
+      knob:
+        bg_color: paper_black
+        bg_opa: COVER
+        checked:
+          bg_color: paper_white
+    slider:
+      bg_color: paper_white
+      bg_opa: COVER
+      border_width: 1
+      border_color: paper_black
+      indicator:
+        bg_color: paper_black
+      knob:
+        bg_color: paper_black
+        bg_opa: COVER
+        border_color: paper_black
+        border_width: 1
+        text_color: paper_white
+    tabview:
+      border_color: paper_black
+#      items:
+#        text_color: paper_black

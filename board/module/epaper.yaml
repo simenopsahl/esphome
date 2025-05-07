@@ -5,7 +5,7 @@
 
 time:
   - platform: homeassistant
-    id: homeassistant_time
+    id: !extend time_homeassistant
     on_time:
       - seconds: 0
         minutes: /5
@@ -56,12 +56,6 @@ button:
     entity_category: config
     on_press:
       - script.execute: update_screen
-  - platform: template
-    name: "Next Screen"
-    entity_category: config
-    on_press:
-      - display.page.show_next: display_eink
-      - component.update: display_eink
 
 sensor:
   # Create sensors for monitoring remotely.

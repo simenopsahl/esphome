@@ -1,0 +1,174 @@
+---
+# LVGL device status page
+
+# Copy sensors to update lvgl
+text_sensor:	
+  - platform: copy
+    source_id: sensor_ip_address
+    id: sensor_ip_address_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_ip
+            text: !lambda return x;
+  - platform: copy
+    source_id: sensor_ssid
+    id: sensor_ssid_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_ssid
+            text: !lambda return x;
+  - platform: copy
+    source_id: sensor_mac_address
+    id: sensor_mac_address_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_mac
+            text: !lambda return x;
+
+# status page
+lvgl:
+  pages:
+    - id: page_status
+      layout:
+        type: GRID
+        grid_columns: [FR(1)]
+        grid_rows: [32px, FR(1), 32px]
+      widgets:
+        - obj:
+            align: top_mid
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 2
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            styles: header_footer
+            bg_color: paper_white
+            bg_opa: COVER
+            widgets:
+#              - image:
+#                  src: i_information
+#                  align: top_right
+#                  y: 1
+#                  x: -1
+              - label:
+                  text: "\U000F02FC" # mdi-information
+                  text_font: f_mdi_s
+                  text_align: right
+                  align: top_right
+        - obj:
+            align: center
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 1
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            pad_all: 0
+            bg_color: paper_white
+            border_opa: TRANSP
+            layout:
+              type: GRID
+              grid_columns: [FR(1), FR(5)]
+              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
+            widgets:
+              - label:
+                  id: lbl_name_l
+                  text: "Nm: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: f16
+                  text_color: paper_black
+              - label:
+                  id: lbl_name
+                  text: $devicename
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: f18
+                  text_color: paper_black
+
+              - label:
+                  id: lbl_build_l
+                  text: "Bld: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: f16
+                  text_color: paper_black
+              - label:
+                  id: lbl_build
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: f18
+                  text_color: paper_black
+                  text:
+                      format: "%s - %s"
+                      args: [__DATE__, __TIME__]
+
+              - label:
+                  id: lbl_ssid_l
+                  text: "SSID: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: f16
+                  text_color: paper_black
+              - label:
+                  id: lbl_ssid
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: f18
+                  text_color: paper_black
+
+              - label:
+                  id: lbl_ip_l
+                  text: "IP: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: f16
+                  text_color: paper_black
+              - label:
+                  id: lbl_ip
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: f18
+                  text_color: paper_black
+
+              - label:
+                  id: lbl_mac_l
+                  text: "MAC: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: f16
+                  text_color: paper_black
+              - label:
+                  id: lbl_mac
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: f18
+                  text_color: paper_black

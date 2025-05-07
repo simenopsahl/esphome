@@ -1,0 +1,27 @@
+substitutions:
+  name: everything-presence-lite-5ad914
+  friendly_name: EPL-5ad914
+  log_level: WARN
+  location: "2etg, Gang"
+
+packages:
+  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha.yaml@main
+  time: !include common/time.yaml
+  status: !include common/status.yaml
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  friendly_name: ${friendly_name}
+  area: $location
+
+api:
+  encryption:
+    key: !secret homeassistant_api
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+  enable_btm: true
+  enable_rrm: true

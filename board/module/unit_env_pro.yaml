@@ -51,6 +51,7 @@ sensor:
     iaq:
       id: iaq_bme688
       name: "IAQ BME688"
+      disabled_by_default: true
       device_class: "aqi"
       filters:
         - sliding_window_moving_average:
@@ -61,6 +62,7 @@ sensor:
     iaq_static:
       id: static_iaq_bme688
       name: "Static IAQ BME688"
+      disabled_by_default: true
       device_class: "aqi"
       filters:
         - sliding_window_moving_average:
@@ -94,11 +96,24 @@ sensor:
             window_size: 10
             send_every: 10
 
+  - platform: combination
+    type: median
+    id: combined_iaq_bme688
+    name: "Combined IAQ BME688"
+    device_class: "aqi"
+    state_class: "measurement"
+    sources:
+      - source: iaq_bme688
+      - source: static_iaq_bme688
+    on_value:
+      - component.update: combined_iaq_classification_bme688
+
 text_sensor:
   - platform: template
     id: iaq_classification_bme688
     name: "IAQ classification"
     icon: "mdi:checkbox-marked-circle-outline"
+    disabled_by_default: true
     lambda: |-
       auto iaq_ = int(id(iaq_bme688).state);
       if (iaq_ < 0) {
@@ -136,6 +151,7 @@ text_sensor:
     id: static_iaq_classification_bme688
     name: "Static IAQ classification"
     icon: "mdi:checkbox-marked-circle-outline"
+    disabled_by_default: true
     lambda: |-
       auto iaq_ = int(id(static_iaq_bme688).state);
       if (iaq_ < 0) {
@@ -168,7 +184,46 @@ text_sensor:
         return {"ukjent"}; // "unknown" in Norwegian
       }
     update_interval: never
+
   - platform: bme68x_bsec2
+    bme68x_bsec2_id: bme68x_bsec_component
     iaq_accuracy: 
       name: "IAQ accuracy"
       entity_category: diagnostic
+
+  - platform: template
+    id: combined_iaq_classification_bme688
+    name: "CombinedIAQ classification"
+    icon: "mdi:checkbox-marked-circle-outline"
+    lambda: |-
+      auto iaq_ = int(id(iaq_bme688).state);
+      if (iaq_ < 0) {
+        // No IAQ sensor.
+        return {"Ukjent"}; // "unknown" in Norwegian
+      }
+      if (iaq_ <= 50) {
+        return {"Utmerket"}; // "excellent" in Norwegian
+      }
+      else if (iaq_ <= 100) {
+        return {"Bra"}; // "good" in Norwegian
+      }
+      else if (iaq_ <= 150) {
+        return {"Litt forurenset"}; // "lightly polluted" in Norwegian
+      }
+      else if (iaq_ <= 200) {
+        return {"Moderat forurenset"}; // "moderately polluted" in Norwegian
+      }
+      else if (iaq_ <= 250) {
+        return {"Høyt forurenset"}; // "heavily polluted" in Norwegian
+      }
+      else if (iaq_ <= 350) {
+        return {"Sterkt forurenset"}; // "severely polluted" in Norwegian
+      }
+      else if (iaq_ <= 500) {
+        return {"Ekstremt forurenset"}; // "extremely polluted" in Norwegian
+      }
+      else {
+        // ESP_LOGD("iaq-classification", "IAQ not yet established: %s", id(static_iaq_bme688).state);
+        return {"Ukjent"}; // "unknown" in Norwegian
+      }
+    update_interval: never
