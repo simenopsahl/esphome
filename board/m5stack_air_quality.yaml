@@ -37,6 +37,7 @@ spi:
 time:
   - platform: pcf8563
     i2c_id: i2c_internal
+    id: time_rtc
     address: 0x51
     update_interval: 10min
   - platform: sntp

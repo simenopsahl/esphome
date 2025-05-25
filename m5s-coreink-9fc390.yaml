@@ -115,7 +115,7 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f14), COLOR_OFF, TextAlign::BOTTOM_CENTER, "@ %s", str );
+          it.printf( it.get_width()/2, it.get_height(), id(f18), COLOR_OFF, TextAlign::BOTTOM_CENTER, "@ %s", str );
       - id: page_info
         lambda: |-
           // Fill background.
@@ -130,8 +130,8 @@ display:
           
           // BATTERY
           it.print( 0, 57, id(f18), COLOR_ON, TextAlign::BOTTOM_LEFT, "Batteri: " );
-          it.printf( it.get_width() - 11, 55, id(f20b), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f", id(bat_adc).state );
-          it.print( it.get_width(), 57, id(f14), COLOR_ON, TextAlign::BOTTOM_RIGHT, "V" );
+          it.printf( it.get_width() - 15, 55, id(f20b), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f", id(bat_adc).state );
+          it.print( it.get_width(), 57, id(f16), COLOR_ON, TextAlign::BOTTOM_RIGHT, "V" );
 
           // DEVICE
           //it.print( it.get_width()/2, 70, id(f20), COLOR_ON, TextAlign::BOTTOM_CENTER, "ESPHome" );
@@ -161,7 +161,7 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f14), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str );
+          it.printf( it.get_width()/2, it.get_height(), id(f18), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str );
       - id: page_room
         lambda: |-
           // Fill background.
@@ -203,7 +203,7 @@ display:
             char str[17];
             time_t currTime = id(time_homeassistant).now().timestamp;
             strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-            it.printf( it.get_width()/2, it.get_height(), id(f14), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str );
+            it.printf( it.get_width()/2, it.get_height(), id(f18), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str );
           }
 
 font:
@@ -211,8 +211,8 @@ font:
       type: gfonts
       family: Noto Sans Display
       weight: 500
-    id: f14
-    size: 14
+    id: f16
+    size: 16
     glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
       'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',

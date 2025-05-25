@@ -349,4 +349,4 @@ sensor:
         - delta: 0.15
     on_value:
       then:
-        - lambda: 'id(data_updated = true)'
+        - lambda: 'id(data_updated) = true;'

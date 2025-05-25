@@ -120,7 +120,7 @@ display:
             // Refresh Timestamp
             // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
             char str[17];
-            time_t currTime = id(homeassistant_time).now().timestamp;
+            time_t currTime = id(time_homeassistant).now().timestamp;
             strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
             it.printf(it.get_width()/2, 379, id(font_small), COLOR_ON, TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
           }

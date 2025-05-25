@@ -1,11 +1,13 @@
 substitutions:
   name: everything-presence-lite-aa2a1c
   friendly_name: EPL-aa2a1c
-  log_level: WARN
+  illuminance_update_interval: "5s"
+  log_level: ERROR
   location: "1etg, TV Stue"
 
 packages:
-  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha.yaml@main
+  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
+  <<: !include_dir_named bluetooth
   time: !include common/time.yaml
   status: !include common/status.yaml
 
