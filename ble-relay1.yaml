@@ -7,6 +7,7 @@ packages:
 
 substitutions:
   devicename: ble-relay1
+  log_level: WARN
   location: "1etg, Kjøkken"
   i2c_internal_frequency: 100kHz
 
@@ -19,6 +20,3 @@ esphome:
 esp32:
     framework:
       type: esp-idf
-
-logger:
-  initial_level: INFO

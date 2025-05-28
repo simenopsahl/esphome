@@ -1,0 +1,33 @@
+api:
+  on_client_connected:
+    then:
+      - lvgl.widget.show: lbl_ha_status
+  on_client_disconnected:
+    then:
+      - lvgl.widget.hide: lbl_ha_status
+
+wifi:
+  on_connect:
+    then:
+      - lvgl.widget.show: lbl_wifi_status
+  on_disconnect:
+    then:
+      - lvgl.widget.hide: lbl_wifi_status
+
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - lvgl.label.update:
+          id: nav_clock
+          text:
+            time_format: "%H:%M"
+            time: ha_time
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - lvgl.label.update:
+              id: nav_clock
+              text:
+                time_format: "%H:%M"
+                time: ha_time

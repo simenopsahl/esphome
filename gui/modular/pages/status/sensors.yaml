@@ -1,0 +1,28 @@
+# LVGL device status page
+
+# Copy sensors to update lvgl
+text_sensor:	
+  - platform: copy
+    source_id: sensor_ip_address
+    id: sensor_ip_address_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_ip
+            text: !lambda return x;
+  - platform: copy
+    source_id: sensor_ssid
+    id: sensor_ssid_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_ssid
+            text: !lambda return x;
+  - platform: copy
+    source_id: sensor_mac_address
+    id: sensor_mac_address_copy
+    on_value: 
+      then:
+        - lvgl.label.update:
+            id: lbl_mac
+            text: !lambda return x;

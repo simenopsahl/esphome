@@ -1,0 +1,73 @@
+packages:
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+  board: !include board/jc3248w535c.yaml
+
+substitutions:
+  devicename: jc3248w535c-1f26fc
+  log_level: INFO
+
+esphome:
+  comment: 'Guition 3.5"'
+  name: $devicename
+  friendly_name: $devicename
+  project:
+    version: "1.0.0"
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+esp32:
+  framework:
+    type: esp-idf
+
+light:
+  - id: !extend backlight_light
+    on_state:
+      - lvgl.slider.update:
+          id: backlight_slider
+          value: !lambda return (int(id(backlight_light).remote_values.get_brightness() * 100));
+      - lvgl.label.update:
+          id: backlight_label
+          text:
+            format: "%d %%"
+            args: [ '(int(id(backlight_light).remote_values.get_brightness() * 100))' ]
+
+lvgl:
+  widgets:
+    - obj:
+        align: center
+        height: 90%
+        width: 90%
+        widgets:
+          - button:
+              id: backlight_button
+              align: top_left
+              checkable: true
+              widgets:
+                - label:
+                    align: center
+                    text: Backlight
+              on_click:
+                then:
+                  - light.control:
+                      id: backlight_light
+                      state: on
+                      brightness: 10%
+          - label:
+              id: backlight_label
+              align: bottom_left
+              text: "?"
+          - slider:
+              id: backlight_slider
+              align: right_mid
+              x: -5
+              height: 90%
+              width: 30
+              on_release:
+                then:
+                  - light.control:
+                      id: backlight_light
+                      state: on
+                      brightness: !lambda return int(x);

@@ -1,0 +1,120 @@
+# LVGL device status page
+
+# status page
+#lvgl:
+#  pages:
+    - id: status_page
+      <<: *page_styles
+      on_load:
+        - lvgl.label.update:
+            id: page_title
+            text: Device
+      widgets:
+        - obj:
+            <<: *container_styles
+            layout:
+              type: GRID
+              grid_columns: [FR(1), FR(4)]
+              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
+            widgets:
+              - label:
+                  id: lbl_name_l
+                  text: "Name: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: font_sm
+                  text_color: c_text_s
+              - label:
+                  id: lbl_name
+                  text: $devicename
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: font_md
+                  text_color: c_text_p
+
+              - label:
+                  id: lbl_build_l
+                  text: "Build: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: font_sm
+                  text_color: c_text_s
+              - label:
+                  id: lbl_build
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: font_md
+                  text_color: c_text_p
+                  text:
+                      format: "%s - %s"
+                      args: [__DATE__, __TIME__]
+
+              - label:
+                  id: lbl_ssid_l
+                  text: "SSID: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: font_sm
+                  text_color: c_text_s
+              - label:
+                  id: lbl_ssid
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: font_md
+                  text_color: c_text_p
+      
+              - label:
+                  id: lbl_ip_l
+                  text: "IP: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: font_sm
+                  text_color: c_text_s
+              - label:
+                  id: lbl_ip
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: font_md
+                  text_color: c_text_p
+      
+              - label:
+                  id: lbl_mac_l
+                  text: "MAC: "
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: end
+                  grid_cell_y_align: center
+                  text_align: RIGHT
+                  text_font: font_sm
+                  text_color: c_text_s
+              - label:
+                  id: lbl_mac
+                  text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: start
+                  grid_cell_y_align: center
+                  text_font: font_md
+                  text_color: c_text_p
