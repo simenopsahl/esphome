@@ -1,0 +1,21 @@
+# required vars:
+# - uid
+# - text
+# - text_font
+# - color
+# - align
+# - cell_column_pos
+# - cell_row_pos
+# - cell_x_align
+# - cell_y_align
+
+# label:
+  id: ${uid}_widget_text
+  text: ${text}
+  text_font: ${text_font}
+  text_color: ${color}
+  text_align: ${align}
+  grid_cell_column_pos: ${cell_column_pos}
+  grid_cell_row_pos: ${cell_row_pos}
+  grid_cell_x_align: ${cell_x_align}
+  grid_cell_y_align: ${cell_y_align}

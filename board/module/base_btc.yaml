@@ -3,7 +3,7 @@
 # https://esphome.io/components/sensor/sht3xd.html
 
 substitutions:
-  base_btc_i2c_bus: i2c_grove
+  base_btc_i2c_bus: i2c_mbus
 
 # SHT30
 sensor:

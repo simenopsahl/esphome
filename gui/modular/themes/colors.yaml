@@ -22,6 +22,8 @@ color:
     hex: "ecc48d"
   - id: c_pink
     hex: "c792ea"
+  - id: c_pink2
+    hex: "7e57c2"
   - id: c_purple
     hex: "ff2c83"
 
@@ -29,6 +31,10 @@ color:
     red: 50%
     green: 50%
     blue: 50%
+  - id: c_dark_gray
+    red: 33%
+    green: 33%
+    blue: 33%
   - id: c_white
     red: 100%
     green: 100%
@@ -37,3 +43,6 @@ color:
     red: 0%
     green: 0%
     blue: 0%
+
+  - id: c_ha_icon
+    hex: "00daff" # 0x00daff

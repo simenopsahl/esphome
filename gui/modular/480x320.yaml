@@ -1,3 +1,5 @@
+# for portrait 480x320 displays
+
 font: !include
   file: fonts/fonts.yaml
   vars:
@@ -6,6 +8,8 @@ font: !include
     text_lg: 24
     text_xl: 32
     text_xxl: 48
+    text_hg: 90
+    text_fl: 150
     icons_sm: 20
     icons_md: 26
     icons_lg: 34
@@ -14,13 +18,13 @@ font: !include
 
 .sizing:
   - &nav_widget_vars
-    height: 50
-    padding: 36
+    height: 40
+    padding: 10
 
   - &page_styles
     <<: !include styles/page_styles.yaml
-    pad_top: 50
-    pad_bottom: 50
+    pad_top: 40
+    pad_bottom: 40
 
   - &container_styles
     <<: !include styles/container_styles.yaml
@@ -42,6 +46,35 @@ font: !include
     width: 100%
     height: 86
 
+# Styles for Weather forcast
+.forcast_styles:
+    - &forcast_obj_base
+      height: SIZE_CONTENT
+      width: SIZE_CONTENT
+      bg_color: c_black
+      radius: 3
+      pad_top: 2
+      pad_bottom : 2
+      layout:
+        type: flex
+        flex_flow: COLUMN
+        flex_align_cross: center
+        flex_align_track: center
+        pad_column: 0
+        pad_row: 2
+
+    - &forcast_label_base
+      text_font: font_md
+      height: SIZE_CONTENT
+
+    - &forcast_label_base_sm
+      height: SIZE_CONTENT
+      text_font: font_sm
+      text_color: c_text_s
+
+    - &forcast_image_base
+      height: SIZE_CONTENT
+
 script:
   - id: go_home
     then:
@@ -50,35 +83,46 @@ script:
 lvgl:
   default_font: font_md
   theme: !include themes/main.yaml
+  disp_bg_color: 0x000000
+  bg_color: 0x000000
   top_layer:
     widgets:
       - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_vars } }
       - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_vars } }
       - <<: !include { file: widgets/boot_screen/widget.yaml }
   pages:
-    - id: splash
+    - id: page_splash
       skip: true
       on_load:
         - script.execute: go_home
     
     # analog clock
-    - id: clock_page
+    - id: page_analog_clock
       <<: *page_styles
       on_load:
         - lvgl.label.update:
             id: page_title
-            text: Clock
+            text: Klokke
+      <<: !include
+        file: sections/swipe_navigation.yaml
       widgets:
-        - obj: # clock container
-            <<: *container_styles
+        # Outer Clock Container
+        - obj:
+            pad_all: 10
+            height: 100%
+            width: 100%
+            align: CENTER
             widgets:
-              - meter: # clock face
-                  height: 90%
+              # clock face
+              - meter:
+                  height: 300
+                  width: 300
                   align: CENTER
                   border_width: 0
                   bg_opa: TRANSP
                   scales:
-                    - range_from: 0 # minutes scale
+                    # Minor ticks
+                    - range_from: 0
                       range_to: 60
                       angle_range: 360
                       rotation: 270
@@ -87,6 +131,7 @@ lvgl:
                         count: 61
                         length: 10
                         color: c_bg_s
+                      # Minuite hand
                       indicators:
                         - line:
                             id: minute_hand
@@ -94,7 +139,8 @@ lvgl:
                             color: c_text_s
                             r_mod: -4
                             value: 0
-                    - range_from: 1 # hours scale for labels
+                    # Major ticks
+                    - range_from: 1
                       range_to: 12
                       angle_range: 330
                       rotation: 300
@@ -108,7 +154,8 @@ lvgl:
                           length: 10
                           color: c_dark_gray
                           label_gap: 12
-                    - range_from: 0 # hi-res hours scale for hand
+                    # Hour hand
+                    - range_from: 0
                       range_to: 720
                       angle_range: 360
                       rotation: 270
@@ -124,45 +171,76 @@ lvgl:
               - label:
                   id: day_label
                   text_font: font_sm
-                  y: -30
+                  align: center
+                  text_color: c_gray
+                  pad_all: 2
+                  y: -50
               - label:
                   id: date_label
                   text_font: font_sm
-                  y: 30
+                  align: center
+                  text_color: c_gray
+                  pad_all: 2
+                  y: 50
     
     # device status
-    - id: status_page
+    - id: page_status
       <<: *page_styles
       on_load:
         - lvgl.label.update:
             id: page_title
-            text: Device
+            text: Enhet
+      <<: !include
+        file: sections/swipe_navigation.yaml
       widgets:
         - obj:
-            <<: *container_styles
+            pad_all: 6
+            height: 100%
+            width: 100%
+            align: CENTER
             layout:
-              <<: *button_layout
+              type: GRID
+              grid_columns: [FR(1), FR(4)]
+              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
             widgets:
               - label:
                   id: lbl_name_l
                   text: "Name: "
-                  text_align: RIGHT
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: LEFT
                   text_font: font_sm
                   text_color: c_text_s
               - label:
                   id: lbl_name
                   text: $devicename
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: RIGHT
                   text_font: font_md
                   text_color: c_text_p
 
               - label:
                   id: lbl_build_l
                   text: "Build: "
-                  text_align: RIGHT
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: LEFT
                   text_font: font_sm
                   text_color: c_text_s
               - label:
                   id: lbl_build
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 1
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: RIGHT
                   text_font: font_md
                   text_color: c_text_p
                   text:
@@ -172,399 +250,333 @@ lvgl:
               - label:
                   id: lbl_ssid_l
                   text: "SSID: "
-                  text_align: RIGHT
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: LEFT
                   text_font: font_sm
                   text_color: c_text_s
               - label:
                   id: lbl_ssid
                   text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: RIGHT
                   text_font: font_md
                   text_color: c_text_p
       
               - label:
                   id: lbl_ip_l
                   text: "IP: "
-                  text_align: RIGHT
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: LEFT
                   text_font: font_sm
                   text_color: c_text_s
               - label:
                   id: lbl_ip
                   text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 3
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: RIGHT
                   text_font: font_md
                   text_color: c_text_p
       
               - label:
                   id: lbl_mac_l
                   text: "MAC: "
-                  text_align: RIGHT
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: LEFT
                   text_font: font_sm
                   text_color: c_text_s
               - label:
                   id: lbl_mac
                   text: "?"
+                  grid_cell_column_pos: 1
+                  grid_cell_row_pos: 4
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: CENTER
+                  text_align: RIGHT
                   text_font: font_md
                   text_color: c_text_p
 
-    - id: bedroom
+    - id: page_temperature
       <<: *page_styles
       on_load:
         - lvgl.label.update:
             id: page_title
-            text: Bedroom
+            text: Temperatur
+      <<: !include
+        file: sections/swipe_navigation.yaml
       widgets:
         - obj:
-            <<: *container_styles
+            pad_all: 6
+            height: 100%
+            width: 100%
+            align: CENTER
             layout:
-              <<: *button_layout
+              type: GRID
+              grid_columns: [ FR(1), FR(2), FR(1) ]
+              grid_rows: [ FR(2), FR(4), FR(4) ]
             widgets:
-              - button: # ceiling light
+              - obj:
+                  grid_cell_row_pos: 1
+                  grid_cell_column_pos: 0
+                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: START
+                  layout:
+                    type: FLEX
+                    flex_flow: COLUMN
+                    flex_align_main: CENTER
+                    flex_align_cross: START
+                  widgets:
+                    - label: # thermometer icon
+                        <<: !include
+                          file: widgets/labels/icon.yaml
+                          vars:
+                            uid: house_temp_icon
+                            icon: "\U000F050F"
+                            icon_size: mdi_lg
+                            color: c_text_s
+                            align: left
+                    - label: # area
+                        <<: !include
+                          file: widgets/labels/text.yaml
+                          vars:
+                            uid: house_temp_area
+                            text: "Hus"
+                            text_font: font_md
+                            color: c_text_s
+                            align: left
+              - label: # temperature value
                   <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
+                    file: widgets/labels/grid_text.yaml
                     vars:
-                      uid: bedroom_light_1
-                      entity_id: light.bedroom_light_1
-                      text: Ceiling
-                      <<: *button_widget_vars
-
-              - button: # volume up
+                      uid: house_temp_value
+                      text: "?"
+                      text_font: font_hg
+                      color: c_text_p
+                      align: center
+                      cell_column_pos: 1
+                      cell_row_pos: 1
+                      cell_x_align: center
+                      cell_y_align: center
+              - label: # temperature unit
                   <<: !include
-                    file: widgets/buttons/icon_buttons/volume_buttons/vol_up.yaml
+                    file: widgets/labels/grid_text.yaml
                     vars:
-                      uid: bedroom_tv_vol_up
-                      entity_id: media_player.bedroom_android_tv
-                      <<: *button_widget_vars
+                      uid: house_temp_unit
+                      text: "°C"
+                      text_font: font_lg
+                      color: c_text_s
+                      align: right
+                      cell_column_pos: 2
+                      cell_row_pos: 1
+                      cell_x_align: end
+                      cell_y_align: center
 
-              - button: # rachel light
+              - obj:
+                  grid_cell_row_pos: 2
+                  grid_cell_column_pos: 0
+                  grid_cell_y_align: STRETCH
+                  grid_cell_x_align: START
+                  layout:
+                    type: FLEX
+                    flex_flow: COLUMN
+                    flex_align_main: CENTER
+                    flex_align_cross: START
+                  widgets:
+                    - label: # thermometer icon
+                        <<: !include
+                          file: widgets/labels/icon.yaml
+                          vars:
+                            uid: rom_temp_icon
+                            icon: "\U000F050F"
+                            icon_size: mdi_lg
+                            color: c_text_s
+                            align: left
+                    - label: # area
+                        <<: !include
+                          file: widgets/labels/text.yaml
+                          vars:
+                            uid: room_temp_area
+                            text: "Rom"
+                            text_font: font_md
+                            color: c_text_s
+                            align: left
+              - label: # temperature value
                   <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
+                    file: widgets/labels/grid_text.yaml
                     vars:
-                      uid: bedroom_light_3
-                      entity_id: light.bedroom_light_3
-                      text: Rachel
-                      <<: *button_widget_vars
-
-              - button: # volume down
+                      uid: room_temp_value
+                      text: "?"
+                      text_font: font_hg
+                      color: c_text_p
+                      align: center
+                      cell_column_pos: 1
+                      cell_row_pos: 2
+                      cell_x_align: center
+                      cell_y_align: center
+              - label: # temperature unit
                   <<: !include
-                    file: widgets/buttons/icon_buttons/volume_buttons/vol_down.yaml
+                    file: widgets/labels/grid_text.yaml
                     vars:
-                      uid: bedroom_tv_vol_down
-                      entity_id: media_player.bedroom_android_tv
-                      <<: *button_widget_vars
+                      uid: room_temp_unit
+                      text: "°C"
+                      text_font: font_lg
+                      color: c_text_s
+                      align: right
+                      cell_column_pos: 2
+                      cell_row_pos: 2
+                      cell_x_align: end
+                      cell_y_align: center
 
-              - button: # ryan light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: bedroom_light_2
-                      entity_id: light.bedroom_light_2
-                      text: Ryan
-                      <<: *button_widget_vars
-
-              - button: # play content
-                  <<: !include
-                    file: widgets/buttons/text_buttons/stateless.yaml
-                    vars:
-                      uid: play_content_futurama
-                      text: Futurama
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: script.play_content_on_bedroom_chromecast
-                        data: { content: Futurama }
-                  on_long_press:
-                    - homeassistant.action:
-                        action: homeassistant.toggle
-                        data: { entity_id: media_player.bedroom_android_tv }
-
-              - button: # play content
-                  <<: !include
-                    file: widgets/buttons/text_buttons/stateless.yaml
-                    vars:
-                      uid: play_content_adventure_time
-                      text: "Adventure\nTime"
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: script.play_content_on_bedroom_chromecast
-                        data: { content: Adventure Time }
-                  on_long_press:
-                    - homeassistant.action:
-                        action: homeassistant.toggle
-                        data: { entity_id: media_player.bedroom_android_tv }
-
-              - button: # play content
-                  <<: !include
-                    file: widgets/buttons/text_buttons/stateless.yaml
-                    vars:
-                      uid: play_content_american_dad
-                      text: American Dad
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: script.play_content_on_bedroom_chromecast
-                        data: { content: American Dad }
-                  on_long_press:
-                    - homeassistant.action:
-                        action: homeassistant.toggle
-                        data: { entity_id: media_player.bedroom_android_tv }
-
-    - id: living_room
+    - id: page_weather
       <<: *page_styles
       on_load:
         - lvgl.label.update:
             id: page_title
-            text: Living Room
+            text: Vær
+      <<: !include
+        file: sections/swipe_navigation.yaml
       widgets:
         - obj:
-            <<: *container_styles
+            pad_all: 6
+            height: 100%
+            width: 100%
+            align: CENTER
             layout:
-              <<: *button_layout
+              type: GRID
+              grid_rows: [ fr(4), fr(3) ]
+              grid_columns: [ fr(7), fr(6) ]
             widgets:
-              - button: # light 1
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: living_room_light_1
-                      entity_id: light.living_room_light_1
-                      text: Light 1
-                      <<: *button_widget_vars
+              - obj:
+                  height: SIZE_CONTENT
+                  width: SIZE_CONTENT
+                  grid_cell_row_pos: 0
+                  grid_cell_column_pos: 0
+                  grid_cell_y_align: CENTER
+                  widgets:
+                    - image:
+                        src: unknown_170
+                        id: weather_condition_icon
+              - obj:
+                  grid_cell_row_pos: 0
+                  grid_cell_column_pos: 1
+                  grid_cell_y_align: CENTER
+                  bg_opa: TRANSP
+                  layout:
+                    type: FLEX
+                    flex_flow: COLUMN
+                    flex_align_main: START
+                    flex_align_cross: START
+                  widgets:
+                    - label:
+                        text: "--°"
+                        id: weather_temperature_today
+                        text_font: font_xl
+                        text_align: LEFT
+                    - label:
+                        text: "Været nå"
+                        id: weather_condition_today
+                        long_mode: wrap
+                        scrollable: true
+                        text_font: font_md
+                        text_align: LEFT
 
-              - button: # light 2
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: living_room_light_2
-                      entity_id: light.living_room_light_2
-                      text: Light 2
-                      <<: *button_widget_vars
-
-              # - button: # dim scene
-              #     <<: !include
-              #       file: widgets/buttons/text_buttons/stateless.yaml
-              #       vars:
-              #         uid: dim
-              #         text: Dim Lights
-              #         <<: *button_widget_vars
-              #     on_short_click:
-              #       - homeassistant.action:
-              #           action: homeassistant.turn_on
-              #           data: { entity_id: scene.living_room_lights_tv_watching }
-              #     on_long_press:
-              #       - homeassistant.action:
-              #           action: light.turn_on
-              #           data: { entity_id: light.all_living_room_lights, brightness_pct: '100' }
-
-              - button: # tv power
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/stateful.yaml
-                    vars:
-                      uid: living_room_tv
-                      icon_on: "\U000F0425"
-                      icon_off: "\U000F0425"
-                      text: TV
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: media_player.toggle
-                        data: { entity_id: media_player.living_room_tv }
-
-              - button: # tv power
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/stateful.yaml
-                    vars:
-                      uid: living_room_xbox
-                      icon_on: "\U000F0425"
-                      icon_off: "\U000F0425"
-                      text: Xbox
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: media_player.toggle
-                        data: { entity_id: media_player.ryan_s_xbox }
-
-              - button: # play / pause
-                  <<: !include
-                    file: widgets/buttons/icon_buttons/stateless.yaml
-                    vars:
-                      uid: living_room_tv_playpause
-                      icon: "\U000F040E"
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: media_player.media_play_pause
-                        data: { entity_id: media_player.living_room_tv }
-
-              - button: # volume up
-                  <<: !include
-                    file: widgets/buttons/icon_buttons/volume_buttons/vol_up.yaml
-                    vars:
-                      uid: living_room_tv_vol_up
-                      entity_id: media_player.living_room_tv
-                      <<: *button_widget_vars
-
-              - button: # stop
-                  <<: !include
-                    file: widgets/buttons/icon_buttons/stateless.yaml
-                    vars:
-                      uid: living_room_tv_stop
-                      icon: "\U000F04DB"
-                      <<: *button_widget_vars
-                  on_short_click:
-                    - homeassistant.action:
-                        action: media_player.media_stop
-                        data: { entity_id: media_player.living_room_tv }
-
-              - button: # volume down
-                  <<: !include
-                    file: widgets/buttons/icon_buttons/volume_buttons/vol_down.yaml
-                    vars:
-                      uid: living_room_tv_vol_down
-                      entity_id: media_player.living_room_tv
-                      <<: *button_widget_vars
-
-    - id: lighting_1
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Main Floor Lighting
-      widgets:
-        - obj:
-            <<: *container_styles
-            layout:
-              <<: *button_layout
-            widgets:
-              - button: # main floor lights
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_group_buttons/widget.yaml
-                    vars:
-                      uid: main_floor_lights
-                      entity_id: light.main_floor_lights
-                      text: Main Floor
-                      <<: *wide_button_widget_vars
-
-              - button: # living room light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: all_living_room_lights
-                      entity_id: light.all_living_room_lights
-                      text: Living Room
-                      <<: *button_widget_vars
-
-              - button: # kitchen light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: kitchen_light
-                      entity_id: light.kitchen_light
-                      text: Kitchen
-                      <<: *button_widget_vars
-
-              - button: # rachel's office light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: rachels_office_light
-                      entity_id: light.rachels_office_light
-                      text: Office
-                      <<: *button_widget_vars
-
-    - id: lighting_2
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Second Floor Lighting
-      widgets:
-        - obj:
-            <<: *container_styles
-            layout:
-              <<: *button_layout
-            widgets:
-              - button: # second floor lights
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_group_buttons/widget.yaml
-                    vars:
-                      uid: second_floor_lights
-                      entity_id: light.second_floor_lights
-                      text: Second Floor
-                      <<: *wide_button_widget_vars
-
-              - button: # bedroom lights
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: all_bedroom_lights
-                      entity_id: light.all_bedroom_lights
-                      text: Bedroom
-                      <<: *button_widget_vars
-
-              - button: # railyn light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: railyns_light
-                      entity_id: light.railyns_light
-                      text: Railyn
-                      <<: *button_widget_vars
-
-              - button: # ryan's office light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: all_ryan_s_office_lights
-                      entity_id: light.all_ryan_s_office_lights
-                      text: Office
-                      <<: *button_widget_vars
-
-              - button: # upstairs hallway light
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: upstairs_hallway_light
-                      entity_id: light.upstairs_hallway_light
-                      text: Hallway
-                      <<: *button_widget_vars
-
-    - id: lighting_3
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Outside Lighting
-      widgets:
-        - obj:
-            <<: *container_styles
-            layout:
-              <<: *button_layout
-            widgets:
-              - button: # outdoor lights
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_group_buttons/widget.yaml
-                    vars:
-                      uid: all_outside_lights
-                      entity_id: light.all_outside_lights
-                      text: Outside Lights
-                      <<: *wide_button_widget_vars
-
-              - button: # door lights
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: outside_light_1
-                      entity_id: light.outside_light_1
-                      text: Door Lights
-                      <<: *button_widget_vars
-
-              - button: # deck lights
-                  <<: !include
-                    file: widgets/buttons/icon_text_buttons/light_buttons/widget.yaml
-                    vars:
-                      uid: outside_light_2
-                      entity_id: light.outside_light_2
-                      text: Deck Lights
-                      <<: *button_widget_vars
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  grid_cell_row_pos: 1
+                  grid_cell_column_pos: 0
+                  grid_cell_column_span: 2
+                  grid_cell_y_align: CENTER
+                  grid_cell_x_align: STRETCH
+                  layout:
+                    type: GRID
+                    grid_rows: [ content ]
+                    grid_columns: [ 62, 62, 62, 62 ]
+                    pad_column: 6
+                    pad_row: 0
+                  widgets:
+                      - obj:
+                          <<: *forcast_obj_base
+                          grid_cell_row_pos: 0
+                          grid_cell_column_pos: 0
+                          widgets:
+                              - label:
+                                  id: forecast_timestamp_0
+                                  <<: *forcast_label_base_sm
+                                  text: ???
+                              - image:
+                                  id: forecast_condition_icon_0
+                                  <<: *forcast_image_base
+                                  src: unknown_62
+                              - label:
+                                  id: forecast_temperature_0
+                                  <<: *forcast_label_base
+                                  text: "--°"
+                      - obj:
+                          <<: *forcast_obj_base
+                          grid_cell_row_pos: 0
+                          grid_cell_column_pos: 1
+                          widgets:
+                              - label:
+                                  id: forecast_timestamp_1
+                                  <<: *forcast_label_base_sm
+                                  text: ???
+                              - image:
+                                  id: forecast_condition_icon_1
+                                  <<: *forcast_image_base
+                                  src: unknown_62
+                              - label:
+                                  id: forecast_temperature_1
+                                  <<: *forcast_label_base
+                                  text: "--°"
+                      - obj:
+                          <<: *forcast_obj_base
+                          grid_cell_row_pos: 0
+                          grid_cell_column_pos: 2
+                          widgets:
+                              - label:
+                                  id: forecast_timestamp_2
+                                  <<: *forcast_label_base_sm
+                                  text: ???
+                              - image:
+                                  id: forecast_condition_icon_2
+                                  <<: *forcast_image_base
+                                  src: unknown_62
+                              - label:
+                                  id: forecast_temperature_2
+                                  <<: *forcast_label_base
+                                  text: "--°"
+                      - obj:
+                          <<: *forcast_obj_base
+                          grid_cell_row_pos: 0
+                          grid_cell_column_pos: 3
+                          widgets:
+                              - label:
+                                  id: forecast_timestamp_3
+                                  <<: *forcast_label_base_sm
+                                  text: ???
+                              - image:
+                                  id: forecast_condition_icon_3
+                                  <<: *forcast_image_base
+                                  src: unknown_62
+                              - label:
+                                  id: forecast_temperature_3
+                                  <<: *forcast_label_base
+                                  text: "--°"
 
 packages:
   # header
@@ -576,101 +588,24 @@ packages:
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
 
-  bedroom_light_1_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: bedroom_light_1,
-    entity_id: light.bedroom_light_1
-  }}
-
-  bedroom_light_2_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: bedroom_light_2,
-    entity_id: light.bedroom_light_2
-  }}
-
-  bedroom_light_3_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: bedroom_light_3,
-    entity_id: light.bedroom_light_3
-  }}
-
-  # living_room
-  living_room_light_1_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: living_room_light_1,
-    entity_id: light.living_room_light_1
-  }}
-
-  living_room_light_2_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: living_room_light_2,
-    entity_id: light.living_room_light_2
-  }}
-
-  living_room_tv_widget_sensors: !include { file: widgets/buttons/icon_buttons/stateful_sensors.yaml, vars: {
-    uid: living_room_tv,
-    entity_id: media_player.living_room_tv
-  }}
-
-  living_room_xbox_widget_sensors: !include { file: widgets/buttons/icon_buttons/stateful_sensors.yaml, vars: {
-    uid: living_room_xbox,
-    entity_id: media_player.ryan_s_xbox
-  }}
-
-  # lighting 1
-  main_floor_lights_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_group_buttons/sensors.yaml, vars: {
-    uid: main_floor_lights,
-    entity_id: light.main_floor_lights
-  }}
-
-  all_living_room_lights_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: all_living_room_lights,
-    entity_id: light.all_living_room_lights
-  }}
-
-  kitchen_light_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: kitchen_light,
-    entity_id: light.kitchen_light
-  }}
-
-  rachels_office_light_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: rachels_office_light,
-    entity_id: light.rachels_office_light
-  }}
-
-  # lighting 2
-  second_floor_lights_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_group_buttons/sensors.yaml, vars: {
-    uid: second_floor_lights,
-    entity_id: light.second_floor_lights
-  }}
-
-  all_bedroom_lights_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: all_bedroom_lights,
-    entity_id: light.all_bedroom_lights
-  }}
-
-  railyns_light_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: railyns_light,
-    entity_id: light.railyns_light
-  }}
-
-  ryans_office_light_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: all_ryan_s_office_lights,
-    entity_id: light.all_ryan_s_office_lights
-  }}
-
-  upstairs_hallway_light_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: upstairs_hallway_light,
-    entity_id: light.upstairs_hallway_light
-  }}
-
-  # lighting 3
-  all_outside_lights_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_group_buttons/sensors.yaml, vars: {
-    uid: all_outside_lights,
-    entity_id: light.all_outside_lights
-  }}
-
-  outside_light_1_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: outside_light_1,
-    entity_id: light.outside_light_1
-  }}
-
-  outside_light_2_widget_sensors: !include { file: widgets/buttons/icon_text_buttons/light_buttons/sensors.yaml, vars: {
-    uid: outside_light_2,
-    entity_id: light.outside_light_2
-  }}
+  # Weather packages
+  # Build icon set from .svg files
+  weather_icons_80: !include
+    file: weather/weather_icons.yaml
+    vars:
+      size: 62
+  # Display weather forcast using icon set (defined above)
+  weather_forcast_80: !include
+    file: weather/weather_forecast.yaml
+    vars:
+      size: 62
+  # Big icons for today weather
+  weather_icons_200: !include
+    file: weather/weather_icons.yaml
+    vars:
+      size: 170
+  # Get todays weather and display it
+  weather_today_200: !include
+    file: weather/weather_today.yaml
+    vars:
+      size: 170

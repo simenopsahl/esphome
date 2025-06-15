@@ -22,7 +22,7 @@ select:
       - "256000"
       - "512000"
       - "921600"
-    initial_option: "115200"
+    initial_option: "9600"
     optimistic: true
     restore_value: true
     entity_category: config

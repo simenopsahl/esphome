@@ -1,0 +1,11 @@
+# required vars:
+# - uid
+# - icon
+# - icon_size
+# - align
+
+# label:
+  id: ${uid}_widget_icon
+  text: ${icon}
+  text_font: ${icon_size}
+  text_align: ${align}

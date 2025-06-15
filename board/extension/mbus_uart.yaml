@@ -1,0 +1,48 @@
+---
+# https://esphome.io/components/uart#uart
+# m5stack mBus UART
+
+# Shared pins
+substitutions:
+  mbus_uart_shared: "false"
+
+uart:
+# mBus Extension
+  - id: uart_mbus
+    tx_pin:
+      number: $mbus16
+      allow_other_uses: $mbus_uart_shared
+    rx_pin:
+      number: $mbus15
+      allow_other_uses: $mbus_uart_shared
+    baud_rate: 9600
+    rx_buffer_size: 256
+
+select:
+  - id: uart_mbus_baud_rate
+    name: Baud rate
+    platform: template
+    options:
+      - "2400"
+      - "9600"
+      - "38400"
+      - "57600"
+      - "115200"
+      - "256000"
+      - "512000"
+      - "921600"
+    initial_option: "9600"
+    optimistic: true
+    restore_value: true
+    entity_category: config
+    disabled_by_default: true
+    icon: mdi:swap-horizontal
+    set_action:
+      - lambda: |-
+          id(uart_mbus).flush();
+          uint32_t new_baud_rate = stoi(x);
+          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_mbus).get_baud_rate(), new_baud_rate);
+          if (id(uart_mbus).get_baud_rate() != new_baud_rate) {
+            id(uart_mbus).set_baud_rate(new_baud_rate);
+            id(uart_mbus).load_settings();
+          }

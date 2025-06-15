@@ -1,0 +1,102 @@
+---
+# PINs for Sunton module ESP32-S3 with 4.3" display
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/sunton-8048s043c.yaml
+
+esphome:
+  project:
+    name: 'Sunton.4,3" 800x480'
+  platformio_options:
+    build_flags: "-DBOARD_HAS_PSRAM"
+    board_build.esp-idf.memory_type: qio_opi
+    board_build.flash_mode: dio
+    board_upload.maximum_ram_size: 524288
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+    # these versions prevent artifacting
+#    version: 5.1.2
+#    platform_version: 6.5.0
+    # Required to achieve sufficient PSRAM bandwidth
+    sdkconfig_options:
+      COMPILER_OPTIMIZATION_SIZE: y
+      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: y
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
+      CONFIG_SPIRAM_RODATA: y
+      CONFIG_ESPTOOLPY_FLASHSIZE_16MB: y # fix warning about 2mb found
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+i2c:
+  - id: i2c_internal
+    sda: $i2c_int_sda_pin
+    scl: $i2c_int_scl_pin
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: $disp_bl_pin
+    frequency: 1220Hz
+
+light:
+  # White
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+# https://community.home-assistant.io/t/esp32-8048s043-sunton-4-3-cyd-config/780603
+display:
+  - platform: rpi_dpi_rgb
+    id: display_lcd
+    dimensions:
+      height: 480
+      width: 800
+    color_order: RGB
+    rotation: 90
+    de_pin: $disp_de_pin
+    hsync_pin: $disp_hsync_pin
+    vsync_pin: $disp_vsync_pin
+    pclk_pin: $disp_pclk_pin
+    pclk_inverted: true
+    pclk_frequency: 14MHz
+    hsync_front_porch: 8
+    hsync_pulse_width: 4
+    hsync_back_porch: 8
+    vsync_front_porch: 8
+    vsync_pulse_width: 4
+    vsync_back_porch: 8
+    data_pins:
+      red: [ $disp_r1_pin, $disp_r2_pin, $disp_r3_pin, $disp_r4_pin, $disp_r5_pin ]
+      green: [ $disp_g1_pin, $disp_g2_pin, $disp_g3_pin, $disp_g4_pin, $disp_g5_pin, $disp_g6_pin ]
+      blue: [ $disp_b1_pin, $disp_b2_pin, $disp_b3_pin, $disp_b4_pin, $disp_b5_pin ]
+    update_interval: never
+    auto_clear_enabled: false
+
+touchscreen:
+  - platform: gt911
+    i2c_id: i2c_internal
+    address: 0x5D
+    id: touchscreen_gt911
+    update_interval: 16ms

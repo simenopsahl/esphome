@@ -25,6 +25,8 @@ esphome:
 esp32:
   board: m5stack-stamps3
   variant: esp32s3
+  framework:
+    type: esp-idf
 
 wifi:
   enable_btm: true
@@ -303,51 +305,20 @@ script:
           id: rgb_led
           effect: "Slow Blink"
 
-# display:
-#   - platform: waveshare_epaper
-#     id: display_eink
-#     model: 1.54inv2
-#     cs_pin: $disp_cs_pin
-#     dc_pin: $disp_dc_pin
-#     reset_pin: $disp_rst_pin
-#     busy_pin:
-#       number: $disp_busy_pin
-#       inverted: false
-#     full_update_every: 6
-#     reset_duration: 2ms
-#     update_interval: never
-#     lambda: |-
-#       auto now = id(sntp_time).now().strftime("%I:%M%p %m/%d/%y").c_str();
-#       it.printf(it.get_width()/2, 0, id(f16), TextAlign::TOP_CENTER, "${location} @ %s", now);
-
-#       it.print(0, 23, id(f24), TextAlign::TOP_LEFT, "PM 1: ");
-#       it.print(0, 48, id(f24), TextAlign::TOP_LEFT, "PM 2.5: ");
-#       it.print(0, 73, id(f24), TextAlign::TOP_LEFT, "PM 4: ");
-#       it.print(0, 98, id(f24), TextAlign::TOP_LEFT, "PM 10: ");
-#       it.print(0, 123, id(f24), TextAlign::TOP_LEFT, "CO2: ");
-#       it.print(0, 148, id(f24), TextAlign::TOP_LEFT, "VOC: ");
-#       it.print(0, 173, id(f24), TextAlign::TOP_LEFT, "NOx: ");
-
-#       it.printf(it.get_width() - 50, 23, id(f24), TextAlign::TOP_RIGHT, "%.1f", id(PM1_0).state);
-#       it.print(it.get_width(), 23, id(f18), TextAlign::TOP_RIGHT, "µg/m³");
-
-#       it.printf(it.get_width() - 50, 48, id(f24), TextAlign::TOP_RIGHT, "%.1f", id(PM2_5).state);
-#       it.print(it.get_width(), 48, id(f18), TextAlign::TOP_RIGHT, "µg/m³");
-
-#       it.printf(it.get_width() - 50, 73, id(f24), TextAlign::TOP_RIGHT, "%.1f", id(PM4_0).state);
-#       it.print(it.get_width(), 73, id(f18), TextAlign::TOP_RIGHT, "µg/m³");
-
-#       it.printf(it.get_width() - 50, 98, id(f24), TextAlign::TOP_RIGHT, "%.1f", id(PM10_0).state);
-#       it.print(it.get_width(), 98, id(f18), TextAlign::TOP_RIGHT, "µg/m³");
-
-#       it.printf(it.get_width() - 50, 123, id(f24), TextAlign::TOP_RIGHT, "%.0f", id(CO2).state);
-#       it.print(it.get_width(), 123, id(f18), TextAlign::TOP_RIGHT, "ppm");
-
-#       it.printf(it.get_width() - 50, 148, id(f24), TextAlign::TOP_RIGHT, "%.0f", id(voc).state);
-#       it.print(it.get_width(), 148, id(f18), TextAlign::TOP_RIGHT, "ppb");
-
-#       it.printf(it.get_width() - 50, 173, id(f24), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
-#       it.print(it.get_width(), 173, id(f18), TextAlign::TOP_RIGHT, "ppb");
+display:
+  # 200 x 200 resolution
+  - platform: waveshare_epaper
+    id: display_eink
+    model: 1.54inv2
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_rst_pin
+    busy_pin:
+      number: $disp_busy_pin
+      inverted: false
+    full_update_every: 1
+#    reset_duration: 2ms
+    update_interval: never
 
 sensor:
   - platform: scd4x

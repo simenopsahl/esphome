@@ -24,6 +24,12 @@ esphome:
 
 esp32:
   board: m5stack-coreink
+  framework:
+    type: esp-idf
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 spi:
   clk_pin: $spi_clk_pin
@@ -291,19 +297,18 @@ sensor:
 #      number: $power_mos_pin
 #      allow_other_uses: true
 
-#display:
+display:
   # 200 x 200 resolution
-#  - platform: waveshare_epaper
-#    model: 1.54inv2
-#    id: display_eink
-#    cs_pin: $disp_cs_pin
-#    dc_pin: $disp_dc_pin
-#    busy_pin:
-#      number: $disp_busy_pin
-#      inverted: false
-#    reset_pin: $disp_reset_pin
-#    full_update_every: 1
+  - platform: waveshare_epaper
+    id: display_eink
+    model: 1.54inv2
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
+    busy_pin:
+      number: $disp_busy_pin
+      inverted: false
+    full_update_every: 1
 #    reset_duration: 2ms
-#    update_interval: 15min
-#    rotation: 90
-#    pages:
+    update_interval: never
+    rotation: 90

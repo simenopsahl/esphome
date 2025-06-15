@@ -1,0 +1,89 @@
+packages:
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+  board: !include board/m5stack_core_s3se.yaml
+#  base_m5go: !include board/module/base_m5go_bottom.yaml
+  colors: !include gui/modular/themes/colors_night_owl.yaml
+  lvgl: !include gui/modular/240x320.yaml
+
+  room_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.etg2_simen_temperature
+  }}
+  house_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+    uid: house_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+substitutions:
+  devicename: m5s-c3se-3e3740
+  log_level: INFO
+  home_page: page_analog_clock
+
+esphome:
+  comment: 'M5Stack Core3 SE'
+  name: $devicename
+  friendly_name: $devicename
+  project:
+    version: "1.0.0"
+
+light:
+  - id: !extend backlight_light
+    on_state:
+      - lvgl.slider.update:
+          id: backlight_slider
+          value: !lambda return (int(id(backlight_light).remote_values.get_brightness() * 100));
+      - lvgl.label.update:
+          id: backlight_label
+          text:
+            format: "%d %%"
+            args: [ '(int(id(backlight_light).remote_values.get_brightness() * 100))' ]
+
+lvgl:
+  pages:
+    - id: page_screen
+      pad_top: 34
+      pad_bottom: 34
+      on_load:
+        - lvgl.label.update:
+            id: page_title
+            text: Skjerm
+      <<: !include
+        file: gui/modular/sections/swipe_navigation.yaml
+      widgets:
+        - obj:
+            pad_all: 1
+            align: CENTER
+            height: 100%
+            width: 100%
+            widgets:
+              - button:
+                  id: backlight_button
+                  align: top_left
+                  checkable: true
+                  widgets:
+                    - label:
+                        align: center
+                        text: Backlight
+                  on_click:
+                    then:
+                      - light.control:
+                          id: backlight_light
+                          state: on
+                          brightness: 10%
+              - label:
+                  id: backlight_label
+                  align: bottom_left
+                  text: "?"
+              - slider:
+                  id: backlight_slider
+                  align: right_mid
+                  x: -5
+                  height: 70%
+                  width: 30
+                  on_release:
+                    then:
+                      - light.control:
+                          id: backlight_light
+                          state: on
+                          brightness: !lambda return int(x);

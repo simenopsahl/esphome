@@ -1,25 +1,42 @@
 ---
 # Display auto off
 
-# extend time component
-time:
-  - platform: homeassistant
-    id: !extend time_homeassistant
-    on_time:
-      - hours: 2,3,4,5
-        minutes: 5
-        seconds: 0
-        then:
-          - if:
-              condition:
-                - switch.is_on: display_auto
-              then:
-                - switch.turn_on: switch_antiburn
-      - hours: 2,3,4,5
-        minutes: 35
-        seconds: 0
-        then:
-          - switch.turn_off: switch_antiburn
+# extend does not work in package
+#time:
+#  - id: !extend time_homeassistant
+#    on_time_sync:
+#      - lvgl.label.update:
+#          id: nav_clock
+#          text:
+#            time_format: "%H:%M"
+#            time: time_homeassistant
+#      - script.execute: time_update
+#    on_time:
+#      - minutes: '*'
+#        seconds: 0
+#        then:
+#          - lvgl.label.update:
+#              id: nav_clock
+#              text:
+#                time_format: "%H:%M"
+#                time: time_homeassistant
+#          - script.execute: time_update
+
+#      - hours: 2,3,4,5
+#        minutes: 5
+#        seconds: 0
+#        then:
+#          - if:
+#              condition:
+#                - switch.is_on: display_auto
+#              then:
+#                - switch.turn_on: switch_antiburn
+
+#      - hours: 2,3,4,5
+#        minutes: 35
+#        seconds: 0
+#        then:
+#          - switch.turn_off: switch_antiburn
 
 switch:
   # Switch to turn on/off the display auto off feature

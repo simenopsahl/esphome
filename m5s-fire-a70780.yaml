@@ -3,27 +3,23 @@ packages:
 #  <<: !include_dir_named bluetooth
   board: !include board/m5stack_fire.yaml
   grove_i2c: !include board/extension/grove_i2c.yaml
-#  alt_uart: !include board/extension/alt_uart.yaml
-  grove_uart: !include board/extension/grove_uart.yaml
-  air_quality: !include board/module/module_air_quality.yaml
-  base_btc: !include board/module/base_btc.yaml
-  env_iv: !include board/module/unit_env_iv.yaml
-  co2: !include board/module/unit_co2.yaml
-  theme: !include gui/lvgl/theme_night_owl_dark.yaml
-  color: !include gui/colors_night_owl.yaml
-  boot_screen: !include gui/lvgl/top_layer_boot_screen.yaml
-  auto_display: !include gui/lvgl/control_auto_display.yaml
-  clock_page: !include gui/lvgl/page_clock.yaml
-  status_page: !include gui/lvgl/page_status.yaml
+  colors: !include gui/modular/themes/colors_night_owl.yaml
+  lvgl: !include gui/modular/240x320.yaml
+
+  room_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
 
 substitutions:
   devicename: m5s-fire-a70780
   location: "2etg, Stue"
+  base_btc_i2c_bus: i2c_grove
   i2c_internal_frequency: 50kHz
   i2c_grove_frequency: 50kHz
 #  module_air_quality_uart_bus: uart_alt
   log_level: WARN
-  default_font: f20
+  home_page: page_temperature
 
 esphome:
   comment: "M5Stack Fire @ Stue"
@@ -31,359 +27,33 @@ esphome:
   friendly_name: $devicename
   area: $location
 
-esp32:
-  framework:
-    type: esp-idf
-
-api:
-  on_client_connected:
-    then:
-      - lvgl.widget.show: img_hastatus
-  on_client_disconnected:
-    then:
-      - lvgl.widget.hide: img_hastatus
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
-  on_connect:
-    then:
-      - lvgl.widget.show: img_wifistatus
-  on_disconnect:
-    then:
-      - lvgl.widget.hide: img_wifistatus
-
 lvgl:
-  log_level: WARN
-  color_depth: 16
   buffer_size: 25%
-
-  disp_bg_color: 0x000000
-  bg_color: 0x000000
-  default_font: $default_font
-
-  top_layer:
-    widgets:
-      # Status icons
-      - image:
-          id: img_wifistatus
-          align: bottom_left
-          y: -2
-          x: 2
-          hidden: true
-          src: i_wifi
-          image_recolor: c_green
-          image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-      - image:
-          id: img_hastatus
-          align: bottom_right
-          y: -2
-          x: -2
-          hidden: true
-          src: i_api
-          image_recolor: 0x00daff
-          image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-      # Footer icons
-      - obj:
-          align: BOTTOM_MID
-          width: 100%
-          height: 30
-          pad_all: 0
-          bg_color: 0x000000
-          bg_opa: TRANSP
-          layout: # enable the GRID layout for the children widgets
-            type: GRID # split the rows and the columns proportionally
-            grid_columns: [FR(1), FR(2), FR(3), FR(2), FR(1)]
-            grid_rows: [FR(1)]
-          widgets:
-            - image:
-                id: img_prev
-                grid_cell_column_pos: 1 # place the widget in
-                grid_cell_row_pos: 0 # the corresponding cell
-                grid_cell_x_align: center
-                grid_cell_y_align: end
-                src: i_prev
-                image_recolor: c_text_s
-                image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-            - image:
-                id: img_next
-                grid_cell_column_pos: 3
-                grid_cell_row_pos: 0
-                grid_cell_x_align: center
-                grid_cell_y_align: end
-                src: i_next
-                image_recolor: c_text_s
-                image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
+  encoders:
+    enter_button: btn_b
+    sensor:
+      left_button: btn_a
+      right_button: btn_c
   pages:
-    - id: home_page
-      widgets:
-        - obj:
-            align: BOTTOM_MID
-            styles: header_footer
-            bg_color: c_bg_p
-            bg_opa: COVER
-            widgets:
-              - image:
-                  src: i_temp_s
-                  align: bottom_mid
-                  y: -2
-                  image_recolor: c_text_p
-                  image_recolor_opa: 100%
-        - obj:
-            align: TOP_MID
-            width: 100%
-            height: 210
-            pad_all: 6
-            #pad_row: 6
-            #pad_column: 6
-            bg_color: 0x000000
-            border_opa: TRANSP
-            layout:
-              type: GRID
-              grid_columns: [FR(1), FR(2), FR(1)]
-              grid_rows: [FR(20), FR(80)]
-            widgets:
-              - label:
-                  id: graph_temp_room
-                  text: "?"
-                  grid_cell_column_pos: 0
-                  grid_cell_column_span: 3
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-              - image:
-                  src: i_temp_l
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  image_recolor: c_text_s
-                  image_recolor_opa: 100%
-              - label:
-                  id: lbl_temp_room_value
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: center
-                  grid_cell_y_align: center
-                  text_font: f100b
-                  text_color: c_text_p
-              - label:
-                  id: lbl_temp_room_unit
-                  text: "°C"
-                  grid_cell_column_pos: 2
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f32b
-                  text_color: c_text_s
-
-    - id: airq_page
-      widgets:
-        - obj:
-            align: BOTTOM_MID
-            styles: header_footer
-            bg_color: c_bg_p
-            bg_opa: COVER
-            widgets:
-              - image:
-                  src: i_airq
-                  align: bottom_mid
-                  y: -2
-                  image_recolor: c_text_p
-                  image_recolor_opa: 100%
-        - obj:
-            align: TOP_MID
-            width: 100%
-            height: 210
-            pad_all: 6
-            #pad_row: 6
-            #pad_column: 6
-            bg_color: 0x000000
-            border_opa: TRANSP
-            layout:
-              type: GRID
-              grid_columns: [FR(4), FR(3), FR(2)]
-              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
-            widgets:
-              - label:
-                  id: lbl_temp_local_l
-                  text: "Temperatur: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  text_font: f18
-                  text_color: c_text_s
-              - label:
-                  id: lbl_temp_local_value
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f24b
-                  text_color: c_text_p
-              - label:
-                  id: lbl_temp_local_unit
-                  text: "°C"
-                  grid_cell_column_pos: 2
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f20
-                  text_color: c_text_s
-
-              - label:
-                  id: lbl_co2_l
-                  text: "Karbondioksid: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  text_font: f18
-                  text_color: c_text_s
-              - label:
-                  id: lbl_co2_value
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f24b
-                  text_color: c_text_p
-              - label:
-                  id: lbl_co2_unit
-                  text: "ppm"
-                  grid_cell_column_pos: 2
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f20
-                  text_color: c_text_s
-
-              - label:
-                  id: lbl_pm1_l
-                  text: "Svevestøv 1.0: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  text_font: f18
-                  text_color: c_text_s
-              - label:
-                  id: lbl_pm1_value
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f24b
-                  text_color: c_text_p
-              - label:
-                  id: lbl_pm1_unit
-                  text: "µg/m³"
-                  grid_cell_column_pos: 2
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f20
-                  text_color: c_text_s
-
-              - label:
-                  id: lbl_pm25_l
-                  text: "Svevestøv 2.5: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  text_font: f18
-                  text_color: c_text_s
-              - label:
-                  id: lbl_pm25_value
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f24b
-                  text_color: c_text_p
-              - label:
-                  id: lbl_pm25_unit
-                  text: "µg/m³"
-                  grid_cell_column_pos: 2
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f20
-                  text_color: c_text_s
-
-              - label:
-                  id: lbl_pm10_l
-                  text: "Svevestøv 10.0: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: start
-                  grid_cell_y_align: center
-                  text_font: f18
-                  text_color: c_text_s
-              - label:
-                  id: lbl_pm10_value
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f24b
-                  text_color: c_text_p
-              - label:
-                  id: lbl_pm10_unit
-                  text: "µg/m³"
-                  grid_cell_column_pos: 2
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: end
-                  grid_cell_y_align: center
-                  text_align: right
-                  text_font: f20
-                  text_color: c_text_s
-
     - id: power_page
+      pad_top: 34
+      pad_bottom: 34
+      on_load:
+        - lvgl.label.update:
+            id: page_title
+            text: Skjerm
+      <<: !include
+        file: gui/modular/sections/swipe_navigation.yaml
       widgets:
         - obj:
-            align: BOTTOM_MID
-            styles: header_footer
-            bg_color: c_bg_p
-            bg_opa: COVER
-            widgets:
-              - image:
-                  src: i_power
-                  align: bottom_mid
-                  y: -2
-                  image_recolor: c_text_p
-                  image_recolor_opa: 100%
-        - obj:
-            align: TOP_MID
-            width: 320
-            height: 210
-            pad_all: 5
-            #pad_row: 6
-            #pad_column: 6
-            bg_color: 0x000000
-            border_opa: TRANSP
+            pad_all: 1
+            align: CENTER
+            height: 100%
+            width: 100%
             layout:
               type: GRID
               grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
-              grid_rows: [FR(18), FR(168), FR(14)]
+              grid_rows: [FR(18), FR(136), FR(14)]
             widgets:
               - label:
                   id: lbl_nordpool_price_0
@@ -393,7 +63,7 @@ lvgl:
                   grid_cell_x_align: start
                   grid_cell_y_align: center
                   text_align: left
-                  text_font: f18
+                  text_font: font_md
                   text_color: c_text_p
               - label:
                   id: lbl_nordpool_time_0
@@ -403,7 +73,7 @@ lvgl:
                   grid_cell_x_align: start
                   grid_cell_y_align: center
                   text_align: left
-                  text_font: f14
+                  text_font: font_sm
                   text_color: c_text_s
 
               - label:
@@ -414,7 +84,7 @@ lvgl:
                   grid_cell_x_align: center
                   grid_cell_y_align: center
                   text_align: center
-                  text_font: f18
+                  text_font: font_md
                   text_color: c_text_p
               - label:
                   id: lbl_nordpool_time_4
@@ -424,7 +94,7 @@ lvgl:
                   grid_cell_x_align: center
                   grid_cell_y_align: center
                   text_align: center
-                  text_font: f14
+                  text_font: font_sm
                   text_color: c_text_s
 
               - label:
@@ -435,7 +105,7 @@ lvgl:
                   grid_cell_x_align: end
                   grid_cell_y_align: center
                   text_align: right
-                  text_font: f18
+                  text_font: font_md
                   text_color: c_text_p
               - label:
                   id: lbl_nordpool_time_8
@@ -445,7 +115,7 @@ lvgl:
                   grid_cell_x_align: end
                   grid_cell_y_align: center
                   text_align: right
-                  text_font: f14
+                  text_font: font_sm
                   text_color: c_text_s
 
               - bar:
@@ -570,106 +240,6 @@ binary_sensor:
         - script.execute: display_on_off
 
 sensor:
-  # Combine sensors
-  - platform: combination
-    type: median
-    id: temperature_local
-    name: "Temperature"
-    device_class: "temperature"
-    state_class: "measurement"
-    sources:
-      # ENV III / Base BTC
-      - source: temperature_sht30_base_btc
-#      - source: temperature_qmp6988
-      # ENV IV
-      - source: temperature_bmp280_unit_env
-      - source: temperature_sht40_unit_env
-      # CO2
-      - source: temperature_scd40_unit_co2
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15
-    on_value: 
-      then:
-        - lvgl.label.update:
-            id: lbl_temp_local_value
-            text:
-              format: "%.1f"
-              args: [ 'x' ]
-
-  - platform: combination
-    type: median
-    id: humidity_local
-    name: "Humidity"
-    device_class: "humidity"
-    state_class: "measurement"
-    sources:
-      # ENV III
-      - source: humidity_sht30_base_btc
-      # ENV IV
-      - source: humidity_sht40_unit_env
-      # CO2
-      - source: humidity_scd40_unit_co2
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15
-
-  # Copy sensors to update lvgl
-  - platform: copy
-    source_id: co2_scd40_unit_co2
-    id: co2_scd40_unit_co2_copy
-    on_value: 
-      then:
-        - lvgl.label.update:
-            id: lbl_co2_value
-            text:
-              format: "%.0f"
-              args: [ 'x' ]
-  - platform: copy
-    source_id: pm1_pmsa003
-    id: pm1_pmsa003_copy
-    on_value: 
-      then:
-        - lvgl.label.update:
-            id: lbl_pm1_value
-            text:
-              format: "%.1f"
-              args: [ 'x' ]
-  - platform: copy
-    source_id: pm_25_pmsa003
-    id: pm_25_pmsa003_copy
-    on_value: 
-      then:
-        - lvgl.label.update:
-            id: lbl_pm25_value
-            text:
-              format: "%.1f"
-              args: [ 'x' ]
-  - platform: copy
-    source_id: pm_10_pmsa003
-    id: pm_10_pmsa003_copy
-    on_value: 
-      then:
-        - lvgl.label.update:
-            id: lbl_pm10_value
-            text:
-              format: "%.1f"
-              args: [ 'x' ]
-
-  # Call sensors from HA.
-  - platform: homeassistant
-    entity_id: sensor.etg2_stue_tc_heatindex
-    id: temperature_feels_like
-    on_value: 
-      then:
-        - lvgl.label.update:
-            id: lbl_temp_room_value
-            text:
-              format: "%.1f"
-              args: [ 'x' ]
-
 #  - platform: homeassistant
 #    entity_id: sensor.waveshare_nordpool_future_offset
 #    id: nordpool_sensor
@@ -855,232 +425,3 @@ text_sensor:
         - lvgl.label.update:
             id: lbl_nordpool_time_8
             text: !lambda return id(nordpool_time_8).state;
-
-graph:
-#  - id: graph_nordpool
-#    duration: 9h
-#    border: false
-#    x_grid: 1h
-#    y_grid: 10.0
-#    width: 320
-#    height: 150
-#    traces:
-#      - sensor: nordpool_sensor
-#        line_thickness: 20
-#        color: c_green
-  - id: graph_temperature_room
-    duration: 8h
-#    x_grid: 15min
-#    y_grid: 1.0
-    width: 320
-    height: 70
-    border: false
-    traces:
-      - sensor: temperature_feels_like
-        line_thickness: 10
-        color: c_blue
-        continuous: true
-
-font:
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f14
-    size: 14
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/', 'µ', '³',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-    extras:
-      - file: "gui/fonts/materialdesignicons-webfont.ttf"
-        glyphs: [
-          "\U000F05A9", # mdi:wifi
-          "\U000F07D0", # mdi:home-assistant
-          "\U000F0D43", # mdi:air-filter
-          "\U000F050F", # mdi:thermometer
-          "\U000F07E4", # mdi:molecule-co2
-          "\U000F013B" # mdi:chemical-weapon
-        ]
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f14b
-    size: 14
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f16
-    size: 16
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f16b
-    size: 16
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f18b
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f20
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f20b
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f24
-    size: 24
-    glyphs: *norwegian-glyphs
-    extras:
-      - file: "gui/fonts/materialdesignicons-webfont.ttf"
-        glyphs: [
-          "\U000F05A9", # mdi:wifi
-          "\U000F07D0" # mdi:home-assistant
-        ]
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f24b
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f32
-    size: 32
-    glyphs: *norwegian-glyphs
-    extras:
-      - file: "gui/fonts/materialdesignicons-webfont.ttf"
-        glyphs: [
-          "\U000F050F", # mdi:thermometer
-          "\U000F07E4", # mdi:molecule-co2
-          "\U000F013B" # mdi:chemical-weapon
-        ]
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f32b
-    size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f60
-    size: 60
-    glyphs: *norwegian-glyphs
-    extras:
-      - file: "gui/fonts/materialdesignicons-webfont.ttf"
-        glyphs: [
-          "\U000F050F", # mdi:thermometer
-          "\U000F02DC", # mdi:home
-          "\U000F0D43", # mdi:air-filter
-          "\U000F1B5A", # mdi:weather-dust
-          "\U000F140B" # mdi:lightning-bolt
-        ]
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f60b
-    size: 60
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f100b
-    size: 100
-    glyphs: *norwegian-glyphs
-
-image:
-  - id: i_wifi
-    file: mdi:wifi
-    type: binary
-    resize: 26x26
-  - id: i_api
-    file: mdi:home-assistant
-    type: binary
-    resize: 26x26
-
-  - id: i_prev
-    file: mdi:arrow-left-thick
-    type: binary
-    resize: 26x26
-  - id: i_next
-    file: mdi:arrow-right-thick
-    type: binary
-    resize: 26x26
-  - id: i_home
-    file: mdi:home
-    type: binary
-    resize: 26x26
-  - id: i_airq
-    file: mdi:weather-dust
-    type: binary
-    resize: 26x26
-  - id: i_power
-    file: mdi:lightning-bolt
-    type: binary
-    resize: 26x26
-  - id: i_temp_s
-    file: mdi:thermometer
-    type: binary
-    resize: 26x26
-  - id: i_information
-    file: mdi:information
-    type: binary
-    resize: 26x26
-#  - id: i_co2
-#    file: mdi:molecule-co2
-#    type: binary
-#    resize: 28x28
-  - id: i_pm1
-    file: mdi:grain
-    type: binary
-    resize: 26x26
-  - id: i_pm25
-    file: mdi:chemical-weapon
-    type: binary
-    resize: 26x26
-  - id: i_pm10
-    file: mdi:molecule
-    type: binary
-    resize: 26x26
-
-  - id: i_temp_l
-    file: mdi:thermometer
-    type: binary
-    resize: 32x32

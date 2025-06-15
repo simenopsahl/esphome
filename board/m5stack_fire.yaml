@@ -28,6 +28,8 @@ esphome:
 esp32:
   board: m5stack-fire
   flash_size: 16MB
+  framework:
+    type: esp-idf
 
 wifi:
   enable_btm: true
@@ -64,7 +66,7 @@ display:
     # Rotate 180deg
 #    transform:
 #      mirror_x: true
-#      mirror_y: true      it.print(80, 0, id(roboto), Color(255, 255, 255), TextAlign::TOP_CENTER, "M5Stack Fire Test");
+#      mirror_y: true
 
 output:
   # backlight output
@@ -115,9 +117,6 @@ binary_sensor:
       then:
         - logger.log: Button A Pressed
         - script.execute: buzzer_beep
-        - lvgl.page.next:
-            animation: FADE_OUT
-            time: 100ms
     on_release:
       then:
         - output.turn_off: buzzer
@@ -135,9 +134,6 @@ binary_sensor:
       then:
         - logger.log: Button B Pressed
         - script.execute: buzzer_beep
-        - lvgl.page.show:
-            id: home_page
-            time: 100ms
     on_release:
       then:
         - output.turn_off: buzzer
@@ -155,9 +151,6 @@ binary_sensor:
       then:
         - logger.log: Button C Pressed
         - script.execute: buzzer_beep
-        - lvgl.page.next:
-            animation: FADE_IN
-            time: 100ms
     on_release:
       then:
         - output.turn_off: buzzer

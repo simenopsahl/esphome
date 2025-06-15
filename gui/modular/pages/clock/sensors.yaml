@@ -2,16 +2,17 @@
 # https://esphome.io/cookbook/lvgl#an-analog-clock
 # LVGL analog clock
 
-time:
+# in widgets/header/sensors.yaml
+#time:
 # extend time component
-  - id: !extend time_homeassistant
-    on_time_sync:
-      - script.execute: time_update
-    on_time:
-      - minutes: '*'
-        seconds: 0
-        then:
-          - script.execute: time_update
+#  - id: !extend time_homeassistant
+#    on_time_sync:
+#      - script.execute: time_update
+#    on_time:
+#      - minutes: '*'
+#        seconds: 0
+#        then:
+#          - script.execute: time_update
 
 # clock update script
 script:

@@ -45,28 +45,9 @@ esphome:
         - display.page.show: page_info
         - script.execute: update_screen
 
-esp32:
-  framework:
-    type: esp-idf
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
-
 display:
   # 200 x 200 resolution
-  - platform: waveshare_epaper
-    id: display_eink
-    model: 1.54inv2
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_rst_pin
-    busy_pin:
-      number: $disp_busy_pin
-      inverted: false
-    full_update_every: 1
-#    reset_duration: 2ms
-    update_interval: never
+  - id: !extend display_eink
     pages:
       - id: page_local
         lambda: |-

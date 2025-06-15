@@ -1,0 +1,81 @@
+---
+# https://docs.m5stack.com/en/base/m5go_bottom
+# https://esphome.io/components/sensor/sht3xd.html
+
+substitutions:
+  m5go_port_b_in: $mbus4
+  m5go_port_b_out: $mbus10
+  m5go_port_c_rx: $mbus15
+  m5go_port_c_tx: $mbus16
+  m5go_pogo_sda: $mbus17
+  m5go_pogo_scl: $mbus18
+  m5go_ir_tx: $mbus22
+  m5go_rgb_led: $mbus23
+  m5go_mic: $mbus26
+
+# RGB SK6812-2020
+light:
+  - platform: esp32_rmt_led_strip
+    id: rgb_led_m5go
+    rgb_order: GRB
+    pin: $m5go_rgb_led
+    num_leds: 10
+    # RMT 0 channels will be occupied by IR
+#    rmt_channel: 1
+    rmt_symbols: 384
+    chipset: sk6812
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 500ms on, 2000ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+#      - addressable_flicker:
+#      - addressable_rainbow:
+#      - addressable_color_wipe:
+#      - addressable_scan:
+#      - addressable_twinkle:
+    default_transition_length: 100ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "m5go LED"
+    entity_category: config
+#  - platform: partition
+#    id: led1
+#    segments: 
+#      id: led
+#      from: 0
+#      to: 1
+#  - platform: partition
+#    id: led2
+#    segments: 
+#      id: led
+#      from: 1
+#      to: 1
+#  - platform: partition
+#    id: led3
+#    segments: 
+#      id: led
+#      from: 2
+#      to: 2
+#  - platform: partition
+#    id: led4
+#    segments: 
+#      id: led
+#      from: 2
+#      to: 3

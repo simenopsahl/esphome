@@ -1,0 +1,11 @@
+# required vars:
+# - uid
+# - text
+# - text_font
+# - align
+
+# label:
+  id: ${uid}_widget_text
+  text: ${text}
+  text_font: ${text_font}
+  text_align: ${align}

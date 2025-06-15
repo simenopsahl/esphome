@@ -1,0 +1,32 @@
+---
+# https://docs.m5stack.com/en/module/DualKmeter%20Module13.2
+# https://esphome.io/components/sensor/pmsx003.html
+# https://github.com/Chill-Division/M5Stack-ESPHome/
+
+substitutions:
+  kmeteriso_i2c_bus: i2c_grove
+
+# UNIT KMeterISO
+sensor:
+  - platform: kmeteriso
+    i2c_id: $kmeteriso_i2c_bus
+    id: kmeteriso_sensor
+    temperature:
+      id: temperature_kmeteriso
+      name: "Temperature KMeterISO"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 6
+    internal_temperature:
+      id: temperature_kmeteriso_internal
+      name: "Temperature KMeterISO Internal"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 6
+    update_interval: 5s

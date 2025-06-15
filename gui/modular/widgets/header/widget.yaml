@@ -3,35 +3,61 @@
 # - padding
 
 obj: # title bar
-    id: titlebar
-    width: 100%
-    height: ${height}
-    border_width: 0
-    radius: 0
-    pad_all: 0
-    align: TOP_MID
-    widgets:
-        - label: # wifi
-            id: lbl_wifi_status
-            align: LEFT_MID
-            hidden: true
-            text: "\U000F05A9" # wifi
-            text_font: icons_lg
-            text_color: c_green
-        - label: # title
-            id: page_title
-            align: LEFT_MID
-            x: ${padding} # RESOLUTION-SPECIFIC
-            text: " "
-        - label: # clock
-            id: nav_clock
-            align: RIGHT_MID
-            x: -${padding} # RESOLUTION-SPECIFIC
-            text: " "
-        - label: # HA_status
-            id: lbl_ha_status
-            align: RIGHT_MID
-            hidden: true
-            text: "\U000F07D0" # home-assistant
-            text_font: icons_lg
-            text_color: 0x00daff
+  id: titlebar
+  width: 100%
+  height: ${height}
+  border_width: 0
+  radius: 0
+  pad_all: 0
+  bg_color: c_black
+  bg_opa: COVER
+  align: TOP_MID
+  layout:
+    type: GRID
+    grid_rows: [ content ]
+    grid_columns: [fr(1), fr(3), fr(3), fr(1)]
+    pad_column: 1
+  widgets:
+    - label: # wifi
+        id: lbl_wifi_status
+        align: LEFT_MID
+        hidden: true
+        text: "\U000F05A9" # wifi
+        text_font: mdi_lg
+        text_color: c_green
+        text_align: LEFT
+        grid_cell_row_pos: 0
+        grid_cell_column_pos: 0
+        grid_cell_x_align: start
+        grid_cell_y_align: center
+    - label: # title
+        id: page_title
+        align: LEFT_MID
+        x: ${padding} # RESOLUTION-SPECIFIC
+        text: " "
+        grid_cell_row_pos: 0
+        grid_cell_column_pos: 1
+        grid_cell_x_align: start
+        grid_cell_y_align: center
+    - label: # clock
+        id: nav_clock
+        align: RIGHT_MID
+        text_align: RIGHT
+        x: -${padding} # RESOLUTION-SPECIFIC
+        text: " "
+        grid_cell_row_pos: 0
+        grid_cell_column_pos: 2
+        grid_cell_x_align: end
+        grid_cell_y_align: center
+    - label: # HA_status
+        id: lbl_ha_status
+        align: RIGHT_MID
+        hidden: true
+        text: "\U000F07D0" # home-assistant
+        text_font: mdi_lg
+        text_color: c_ha_icon
+        text_align: RIGHT
+        grid_cell_row_pos: 0
+        grid_cell_column_pos: 3
+        grid_cell_x_align: end
+        grid_cell_y_align: center

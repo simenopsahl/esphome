@@ -5,6 +5,13 @@
       family: Noto Sans Display
     size: ${text_sm}
     bpp: 4
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', '!', '#', '$', '&', '(', ')',
+      '*', '+', '=', '<', '>', '[', ']', '\', '|', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
 
   - id: font_md
     file:
@@ -12,6 +19,7 @@
       family: Noto Sans Display
     size: ${text_md}
     bpp: 4
+    glyphs: *norwegian-glyphs
 
   - id: font_lg
     file:
@@ -19,6 +27,7 @@
       family: Noto Sans Display
     size: ${text_lg}
     bpp: 4
+    glyphs: *norwegian-glyphs
 
   - id: font_xl
     file:
@@ -26,6 +35,7 @@
       family: Noto Sans Display
     size: ${text_xl}
     bpp: 4
+    glyphs: *norwegian-glyphs
 
   - id: font_xxl
     file:
@@ -33,6 +43,25 @@
       family: Noto Sans Display
     size: ${text_xxl}
     bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_hg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    size: ${text_hg}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_fl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    size: ${text_fl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
 
   - id: mdi_sm
     file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf

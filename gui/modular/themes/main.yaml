@@ -1,18 +1,63 @@
 obj:
-  bg_color: 0x42495A
-  text_color: 0xFFFFFF
-button:
-  bg_color: 0x5A6173
   border_width: 0
-  border_color: 0x00B6FF
+  bg_color: c_bg_p
+  bg_opa: TRANSP
+  text_color: c_text_p
+  scrollable: false
+label:
+  border_width: 0
+  scrollable: false
+image:
+  border_width: 0
+  scrollable: false
+bar:
+  bg_color: c_bg_s
+  indicator:
+    bg_color: c_pink
+button:
+  bg_color: c_bg_s
+  border_width: 1
+  border_color: c_bg_p
+  text_color: c_text_p
   radius: 20
   shadow_width: 0
-bar:
-  bg_color: 0x111111
-  text_color: 0xFFFFFF
+  pressed: # set some button colors to be different in pressed state
+    bg_color: c_dark_gray
+  checked: # set some button colors to be different in checked state
+    bg_color: c_dark_gray
+    text_color: c_purple
 dropdown:
-  bg_color: 0x5A6173
-  text_color: 0xFFFFFF
-  border_color: 0x00B6FF
+  bg_color: c_dark_gray
+  text_color: c_text_p
+  border_color: c_blue
   border_width: 1
   shadow_width: 0
+slider:
+  border_width: 1
+  border_opa: 15%
+  bg_color: c_gray
+  bg_opa: 25%
+  indicator:
+    bg_color: c_pink
+    bg_opa: COVER
+  knob:
+    bg_color: c_pink
+    bg_opa: COVER
+    border_color: c_pink2
+    border_width: 1
+    text_color: c_text_p
+switch:
+  bg_color: c_gray
+  bg_grad_color: c_dark_gray
+  bg_grad_dir: VER
+  bg_opa: 80%
+  checked:
+    bg_color: c_pink
+    bg_grad_color: c_pink2
+    bg_grad_dir: VER
+    bg_opa: COVER
+  knob:
+    bg_color: c_text_s
+    bg_opa: COVER
+    checked:
+      bg_color: c_text_p

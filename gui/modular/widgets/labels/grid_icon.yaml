@@ -1,0 +1,21 @@
+# required vars:
+# - uid
+# - icon
+# - icon_size
+# - color
+# - align
+# - cell_column_pos
+# - cell_row_pos
+# - cell_x_align
+# - cell_y_align
+
+# label:
+  id: ${uid}_widget_icon
+  text: ${icon}
+  text_font: ${icon_size}
+  text_color: ${color}
+  text_align: ${align}
+  grid_cell_column_pos: ${cell_column_pos}
+  grid_cell_row_pos: ${cell_row_pos}
+  grid_cell_x_align: ${cell_x_align}
+  grid_cell_y_align: ${cell_y_align}

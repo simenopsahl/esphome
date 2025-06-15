@@ -13,10 +13,34 @@ substitutions:
   disp_dc_pin: GPIO35
   card_cs_pin: GPIO4
   # M-Bus
-#  i2c_mbus_sda_pin: GPIO21
-#  i2c_mbus_scl_pin: GPIO22
-  tx_mbus_pin: GPIO43
-  rx_mbus_pin: GPIO44
+  i2c_mbus_sda_pin: GPIO2
+  i2c_mbus_scl_pin: GPIO1
+  tx1_mbus_pin: GPIO43
+  rx1_mbus_pin: GPIO44
+  tx2_mbus_pin: GPIO17
+  rx2_mbus_pin: GPIO18
+  in_mbus_pin: GPIO8
+  out_mbus_pin: GPIO9
+  mbus2: GPIO10
+  mbus4: GPIO8
+  mbus7: GPIO37
+  mbus8: GPIO5
+  mbus9: GPIO35
+  mbus10: GPIO9
+  mbus11: GPIO36
+  mbus13: GPIO44
+  mbus14: GPIO43
+  mbus15: GPIO18
+  mbus16: GPIO17
+  mbus17: GPIO12
+  mbus18: GPIO11
+  mbus19: GPIO2
+  mbus20: GPIO1
+  mbus21: GPIO6
+  mbus22: GPIO7
+  mbus23: GPIO13
+  mbus24: GPIO0
+  mbus26: GPIO14
   # GROVE
   i2c_grove_sda_pin: GPIO2
   i2c_grove_scl_pin: GPIO1
@@ -34,10 +58,13 @@ substitutions:
 #  ir_pin: GPIO19
   # Mic & Speaker
   i2s_lrclk_pin: GPIO33
+  i2s_wck_pin: GPIO33
   i2s_bclk_pin: GPIO34
   i2s_mclk_pin: GPIO0
   i2s_din_pin: GPIO14
+  i2s_dat1_pin: GPIO14
   i2s_dout_pin: GPIO13
+  i2s_dato_pin: GPIO13
   # Power MOS
 #  power_mos_pin: GPIO4
 #  bat_feedback: GPIO38

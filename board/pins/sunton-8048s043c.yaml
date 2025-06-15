@@ -1,0 +1,53 @@
+---
+# PINs for Sunton moduleESP32-S3 with Guition 3.5" display
+
+substitutions:
+# Internal
+  # I2C
+  i2c_int_sda_pin: GPIO19 # 19
+  i2c_int_scl_pin: GPIO20 # 20
+  # Display
+  disp_de_pin: GPIO40 # 40
+  disp_pclk_pin: GPIO42 # 42
+  disp_hsync_pin: GPIO39 # 39
+  disp_vsync_pin: GPIO41 # 41
+#  disp_enable_pin: xx
+#  disp_rst_pin: xx
+  disp_r1_pin: GPIO45 # 45
+  disp_r2_pin: GPIO48 # 48
+  disp_r3_pin: GPIO47 # 47
+  disp_r4_pin: GPIO21 # 21
+  disp_r5_pin: GPIO14 # 14
+  disp_g1_pin: GPIO5 # 5
+  disp_g2_pin: GPIO6 # 6
+  disp_g3_pin: GPIO7 # 7
+  disp_g4_pin: GPIO15 # 15
+  disp_g5_pin: GPIO16 # 16
+  disp_g6_pin: GPIO4 # 4
+  disp_b1_pin: GPIO8 # 8
+  disp_b2_pin: GPIO3 # 3
+  disp_b3_pin: GPIO46 # 46
+  disp_b4_pin: GPIO9 # 9
+  disp_b5_pin: GPIO1 # 1
+
+# Extended IO
+  # P2 HC1.0 4pin
+  p2_hc100_pin3: GPIO17
+  p2_hc100_pin4: GPIO18
+  # P3 JST1.25 4pin
+  p3_jst125_pin1: GPIO17
+  p3_jst125_pin2: GPIO18
+  p3_jst125_pin3: GPIO19
+  p3_jst125_pin4: GPIO20
+  # P4 JST1.25 8pin
+  p4_jst125_1_pin: GPIO19
+  p4_jst125_2_pin: GPIO11
+  p4_jst125_3_pin: GPIO12
+  p4_jst125_4_pin: GPIO13
+
+# Button
+#  boot_pin: GPIO0 # io00
+# LED
+  disp_bl_pin: GPIO2 # 2
+# Power MOS
+#  bat_feedback: GPIO5 # io05

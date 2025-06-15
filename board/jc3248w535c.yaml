@@ -1,5 +1,5 @@
 ---
-# PINs for Sunton moduleESP32-S3 with Guition 3.5" display
+# PINs for Sunton module ESP32-S3 with Guition 3.5" display
 #
 
 # Pins for this model
@@ -8,17 +8,28 @@ packages:
 
 esphome:
   project:
-    name: 'Sunton.Guition 3,5"'
+    name: 'Sunton.3,5" 320x480'
 
 esp32:
   board: esp32s3box
   variant: ESP32S3
   flash_size: 16MB
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: y
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
+      CONFIG_SPIRAM_RODATA: y
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 psram:
   mode: octal
   speed: 80MHz
-
 
 # https://community.home-assistant.io/t/jc3248w535-guition-3-5-config/791363
 spi:
@@ -61,7 +72,7 @@ display:
       number: $disp_cs_pin
       ignore_strapping_warning: true
     draw_from_origin: true
-    update_interval: never
+    update_interval: 5s
     auto_clear_enabled: false
 
 touchscreen:

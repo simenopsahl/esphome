@@ -1,0 +1,100 @@
+---
+# Weather icons
+# https://github.com/manifestinteractive/weather-underground-icons.git
+
+image:
+  - file: gui/img/weather/yr_svg_darkmode/nt_clear.svg
+    id: clear_night_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/cloudy.svg
+    id: cloudy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/tstorms.svg
+    id: exceptional_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/fog.svg
+    id: fog_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/sleet.svg
+    id: hail_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/chancetstorms.svg
+    id: lightning_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/tstorms.svg
+    id: lightning_rainy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/partlycloudy.svg
+    id: partlycloudy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/rain.svg
+    id: pouring_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/chancerain.svg
+    id: rainy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/snow.svg
+    id: snowy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/chancesleet.svg
+    id: snowy_rainy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/sunny.svg
+    id: sunny_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/windy.svg
+    id: windy_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/unknown.svg
+    id: unknown_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel
+
+  - file: gui/img/weather/yr_svg_darkmode/circle-slash.svg
+    id: unavailable_${size}
+    resize: ${size}x${size}
+    type: RGB565
+    transparency: alpha_channel

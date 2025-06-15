@@ -2,10 +2,25 @@ packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
   board: !include board/jc3248w535c.yaml
+  grove: !include board/extension/grove_i2c.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
+  co2: !include board/module/unit_co2.yaml
+  colors: !include gui/modular/themes/colors_night_owl.yaml
+  lvgl: !include gui/modular/480x320.yaml
+
+  room_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.etg2_simen_temperature
+  }}
+  house_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+    uid: house_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
 
 substitutions:
   devicename: jc3248w535c-1f26fc
-  log_level: INFO
+  log_level: WARN
+  home_page: page_analog_clock
 
 esphome:
   comment: 'Guition 3.5"'
@@ -13,14 +28,6 @@ esphome:
   friendly_name: $devicename
   project:
     version: "1.0.0"
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
-
-esp32:
-  framework:
-    type: esp-idf
 
 light:
   - id: !extend backlight_light
@@ -35,39 +42,94 @@ light:
             args: [ '(int(id(backlight_light).remote_values.get_brightness() * 100))' ]
 
 lvgl:
-  widgets:
-    - obj:
-        align: center
-        height: 90%
-        width: 90%
-        widgets:
-          - button:
-              id: backlight_button
-              align: top_left
-              checkable: true
-              widgets:
-                - label:
-                    align: center
-                    text: Backlight
-              on_click:
-                then:
-                  - light.control:
-                      id: backlight_light
-                      state: on
-                      brightness: 10%
-          - label:
-              id: backlight_label
-              align: bottom_left
-              text: "?"
-          - slider:
-              id: backlight_slider
-              align: right_mid
-              x: -5
-              height: 90%
-              width: 30
-              on_release:
-                then:
-                  - light.control:
-                      id: backlight_light
-                      state: on
-                      brightness: !lambda return int(x);
+  pages:
+    - id: page_screen
+      pad_top: 40
+      pad_bottom: 40
+      on_load:
+        - lvgl.label.update:
+            id: page_title
+            text: Skjerm
+      <<: !include
+        file: gui/modular/sections/swipe_navigation.yaml
+      widgets:
+        - obj:
+            pad_all: 10
+            align: CENTER
+            height: 100%
+            width: 100%
+            widgets:
+              - button:
+                  id: backlight_button
+                  align: top_left
+                  checkable: true
+                  widgets:
+                    - label:
+                        align: center
+                        text: Backlight
+                  on_click:
+                    then:
+                      - light.control:
+                          id: backlight_light
+                          state: on
+                          brightness: 10%
+              - label:
+                  id: backlight_label
+                  align: bottom_left
+                  text: "?"
+              - slider:
+                  id: backlight_slider
+                  align: right_mid
+                  x: -5
+                  height: 80%
+                  width: 30
+                  on_release:
+                    then:
+                      - light.control:
+                          id: backlight_light
+                          state: on
+                          brightness: !lambda return int(x);
+
+sensor:
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    state_class: "measurement"
+    sources:
+      # ENV III
+#      - source: temperature_sht30_hat_env
+#      - source: temperature_qmp6988_hat_env
+      # ENV IV
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
+      # ENV Pro
+#      - source: temperature_bme688
+      # CO2
+      - source: temperature_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
+  - platform: combination
+    type: median
+    id: humidity_local
+    name: "Humidity"
+    device_class: "humidity"
+    state_class: "measurement"
+    sources:
+      # ENV III
+#      - source: humidity_sht30_hat_env
+      # ENV IV
+      - source: humidity_sht40_unit_env
+      # ENV Pro
+#      - source: humidity_bme688
+      # CO2
+      - source: humidity_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15

@@ -53,6 +53,7 @@ sensor:
       name: "IAQ BME688"
       disabled_by_default: true
       device_class: "aqi"
+      entity_category: diagnostic
       filters:
         - sliding_window_moving_average:
             window_size: 10
@@ -64,6 +65,7 @@ sensor:
       name: "Static IAQ BME688"
       disabled_by_default: true
       device_class: "aqi"
+      entity_category: diagnostic
       filters:
         - sliding_window_moving_average:
             window_size: 10
@@ -91,17 +93,19 @@ sensor:
       id: gas_resistance_bme688
       # Gas resistance in Ω
       name: "Gas resistance"
+      entity_category: diagnostic
       filters:
         - sliding_window_moving_average:
             window_size: 10
             send_every: 10
 
   - platform: combination
-    type: median
+    type: min
     id: combined_iaq_bme688
     name: "Combined IAQ BME688"
     device_class: "aqi"
     state_class: "measurement"
+    entity_category: diagnostic
     sources:
       - source: iaq_bme688
       - source: static_iaq_bme688
@@ -114,6 +118,7 @@ text_sensor:
     name: "IAQ classification"
     icon: "mdi:checkbox-marked-circle-outline"
     disabled_by_default: true
+    entity_category: diagnostic
     lambda: |-
       auto iaq_ = int(id(iaq_bme688).state);
       if (iaq_ < 0) {
@@ -152,6 +157,7 @@ text_sensor:
     name: "Static IAQ classification"
     icon: "mdi:checkbox-marked-circle-outline"
     disabled_by_default: true
+    entity_category: diagnostic
     lambda: |-
       auto iaq_ = int(id(static_iaq_bme688).state);
       if (iaq_ < 0) {

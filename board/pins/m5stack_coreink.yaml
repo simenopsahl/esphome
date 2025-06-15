@@ -18,6 +18,16 @@ substitutions:
   i2c_mbus_scl_pin: GPIO22
   tx_mbus_pin: GPIO14
   rx_mbus_pin: GPIO23
+  mbus7: GPIO13
+  mbus8: GPIO14
+  mbus9: GPIO21
+  mbus10: GPIO22
+  mbus11: GPIO18
+  mbus12: GPIO36
+  mbus13: GPIO34
+  mbus14: GPIO26
+  mbus15: GPIO23
+  mbus16: GPIO25
   # GROVE
   i2c_grove_sda_pin: GPIO32
   i2c_grove_scl_pin: GPIO33

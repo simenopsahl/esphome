@@ -1,5 +1,5 @@
 ---
-# PINs for Sunton moduleESP32-S3 with Guition 3.5" display
+# PINs for Sunton module ESP32-S3 with Guition 3.5" display
 
 substitutions:
 # Internal
@@ -13,8 +13,19 @@ substitutions:
   spi_data3_pin: GPIO40 # io40
   spi_data4_pin: GPIO39 # io39
   disp_cs_pin: GPIO45 # io45
+  # SD Card
+  card_clk_pin: GPIO12 # io12
+  card_cs_pin: GPIO10 # io10
+  card_mosi_pin: GPIO11 # io11
+  card_miso_pin: GPIO13 # io13
+  # i2s Audio
+  i2s_lrclk_pin: GPIO2 # io2
+  i2s_bclk_pin: GPIO42 # io42
+  i2s_mclk_pin: GPIO00 # io00
 
 # Extended IO
+  # i2s Audio
+  i2s_dout_pin: GPIO41 # io41
   # HC1.0 4pin
   i2c_hc100_sda_pin: GPIO18 # io18
   i2c_hc100_scl_pin: GPIO17 # io17
@@ -23,12 +34,14 @@ substitutions:
   tx_hc100_pin: GPIO17
   rx_hc100_pin: GPIO18
   # JST1.25 4pin
-  i2c_jst125_sda_pin: GPIO18 # io18
-  i2c_jst125_scl_pin: GPIO17 # io17
-  in_jst125_pin: GPIO17
-  out_jst125_pin: GPIO18
-  tx_jst125_pin: GPIO17
-  rx_jst125_pin: GPIO18
+  i2c_jst125_sda_pin: GPIO17 # io17
+  i2c_jst125_scl_pin: GPIO18 # io18
+  i2c_grove_sda_pin: GPIO17 # io17
+  i2c_grove_scl_pin: GPIO18 # io18
+  in_jst125_pin: GPIO18
+  out_jst125_pin: GPIO17
+  tx_jst125_pin: GPIO18
+  rx_jst125_pin: GPIO17
   # JST1.25 8pin
   jst125_1_pin: GPIO5 # io5
   jst125_2_pin: GPIO6 # io6
