@@ -1,0 +1,49 @@
+---
+# https://docs.m5stack.com/en/base/m5go_bottom
+# M5Stack Go Bottom
+#
+
+# RGB Side LED light strip
+light:
+  - platform: esp32_rmt_led_strip
+    id: go_base_side_light
+    rgb_order: GRB
+    pin: $mbus23
+    num_leds: 10
+#    rmt_channel: 1
+    rmt_symbols: 256
+    chipset: SK6812
+    restore_mode: RESTORE_DEFAULT_OFF
+    default_transition_length: 100ms
+    use_psram: false
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 500ms on, 2000ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "Go Base Side Light"
+    entity_category: config
+
+#microphone:
+#  - platform: i2s_audio
+#    id: adc_mic
+#    adc_pin: $mbus26
+#    adc_type: internal

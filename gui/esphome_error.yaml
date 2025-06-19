@@ -1,0 +1,14 @@
+/config/esphome/m5s-c3se-3e3740.yaml: In lambda function:
+/config/esphome/m5s-c3se-3e3740.yaml:327:26: error: cannot convert 'esphome::lvgl::LvLineType*' to 'lv_obj_t*' {aka '_lv_obj_t*'}
+  327 |           lv_line_set_points(line, points, num_points);
+      |                          ^~~~
+      |                          |
+      |                          esphome::lvgl::LvLineType*
+In file included from .piolibdeps/m5s-c3se-3e3740/lvgl/lvgl.h:50,
+                 from src/esphome/components/lvgl/lvgl_proxy.h:13,
+                 from src/esphome/components/image/image.h:6,
+                 from src/esphome.h:48,
+                 from src/main.cpp:3:
+.piolibdeps/m5s-c3se-3e3740/lvgl/src/widgets/lv_line.h:61:36: note:   initializing argument 1 of 'void lv_line_set_points(lv_obj_t*, const lv_point_t*, uint16_t)'
+   61 | void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint16_t point_num);
+      |                         ~~~~~~~~~~~^~~

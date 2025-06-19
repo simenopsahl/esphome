@@ -12,21 +12,21 @@ esphome:
   project:
     name: "M5Stack.Fire"
     version: "2.7"
-#  platformio_options:
-#    build_flags:
-#      - "-DARDUINO_M5STACK_FIRE"
-#      - "-DBOARD_HAS_PSRAM"
-#      - "-DARDUINO_USB_CDC_ON_BOOT=1"
-#      - "-mfix-esp32-psram-cache-issue"
-#      - "-mfix-esp32-psram-cache-strategy=memw"
+  platformio_options:
+    build_flags:
+      - "-DARDUINO_M5STACK_FIRE"
+      - "-DBOARD_HAS_PSRAM"
+      - "-DARDUINO_USB_CDC_ON_BOOT=1"
+      - "-mfix-esp32-psram-cache-issue"
+      - "-mfix-esp32-psram-cache-strategy=memw"
 
 # PSRAM is shared with UART bus tx17/rx16
-#psram:
-#  mode: octal
-#  speed: 80MHz
+psram:
+  mode: quad
+  speed: 80MHz
 
 esp32:
-  board: m5stack-fire
+  board: m5stack-grey
   flash_size: 16MB
   framework:
     type: esp-idf

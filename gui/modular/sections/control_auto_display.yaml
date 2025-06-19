@@ -2,24 +2,24 @@
 # Display auto off
 
 # extend time component
-time:
-  - platform: homeassistant
-    id: !extend time_homeassistant
-    on_time:
-      - hours: 3,5
-        minutes: 5
-        seconds: 0
-        then:
-          - if:
-              condition:
-                - switch.is_on: display_auto
-              then:
-                - switch.turn_on: switch_antiburn
-      - hours: 3,5
-        minutes: 35
-        seconds: 0
-        then:
-          - switch.turn_off: switch_antiburn
+#time:
+#  - platform: homeassistant
+#    id: !extend time_homeassistant
+#    on_time:
+#      - hours: 3,5
+#        minutes: 5
+#        seconds: 0
+#        then:
+#          - if:
+#              condition:
+#                - switch.is_on: display_auto
+#              then:
+#                - switch.turn_on: switch_antiburn
+#      - hours: 3,5
+#        minutes: 35
+#        seconds: 0
+#        then:
+#          - switch.turn_off: switch_antiburn
 
 switch:
   # Switch to turn on/off the display auto off feature
@@ -31,28 +31,28 @@ switch:
     entity_category: config
 
   # Switch to reduce display burn-in
-  - platform: template
-    name: Antiburn
-    id: switch_antiburn
-    icon: mdi:television-shimmer
-    optimistic: true
-    entity_category: "config"
-    turn_on_action:
-      - logger.log: "Starting Antiburn"
-      - if:
-          condition: lvgl.is_paused
-          then:
-            - lvgl.resume:
-            - lvgl.widget.redraw:
-      - lvgl.pause:
-          show_snow: true
-    turn_off_action:
-      - logger.log: "Stopping Antiburn"
-      - if:
-          condition: lvgl.is_paused
-          then:
-            - lvgl.resume:
-            - lvgl.widget.redraw:
+#  - platform: template
+#    name: Antiburn
+#    id: switch_antiburn
+#    icon: mdi:television-shimmer
+#    optimistic: true
+#    entity_category: "config"
+#    turn_on_action:
+#      - logger.log: "Starting Antiburn"
+#      - if:
+#          condition: lvgl.is_paused
+#          then:
+#            - lvgl.resume:
+#            - lvgl.widget.redraw:
+#      - lvgl.pause:
+#          show_snow: true
+#    turn_off_action:
+#      - logger.log: "Stopping Antiburn"
+#      - if:
+#          condition: lvgl.is_paused
+#          then:
+#            - lvgl.resume:
+#            - lvgl.widget.redraw:
 
 # Script to control the display backlight based on motion detection
 script:

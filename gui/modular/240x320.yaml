@@ -39,6 +39,22 @@ font: !include
     pad_column: 5
     pad_row: 4
 
+  - &nordpool_layout_vars
+    # -- DISPLAY CONFIGURATION --
+    screen_width: 320
+    screen_height: 240
+
+    # -- LAYOUT CONFIGURATION --
+    # Height of the status bar area at the top and navigation at the bottom
+    status_bar_height: 34
+    # Proportions for the 3 rows in the grid layout (labels, graph, labels)
+    grid_row_top_fr: 18
+    grid_row_graph_fr: 136
+    grid_row_bottom_fr: 14
+
+    # -- GRAPH CONFIGURATION --
+    line_width: 4
+
   - &button_widget_vars
     width: 75
     height: 114

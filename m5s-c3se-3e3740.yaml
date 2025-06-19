@@ -1,7 +1,8 @@
 packages:
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
   board: !include board/m5stack_core_s3se.yaml
+  internal_i2c: !include board/extension/internal_i2c.yaml
 #  base_m5go: !include board/module/base_m5go_bottom.yaml
   colors: !include gui/modular/themes/colors_night_owl.yaml
   lvgl: !include gui/modular/240x320.yaml
@@ -10,14 +11,11 @@ packages:
     uid: room_temp_value,
     entity_id: sensor.etg2_simen_temperature
   }}
-  house_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
-    uid: house_temp_value,
-    entity_id: sensor.t22_temperature
-  }}
 
 substitutions:
   devicename: m5s-c3se-3e3740
-  log_level: INFO
+  log_level: DEBUG
+  log_baud_rate: "115200"
   home_page: page_analog_clock
 
 esphome:
@@ -27,63 +25,407 @@ esphome:
   project:
     version: "1.0.0"
 
-light:
-  - id: !extend backlight_light
-    on_state:
-      - lvgl.slider.update:
-          id: backlight_slider
-          value: !lambda return (int(id(backlight_light).remote_values.get_brightness() * 100));
-      - lvgl.label.update:
-          id: backlight_label
-          text:
-            format: "%d %%"
-            args: [ '(int(id(backlight_light).remote_values.get_brightness() * 100))' ]
-
 lvgl:
   pages:
-    - id: page_screen
+    - id: page_nordpool
+      # Pad navigation bar and status bar
       pad_top: 34
       pad_bottom: 34
       on_load:
         - lvgl.label.update:
             id: page_title
-            text: Skjerm
+            text: NordPool
+        - script.execute: update_price_chart
       <<: !include
         file: gui/modular/sections/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 1
-            align: CENTER
             height: 100%
             width: 100%
+            # Object area 172x320
+            align: CENTER
+            layout:
+              type: GRID
+              # Grid definition for the page layout
+              grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
+              grid_rows: [ FR(18), FR(136), FR(14) ] # Graph container is the middle row (136)
             widgets:
-              - button:
-                  id: backlight_button
-                  align: top_left
-                  checkable: true
-                  widgets:
-                    - label:
-                        align: center
-                        text: Backlight
-                  on_click:
-                    then:
-                      - light.control:
-                          id: backlight_light
-                          state: on
-                          brightness: 10%
-              - label:
-                  id: backlight_label
-                  align: bottom_left
-                  text: "?"
-              - slider:
-                  id: backlight_slider
-                  align: right_mid
-                  x: -5
-                  height: 70%
-                  width: 30
-                  on_release:
-                    then:
-                      - light.control:
-                          id: backlight_light
-                          state: on
-                          brightness: !lambda return int(x);
+              - label: # Current electricity price
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: START
+                  grid_cell_y_align: CENTER
+                  id: lbl_nordpool_price_0
+                  text: "???"
+                  text_font: font_md
+                  text_color: c_text_p
+                  text_align: LEFT
+              - label: # Current hour of the day
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: START
+                  grid_cell_y_align: CENTER
+                  id: lbl_nordpool_time_0
+                  text: "??:??"
+                  text_font: font_sm
+                  text_color: c_text_s
+                  text_align: LEFT
+
+              - label: # Electricity price 2 hours from now
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: START
+                  grid_cell_y_align: CENTER
+                  id: lbl_nordpool_price_2
+                  text: "???"
+                  text_font: font_md
+                  text_color: c_text_p
+                  text_align: CENTER
+              - label: # Hour of the day 2 hours from now
+                  grid_cell_column_pos: 2
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: START
+                  grid_cell_y_align: CENTER
+                  id: lbl_nordpool_time_2
+                  text: "??:??"
+                  text_font: font_sm
+                  text_color: c_text_s
+                  text_align: CENTER
+
+              - label: # Electricity price 5 hours from now
+                  id: lbl_nordpool_price_4
+                  text: "???"
+                  grid_cell_column_pos: 4
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: CENTER
+                  grid_cell_y_align: CENTER
+                  text_font: font_md
+                  text_color: c_text_p
+                  text_align: CENTER
+              - label:  # Hour of the day 5 hours from now
+                  id: lbl_nordpool_time_4
+                  text: "??:??"
+                  grid_cell_column_pos: 4
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: CENTER
+                  grid_cell_y_align: CENTER
+                  text_font: font_sm
+                  text_color: c_text_s
+                  text_align: CENTER
+
+              - label: # Electricity price 7 hours from now
+                  id: lbl_nordpool_price_6
+                  text: "???"
+                  grid_cell_column_pos: 6
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: CENTER
+                  grid_cell_y_align: CENTER
+                  text_font: font_md
+                  text_color: c_text_p
+                  text_align: CENTER
+              - label:  # Hour of the day 7 hours from now
+                  id: lbl_nordpool_time_6
+                  text: "??:??"
+                  grid_cell_column_pos: 6
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: CENTER
+                  grid_cell_y_align: CENTER
+                  text_font: font_sm
+                  text_color: c_text_s
+                  text_align: CENTER
+
+              - label: # Electricity price 9 hours from now
+                  id: lbl_nordpool_price_8
+                  text: "???"
+                  grid_cell_column_pos: 8
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: END
+                  grid_cell_y_align: CENTER
+                  text_font: font_md
+                  text_color: c_text_p
+                  text_align: RIGHT
+              - label:  # Hour of the day 9 hours from now
+                  id: lbl_nordpool_time_8
+                  text: "??:??"
+                  grid_cell_column_pos: 8
+                  grid_cell_row_pos: 2
+                  grid_cell_x_align: END
+                  grid_cell_y_align: CENTER
+                  text_font: font_sm
+                  text_color: c_text_s
+                  text_align: RIGHT
+
+              - line: # graph container
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 1
+                  grid_cell_column_span: 9
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  height: 100% # This will be 136px based on grid layout
+                  width: 100%  # This will be 318px
+                  align: CENTER
+                  id: lvgl_nordpool_line
+                  line_width: 4
+                  line_color: c_green
+                  line_rounded: true
+                  points:
+                    # Read initial points from globals
+                    - x: !lambda return id(nordpool_points_x)[0];
+                      y: !lambda return id(nordpool_points_y)[0];
+                    - x: !lambda return id(nordpool_points_x)[1];
+                      y: !lambda return id(nordpool_points_y)[1];
+                    - x: !lambda return id(nordpool_points_x)[2];
+                      y: !lambda return id(nordpool_points_y)[2];
+                    - x: !lambda return id(nordpool_points_x)[3];
+                      y: !lambda return id(nordpool_points_y)[3];
+                    - x: !lambda return id(nordpool_points_x)[4];
+                      y: !lambda return id(nordpool_points_y)[4];
+                    - x: !lambda return id(nordpool_points_x)[5];
+                      y: !lambda return id(nordpool_points_y)[5];
+                    - x: !lambda return id(nordpool_points_x)[6];
+                      y: !lambda return id(nordpool_points_y)[6];
+                    - x: !lambda return id(nordpool_points_x)[7];
+                      y: !lambda return id(nordpool_points_y)[7];
+                    - x: !lambda return id(nordpool_points_x)[8];
+                      y: !lambda return id(nordpool_points_y)[8];
+
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: motion_simen
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: motion_gang
+  # Turn on display while room is occupied
+  - platform: template
+    id: motion_detected
+    lambda: !lambda |-
+      if ( (id(motion_simen).state) or (id(motion_gang).state) ) {
+        return true;
+      } else {
+        return false;
+      }
+    on_state: 
+      then:
+        - script.execute: display_on_off
+
+sensor:
+  # Get values from home assistant
+  - platform: homeassistant
+    id: nordpool_price_0
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_price_0
+          text:
+            format: "%.0f"
+            args: [ 'x' ]
+  - platform: homeassistant
+    id: nordpool_price_1
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price1
+  - platform: homeassistant
+    id: nordpool_price_2
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price2
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_price_2
+          text:
+            format: "%.0f"
+            args: [ 'x' ]
+  - platform: homeassistant
+    id: nordpool_price_3
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price3
+  - platform: homeassistant
+    id: nordpool_price_4
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_price_4
+          text:
+            format: "%.0f"
+            args: [ 'x' ]
+  - platform: homeassistant
+    id: nordpool_price_5
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price5
+  - platform: homeassistant
+    id: nordpool_price_6
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price6
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_price_6
+          text:
+            format: "%.0f"
+            args: [ 'x' ]
+  - platform: homeassistant
+    id: nordpool_price_7
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price7
+  - platform: homeassistant
+    id: nordpool_price_8
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price8
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_price_8
+          text:
+            format: "%.0f"
+            args: [ 'x' ]
+
+  - platform: combination
+    id: nordpool_price_min
+    type: min
+    sources:
+      - source: nordpool_price_0
+      - source: nordpool_price_1
+      - source: nordpool_price_2
+      - source: nordpool_price_3
+      - source: nordpool_price_4
+      - source: nordpool_price_5
+      - source: nordpool_price_6
+      - source: nordpool_price_7
+      - source: nordpool_price_8
+
+  - platform: combination
+    id: nordpool_price_max
+    type: max
+    sources:
+      - source: nordpool_price_0
+      - source: nordpool_price_1
+      - source: nordpool_price_2
+      - source: nordpool_price_3
+      - source: nordpool_price_4
+      - source: nordpool_price_5
+      - source: nordpool_price_6
+      - source: nordpool_price_7
+      - source: nordpool_price_8
+    on_value:
+      - script.execute: update_price_chart
+
+text_sensor:
+  # Strings from Home Assistant
+  - platform: homeassistant
+    id: nordpool_time_0
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time0
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_time_0
+          text: !lambda return id(nordpool_time_0).state;
+  - platform: homeassistant
+    id: nordpool_time_2
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time2
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_time_2
+          text: !lambda return id(nordpool_time_2).state;
+  - platform: homeassistant
+    id: nordpool_time_4
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time4
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_time_4
+          text: !lambda return id(nordpool_time_4).state;
+  - platform: homeassistant
+    id: nordpool_time_6
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time6
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_time_6
+          text: !lambda return id(nordpool_time_6).state;
+  - platform: homeassistant
+    id: nordpool_time_8
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time8
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nordpool_time_8
+          text: !lambda return id(nordpool_time_8).state;
+
+globals:
+  - id: nordpool_points_y
+    type: int[9]
+    restore_value: no
+    initial_value: '{102, 102, 102, 102, 102, 102, 102, 102, 102}'
+  - id: nordpool_points_x
+    type: int[9]
+    restore_value: no
+    initial_value: '{2, 41, 80, 119, 159, 198, 237, 276, 315}'
+
+script:
+  - id: update_price_chart
+    mode: single
+    then:
+      - lambda: |-
+          // STEP 1: Calculate all Y coordinates and save them to the global array.
+          float prices[9];
+          prices[0] = id(nordpool_price_0).state;
+          prices[1] = id(nordpool_price_1).state;
+          prices[2] = id(nordpool_price_2).state;
+          prices[3] = id(nordpool_price_3).state;
+          prices[4] = id(nordpool_price_4).state;
+          prices[5] = id(nordpool_price_5).state;
+          prices[6] = id(nordpool_price_6).state;
+          prices[7] = id(nordpool_price_7).state;
+          prices[8] = id(nordpool_price_8).state;
+
+          float min_p = id(nordpool_price_min).state;
+          float max_p = id(nordpool_price_max).state;
+
+          if (isnan(min_p) || isnan(max_p)) { return; }
+          for (int i = 0; i < 9; ++i) {
+            if (isnan(prices[i])) { return; }
+          }
+
+          const float line_w = 4.0;
+          const float inset = line_w / 2.0;
+          const float container_height = 136.0;
+          const float graph_height = container_height - line_w;
+
+          for (int i = 0; i < 9; ++i) {
+            if (max_p == min_p) {
+              id(nordpool_points_y)[i] = (int)(container_height / 2.0);
+            } else {
+              float y_coord = graph_height - ((prices[i] - min_p) / (max_p - min_p) * graph_height);
+              id(nordpool_points_y)[i] = (int)round(inset + y_coord);
+            }
+          }
+          // ADD THIS LINE FOR DEBUGGING
+          ESP_LOGD("update_chart", "Calculated Y-Points: %d, %d, %d, %d, %d, %d, %d, %d, %d",
+                 id(nordpool_points_y)[0], id(nordpool_points_y)[1], id(nordpool_points_y)[2],
+                 id(nordpool_points_y)[3], id(nordpool_points_y)[4], id(nordpool_points_y)[5],
+                 id(nordpool_points_y)[6], id(nordpool_points_y)[7], id(nordpool_points_y)[8]);
+      - delay: 1s
+      - lvgl.line.update:
+          # STEP 2: Redraw the line using the new values from the global arrays.
+          id: lvgl_nordpool_line
+          points:
+            - x: !lambda return id(nordpool_points_x)[0];
+              y: !lambda return id(nordpool_points_y)[0];
+            - x: !lambda return id(nordpool_points_x)[1];
+              y: !lambda return id(nordpool_points_y)[1];
+            - x: !lambda return id(nordpool_points_x)[2];
+              y: !lambda return id(nordpool_points_y)[2];
+            - x: !lambda return id(nordpool_points_x)[3];
+              y: !lambda return id(nordpool_points_y)[3];
+            - x: !lambda return id(nordpool_points_x)[4];
+              y: !lambda return id(nordpool_points_y)[4];
+            - x: !lambda return id(nordpool_points_x)[5];
+              y: !lambda return id(nordpool_points_y)[5];
+            - x: !lambda return id(nordpool_points_x)[6];
+              y: !lambda return id(nordpool_points_y)[6];
+            - x: !lambda return id(nordpool_points_x)[7];
+              y: !lambda return id(nordpool_points_y)[7];
+            - x: !lambda return id(nordpool_points_x)[8];
+              y: !lambda return id(nordpool_points_y)[8];

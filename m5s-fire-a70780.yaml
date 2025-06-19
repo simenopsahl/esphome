@@ -1,8 +1,11 @@
 packages:
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
   board: !include board/m5stack_fire.yaml
+  go_base: !include board/module/base_m5go_bottom.yaml
   grove_i2c: !include board/extension/grove_i2c.yaml
+  env: !include board/module/unit_env_iv.yaml
+  pir: !include board/module/unit_pir.yaml
   colors: !include gui/modular/themes/colors_night_owl.yaml
   lvgl: !include gui/modular/240x320.yaml
 
@@ -14,10 +17,6 @@ packages:
 substitutions:
   devicename: m5s-fire-a70780
   location: "2etg, Stue"
-  base_btc_i2c_bus: i2c_grove
-  i2c_internal_frequency: 50kHz
-  i2c_grove_frequency: 50kHz
-#  module_air_quality_uart_bus: uart_alt
   log_level: WARN
   home_page: page_temperature
 
@@ -28,7 +27,7 @@ esphome:
   area: $location
 
 lvgl:
-  buffer_size: 25%
+  buffer_size: 50%
   encoders:
     enter_button: btn_b
     sensor:
@@ -240,6 +239,29 @@ binary_sensor:
         - script.execute: display_on_off
 
 sensor:
+  # Combine sensors
+  - platform: combination
+    type: median
+    id: temperature_local
+    name: "Temperature"
+    device_class: "temperature"
+    state_class: "measurement"
+    sources:
+      # ENV III
+#      - source: temperature_sht30_hat_env
+#      - source: temperature_qmp6988_hat_env
+      # ENV IV
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
+      # ENV Pro
+#      - source: temperature_bme688
+      # CO2
+#      - source: temperature_scd40_unit_co2
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+
 #  - platform: homeassistant
 #    entity_id: sensor.waveshare_nordpool_future_offset
 #    id: nordpool_sensor
