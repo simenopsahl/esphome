@@ -26,10 +26,6 @@ font: !include
     page_pad_top: 40
     page_pad_bottom: 40
 
-  - &clock_page_styles
-    meter_height: 300
-    meter_width: 300
-
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 2
@@ -43,6 +39,44 @@ font: !include
     pad_column: 8
     pad_row: 8
 
+  - &clock_page_styles
+    meter_height: 300
+    meter_width: 300
+
+  - &nordpool_layout_styles
+    # -- DISPLAY CONFIGURATION --
+    screen_width: 320
+    screen_height: 480
+    # -- LAYOUT CONFIGURATION --
+    # Height of the status bar area at the top and navigation at the bottom
+    status_bar_height: 40
+    # Proportions for the 3 rows in the grid layout (labels, graph, labels)
+    grid_row_top_fr: 22
+    grid_row_graph_fr: 358
+    grid_row_bottom_fr: 18
+    # -- GRAPH CONFIGURATION --
+    line_width: 6
+
+  - &weather_page_styles
+    # Variables for the main layout grid
+    weather_grid_rows: [ fr(4), fr(3) ]
+    weather_grid_columns: [ fr(7), fr(6) ]
+    # Variables for the forecast objects at the bottom
+    weather_forecast_grid_columns: [ 70, 70, 70, 70 ]
+    weather_forecast_grid_pad_column: 6
+    # --- Styles moved from .forcast_styles ---
+    weather_forecast_obj_radius: 3
+    weather_forecast_obj_pad_top: 2
+    weather_forecast_obj_pad_bottom: 2
+    weather_forecast_obj_pad_row: 2
+    weather_forecast_obj_pad_column: 0
+    # Font for the main temperature and forecast temperature
+    weather_forecast_temp_font: font_xl
+    # Font for the forecast timestamp
+    weather_forecast_time_font: font_sm
+    # Font for the "Været nå" text
+    weather_forecast_condition_font: font_md
+
   - &button_widget_vars
     width: 49%
     height: 86
@@ -50,35 +84,6 @@ font: !include
   - &wide_button_widget_vars
     width: 100%
     height: 86
-
-# Styles for Weather forcast
-.forcast_styles:
-    - &forcast_obj_base
-      height: SIZE_CONTENT
-      width: SIZE_CONTENT
-      bg_color: c_black
-      radius: 3
-      pad_top: 2
-      pad_bottom : 2
-      layout:
-        type: flex
-        flex_flow: COLUMN
-        flex_align_cross: center
-        flex_align_track: center
-        pad_column: 0
-        pad_row: 2
-
-    - &forcast_label_base
-      text_font: font_md
-      height: SIZE_CONTENT
-
-    - &forcast_label_base_sm
-      height: SIZE_CONTENT
-      text_font: font_sm
-      text_color: c_text_s
-
-    - &forcast_image_base
-      height: SIZE_CONTENT
 
 script:
   - id: go_home
@@ -104,152 +109,14 @@ lvgl:
     # analog clock
     - <<: !include { file: pages/clock/page.yaml, vars: { <<: [*page_styles, *container_styles, *clock_page_styles] } }
 
-    # device status
-    - <<: !include { file: pages/status/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
-
     # room temperature
     - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
     # weather forecast
-    - id: page_weather
-      # REMOVED: `<<: *page_styles`
-      # ADDED: Use the variables passed from the parent file
-      pad_top: !lambda return page_pad_top;
-      pad_bottom: !lambda return page_pad_bottom;
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Vær
-      <<: !include
-        file: functions/swipe_navigation.yaml
-      widgets:
-        - obj:
-            pad_all: 6
-            height: 100%
-            width: 100%
-            align: CENTER
-            layout:
-              type: GRID
-              grid_rows: [ fr(4), fr(3) ]
-              grid_columns: [ fr(7), fr(6) ]
-            widgets:
-              - obj:
-                  height: SIZE_CONTENT
-                  width: SIZE_CONTENT
-                  grid_cell_row_pos: 0
-                  grid_cell_column_pos: 0
-                  grid_cell_y_align: CENTER
-                  widgets:
-                    - image:
-                        src: unknown_170
-                        id: weather_condition_icon
-              - obj:
-                  grid_cell_row_pos: 0
-                  grid_cell_column_pos: 1
-                  grid_cell_y_align: CENTER
-                  bg_opa: TRANSP
-                  layout:
-                    type: FLEX
-                    flex_flow: COLUMN
-                    flex_align_main: START
-                    flex_align_cross: START
-                  widgets:
-                    - label:
-                        text: "--°"
-                        id: weather_temperature_today
-                        text_font: font_xl
-                        text_align: LEFT
-                    - label:
-                        text: "Været nå"
-                        id: weather_condition_today
-                        long_mode: wrap
-                        scrollable: true
-                        text_font: font_md
-                        text_align: LEFT
+    - <<: !include { file: pages/weather/page.yaml, vars: { <<: [*page_styles, *container_styles, *weather_page_styles] } }
 
-              - obj:
-                  width: 100%
-                  height: SIZE_CONTENT
-                  grid_cell_row_pos: 1
-                  grid_cell_column_pos: 0
-                  grid_cell_column_span: 2
-                  grid_cell_y_align: CENTER
-                  grid_cell_x_align: STRETCH
-                  layout:
-                    type: GRID
-                    grid_rows: [ content ]
-                    grid_columns: [ 62, 62, 62, 62 ]
-                    pad_column: 6
-                    pad_row: 0
-                  widgets:
-                      - obj:
-                          <<: *forcast_obj_base
-                          grid_cell_row_pos: 0
-                          grid_cell_column_pos: 0
-                          widgets:
-                              - label:
-                                  id: forecast_timestamp_0
-                                  <<: *forcast_label_base_sm
-                                  text: ???
-                              - image:
-                                  id: forecast_condition_icon_0
-                                  <<: *forcast_image_base
-                                  src: unknown_62
-                              - label:
-                                  id: forecast_temperature_0
-                                  <<: *forcast_label_base
-                                  text: "--°"
-                      - obj:
-                          <<: *forcast_obj_base
-                          grid_cell_row_pos: 0
-                          grid_cell_column_pos: 1
-                          widgets:
-                              - label:
-                                  id: forecast_timestamp_1
-                                  <<: *forcast_label_base_sm
-                                  text: ???
-                              - image:
-                                  id: forecast_condition_icon_1
-                                  <<: *forcast_image_base
-                                  src: unknown_62
-                              - label:
-                                  id: forecast_temperature_1
-                                  <<: *forcast_label_base
-                                  text: "--°"
-                      - obj:
-                          <<: *forcast_obj_base
-                          grid_cell_row_pos: 0
-                          grid_cell_column_pos: 2
-                          widgets:
-                              - label:
-                                  id: forecast_timestamp_2
-                                  <<: *forcast_label_base_sm
-                                  text: ???
-                              - image:
-                                  id: forecast_condition_icon_2
-                                  <<: *forcast_image_base
-                                  src: unknown_62
-                              - label:
-                                  id: forecast_temperature_2
-                                  <<: *forcast_label_base
-                                  text: "--°"
-                      - obj:
-                          <<: *forcast_obj_base
-                          grid_cell_row_pos: 0
-                          grid_cell_column_pos: 3
-                          widgets:
-                              - label:
-                                  id: forecast_timestamp_3
-                                  <<: *forcast_label_base_sm
-                                  text: ???
-                              - image:
-                                  id: forecast_condition_icon_3
-                                  <<: *forcast_image_base
-                                  src: unknown_62
-                              - label:
-                                  id: forecast_temperature_3
-                                  <<: *forcast_label_base
-                                  text: "--°"
+    # device status
+    - <<: !include { file: pages/status/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
 packages:
   # header

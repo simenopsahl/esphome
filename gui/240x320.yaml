@@ -51,9 +51,11 @@ font: !include
     # Height of the status bar area at the top and navigation at the bottom
     status_bar_height: 34
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    grid_row_top_fr: 18
-    grid_row_graph_fr: 136
-    grid_row_bottom_fr: 14
+    grid_row_top_fr: 19
+    grid_row_graph_fr: 135
+    grid_row_bottom_fr: 15
+    # -- GRAPH CONFIGURATION --
+    line_width: 4
 
   - &weather_page_styles
     # Variables for the main layout grid
@@ -75,9 +77,6 @@ font: !include
     # Font for the "Været nå" text
     weather_forecast_condition_font: font_md
 
-    # -- GRAPH CONFIGURATION --
-    line_width: 4
-
   - &button_widget_vars
     width: 75
     height: 114
@@ -85,35 +84,6 @@ font: !include
   - &wide_button_widget_vars
     width: 232
     height: 75
-
-# Styles for Weather forcast
-.forcast_styles:
-    - &forcast_obj_base
-      height: SIZE_CONTENT
-      width: SIZE_CONTENT
-      bg_color: c_black
-      radius: 3
-      pad_top: 0
-      pad_bottom : 0
-      layout:
-        type: flex
-        flex_flow: COLUMN
-        flex_align_cross: center
-        flex_align_track: center
-        pad_column: 0
-        pad_row: 0
-
-    - &forcast_label_base
-      text_font: font_md
-      height: SIZE_CONTENT
-
-    - &forcast_label_base_sm
-      height: SIZE_CONTENT
-      text_font: font_sm
-      text_color: c_text_s
-
-    - &forcast_image_base
-      height: SIZE_CONTENT
 
 script:
   - id: go_home
