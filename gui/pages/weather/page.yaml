@@ -1,0 +1,189 @@
+# https://esphome.io/cookbook/lvgl#an-analog-clock
+# LVGL analog clock
+
+# clock page
+#lvgl:
+#  pages:
+    .styles:
+      # --- Base styles for forecast objects ---
+      - &forecast_base_styles
+        grid_cell_row_pos: 0
+        height: SIZE_CONTENT
+        width: SIZE_CONTENT
+        bg_color: c_black
+        radius: !lambda return weather_forecast_obj_radius;
+        pad_top: !lambda return weather_forecast_obj_pad_top;
+        pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+        layout:
+          type: FLEX
+          flex_flow: COLUMN
+          flex_align_cross: CENTER
+          flex_align_track: CENTER
+          pad_column: !lambda return weather_forecast_obj_pad_column;
+          pad_row: !lambda return weather_forecast_obj_pad_row;
+
+# --- Page definition begins ---
+    id: page_weather
+    <<: !include ../../styles/page_styles.yaml
+    # REMOVED: `<<: *page_styles`
+    # ADDED: Use the variables passed from the parent file
+    pad_top: !lambda return page_pad_top;
+    pad_bottom: !lambda return page_pad_bottom;
+    on_load:
+      - lvgl.label.update:
+          id: page_title
+          text: Vær
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      - obj:
+          <<: !include ../../styles/container_styles.yaml
+          # Use the passed-in variables for size
+          pad_top: !lambda return container_pad_top;
+          pad_bottom: !lambda return container_pad_bottom;
+          pad_left: !lambda return container_pad_left;
+          pad_right: !lambda return container_pad_right;
+          scrollable: !lambda return container_scrollable;
+          align: CENTER
+          layout:
+            type: GRID
+            grid_rows: !lambda return grid_rows;
+            grid_columns: !lambda return grid_columns;
+          widgets:
+            # Today's weather icon
+            - image:
+                id: weather_condition_icon
+                src: "unknown_80"
+                height: SIZE_CONTENT
+                width: SIZE_CONTENT
+                grid_cell_row_pos: 0
+                grid_cell_column_pos: 0
+                grid_cell_y_align: CENTER
+                grid_cell_x_align: CENTER
+                align: CENTER
+                
+            # Today's temperature and condition
+            - obj:
+                grid_cell_row_pos: 0
+                grid_cell_column_pos: 1
+                grid_cell_y_align: CENTER
+                bg_opa: TRANSP
+                layout:
+                  type: FLEX
+                  flex_flow: COLUMN
+                  flex_align_main: CENTER
+                  flex_align_cross: START
+                widgets:
+                  - label:
+                      id: weather_temperature_today
+                      text: "--°"
+                      text_font: !lambda return weather_forecast_temp_font;
+                      text_align: LEFT
+                  - label:
+                      id: weather_condition_today
+                      text: "Været nå"
+                      long_mode: wrap
+                      scrollable: true
+                      text_font: !lambda return weather_forecast_condition_font;
+                      text_align: LEFT
+
+            # Forecast section at the bottom
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                grid_cell_row_pos: 1
+                grid_cell_column_pos: 0
+                grid_cell_column_span: 2
+                grid_cell_y_align: CENTER
+                grid_cell_x_align: STRETCH
+                layout:
+                  type: GRID
+                  grid_rows: [ content ]
+                  grid_columns: !lambda return weather_forecast_grid_columns;
+                  pad_column: !lambda return weather_forecast_grid_pad_column;
+                  pad_row: 0
+                widgets:
+                  # Forecast Item 0
+                  - obj:
+                      grid_cell_column_pos: 0
+                      <<: *forecast_base_styles
+                      # --- Widgets for this forecast item ---
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_0
+                            text: ???
+                            text_font: !lambda return weather_forecast_time_font;
+                            text_color: c_text_s
+                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_0
+                            src: "unknown_34"
+                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_0
+                            text: "--°"
+                            text_font: !lambda return weather_forecast_temp_font;
+                            height: SIZE_CONTENT
+
+                  # Forecast Item 1
+                  - obj:
+                      grid_cell_column_pos: 1
+                      <<: *forecast_base_styles
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_1
+                            text: ???
+                            text_font: !lambda return weather_forecast_time_font;
+                            text_color: c_text_s
+                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_1
+                            src: "unknown_34"
+                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_1
+                            text: "--°"
+                            text_font: !lambda return weather_forecast_temp_font;
+                            height: SIZE_CONTENT
+
+                  # Forecast Item 2
+                  - obj:
+                      grid_cell_column_pos: 2
+                      <<: *forecast_base_styles
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_2
+                            text: ???
+                            text_font: !lambda return weather_forecast_time_font;
+                            text_color: c_text_s
+                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_2
+                            src: "unknown_34"
+                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_2
+                            text: "--°"
+                            text_font: !lambda return weather_forecast_temp_font;
+                            height: SIZE_CONTENT
+
+                  # Forecast Item 3
+                  - obj:
+                      grid_cell_column_pos: 3
+                      <<: *forecast_base_styles
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_3
+                            text: ???
+                            text_font: !lambda return weather_forecast_time_font;
+                            text_color: c_text_s
+                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_3
+                            src: "unknown_34"
+                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_3
+                            text: "--°"
+                            text_font: !lambda return weather_forecast_temp_font;
+                            height: SIZE_CONTENT

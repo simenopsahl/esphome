@@ -4,6 +4,7 @@
 #lvgl:
 #  pages:
     id: page_temperature
+    <<: !include ../../styles/page_styles.yaml
     # REMOVED: `<<: *page_styles`
     # ADDED: Use the variables passed from the parent file
     pad_top: !lambda return page_pad_top;
