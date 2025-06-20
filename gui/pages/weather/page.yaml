@@ -27,8 +27,18 @@
           align: CENTER
           layout:
             type: GRID
-            grid_rows: !lambda return weather_grid_rows;
-            grid_columns: !lambda return weather_grid_columns;
+            grid_rows: !lambda |-
+              std::vector<lv_coord_t> rows;
+              for (int val : weather_grid_row_values) {
+                rows.push_back(fr(val));
+              }
+              return rows;
+            grid_columns: !lambda |-
+              std::vector<lv_coord_t> cols;
+              for (int val : weather_grid_column_values) {
+                cols.push_back(fr(val));
+              }
+              return cols;
           widgets:
             # Today's weather icon
             - image:
@@ -104,7 +114,7 @@
                       widgets:
                         - label:
                             id: forecast_timestamp_0
-                            text: ???
+                            text: "??:??"
                             text_font: !lambda return weather_forecast_time_font;
                             text_color: c_text_s
                             height: SIZE_CONTENT
@@ -138,7 +148,7 @@
                       widgets:
                         - label:
                             id: forecast_timestamp_1
-                            text: ???
+                            text: "??:??"
                             text_font: !lambda return weather_forecast_time_font;
                             text_color: c_text_s
                             height: SIZE_CONTENT
@@ -172,7 +182,7 @@
                       widgets:
                         - label:
                             id: forecast_timestamp_2
-                            text: ???
+                            text: "??:??"
                             text_font: !lambda return weather_forecast_time_font;
                             text_color: c_text_s
                             height: SIZE_CONTENT
@@ -206,7 +216,7 @@
                       widgets:
                         - label:
                             id: forecast_timestamp_3
-                            text: ???
+                            text: "??:??"
                             text_font: !lambda return weather_forecast_time_font;
                             text_color: c_text_s
                             height: SIZE_CONTENT

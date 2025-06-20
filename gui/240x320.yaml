@@ -51,14 +51,14 @@ font: !include
     # Height of the status bar area at the top and navigation at the bottom
     status_bar_height: 34
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_grid_rows: [ FR(18), FR(136), FR(14) ]
+    nordpool_grid_row_values: [ 18, 136, 14 ]
     # -- GRAPH CONFIGURATION --
     line_width: 4
 
   - &weather_page_styles
     # Variables for the main layout grid
-    weather_grid_rows: [ fr(3), fr(4) ]
-    weather_grid_columns: [ fr(1), fr(1) ]
+    weather_grid_row_values: [ 3, 4 ]
+    weather_grid_column_values: [ 1, 1 ]
     # Variables for the forecast objects at the bottom
     weather_forecast_grid_columns: [ 70, 70, 70, 70 ]
     weather_forecast_grid_pad_column: 6
