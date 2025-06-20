@@ -4,25 +4,6 @@
 # clock page
 #lvgl:
 #  pages:
-    .styles:
-      # --- Base styles for forecast objects ---
-      - &forecast_base_styles
-        grid_cell_row_pos: 0
-        height: SIZE_CONTENT
-        width: SIZE_CONTENT
-        bg_color: c_black
-        radius: !lambda return weather_forecast_obj_radius;
-        pad_top: !lambda return weather_forecast_obj_pad_top;
-        pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
-        layout:
-          type: FLEX
-          flex_flow: COLUMN
-          flex_align_cross: CENTER
-          flex_align_track: CENTER
-          pad_column: !lambda return weather_forecast_obj_pad_column;
-          pad_row: !lambda return weather_forecast_obj_pad_row;
-
-# --- Page definition begins ---
     id: page_weather
     <<: !include ../../styles/page_styles.yaml
     # REMOVED: `<<: *page_styles`
@@ -106,7 +87,20 @@
                   # Forecast Item 0
                   - obj:
                       grid_cell_column_pos: 0
-                      <<: *forecast_base_styles
+                      grid_cell_row_pos: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
+                      bg_color: c_black
+                      radius: !lambda return weather_forecast_obj_radius;
+                      pad_top: !lambda return weather_forecast_obj_pad_top;
+                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                        pad_column: !lambda return weather_forecast_obj_pad_column;
+                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       # --- Widgets for this forecast item ---
                       widgets:
                         - label:
@@ -128,7 +122,20 @@
                   # Forecast Item 1
                   - obj:
                       grid_cell_column_pos: 1
-                      <<: *forecast_base_styles
+                      grid_cell_row_pos: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
+                      bg_color: c_black
+                      radius: !lambda return weather_forecast_obj_radius;
+                      pad_top: !lambda return weather_forecast_obj_pad_top;
+                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                        pad_column: !lambda return weather_forecast_obj_pad_column;
+                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       widgets:
                         - label:
                             id: forecast_timestamp_1
@@ -149,7 +156,20 @@
                   # Forecast Item 2
                   - obj:
                       grid_cell_column_pos: 2
-                      <<: *forecast_base_styles
+                      grid_cell_row_pos: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
+                      bg_color: c_black
+                      radius: !lambda return weather_forecast_obj_radius;
+                      pad_top: !lambda return weather_forecast_obj_pad_top;
+                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                        pad_column: !lambda return weather_forecast_obj_pad_column;
+                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       widgets:
                         - label:
                             id: forecast_timestamp_2
@@ -170,7 +190,20 @@
                   # Forecast Item 3
                   - obj:
                       grid_cell_column_pos: 3
-                      <<: *forecast_base_styles
+                      grid_cell_row_pos: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
+                      bg_color: c_black
+                      radius: !lambda return weather_forecast_obj_radius;
+                      pad_top: !lambda return weather_forecast_obj_pad_top;
+                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                        pad_column: !lambda return weather_forecast_obj_pad_column;
+                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       widgets:
                         - label:
                             id: forecast_timestamp_3
