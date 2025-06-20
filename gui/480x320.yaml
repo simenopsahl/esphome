@@ -23,15 +23,20 @@ font: !include
 
   - &page_styles
     <<: !include styles/page_styles.yaml
-    pad_top: 40
-    pad_bottom: 40
+    page_pad_top: 40
+    page_pad_bottom: 40
+
+  - &clock_page_styles
+    meter_height: 300
+    meter_width: 300
 
   - &container_styles
     <<: !include styles/container_styles.yaml
-    pad_top: 0
-    pad_bottom: 0
-    pad_left: 6
-    pad_right: 6
+    container_pad_top: 2
+    container_pad_bottom: 2
+    container_pad_left: 6
+    container_pad_right: 6
+    container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &button_layout
     <<: !include styles/button_layout.yaml
@@ -95,352 +100,17 @@ lvgl:
       skip: true
       on_load:
         - script.execute: go_home
-    
+
     # analog clock
-    - id: page_analog_clock
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Klokke
-      <<: !include
-        file: functions/swipe_navigation.yaml
-      widgets:
-        # Outer Clock Container
-        - obj:
-            pad_all: 10
-            height: 100%
-            width: 100%
-            align: CENTER
-            widgets:
-              # clock face
-              - meter:
-                  height: 300
-                  width: 300
-                  align: CENTER
-                  border_width: 0
-                  bg_opa: TRANSP
-                  scales:
-                    # Minor ticks
-                    - range_from: 0
-                      range_to: 60
-                      angle_range: 360
-                      rotation: 270
-                      ticks:
-                        width: 1
-                        count: 61
-                        length: 10
-                        color: c_bg_s
-                      # Minuite hand
-                      indicators:
-                        - line:
-                            id: minute_hand
-                            width: 3
-                            color: c_text_s
-                            r_mod: -4
-                            value: 0
-                    # Major ticks
-                    - range_from: 1
-                      range_to: 12
-                      angle_range: 330
-                      rotation: 300
-                      ticks:
-                        width: 1
-                        count: 12
-                        length: 1
-                        major:
-                          stride: 1
-                          width: 4
-                          length: 10
-                          color: c_dark_gray
-                          label_gap: 12
-                    # Hour hand
-                    - range_from: 0
-                      range_to: 720
-                      angle_range: 360
-                      rotation: 270
-                      ticks:
-                        count: 0
-                      indicators:
-                        - line:
-                            id: hour_hand
-                            width: 5
-                            color: c_purple
-                            r_mod: -30
-                            value: 0
-              - label:
-                  id: day_label
-                  text_font: font_sm
-                  align: center
-                  text_color: c_gray
-                  pad_all: 2
-                  y: -50
-              - label:
-                  id: date_label
-                  text_font: font_sm
-                  align: center
-                  text_color: c_gray
-                  pad_all: 2
-                  y: 50
-    
+    - <<: !include { file: pages/clock/page.yaml, vars: { <<: [*page_styles, *container_styles, *clock_page_styles] } }
+
     # device status
-    - id: page_status
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Enhet
-      <<: !include
-        file: functions/swipe_navigation.yaml
-      widgets:
-        - obj:
-            pad_all: 6
-            height: 100%
-            width: 100%
-            align: CENTER
-            layout:
-              type: GRID
-              grid_columns: [FR(1), FR(4)]
-              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
-            widgets:
-              - label:
-                  id: lbl_name_l
-                  text: "Name: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: LEFT
-                  text_font: font_sm
-                  text_color: c_text_s
-              - label:
-                  id: lbl_name
-                  text: $devicename
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: RIGHT
-                  text_font: font_md
-                  text_color: c_text_p
+    - <<: !include { file: pages/status/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
-              - label:
-                  id: lbl_build_l
-                  text: "Build: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: LEFT
-                  text_font: font_sm
-                  text_color: c_text_s
-              - label:
-                  id: lbl_build
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: RIGHT
-                  text_font: font_md
-                  text_color: c_text_p
-                  text:
-                      format: "%s - %s"
-                      args: [__DATE__, __TIME__]
+    # room temperature
+    - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
-              - label:
-                  id: lbl_ssid_l
-                  text: "SSID: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: LEFT
-                  text_font: font_sm
-                  text_color: c_text_s
-              - label:
-                  id: lbl_ssid
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: RIGHT
-                  text_font: font_md
-                  text_color: c_text_p
-      
-              - label:
-                  id: lbl_ip_l
-                  text: "IP: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: LEFT
-                  text_font: font_sm
-                  text_color: c_text_s
-              - label:
-                  id: lbl_ip
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: RIGHT
-                  text_font: font_md
-                  text_color: c_text_p
-      
-              - label:
-                  id: lbl_mac_l
-                  text: "MAC: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: LEFT
-                  text_font: font_sm
-                  text_color: c_text_s
-              - label:
-                  id: lbl_mac
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: CENTER
-                  text_align: RIGHT
-                  text_font: font_md
-                  text_color: c_text_p
-
-    - id: page_temperature
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Temperatur
-      <<: !include
-        file: functions/swipe_navigation.yaml
-      widgets:
-        - obj:
-            pad_all: 6
-            height: 100%
-            width: 100%
-            align: CENTER
-            layout:
-              type: GRID
-              grid_columns: [ FR(1), FR(2), FR(1) ]
-              grid_rows: [ FR(2), FR(4), FR(4) ]
-            widgets:
-              - obj:
-                  grid_cell_row_pos: 1
-                  grid_cell_column_pos: 0
-                  grid_cell_y_align: STRETCH
-                  grid_cell_x_align: START
-                  layout:
-                    type: FLEX
-                    flex_flow: COLUMN
-                    flex_align_main: CENTER
-                    flex_align_cross: START
-                  widgets:
-                    - label: # thermometer icon
-                        <<: !include
-                          file: widgets/labels/icon.yaml
-                          vars:
-                            uid: house_temp_icon
-                            icon: "\U000F050F"
-                            icon_size: mdi_lg
-                            color: c_text_s
-                            align: left
-                    - label: # area
-                        <<: !include
-                          file: widgets/labels/text.yaml
-                          vars:
-                            uid: house_temp_area
-                            text: "Hus"
-                            text_font: font_md
-                            color: c_text_s
-                            align: left
-              - label: # temperature value
-                  <<: !include
-                    file: widgets/labels/grid_text.yaml
-                    vars:
-                      uid: house_temp_value
-                      text: "?"
-                      text_font: font_hg
-                      color: c_text_p
-                      align: center
-                      cell_column_pos: 1
-                      cell_row_pos: 1
-                      cell_x_align: center
-                      cell_y_align: center
-              - label: # temperature unit
-                  <<: !include
-                    file: widgets/labels/grid_text.yaml
-                    vars:
-                      uid: house_temp_unit
-                      text: "°C"
-                      text_font: font_lg
-                      color: c_text_s
-                      align: right
-                      cell_column_pos: 2
-                      cell_row_pos: 1
-                      cell_x_align: end
-                      cell_y_align: center
-
-              - obj:
-                  grid_cell_row_pos: 2
-                  grid_cell_column_pos: 0
-                  grid_cell_y_align: STRETCH
-                  grid_cell_x_align: START
-                  layout:
-                    type: FLEX
-                    flex_flow: COLUMN
-                    flex_align_main: CENTER
-                    flex_align_cross: START
-                  widgets:
-                    - label: # thermometer icon
-                        <<: !include
-                          file: widgets/labels/icon.yaml
-                          vars:
-                            uid: rom_temp_icon
-                            icon: "\U000F050F"
-                            icon_size: mdi_lg
-                            color: c_text_s
-                            align: left
-                    - label: # area
-                        <<: !include
-                          file: widgets/labels/text.yaml
-                          vars:
-                            uid: room_temp_area
-                            text: "Rom"
-                            text_font: font_md
-                            color: c_text_s
-                            align: left
-              - label: # temperature value
-                  <<: !include
-                    file: widgets/labels/grid_text.yaml
-                    vars:
-                      uid: room_temp_value
-                      text: "?"
-                      text_font: font_hg
-                      color: c_text_p
-                      align: center
-                      cell_column_pos: 1
-                      cell_row_pos: 2
-                      cell_x_align: center
-                      cell_y_align: center
-              - label: # temperature unit
-                  <<: !include
-                    file: widgets/labels/grid_text.yaml
-                    vars:
-                      uid: room_temp_unit
-                      text: "°C"
-                      text_font: font_lg
-                      color: c_text_s
-                      align: right
-                      cell_column_pos: 2
-                      cell_row_pos: 2
-                      cell_x_align: end
-                      cell_y_align: center
-
+    # weather forecast
     - id: page_weather
       <<: *page_styles
       on_load:
@@ -587,6 +257,8 @@ packages:
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
+  # automatic screen control
+  control_auto_display: !include { file: functions/control_auto_display.yaml }
 
   # Weather packages
   # Build icon set from .svg files

@@ -126,6 +126,7 @@ lvgl:
     # room temperature
     - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
+    # weather forecast
     - id: page_weather
       <<: *page_styles
       on_load:
