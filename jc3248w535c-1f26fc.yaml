@@ -5,14 +5,14 @@ packages:
   grove: !include board/extension/grove_i2c.yaml
   env_iv: !include board/module/unit_env_iv.yaml
   co2: !include board/module/unit_co2.yaml
-  colors: !include gui/modular/themes/colors_night_owl.yaml
-  lvgl: !include gui/modular/480x320.yaml
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/480x320.yaml
 
-  room_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.etg2_simen_temperature
   }}
-  house_temperature_widget_sensors: !include { file: gui/modular/widgets/labels/number_sensor.yaml, vars: {
+  house_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: house_temp_value,
     entity_id: sensor.t22_temperature
   }}
@@ -51,7 +51,7 @@ lvgl:
             id: page_title
             text: Skjerm
       <<: !include
-        file: gui/modular/functions/swipe_navigation.yaml
+        file: gui/functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 10
