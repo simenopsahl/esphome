@@ -128,7 +128,10 @@ lvgl:
 
     # weather forecast
     - id: page_weather
-      <<: *page_styles
+      # REMOVED: `<<: *page_styles`
+      # ADDED: Use the variables passed from the parent file
+      pad_top: !lambda return page_pad_top;
+      pad_bottom: !lambda return page_pad_bottom;
       on_load:
         - lvgl.label.update:
             id: page_title
