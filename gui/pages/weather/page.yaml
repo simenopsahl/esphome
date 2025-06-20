@@ -28,8 +28,8 @@
           align: CENTER
           layout:
             type: GRID
-            grid_rows: !lambda return grid_rows;
-            grid_columns: !lambda return grid_columns;
+            grid_rows: !lambda return weather_grid_rows;
+            grid_columns: !lambda return weather_grid_columns;
           widgets:
             # Today's weather icon
             - image:
