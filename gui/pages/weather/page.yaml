@@ -1,7 +1,6 @@
-# https://esphome.io/cookbook/lvgl#an-analog-clock
-# LVGL analog clock
+# LVGL Weather forecast page
 
-# clock page
+# weather page
 #lvgl:
 #  pages:
     id: page_weather
