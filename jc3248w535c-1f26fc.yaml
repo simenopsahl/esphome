@@ -51,7 +51,7 @@ lvgl:
             id: page_title
             text: Skjerm
       <<: !include
-        file: gui/modular/sections/swipe_navigation.yaml
+        file: gui/modular/functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 10

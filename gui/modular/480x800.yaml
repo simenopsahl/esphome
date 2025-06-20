@@ -104,7 +104,7 @@ lvgl:
             id: page_title
             text: Klokke
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         # Outer Clock Container
         - obj:
@@ -191,7 +191,7 @@ lvgl:
             id: page_title
             text: Enhet
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 8
@@ -317,7 +317,7 @@ lvgl:
             id: page_title
             text: Temperatur
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 8
@@ -448,7 +448,7 @@ lvgl:
             id: page_title
             text: Vær
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 8

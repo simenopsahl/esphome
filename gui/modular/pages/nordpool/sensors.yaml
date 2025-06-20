@@ -145,11 +145,11 @@ globals:
   - id: nordpool_points_y
     type: int[9]
     restore_value: no
-    initial_value: '{0, 0, 0, 0, 0, 0, 0, 0, 0}'
+    initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
   - id: nordpool_points_x
     type: int[9]
     restore_value: no
-    initial_value: '{0, 0, 0, 0, 0, 0, 0, 0, 0}'
+    initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
 
 script:
   - id: initialize_graph_layout

@@ -37,7 +37,7 @@ lvgl:
             text: NordPool
         - script.execute: update_price_chart
       <<: !include
-        file: gui/modular/sections/swipe_navigation.yaml
+        file: gui/modular/functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 1

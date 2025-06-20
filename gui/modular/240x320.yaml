@@ -121,7 +121,7 @@ lvgl:
             id: page_title
             text: Klokke
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         # Outer Clock Container
         - obj:
@@ -208,7 +208,7 @@ lvgl:
             id: page_title
             text: Enhet
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 1
@@ -334,7 +334,7 @@ lvgl:
             id: page_title
             text: Temperatur
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 1
@@ -409,7 +409,7 @@ lvgl:
             id: page_title
             text: Vær
       <<: !include
-        file: sections/swipe_navigation.yaml
+        file: functions/swipe_navigation.yaml
       widgets:
         - obj:
             pad_all: 1
@@ -553,7 +553,7 @@ packages:
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control
-  control_auto_display: !include { file: sections/control_auto_display.yaml }
+  control_auto_display: !include { file: functions/control_auto_display.yaml }
 
   # Weather packages
   # Build icon set from .svg files
