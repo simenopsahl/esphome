@@ -62,7 +62,6 @@ font: !include
     # Variables for the forecast objects at the bottom
     weather_forecast_grid_columns: [ 70, 70, 70, 70 ]
     weather_forecast_grid_pad_column: 6
-    # --- Styles moved from .forcast_styles ---
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
@@ -74,6 +73,8 @@ font: !include
     weather_forecast_time_font: font_sm
     # Font for the "Været nå" text
     weather_forecast_condition_font: font_md
+    initial_today_icon_src: "unknown_60"
+    initial_forecast_icon_src: "unknown_34"
 
   - &button_widget_vars
     width: 75

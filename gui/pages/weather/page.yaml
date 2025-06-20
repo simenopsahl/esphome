@@ -33,7 +33,7 @@
             # Today's weather icon
             - image:
                 id: weather_condition_icon
-                src: "unknown_80"
+                src: !lambda return initial_today_icon_src;
                 height: SIZE_CONTENT
                 width: SIZE_CONTENT
                 grid_cell_row_pos: 0
@@ -110,7 +110,7 @@
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_0
-                            src: "unknown_34"
+                            src: !lambda return initial_forecast_icon_src;
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_0
@@ -144,7 +144,7 @@
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_1
-                            src: "unknown_34"
+                            src: !lambda return initial_forecast_icon_src;
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_1
@@ -178,7 +178,7 @@
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_2
-                            src: "unknown_34"
+                            src: !lambda return initial_forecast_icon_src;
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_2
@@ -212,7 +212,7 @@
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_3
-                            src: "unknown_34"
+                            src: !lambda return initial_forecast_icon_src;
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_3
