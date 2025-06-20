@@ -1,6 +1,4 @@
----
 # Display auto off
-
 
 switch:
   # Switch to turn on/off the display auto off feature

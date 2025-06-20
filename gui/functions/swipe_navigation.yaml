@@ -1,4 +1,3 @@
----
 # Swipe navigation
   on_swipe_right:
       - lambda: 'lv_indev_wait_release(lv_indev_get_act());'
