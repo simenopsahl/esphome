@@ -1,73 +1,99 @@
 # https://esphome.io/cookbook/lvgl#an-analog-clock
 # LVGL analog clock
 
-# clock element
+# clock page
 #lvgl:
 #  pages:
-    - id: clock_page
-      <<: *page_styles
-      on_load:
-        - lvgl.label.update:
-            id: page_title
-            text: Clock
-      widgets:
-        - obj: # clock container
-            <<: *container_styles
-            widgets:
-              - meter: # clock face
-                  height: 90%
-                  align: CENTER
-                  border_width: 0
-                  bg_opa: TRANSP
-                  scales:
-                    - range_from: 0 # minutes scale
-                      range_to: 60
-                      angle_range: 360
-                      rotation: 270
-                      ticks:
-                        width: 1
-                        count: 61
+    id: page_analog_clock
+    # REMOVED: `<<: *page_styles`
+    # ADDED: Use the variables passed from the parent file
+    pad_top: !lambda return page_pad_top;
+    pad_bottom: !lambda return page_pad_bottom;
+    on_load:
+      - lvgl.label.update:
+          id: page_title
+          text: Klokke
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      # Outer Clock Container
+      - obj:
+          <<: !include ../../styles/container_styles.yaml
+          # Use the passed-in variables for size
+          pad_top: !lambda return container_pad_top;
+          pad_bottom: !lambda return container_pad_bottom;
+          pad_left: !lambda return container_pad_left;
+          pad_right: !lambda return container_pad_right;
+          scrollable: !lambda return container_scrollable;
+          align: CENTER
+          widgets:
+            # clock face
+            - meter:
+                # Use the passed-in variables for size
+                height: !lambda return meter_height;
+                width: !lambda return meter_width;
+                align: CENTER
+                border_width: 0
+                bg_opa: TRANSP
+                scales:
+                  # Minor ticks
+                  - range_from: 0
+                    range_to: 60
+                    angle_range: 360
+                    rotation: 270
+                    ticks:
+                      width: 1
+                      count: 61
+                      length: 10
+                      color: c_bg_s
+                    # Minuite hand
+                    indicators:
+                      - line:
+                          id: minute_hand
+                          width: 3
+                          color: c_text_s
+                          r_mod: -4
+                          value: 0
+                  # Major ticks
+                  - range_from: 1
+                    range_to: 12
+                    angle_range: 330
+                    rotation: 300
+                    ticks:
+                      width: 1
+                      count: 12
+                      length: 1
+                      major:
+                        stride: 1
+                        width: 4
                         length: 10
-                        color: c_bg_s
-                      indicators:
-                        - line:
-                            id: minute_hand
-                            width: 3
-                            color: c_text_s
-                            r_mod: -4
-                            value: 0
-                    - range_from: 1 # hours scale for labels
-                      range_to: 12
-                      angle_range: 330
-                      rotation: 300
-                      ticks:
-                        width: 1
-                        count: 12
-                        length: 1
-                        major:
-                          stride: 1
-                          width: 4
-                          length: 10
-                          color: c_dark_gray
-                          label_gap: 12
-                    - range_from: 0 # hi-res hours scale for hand
-                      range_to: 720
-                      angle_range: 360
-                      rotation: 270
-                      ticks:
-                        count: 0
-                      indicators:
-                        - line:
-                            id: hour_hand
-                            width: 5
-                            color: c_purple
-                            r_mod: -30
-                            value: 0
-              - label:
-                  id: day_label
-                  text_font: font_sm
-                  y: -30
-              - label:
-                  id: date_label
-                  text_font: font_sm
-                  y: 30
+                        color: c_dark_gray
+                        label_gap: 12
+                  # Hour hand
+                  - range_from: 0
+                    range_to: 720
+                    angle_range: 360
+                    rotation: 270
+                    ticks:
+                      count: 0
+                    indicators:
+                      - line:
+                          id: hour_hand
+                          width: 5
+                          color: c_purple
+                          r_mod: -30
+                          value: 0
+            - label:
+                id: day_label
+                text_font: font_sm
+                align: center
+                text_color: c_gray
+                pad_all: 2
+                x: -110
+            - label:
+                id: date_label
+                text_font: font_sm
+                align: center
+                text_color: c_gray
+                pad_all: 2
+                x: 110
