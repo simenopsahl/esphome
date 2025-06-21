@@ -40,8 +40,8 @@ font: !include
     pad_row: 8
 
   - &clock_page_styles
-    meter_height: 300
-    meter_width: 300
+    clock_meter_height: 300
+    clock_meter_width: 300
 
   - &nordpool_layout_styles
     # -- DISPLAY CONFIGURATION --
@@ -54,12 +54,12 @@ font: !include
     # 480 - (2 * 40) - (2 * 2) = 396
     nordpool_usable_screen_height: 396
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_grid_row_1_height: 20 # text_md
-    nordpool_grid_row_3_height: 16 # text_sm
+    nordpool_row_1_height: 20 # text_md
+    nordpool_row_3_height: 16 # text_sm
     # Calculate the usable graph area for the page
     # (usable_height - text_md - text_sm)
     # 396 - 20 - 16 = 360
-    nordpool_grid_row_2_height: 360
+    nordpool_row_2_height: 360
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 5
 
@@ -81,23 +81,23 @@ font: !include
     # Total fr units = 4 + 3 = 7
     # Row 1 height = (4 / 7) * 396px = ~226px
     # Row 2 height = (3 / 7) * 396px = ~169px
-    weather_grid_row_1_height: 226
-    weather_grid_row_2_height: 169
+    weather_row_1_height: 226
+    weather_row_2_height: 169
     # Calculation for this 480x320 screen:
     # Available width = 320px (screen) - 6px (left pad) - 6px (right pad) = 308px
     # Total fr units = 7 + 6 = 13
     # Column 1 width = (7 / 13) * 308px = 165px
     # Column 2 width = (6 / 13) * 308px = 142px
-    weather_grid_column_1_width: 165
-    weather_grid_column_2_width: 142
+    weather_column_1_width: 165
+    weather_column_2_width: 142
     # Variables for the forecast objects at the bottom
-    weather_forecast_grid_column_width: 70
-    weather_forecast_grid_pad_column: 6
+    weather_forecast_column_width: 70
+    #weather_forecast_grid_pad_column: 6 # must be static
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 2
     weather_forecast_obj_pad_bottom: 2
-    weather_forecast_obj_pad_row: 2
-    weather_forecast_obj_pad_column: 0
+    #weather_forecast_obj_pad_row: 2 # must be static
+    #weather_forecast_obj_pad_column: 0 # must be static
     # Font for the main temperature and forecast temperature
     weather_forecast_temp_font: font_xl
     # Font for the forecast timestamp

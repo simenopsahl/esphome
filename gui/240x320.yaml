@@ -40,8 +40,8 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    meter_height: 170
-    meter_width: 170
+    clock_meter_height: 170
+    clock_meter_width: 170
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
@@ -55,12 +55,12 @@ font: !include
     # Note: container_pad is 0 in this layout from &container_styles
     nordpool_usable_screen_height: 172
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_grid_row_1_height: 18 # text_md
-    nordpool_grid_row_3_height: 14 # text_sm
+    nordpool_row_1_height: 18 # text_md
+    nordpool_row_3_height: 14 # text_sm
     # Calculate the usable graph area for the page
     # (usable_height - text_md - text_sm)
     # 312 - 18 - 14 = 140
-    nordpool_grid_row_2_height: 140
+    nordpool_row_2_height: 140
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 4
 
@@ -71,23 +71,23 @@ font: !include
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 172px = ~74px
     # Row 2 height = (4 / 7) * 172px = ~98px
-    weather_grid_row_1_height: 74
-    weather_grid_row_2_height: 98
+    weather_row_1_height: 74
+    weather_row_2_height: 98
     # Calculation for this 240x320 screen:
     # Available width = 320px (screen) - 2px (left pad) - 2px (right pad) = 312px
     # Total fr units = 1 + 1 = 2
     # Column 1 width = (1 / 2) * 312px = 156px
     # Column 2 width = (1 / 2) * 312px = 156px
-    weather_grid_column_1_width: 156
-    weather_grid_column_2_width: 156
+    weather_column_1_width: 156
+    weather_column_2_width: 156
     # Variables for the forecast objects at the bottom
-    weather_forecast_grid_column_width: 70
-    weather_forecast_grid_pad_column: 6
+    weather_forecast_column_width: 70
+    #weather_forecast_grid_pad_column: 6 # must be static
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
-    weather_forecast_obj_pad_row: 0
-    weather_forecast_obj_pad_column: 0
+    #weather_forecast_obj_pad_row: 0 # must be static
+    #weather_forecast_obj_pad_column: 0 # must be static
     # Font for the main temperature and forecast temperature
     weather_forecast_temp_font: font_xl
     # Font for the forecast timestamp
@@ -149,7 +149,7 @@ packages:
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
-  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*nordpool_page_styles] } }
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: *nordpool_page_styles } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control

@@ -7,8 +7,8 @@
     <<: !include ../../styles/page_styles.yaml
     # REMOVED: `<<: *page_styles`
     # ADDED: Use the variables passed from the parent file
-    pad_top: !lambda return page_pad_top;
-    pad_bottom: !lambda return page_pad_bottom;
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
     on_load:
       - lvgl.label.update:
           id: page_title
@@ -20,11 +20,11 @@
       - obj:
           <<: !include ../../styles/container_styles.yaml
           # Use the passed-in variables for size
-          pad_top: !lambda return container_pad_top;
-          pad_bottom: !lambda return container_pad_bottom;
-          pad_left: !lambda return container_pad_left;
-          pad_right: !lambda return container_pad_right;
-          scrollable: !lambda return container_scrollable;
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
           align: CENTER
           layout:
             type: GRID
@@ -38,7 +38,7 @@
                 grid_cell_x_align: CENTER
                 grid_cell_y_align: END
                 width: 100%
-                height: !lambda return nordpool_grid_row_1_height;
+                height: ${nordpool_row_1_height}
                 pad_all: 0
                 layout:
                   type: GRID
@@ -103,7 +103,7 @@
                 grid_cell_x_align: CENTER
                 grid_cell_y_align: CENTER
                 width: 100%
-                height: !lambda return nordpool_grid_row_2_height;
+                height: ${nordpool_row_2_height}
                 widgets:
                   - line:
                       id: lvgl_nordpool_line
@@ -141,7 +141,7 @@
                 grid_cell_x_align: CENTER
                 grid_cell_y_align: START
                 width: 100%
-                height: !lambda return nordpool_grid_row_3_height;
+                height: ${nordpool_row_3_height}
                 pad_all: 0
                 layout:
                   type: GRID

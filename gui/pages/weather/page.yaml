@@ -7,8 +7,8 @@
     <<: !include ../../styles/page_styles.yaml
     # REMOVED: `<<: *page_styles`
     # ADDED: Use the variables passed from the parent file
-    pad_top: !lambda return page_pad_top;
-    pad_bottom: !lambda return page_pad_bottom;
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
     on_load:
       - lvgl.label.update:
           id: page_title
@@ -19,11 +19,11 @@
       - obj:
           <<: !include ../../styles/container_styles.yaml
           # Use the passed-in variables for size
-          pad_top: !lambda return container_pad_top;
-          pad_bottom: !lambda return container_pad_bottom;
-          pad_left: !lambda return container_pad_left;
-          pad_right: !lambda return container_pad_right;
-          scrollable: !lambda return container_scrollable;
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
           align: CENTER
           layout:
             type: GRID
@@ -33,13 +33,13 @@
             # Today's weather icon
             - image:
                 id: weather_condition_icon
-                src: !lambda return initial_today_icon_src;
+                src: ${initial_today_icon_src}
                 grid_cell_row_pos: 0
                 grid_cell_column_pos: 0
                 grid_cell_y_align: CENTER
                 grid_cell_x_align: CENTER
-                height: !lambda return weather_row_1_height;
-                width: !lambda return weather_column_1_width;
+                height: ${weather_row_1_height}
+                width: ${weather_column_1_width}
                 align: CENTER
                 
             # Today's temperature and condition
@@ -47,8 +47,8 @@
                 grid_cell_row_pos: 0
                 grid_cell_column_pos: 1
                 grid_cell_y_align: CENTER
-                height: !lambda return weather_row_1_height;
-                width: !lambda return weather_column_2_width;
+                height: ${weather_row_1_height}
+                width: ${weather_column_2_width}
                 bg_opa: TRANSP
                 layout:
                   type: FLEX
@@ -59,14 +59,14 @@
                   - label:
                       id: weather_temperature_today
                       text: "--°"
-                      text_font: !lambda return weather_forecast_temp_font;
+                      text_font: ${weather_forecast_temp_font}
                       text_align: LEFT
                   - label:
                       id: weather_condition_today
                       text: "Været nå"
                       long_mode: wrap
                       scrollable: true
-                      text_font: !lambda return weather_forecast_condition_font;
+                      text_font: ${weather_forecast_condition_font}
                       text_align: LEFT
 
             # The second row (forecast section)
@@ -75,14 +75,14 @@
                 grid_cell_column_pos: 0
                 grid_cell_column_span: 2
                 grid_cell_y_align: CENTER
-                height: !lambda return weather_row_2_height;
+                height: ${weather_row_2_height}
                 width: 100%
                 bg_opa: TRANSP
                 layout:
                   type: GRID
                   grid_rows: [ content ]
                   grid_columns: [ content, content, content, content ]
-                  pad_column: !lambda return weather_forecast_grid_pad_column;
+                  pad_column: 6
                   pad_row: 0
                 widgets:
                   # Forecast Item 0
@@ -90,34 +90,32 @@
                       grid_cell_column_pos: 0
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: !lambda return weather_forecast_grid_column_width;
+                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: !lambda return weather_forecast_obj_radius;
-                      pad_top: !lambda return weather_forecast_obj_pad_top;
-                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
                         flex_align_track: CENTER
-                        pad_column: !lambda return weather_forecast_obj_pad_column;
-                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       # --- Widgets for this forecast item ---
                       widgets:
                         - label:
                             id: forecast_timestamp_0
                             text: "??:??"
-                            text_font: !lambda return weather_forecast_time_font;
+                            text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_0
-                            src: !lambda return initial_forecast_icon_src;
+                            src: ${initial_forecast_icon_src}
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_0
                             text: "--°"
-                            text_font: !lambda return weather_forecast_temp_font;
+                            text_font: ${weather_forecast_temp_font}
                             height: SIZE_CONTENT
 
                   # Forecast Item 1
@@ -125,33 +123,31 @@
                       grid_cell_column_pos: 1
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: !lambda return weather_forecast_grid_column_width;
+                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: !lambda return weather_forecast_obj_radius;
-                      pad_top: !lambda return weather_forecast_obj_pad_top;
-                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
                         flex_align_track: CENTER
-                        pad_column: !lambda return weather_forecast_obj_pad_column;
-                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       widgets:
                         - label:
                             id: forecast_timestamp_1
                             text: "??:??"
-                            text_font: !lambda return weather_forecast_time_font;
+                            text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_1
-                            src: !lambda return initial_forecast_icon_src;
+                            src: ${initial_forecast_icon_src}
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_1
                             text: "--°"
-                            text_font: !lambda return weather_forecast_temp_font;
+                            text_font: ${weather_forecast_temp_font}
                             height: SIZE_CONTENT
 
                   # Forecast Item 2
@@ -159,33 +155,31 @@
                       grid_cell_column_pos: 2
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: !lambda return weather_forecast_grid_column_width;
+                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: !lambda return weather_forecast_obj_radius;
-                      pad_top: !lambda return weather_forecast_obj_pad_top;
-                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
                         flex_align_track: CENTER
-                        pad_column: !lambda return weather_forecast_obj_pad_column;
-                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       widgets:
                         - label:
                             id: forecast_timestamp_2
                             text: "??:??"
-                            text_font: !lambda return weather_forecast_time_font;
+                            text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_2
-                            src: !lambda return initial_forecast_icon_src;
+                            src: ${initial_forecast_icon_src}
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_2
                             text: "--°"
-                            text_font: !lambda return weather_forecast_temp_font;
+                            text_font: ${weather_forecast_temp_font}
                             height: SIZE_CONTENT
 
                   # Forecast Item 3
@@ -193,31 +187,29 @@
                       grid_cell_column_pos: 3
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: !lambda return weather_forecast_grid_column_width;
+                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: !lambda return weather_forecast_obj_radius;
-                      pad_top: !lambda return weather_forecast_obj_pad_top;
-                      pad_bottom: !lambda return weather_forecast_obj_pad_bottom;
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
                         flex_align_track: CENTER
-                        pad_column: !lambda return weather_forecast_obj_pad_column;
-                        pad_row: !lambda return weather_forecast_obj_pad_row;
                       widgets:
                         - label:
                             id: forecast_timestamp_3
                             text: "??:??"
-                            text_font: !lambda return weather_forecast_time_font;
+                            text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
                             height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_3
-                            src: !lambda return initial_forecast_icon_src;
+                            src: ${initial_forecast_icon_src}
                             height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_3
                             text: "--°"
-                            text_font: !lambda return weather_forecast_temp_font;
+                            text_font: ${weather_forecast_temp_font}
                             height: SIZE_CONTENT

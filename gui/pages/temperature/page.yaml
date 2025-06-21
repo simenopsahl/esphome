@@ -7,8 +7,8 @@
     <<: !include ../../styles/page_styles.yaml
     # REMOVED: `<<: *page_styles`
     # ADDED: Use the variables passed from the parent file
-    pad_top: !lambda return page_pad_top;
-    pad_bottom: !lambda return page_pad_bottom;
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
     on_load:
       - lvgl.label.update:
           id: page_title
@@ -19,11 +19,11 @@
       - obj:
           <<: !include ../../styles/container_styles.yaml
           # Use the passed-in variables for size
-          pad_top: !lambda return container_pad_top;
-          pad_bottom: !lambda return container_pad_bottom;
-          pad_left: !lambda return container_pad_left;
-          pad_right: !lambda return container_pad_right;
-          scrollable: !lambda return container_scrollable;
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
           align: CENTER
           layout:
             type: GRID
