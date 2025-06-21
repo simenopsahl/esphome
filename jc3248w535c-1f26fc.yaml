@@ -31,6 +31,17 @@ esphome:
   project:
     version: "1.0.0"
 
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
 light:
   - id: !extend backlight_light
     on_state:

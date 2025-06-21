@@ -108,15 +108,17 @@
                 grid_cell_y_align: CENTER
                 width: 100%
                 height: ${nordpool_row_2_height}
+                pad_all: 0
                 widgets:
                   - line:
                       id: lvgl_nordpool_line
-                      height: 100%
+                      height: ${nordpool_row_2_height}
                       width: 100%
                       align: CENTER
                       line_width: ${nordpool_line_width}
                       line_color: c_green
                       line_rounded: true
+                      pad_all: 0
                       points:
                         # Read initial points from globals
                         - x: !lambda return id(nordpool_points_x)[0];

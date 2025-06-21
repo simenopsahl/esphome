@@ -42,6 +42,8 @@ font: !include
   - &clock_page_styles
     clock_meter_height: 170
     clock_meter_width: 170
+    clock_translate_x: 110
+    clock_translate_y: 0
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
@@ -52,17 +54,16 @@ font: !include
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
     # 240 - (2 * 34) - (2 * 0) = 172
-    # Note: container_pad is 0 in this layout from &container_styles
     nordpool_usable_page_height: 172
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_row_1_height: 18 # text_md
-    nordpool_row_3_height: 14 # text_sm
+    nordpool_row_1_height: 20 # text_md +2
+    nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
-    # (usable_height - text_md - text_sm)
-    # 312 - 18 - 14 = 140
-    nordpool_row_2_height: 140
+    # (usable_height - row_1_height - row_3_height)
+    # 312 - 20 - 16 = 136
+    nordpool_row_2_height: 136
     # -- GRAPH CONFIGURATION --
-    nordpool_line_width: 4
+    nordpool_line_width: 6
 
   - &weather_page_styles
     # Variables for the main layout grid

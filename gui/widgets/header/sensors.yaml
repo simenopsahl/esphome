@@ -30,19 +30,3 @@ wifi:
 #                time_format: "%H:%M"
 #                time: time_homeassistant
 #          - script.execute: time_update
-
-#      - hours: 2,3,4,5
-#        minutes: 5
-#        seconds: 0
-#        then:
-#          - if:
-#              condition:
-#                - switch.is_on: display_auto
-#              then:
-#                - switch.turn_on: switch_antiburn
-
-#      - hours: 2,3,4,5
-#        minutes: 35
-#        seconds: 0
-#        then:
-#          - switch.turn_off: switch_antiburn

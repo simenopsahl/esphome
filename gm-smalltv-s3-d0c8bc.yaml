@@ -7,7 +7,7 @@ packages:
 #  board: !include board/geekmagic_smalltv_s3.yaml
 
   # --- GUI PACKAGES ---
-  color: !include gui/colors_night_owl.yaml
+  color: !include gui/themes/colors_night_owl.yaml
 
 substitutions:
   devicename: gm-smalltv-s3-d0c8bc

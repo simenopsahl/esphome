@@ -16,8 +16,13 @@
 
 # clock update script
 script:
-  - id: time_update
+  - id: lvgl_time_update
     then:
+      - lvgl.label.update:
+          id: nav_clock
+          text:
+            time_format: "%H:%M"
+            time: time_homeassistant
       - lvgl.indicator.update:
           id: minute_hand
           value: !lambda |-

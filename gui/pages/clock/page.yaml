@@ -88,13 +88,17 @@
                 id: day_label
                 text_font: font_sm
                 align: center
+                text: "Dag"
                 text_color: c_gray
                 pad_all: 2
-                x: -110
+                translate_x: -${clock_translate_x}
+                translate_y: -${clock_translate_y}
             - label:
                 id: date_label
                 text_font: font_sm
                 align: center
+                text: "Dato"
                 text_color: c_gray
                 pad_all: 2
-                x: 110
+                translate_x: ${clock_translate_x}
+                translate_y: -${clock_translate_y}

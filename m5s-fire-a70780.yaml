@@ -32,11 +32,22 @@ esphome:
   friendly_name: $devicename
   area: $location
 
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
 binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: binary_sensor.etg2_stue_occupancy
-    id: motion_stue
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: motion_simen
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
     id: motion_gang
@@ -44,7 +55,7 @@ binary_sensor:
   - platform: template
     id: motion_detected
     lambda: !lambda |-
-      if ( (id(motion_stue).state) or (id(motion_gang).state) ) {
+      if ( (id(motion_simen).state) or (id(motion_gang).state) ) {
         return true;
       } else {
         return false;
