@@ -13,7 +13,7 @@
       - lvgl.label.update:
           id: page_title
           text: NordPool
-      - script.execute: update_price_chart
+      - script.execute: nordpool_update_chart
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
@@ -28,145 +28,174 @@
           align: CENTER
           layout:
             type: GRID
-            # Grid definition for the page layout
-            grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
-            grid_rows: !lambda return nordpool_grid_rows;
+            grid_columns: [ content ]
+            grid_rows: [ content, content, content]
           widgets:
-            - label: # Current electricity price
+            # --- TOP ROW: Price Labels ---
+            - obj:
+                grid_cell_row_pos: 0
                 grid_cell_column_pos: 0
-                grid_cell_row_pos: 0
-                grid_cell_x_align: START
-                grid_cell_y_align: CENTER
-                id: lbl_nordpool_price_0
-                text: "???"
-                text_font: font_md
-                text_color: c_text_p
-                text_align: LEFT
-            - label: # Current hour of the day
-                grid_cell_column_pos: 0
-                grid_cell_row_pos: 2
-                grid_cell_x_align: START
-                grid_cell_y_align: CENTER
-                id: lbl_nordpool_time_0
-                text: "??:??"
-                text_font: font_sm
-                text_color: c_text_s
-                text_align: LEFT
-
-            - label: # Electricity price 2 hours from now
-                grid_cell_column_pos: 2
-                grid_cell_row_pos: 0
-                grid_cell_x_align: START
-                grid_cell_y_align: CENTER
-                id: lbl_nordpool_price_2
-                text: "???"
-                text_font: font_md
-                text_color: c_text_p
-                text_align: CENTER
-            - label: # Hour of the day 2 hours from now
-                grid_cell_column_pos: 2
-                grid_cell_row_pos: 2
-                grid_cell_x_align: START
-                grid_cell_y_align: CENTER
-                id: lbl_nordpool_time_2
-                text: "??:??"
-                text_font: font_sm
-                text_color: c_text_s
-                text_align: CENTER
-
-            - label: # Electricity price 5 hours from now
-                id: lbl_nordpool_price_4
-                text: "???"
-                grid_cell_column_pos: 4
-                grid_cell_row_pos: 0
                 grid_cell_x_align: CENTER
-                grid_cell_y_align: CENTER
-                text_font: font_md
-                text_color: c_text_p
-                text_align: CENTER
-            - label:  # Hour of the day 5 hours from now
-                id: lbl_nordpool_time_4
-                text: "??:??"
-                grid_cell_column_pos: 4
-                grid_cell_row_pos: 2
-                grid_cell_x_align: CENTER
-                grid_cell_y_align: CENTER
-                text_font: font_sm
-                text_color: c_text_s
-                text_align: CENTER
-
-            - label: # Electricity price 7 hours from now
-                id: lbl_nordpool_price_6
-                text: "???"
-                grid_cell_column_pos: 6
-                grid_cell_row_pos: 0
-                grid_cell_x_align: CENTER
-                grid_cell_y_align: CENTER
-                text_font: font_md
-                text_color: c_text_p
-                text_align: CENTER
-            - label:  # Hour of the day 7 hours from now
-                id: lbl_nordpool_time_6
-                text: "??:??"
-                grid_cell_column_pos: 6
-                grid_cell_row_pos: 2
-                grid_cell_x_align: CENTER
-                grid_cell_y_align: CENTER
-                text_font: font_sm
-                text_color: c_text_s
-                text_align: CENTER
-
-            - label: # Electricity price 9 hours from now
-                id: lbl_nordpool_price_8
-                text: "???"
-                grid_cell_column_pos: 8
-                grid_cell_row_pos: 0
-                grid_cell_x_align: END
-                grid_cell_y_align: CENTER
-                text_font: font_md
-                text_color: c_text_p
-                text_align: RIGHT
-            - label:  # Hour of the day 9 hours from now
-                id: lbl_nordpool_time_8
-                text: "??:??"
-                grid_cell_column_pos: 8
-                grid_cell_row_pos: 2
-                grid_cell_x_align: END
-                grid_cell_y_align: CENTER
-                text_font: font_sm
-                text_color: c_text_s
-                text_align: RIGHT
-
-            - line: # graph container
-                grid_cell_column_pos: 0
-                grid_cell_row_pos: 1
-                grid_cell_column_span: 9
-                grid_cell_x_align: STRETCH
-                grid_cell_y_align: STRETCH
-                height: 100%
+                grid_cell_y_align: END
                 width: 100%
-                align: CENTER
-                id: lvgl_nordpool_line
-                line_width: !lambda return nordpool_line_width;
-                line_color: c_green
-                line_rounded: true
-                points:
-                  # Read initial points from globals
-                  - x: !lambda return id(nordpool_points_x)[0];
-                    y: !lambda return id(nordpool_points_y)[0];
-                  - x: !lambda return id(nordpool_points_x)[1];
-                    y: !lambda return id(nordpool_points_y)[1];
-                  - x: !lambda return id(nordpool_points_x)[2];
-                    y: !lambda return id(nordpool_points_y)[2];
-                  - x: !lambda return id(nordpool_points_x)[3];
-                    y: !lambda return id(nordpool_points_y)[3];
-                  - x: !lambda return id(nordpool_points_x)[4];
-                    y: !lambda return id(nordpool_points_y)[4];
-                  - x: !lambda return id(nordpool_points_x)[5];
-                    y: !lambda return id(nordpool_points_y)[5];
-                  - x: !lambda return id(nordpool_points_x)[6];
-                    y: !lambda return id(nordpool_points_y)[6];
-                  - x: !lambda return id(nordpool_points_x)[7];
-                    y: !lambda return id(nordpool_points_y)[7];
-                  - x: !lambda return id(nordpool_points_x)[8];
-                    y: !lambda return id(nordpool_points_y)[8];
+                height: !lambda return nordpool_grid_row_1_height;
+                pad_all: 0
+                layout:
+                  type: GRID
+                  grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
+                  grid_rows: [ content ]
+                widgets:
+                  - label:
+                      grid_cell_column_pos: 0
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: START
+                      grid_cell_y_align: CENTER
+                      id: lbl_nordpool_price_0
+                      text: "???"
+                      text_font: font_md
+                      text_color: c_text_p
+                      text_align: LEFT
+                  - label:
+                      grid_cell_column_pos: 2
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: START
+                      grid_cell_y_align: CENTER
+                      id: lbl_nordpool_price_2
+                      text: "???"
+                      text_font: font_md
+                      text_color: c_text_p
+                      text_align: CENTER
+                  - label:
+                      id: lbl_nordpool_price_4
+                      text: "???"
+                      grid_cell_column_pos: 4
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: CENTER
+                      text_font: font_md
+                      text_color: c_text_p
+                      text_align: CENTER
+                  - label:
+                      id: lbl_nordpool_price_6
+                      text: "???"
+                      grid_cell_column_pos: 6
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: CENTER
+                      text_font: font_md
+                      text_color: c_text_p
+                      text_align: CENTER
+                  - label:
+                      id: lbl_nordpool_price_8
+                      text: "???"
+                      grid_cell_column_pos: 8
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: END
+                      grid_cell_y_align: CENTER
+                      text_font: font_md
+                      text_color: c_text_p
+                      text_align: RIGHT
+
+            # --- MIDDLE ROW: Price Graph ---
+            - obj:
+                grid_cell_row_pos: 1
+                grid_cell_column_pos: 0
+                grid_cell_x_align: CENTER
+                grid_cell_y_align: CENTER
+                width: 100%
+                height: !lambda return nordpool_grid_row_2_height;
+                widgets:
+                  - line:
+                      id: lvgl_nordpool_line
+                      height: 100%
+                      width: 100%
+                      align: CENTER
+                      line_width: !lambda return nordpool_line_width;
+                      line_color: c_green
+                      line_rounded: true
+                      points:
+                        # Read initial points from globals
+                        - x: !lambda return id(nordpool_points_x)[0];
+                          y: !lambda return id(nordpool_points_y)[0];
+                        - x: !lambda return id(nordpool_points_x)[1];
+                          y: !lambda return id(nordpool_points_y)[1];
+                        - x: !lambda return id(nordpool_points_x)[2];
+                          y: !lambda return id(nordpool_points_y)[2];
+                        - x: !lambda return id(nordpool_points_x)[3];
+                          y: !lambda return id(nordpool_points_y)[3];
+                        - x: !lambda return id(nordpool_points_x)[4];
+                          y: !lambda return id(nordpool_points_y)[4];
+                        - x: !lambda return id(nordpool_points_x)[5];
+                          y: !lambda return id(nordpool_points_y)[5];
+                        - x: !lambda return id(nordpool_points_x)[6];
+                          y: !lambda return id(nordpool_points_y)[6];
+                        - x: !lambda return id(nordpool_points_x)[7];
+                          y: !lambda return id(nordpool_points_y)[7];
+                        - x: !lambda return id(nordpool_points_x)[8];
+                          y: !lambda return id(nordpool_points_y)[8];
+
+            # --- BOTTOM ROW: Time Labels ---
+            - obj:
+                grid_cell_row_pos: 2
+                grid_cell_column_pos: 0
+                grid_cell_x_align: CENTER
+                grid_cell_y_align: START
+                width: 100%
+                height: !lambda return nordpool_grid_row_3_height;
+                pad_all: 0
+                layout:
+                  type: GRID
+                  grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
+                  grid_rows: [ content ]
+                widgets:
+                  - label:
+                      grid_cell_column_pos: 0
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: START
+                      grid_cell_y_align: CENTER
+                      id: lbl_nordpool_time_0
+                      text: "??:??"
+                      text_font: font_sm
+                      text_color: c_text_s
+                      text_align: LEFT
+                  - label:
+                      grid_cell_column_pos: 2
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: START
+                      grid_cell_y_align: CENTER
+                      id: lbl_nordpool_time_2
+                      text: "??:??"
+                      text_font: font_sm
+                      text_color: c_text_s
+                      text_align: CENTER
+                  - label:
+                      id: lbl_nordpool_time_4
+                      text: "??:??"
+                      grid_cell_column_pos: 4
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: CENTER
+                      text_font: font_sm
+                      text_color: c_text_s
+                      text_align: CENTER
+                  - label:
+                      id: lbl_nordpool_time_6
+                      text: "??:??"
+                      grid_cell_column_pos: 6
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: CENTER
+                      text_font: font_sm
+                      text_color: c_text_s
+                      text_align: CENTER
+                  - label:
+                      id: lbl_nordpool_time_8
+                      text: "??:??"
+                      grid_cell_column_pos: 8
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: END
+                      grid_cell_y_align: CENTER
+                      text_font: font_sm
+                      text_color: c_text_s
+                      text_align: RIGHT
+

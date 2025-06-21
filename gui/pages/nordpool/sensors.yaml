@@ -95,7 +95,7 @@ sensor:
       - source: nordpool_price_7
       - source: nordpool_price_8
     on_value:
-      - script.execute: update_price_chart
+      - script.execute: nordpool_update_chart
 
 text_sensor:
   # Strings from Home Assistant
@@ -152,7 +152,7 @@ globals:
     initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
 
 script:
-  - id: initialize_graph_layout
+  - id: nordpool_initialize_graph_layout
     then:
       - lambda: |-
           // This script runs once on boot to set up the graph coordinates
@@ -177,7 +177,7 @@ script:
             id(nordpool_points_y)[i] = mid_y;
           }
 
-  - id: update_price_chart
+  - id: nordpool_update_chart
     mode: single
     then:
       - lambda: |-
