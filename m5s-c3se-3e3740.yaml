@@ -1,12 +1,18 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
 #  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/m5stack_core_s3se.yaml
   internal_i2c: !include board/extension/internal_i2c.yaml
 #  base_m5go: !include board/module/base_m5go_bottom.yaml
+
+  # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/240x320.yaml
 
+  # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.etg2_simen_temperature

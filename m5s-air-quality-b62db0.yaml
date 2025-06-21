@@ -1,6 +1,9 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
 #  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/m5stack_air_quality.yaml
   internal_i2c: !include board/extension/internal_i2c.yaml
   grove_i2c: !include board/extension/grove_i2c.yaml

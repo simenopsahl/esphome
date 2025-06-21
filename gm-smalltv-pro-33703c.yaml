@@ -1,7 +1,12 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
 #  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/geekmagic_smalltv_pro.yaml
+
+  # --- GUI PACKAGES ---
   color: !include gui/colors_night_owl.yaml
 #  lvgl_theme: !include gui/lvgl_night_owl_dark.yaml
 

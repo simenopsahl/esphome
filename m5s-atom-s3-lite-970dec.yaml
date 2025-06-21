@@ -1,6 +1,9 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml

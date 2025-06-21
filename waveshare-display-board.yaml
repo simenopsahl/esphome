@@ -1,7 +1,10 @@
 # https://community.home-assistant.io/t/use-esphome-with-e-ink-displays-to-blend-in-with-your-home-decor/435428
 # https://github.com/Madelena/esphome-weatherman-dashboard
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
   board: !include board/waveshare_epaper_driver.yaml
 
 substitutions:

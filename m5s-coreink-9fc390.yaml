@@ -1,6 +1,9 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/m5stack_coreink.yaml
 #  internal_i2c: !include board/extension/internal_i2c.yaml
   hat: !include board/extension/hat_i2c.yaml

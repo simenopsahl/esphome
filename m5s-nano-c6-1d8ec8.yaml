@@ -1,7 +1,10 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
 # might be too weak for BLE ?
   <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/m5stack_nano_c6.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/unit_env_iii.yaml

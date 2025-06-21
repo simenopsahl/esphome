@@ -1,6 +1,9 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/upesy_wroom.yaml
   i2c_internal: !include board/extension/internal_i2c.yaml
   bme280: !include board/module/bme280_i2c.yaml

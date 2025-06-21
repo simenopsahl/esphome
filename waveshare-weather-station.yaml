@@ -1,5 +1,8 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
   board: !include board/waveshare_epaper_driver.yaml
 
 substitutions:

@@ -1,4 +1,5 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
 
 substitutions:

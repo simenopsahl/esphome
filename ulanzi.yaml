@@ -3,7 +3,10 @@
 # https://developer.lametric.com/icons
 
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
   board: !include board/ulanzi_tc001.yaml
 
 substitutions:

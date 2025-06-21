@@ -1,10 +1,15 @@
 packages:
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
   hat: !include board/extension/hat_i2c.yaml
   portabc: !include board/extension/port_abc_i2c.yaml
   env: !include board/module/hat_env_iii.yaml
+
+  # --- GUI PACKAGES ---
   color: !include gui/colors.yaml
 
 substitutions:
