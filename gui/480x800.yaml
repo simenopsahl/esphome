@@ -17,7 +17,7 @@ font: !include
     icons_xxl: 56
 
 .sizing:
-  - &nav_widget_vars
+  - &nav_widget_styles
     height: 44
     padding: 14
 
@@ -57,7 +57,7 @@ font: !include
 
   - &weather_page_styles
     # Variables for the main layout grid
-    weather_grid_row_values: [ 4, 3 ]
+    weather_grid_row_values: [ 3, 4 ]
     weather_grid_column_values: [ 7, 6 ]
     # Variables for the forecast objects at the bottom
     weather_forecast_grid_columns: [ 80, 80, 80, 80 ]
@@ -96,8 +96,8 @@ lvgl:
   bg_color: 0x000000
   top_layer:
     widgets:
-      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_vars } }
-      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_vars } }
+      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
+      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml }
   pages:
     - id: page_splash

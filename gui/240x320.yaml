@@ -17,7 +17,7 @@ font: !include
     icons_xxl: 48
 
 .sizing:
-  - &nav_widget_vars
+  - &nav_widget_styles
     height: 34
     padding: 12
 
