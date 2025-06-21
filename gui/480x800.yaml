@@ -62,15 +62,17 @@ font: !include
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 388px = ~166px
     # Row 2 height = (4 / 7) * 388px = ~221px
-    weather_grid_rows: [ 166, 221 ]
+    weather_grid_row_1_height: 166
+    weather_grid_row_2_height: 221
     # Calculation for this 480x800 screen:
     # Available width = 800px (screen) - 10px (left pad) - 10px (right pad) = 780px
     # Total fr units = 7 + 6 = 13
     # Column 1 width = (7 / 13) * 780px = 420px
     # Column 2 width = (6 / 13) * 780px = 360px
-    weather_grid_columns: [ 420, 360 ]
+    weather_grid_column_1_width: 420
+    weather_grid_column_2_width: 360
     # Variables for the forecast objects at the bottom
-    weather_forecast_grid_columns: [ 80, 80, 80, 80 ]
+    weather_forecast_grid_column_width: 80
     weather_forecast_grid_pad_column: 6
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 2

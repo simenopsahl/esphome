@@ -27,19 +27,19 @@
           align: CENTER
           layout:
             type: GRID
-            grid_rows: !lambda return weather_grid_rows;
-            grid_columns: !lambda return weather_grid_columns;
+            grid_rows: [ content, content]
+            grid_columns: [ content, content]
           widgets:
             # Today's weather icon
             - image:
                 id: weather_condition_icon
                 src: !lambda return initial_today_icon_src;
-                height: SIZE_CONTENT
-                width: SIZE_CONTENT
                 grid_cell_row_pos: 0
                 grid_cell_column_pos: 0
                 grid_cell_y_align: CENTER
                 grid_cell_x_align: CENTER
+                height: !lambda return weather_row_1_height;
+                width: !lambda return weather_column_1_width;
                 align: CENTER
                 
             # Today's temperature and condition
@@ -47,6 +47,8 @@
                 grid_cell_row_pos: 0
                 grid_cell_column_pos: 1
                 grid_cell_y_align: CENTER
+                height: !lambda return weather_row_1_height;
+                width: !lambda return weather_column_2_width;
                 bg_opa: TRANSP
                 layout:
                   type: FLEX
@@ -67,16 +69,19 @@
                       text_font: !lambda return weather_forecast_condition_font;
                       text_align: LEFT
 
-            # Today's temperature and condition
+            # The second row (forecast section)
             - obj:
-                grid_cell_row_pos: 0
-                grid_cell_column_pos: 1
+                grid_cell_row_pos: 1
+                grid_cell_column_pos: 0
+                grid_cell_column_span: 2
                 grid_cell_y_align: CENTER
+                height: !lambda return weather_row_2_height;
+                width: 100%
                 bg_opa: TRANSP
                 layout:
                   type: GRID
                   grid_rows: [ content ]
-                  grid_columns: !lambda return weather_forecast_grid_columns;
+                  grid_columns: [ content, content, content, content ]
                   pad_column: !lambda return weather_forecast_grid_pad_column;
                   pad_row: 0
                 widgets:
@@ -85,7 +90,7 @@
                       grid_cell_column_pos: 0
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: SIZE_CONTENT
+                      width: !lambda return weather_forecast_grid_column_width;
                       bg_color: c_black
                       radius: !lambda return weather_forecast_obj_radius;
                       pad_top: !lambda return weather_forecast_obj_pad_top;
@@ -120,7 +125,7 @@
                       grid_cell_column_pos: 1
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: SIZE_CONTENT
+                      width: !lambda return weather_forecast_grid_column_width;
                       bg_color: c_black
                       radius: !lambda return weather_forecast_obj_radius;
                       pad_top: !lambda return weather_forecast_obj_pad_top;
@@ -154,7 +159,7 @@
                       grid_cell_column_pos: 2
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: SIZE_CONTENT
+                      width: !lambda return weather_forecast_grid_column_width;
                       bg_color: c_black
                       radius: !lambda return weather_forecast_obj_radius;
                       pad_top: !lambda return weather_forecast_obj_pad_top;
@@ -188,7 +193,7 @@
                       grid_cell_column_pos: 3
                       grid_cell_row_pos: 0
                       height: SIZE_CONTENT
-                      width: SIZE_CONTENT
+                      width: !lambda return weather_forecast_grid_column_width;
                       bg_color: c_black
                       radius: !lambda return weather_forecast_obj_radius;
                       pad_top: !lambda return weather_forecast_obj_pad_top;
