@@ -16,21 +16,25 @@ esphome:
   on_boot:
     priority: -10.0 # Run before the display subsystem starts
     then:
-      - script.execute: nordpool_initialize_graph_layout
+      - script.execute:
+          id: nordpool_initialize_graph_layout
+          # Pass the variables to the script
+          graph_container_w: ${nordpool_usable_page_width}
+          graph_container_h: ${nordpool_row_2_height}
+          line_w: ${nordpool_line_width}
 
 script:
   - id: nordpool_initialize_graph_layout
+    parameters:
+      graph_container_w: float
+      graph_container_h: float
+      line_w: float
     then:
       - lambda: |-
           // This script runs on boot to set the initial X and Y coordinates.
-          const float graph_container_h = nordpool_grid_row_2_height;
-          const float graph_container_w = usable_page_width;
-          const float line_w = nordpool_line_width;
-          const float inset = line_w / 2.0;
-
           const float graph_drawable_h = graph_container_h - line_w;
           const float graph_drawable_w = graph_container_w - line_w;
-
+          const float inset = line_w / 2.0;
           const int mid_y = (int)round(inset + graph_drawable_h / 2.0);
 
           // Calculate and store initial X and Y points
@@ -42,6 +46,9 @@ script:
 
   - id: nordpool_update_chart
     mode: single
+    parameters:
+      graph_container_h: float
+      line_w: float
     then:
       - lambda: |-
           // STEP 1: Calculate all Y coordinates and save them to the global array.
@@ -64,8 +71,6 @@ script:
             if (isnan(prices[i])) { return; }
           }
 
-          const float graph_container_h = nordpool_grid_row_2_height;
-          const float line_w = nordpool_line_width;
           const float inset = line_w / 2.0;
           const float graph_drawable_h = graph_container_h - line_w;
 
@@ -205,7 +210,11 @@ sensor:
       - source: nordpool_price_8
     on_value:
       # When the max price changes (meaning any price has changed), run the update script.
-      - script.execute: nordpool_update_chart
+      - script.execute:
+          id: nordpool_update_chart
+          # Pass the variables to the script
+          graph_container_h: ${nordpool_row_2_height}
+          line_w: ${nordpool_line_width}
 
 text_sensor:
   # All your homeassistant text_sensors for the time labels go here

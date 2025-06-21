@@ -48,11 +48,11 @@ font: !include
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
     # 800  (2 * 10) = 780
-    nordpool_usable_screen_width: 780
+    nordpool_usable_page_width: 780
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
     # 480 - (2 * 44) - (2 * 2) = 388
-    nordpool_usable_screen_height: 388
+    nordpool_usable_page_height: 388
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 30 # text_md
     nordpool_row_3_height: 26 # text_sm

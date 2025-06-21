@@ -110,7 +110,7 @@
                       height: 100%
                       width: 100%
                       align: CENTER
-                      line_width: !lambda return nordpool_line_width;
+                      line_width: ${nordpool_line_width}
                       line_color: c_green
                       line_rounded: true
                       points:
