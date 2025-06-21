@@ -13,7 +13,11 @@
       - lvgl.label.update:
           id: page_title
           text: NordPool
-      - script.execute: nordpool_update_chart
+      - script.execute:
+          id: nordpool_update_chart
+          # Pass the variables to the script
+          graph_container_h: ${nordpool_row_2_height}
+          line_w: ${nordpool_line_width}
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
