@@ -46,7 +46,7 @@ font: !include
   - &nordpool_layout_styles
     # -- DISPLAY CONFIGURATION --
     screen_width: 308
-    screen_height: 480
+    screen_height: 476
     # -- LAYOUT CONFIGURATION --
     # Height of the status bar area at the top and navigation at the bottom
     status_bar_height: 40
@@ -57,8 +57,18 @@ font: !include
 
   - &weather_page_styles
     # Variables for the main layout grid
-    weather_grid_row_values: [ 4, 3 ]
-    weather_grid_column_values: [ 7, 6 ]
+    # Calculation for this 480x320 screen:
+    # Available height = 480px (screen) - 42px (top pad) - 42px (bottom pad) = 396px
+    # Total fr units = 4 + 3 = 7
+    # Row 1 height = (4 / 7) * 396px = ~226px
+    # Row 2 height = (3 / 7) * 396px = ~169px
+    weather_grid_rows: [ 226, 169 ]
+    # Calculation for this 480x320 screen:
+    # Available width = 320px (screen) - 6px (left pad) - 6px (right pad) = 308px
+    # Total fr units = 7 + 6 = 13
+    # Column 1 width = (7 / 13) * 308px = 165px
+    # Column 2 width = (6 / 13) * 308px = 142px
+    weather_grid_columns: [ 165, 142 ]
     # Variables for the forecast objects at the bottom
     weather_forecast_grid_columns: [ 70, 70, 70, 70 ]
     weather_forecast_grid_pad_column: 6
@@ -96,8 +106,8 @@ lvgl:
   bg_color: 0x000000
   top_layer:
     widgets:
-      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_vars } }
-      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_vars } }
+      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
+      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml }
   pages:
     - id: page_splash

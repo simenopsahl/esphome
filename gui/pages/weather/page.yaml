@@ -27,18 +27,8 @@
           align: CENTER
           layout:
             type: GRID
-            grid_rows: !lambda |-
-              std::vector<lv_coord_t> rows;
-              for (int val : weather_grid_row_values) {
-                rows.push_back(fr(val));
-              }
-              return rows;
-            grid_columns: !lambda |-
-              std::vector<lv_coord_t> cols;
-              for (int val : weather_grid_column_values) {
-                cols.push_back(fr(val));
-              }
-              return cols;
+            grid_rows: !lambda return weather_grid_rows;
+            grid_columns: !lambda return weather_grid_columns;
           widgets:
             # Today's weather icon
             - image:
@@ -77,15 +67,12 @@
                       text_font: !lambda return weather_forecast_condition_font;
                       text_align: LEFT
 
-            # Forecast section at the bottom
+            # Today's temperature and condition
             - obj:
-                width: 100%
-                height: SIZE_CONTENT
-                grid_cell_row_pos: 1
-                grid_cell_column_pos: 0
-                grid_cell_column_span: 2
+                grid_cell_row_pos: 0
+                grid_cell_column_pos: 1
                 grid_cell_y_align: CENTER
-                grid_cell_x_align: STRETCH
+                bg_opa: TRANSP
                 layout:
                   type: GRID
                   grid_rows: [ content ]
