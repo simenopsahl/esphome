@@ -114,12 +114,10 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Button A Pressed
-        - script.execute: buzzer_beep
+      - logger.log: Button A Pressed
+      - script.execute: buzzer_beep
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
   # Button B
   - platform: gpio
     id: btn_b
@@ -131,12 +129,10 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Button B Pressed
-        - script.execute: buzzer_beep
+      - logger.log: Button B Pressed
+      - script.execute: buzzer_beep
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
   # Button C
   - platform: gpio
     id: btn_c
@@ -148,12 +144,10 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Button C Pressed
-        - script.execute: buzzer_beep
+      - logger.log: Button C Pressed
+      - script.execute: buzzer_beep
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
 
 #sensor:
   # Built-in 6-axis (IMU) that also includes a temperature sensor

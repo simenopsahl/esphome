@@ -88,15 +88,14 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Button Pressed
-        - script.execute: led_wifi
-        - script.wait: led_wifi
-        - delay: 1000ms
-        - script.execute: led_homeassistant
-        - script.wait: led_homeassistant
-        - delay: 1000ms
-        - script.execute: led_default_state
+      - logger.log: Button Pressed
+      - script.execute: led_wifi
+      - script.wait: led_wifi
+      - delay: 1000ms
+      - script.execute: led_homeassistant
+      - script.wait: led_homeassistant
+      - delay: 1000ms
+      - script.execute: led_default_state
     on_click:
       min_length: 1000ms
       max_length: 5000ms

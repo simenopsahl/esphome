@@ -1,5 +1,114 @@
+# Functions to update the NordPool LVGL page
+
+globals:
+  # These arrays will store the coordinates for the line graph's points.
+  - id: nordpool_points_y
+    type: int[9]
+    restore_value: no
+    initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
+  - id: nordpool_points_x
+    type: int[9]
+    restore_value: no
+    initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
+
+esphome:
+  # On boot, run the script to calculate the initial graph layout.
+  on_boot:
+    priority: -10.0 # Run before the display subsystem starts
+    then:
+      - script.execute: nordpool_initialize_graph_layout
+
+script:
+  - id: nordpool_initialize_graph_layout
+    then:
+      - lambda: |-
+          // This script runs on boot to set the initial X and Y coordinates.
+          const float graph_container_h = nordpool_grid_row_2_height;
+          const float graph_container_w = usable_page_width;
+          const float line_w = nordpool_line_width;
+          const float inset = line_w / 2.0;
+
+          const float graph_drawable_h = graph_container_h - line_w;
+          const float graph_drawable_w = graph_container_w - line_w;
+
+          const int mid_y = (int)round(inset + graph_drawable_h / 2.0);
+
+          // Calculate and store initial X and Y points
+          for (int i = 0; i < 9; ++i) {
+            float x_coord = i * (graph_drawable_w - 1) / 8.0;
+            id(nordpool_points_x)[i] = (int)round(inset + x_coord);
+            id(nordpool_points_y)[i] = mid_y;
+          }
+
+  - id: nordpool_update_chart
+    mode: single
+    then:
+      - lambda: |-
+          // STEP 1: Calculate all Y coordinates and save them to the global array.
+          float prices[9];
+          prices[0] = id(nordpool_price_0).state;
+          prices[1] = id(nordpool_price_1).state;
+          prices[2] = id(nordpool_price_2).state;
+          prices[3] = id(nordpool_price_3).state;
+          prices[4] = id(nordpool_price_4).state;
+          prices[5] = id(nordpool_price_5).state;
+          prices[6] = id(nordpool_price_6).state;
+          prices[7] = id(nordpool_price_7).state;
+          prices[8] = id(nordpool_price_8).state;
+
+          float min_p = id(nordpool_price_min).state;
+          float max_p = id(nordpool_price_max).state;
+
+          if (isnan(min_p) || isnan(max_p)) { return; }
+          for (int i = 0; i < 9; ++i) {
+            if (isnan(prices[i])) { return; }
+          }
+
+          const float graph_container_h = nordpool_grid_row_2_height;
+          const float line_w = nordpool_line_width;
+          const float inset = line_w / 2.0;
+          const float graph_drawable_h = graph_container_h - line_w;
+
+          for (int i = 0; i < 9; ++i) {
+            if (max_p == min_p) {
+              id(nordpool_points_y)[i] = (int)round(graph_container_h / 2.0);
+            } else {
+              float scaled_y = graph_drawable_h - ((prices[i] - min_p) / (max_p - min_p) * graph_drawable_h);
+              id(nordpool_points_y)[i] = (int)round(inset + scaled_y);
+            }
+          }
+          // ADD THIS LINE FOR DEBUGGING
+          ESP_LOGD("update_chart", "Calculated Y-Points: %d, %d, %d, %d, %d, %d, %d, %d, %d",
+                id(nordpool_points_y)[0], id(nordpool_points_y)[1], id(nordpool_points_y)[2],
+                id(nordpool_points_y)[3], id(nordpool_points_y)[4], id(nordpool_points_y)[5],
+                id(nordpool_points_y)[6], id(nordpool_points_y)[7], id(nordpool_points_y)[8]);
+      - delay: 1s
+      - lvgl.line.update:
+          # STEP 2: Redraw the line using the new values from the global arrays.
+          id: lvgl_nordpool_line
+          points:
+            - x: !lambda return id(nordpool_points_x)[0];
+              y: !lambda return id(nordpool_points_y)[0];
+            - x: !lambda return id(nordpool_points_x)[1];
+              y: !lambda return id(nordpool_points_y)[1];
+            - x: !lambda return id(nordpool_points_x)[2];
+              y: !lambda return id(nordpool_points_y)[2];
+            - x: !lambda return id(nordpool_points_x)[3];
+              y: !lambda return id(nordpool_points_y)[3];
+            - x: !lambda return id(nordpool_points_x)[4];
+              y: !lambda return id(nordpool_points_y)[4];
+            - x: !lambda return id(nordpool_points_x)[5];
+              y: !lambda return id(nordpool_points_y)[5];
+            - x: !lambda return id(nordpool_points_x)[6];
+              y: !lambda return id(nordpool_points_y)[6];
+            - x: !lambda return id(nordpool_points_x)[7];
+              y: !lambda return id(nordpool_points_y)[7];
+            - x: !lambda return id(nordpool_points_x)[8];
+              y: !lambda return id(nordpool_points_y)[8];
+
 sensor:
-  # Get values from home assistant
+  # All your homeassistant sensors for prices 0 through 8 go here
+  # This setup ensures each widget is updated when its corresponding sensor value changes.
   - platform: homeassistant
     id: nordpool_price_0
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -67,6 +176,7 @@ sensor:
             format: "%.0f"
             args: [ 'x' ]
 
+  # Combination sensors to find the min and max price across all points
   - platform: combination
     id: nordpool_price_min
     type: min
@@ -80,7 +190,6 @@ sensor:
       - source: nordpool_price_6
       - source: nordpool_price_7
       - source: nordpool_price_8
-
   - platform: combination
     id: nordpool_price_max
     type: max
@@ -95,10 +204,11 @@ sensor:
       - source: nordpool_price_7
       - source: nordpool_price_8
     on_value:
+      # When the max price changes (meaning any price has changed), run the update script.
       - script.execute: nordpool_update_chart
 
 text_sensor:
-  # Strings from Home Assistant
+  # All your homeassistant text_sensors for the time labels go here
   - platform: homeassistant
     id: nordpool_time_0
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -139,109 +249,3 @@ text_sensor:
       - lvgl.label.update:
           id: lbl_nordpool_time_8
           text: !lambda return id(nordpool_time_8).state;
-
-globals:
-  # These arrays will be populated on boot by the initialize_graph_layout script
-  - id: nordpool_points_y
-    type: int[9]
-    restore_value: no
-    initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
-  - id: nordpool_points_x
-    type: int[9]
-    restore_value: no
-    initial_value: '{0, 10, 20, 30, 40, 50, 60, 70, 80}'
-
-script:
-  - id: nordpool_initialize_graph_layout
-    then:
-      - lambda: |-
-          // This script runs once on boot to set up the graph coordinates
-          // based on the screen size defined in substitutions.
-          const float scr_w = atoi("${screen_width}");
-          const float scr_h = atoi("${screen_height}");
-          const float status_h = atoi("${status_bar_height}");
-          const float total_fr = atoi("${grid_row_top_fr}") + atoi("${grid_row_graph_fr}") + atoi("${grid_row_bottom_fr}");
-          const float line_w = atoi("${line_width}");
-          const float inset = line_w / 2.0;
-
-          const float container_h = (atoi("${grid_row_graph_fr}") / total_fr) * (scr_h - 2 * status_h);
-          const float container_w = scr_w;
-
-          const float graph_w = container_w - line_w;
-          const float graph_h = container_h - line_w;
-          const int mid_y = (int)round(inset + graph_h / 2.0);
-
-          for (int i = 0; i < 9; ++i) {
-            float x_coord = i * (graph_w - 1) / 8.0;
-            id(nordpool_points_x)[i] = (int)round(inset + x_coord);
-            id(nordpool_points_y)[i] = mid_y;
-          }
-
-  - id: nordpool_update_chart
-    mode: single
-    then:
-      - lambda: |-
-          // STEP 1: Calculate all Y coordinates and save them to the global array.
-          float prices[9];
-          prices[0] = id(nordpool_price_0).state;
-          prices[1] = id(nordpool_price_1).state;
-          prices[2] = id(nordpool_price_2).state;
-          prices[3] = id(nordpool_price_3).state;
-          prices[4] = id(nordpool_price_4).state;
-          prices[5] = id(nordpool_price_5).state;
-          prices[6] = id(nordpool_price_6).state;
-          prices[7] = id(nordpool_price_7).state;
-          prices[8] = id(nordpool_price_8).state;
-
-          float min_p = id(nordpool_price_min).state;
-          float max_p = id(nordpool_price_max).state;
-
-          if (isnan(min_p) || isnan(max_p)) { return; }
-          for (int i = 0; i < 9; ++i) {
-            if (isnan(prices[i])) { return; }
-          }
-
-          const float scr_h = atoi("${screen_height}");
-          const float status_h = atoi("${status_bar_height}");
-          const float total_fr = atoi("${grid_row_top_fr}") + atoi("${grid_row_graph_fr}") + atoi("${grid_row_bottom_fr}");
-          const float line_w = atoi("${line_width}");
-          const float inset = line_w / 2.0;
-          const float container_h = (atoi("${grid_row_graph_fr}") / total_fr) * (scr_h - 2 * status_h);
-          const float graph_h = container_h - line_w;
-
-          for (int i = 0; i < 9; ++i) {
-            if (max_p == min_p) {
-              id(nordpool_points_y)[i] = (int)(container_height / 2.0);
-            } else {
-              float y_coord = graph_height - ((prices[i] - min_p) / (max_p - min_p) * graph_height);
-              id(nordpool_points_y)[i] = (int)round(inset + y_coord);
-            }
-          }
-          // ADD THIS LINE FOR DEBUGGING
-          ESP_LOGD("update_chart", "Calculated Y-Points: %d, %d, %d, %d, %d, %d, %d, %d, %d",
-                id(nordpool_points_y)[0], id(nordpool_points_y)[1], id(nordpool_points_y)[2],
-                id(nordpool_points_y)[3], id(nordpool_points_y)[4], id(nordpool_points_y)[5],
-                id(nordpool_points_y)[6], id(nordpool_points_y)[7], id(nordpool_points_y)[8]);
-      - delay: 1s
-      - lvgl.line.update:
-          # STEP 2: Redraw the line using the new values from the global arrays.
-          id: lvgl_nordpool_line
-          points:
-            - x: !lambda return id(nordpool_points_x)[0];
-              y: !lambda return id(nordpool_points_y)[0];
-            - x: !lambda return id(nordpool_points_x)[1];
-              y: !lambda return id(nordpool_points_y)[1];
-            - x: !lambda return id(nordpool_points_x)[2];
-              y: !lambda return id(nordpool_points_y)[2];
-            - x: !lambda return id(nordpool_points_x)[3];
-              y: !lambda return id(nordpool_points_y)[3];
-            - x: !lambda return id(nordpool_points_x)[4];
-              y: !lambda return id(nordpool_points_y)[4];
-            - x: !lambda return id(nordpool_points_x)[5];
-              y: !lambda return id(nordpool_points_y)[5];
-            - x: !lambda return id(nordpool_points_x)[6];
-              y: !lambda return id(nordpool_points_y)[6];
-            - x: !lambda return id(nordpool_points_x)[7];
-              y: !lambda return id(nordpool_points_y)[7];
-            - x: !lambda return id(nordpool_points_x)[8];
-              y: !lambda return id(nordpool_points_y)[8];

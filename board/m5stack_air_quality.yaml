@@ -112,13 +112,11 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Button A Pressed
-        - script.execute: buzzer_beep
-        - script.execute: update_screen
+      - logger.log: Button A Pressed
+      - script.execute: buzzer_beep
+      - script.execute: update_screen
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
 
   - platform: gpio
     id: button_b
@@ -134,14 +132,12 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Button B Pressed
-        - script.execute: buzzer_beep
-        - display.page.show_next: display_eink
-        - script.execute: update_screen
+      - logger.log: Button B Pressed
+      - script.execute: buzzer_beep
+      - display.page.show_next: display_eink
+      - script.execute: update_screen
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
 
   - platform: gpio
     id: button_pwr

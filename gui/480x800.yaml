@@ -45,15 +45,23 @@ font: !include
 
   - &nordpool_layout_styles
     # -- DISPLAY CONFIGURATION --
-    screen_width: 780
-    screen_height: 480
-    # -- LAYOUT CONFIGURATION --
-    # Height of the status bar area at the top and navigation at the bottom
-    status_bar_height: 44
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 800  (2 * 10) = 780
+    nordpool_usable_screen_width: 780
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 480 - (2 * 44) - (2 * 2) = 388
+    nordpool_usable_screen_height: 388
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_grid_row_values: [ 32, 330, 28 ]
+    nordpool_grid_row_1_height: 30 # text_md
+    nordpool_grid_row_3_height: 26 # text_sm
+    # Calculate the usable graph area for the page
+    # (usable_height - text_md - text_sm)
+    # 388 - 30 - 26 = 332
+    nordpool_grid_row_2_height: 332
     # -- GRAPH CONFIGURATION --
-    line_width: 4
+    nordpool_line_width: 6
 
   - &weather_page_styles
     # Variables for the main layout grid
@@ -123,6 +131,9 @@ lvgl:
     # room temperature
     - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
+    # nordpool prices
+    - <<: !include { file: pages/nordpool/page.yaml, vars: { <<: [*page_styles, *container_styles, *nordpool_page_styles] } }
+
     # weather forecast
     - <<: !include { file: pages/weather/page.yaml, vars: { <<: [*page_styles, *container_styles, *weather_page_styles] } }
 
@@ -137,6 +148,8 @@ packages:
   boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml }
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
+  # nordpool screen
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*nordpool_page_styles] } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control

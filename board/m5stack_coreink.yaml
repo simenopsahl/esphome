@@ -95,12 +95,10 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Top Button Pressed
-        - script.execute: buzzer_beep
+      - logger.log: Top Button Pressed
+      - script.execute: buzzer_beep
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
 
   # Stick Up
   - platform: gpio
@@ -117,14 +115,12 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Stick Up
-        - script.execute: buzzer_beep
-        - display.page.show: page_local
-        - script.execute: update_screen
+      - logger.log: Stick Up
+      - script.execute: buzzer_beep
+      - display.page.show: page_local
+      - script.execute: update_screen
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
   # Stick Press
   - platform: gpio
     id: stick_press
@@ -140,13 +136,11 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Stick Press
-        - script.execute: buzzer_beep
-        - script.execute: update_screen
+      - logger.log: Stick Press
+      - script.execute: buzzer_beep
+      - script.execute: update_screen
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
   # Stick Down
   - platform: gpio
     id: stick_down
@@ -162,14 +156,12 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Stick Down
-        - script.execute: buzzer_beep
-        - display.page.show_next: display_eink
-        - script.execute: update_screen
+      - logger.log: Stick Down
+      - script.execute: buzzer_beep
+      - display.page.show_next: display_eink
+      - script.execute: update_screen
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
 
   - platform: gpio
     id: pwr_hold

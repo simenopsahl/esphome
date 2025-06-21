@@ -80,8 +80,7 @@ binary_sensor:
     name: "left button"
     entity_category: diagnostic
     on_press:
-      then:
-        - number.decrement: screen_brightness
+      - number.decrement: screen_brightness
   - platform: gpio
     pin: 
       inverted: true
@@ -90,8 +89,7 @@ binary_sensor:
     name: "middle button"
     entity_category: diagnostic
     on_press:
-      then:
-        - switch.toggle: displaycontrol
+      - switch.toggle: displaycontrol
   - platform: gpio
     pin: 
       number: $button_right_pin
@@ -99,8 +97,7 @@ binary_sensor:
     name: "right button"
     entity_category: diagnostic
     on_press:
-      then:
-        - number.increment: screen_brightness
+      - number.increment: screen_brightness
 # example to switch to next screen
 #        lambda: |-
 #          id(rgb8x32)->skip_screen();

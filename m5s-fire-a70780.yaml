@@ -1,7 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_fire.yaml
@@ -52,6 +52,19 @@ binary_sensor:
     on_state: 
       then:
         - script.execute: display_on_off
+
+  # Button Left
+  - id: !extend btn_a
+    on_press:
+      - lvgl.page.previous
+  # Button Mid
+  - id: !extend btn_b
+    on_press:
+      - script.execute: go_home
+  # Button Right
+  - id: !extend btn_c
+    on_press:
+      - lvgl.page.next
 
 sensor:
   # Combine sensors

@@ -45,6 +45,25 @@ font: !include
 
   - &nordpool_layout_styles
     # -- DISPLAY CONFIGURATION --
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 320  (2 * 6) = 308
+    nordpool_usable_screen_width: 308
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 480 - (2 * 40) - (2 * 2) = 396
+    nordpool_usable_screen_height: 396
+    # Proportions for the 3 rows in the grid layout (labels, graph, labels)
+    nordpool_grid_row_1_height: 20 # text_md
+    nordpool_grid_row_3_height: 16 # text_sm
+    # Calculate the usable graph area for the page
+    # (usable_height - text_md - text_sm)
+    # 396 - 20 - 16 = 360
+    nordpool_grid_row_2_height: 360
+    # -- GRAPH CONFIGURATION --
+    nordpool_line_width: 5
+
+    # -- DISPLAY CONFIGURATION --
     screen_width: 308
     screen_height: 476
     # -- LAYOUT CONFIGURATION --
@@ -123,6 +142,9 @@ lvgl:
     # room temperature
     - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
 
+    # nordpool prices
+    - <<: !include { file: pages/nordpool/page.yaml, vars: { <<: [*page_styles, *container_styles, *nordpool_page_styles] } }
+
     # weather forecast
     - <<: !include { file: pages/weather/page.yaml, vars: { <<: [*page_styles, *container_styles, *weather_page_styles] } }
 
@@ -136,6 +158,8 @@ packages:
   boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml }
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
+  # nordpool screen
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*nordpool_page_styles] } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control

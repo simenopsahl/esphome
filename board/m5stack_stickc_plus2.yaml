@@ -108,14 +108,12 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Side Button Pressed
-        - script.execute: buzzer_beep
-        - display.page.show: page_local
-        - component.update: display_lcd
+      - logger.log: Side Button Pressed
+      - script.execute: buzzer_beep
+      - display.page.show: page_local
+      - component.update: display_lcd
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
   # Front Button
   - platform: gpio
     id: button_front
@@ -127,14 +125,12 @@ binary_sensor:
     filters:
       - delayed_off: 10ms
     on_press:
-      then:
-        - logger.log: Front Button Pressed
-        - script.execute: buzzer_beep
-        - display.page.show_next: display_lcd
-        - component.update: display_lcd
+      - logger.log: Front Button Pressed
+      - script.execute: buzzer_beep
+      - display.page.show_next: display_lcd
+      - component.update: display_lcd
     on_release:
-      then:
-        - output.turn_off: buzzer
+      - output.turn_off: buzzer
 
   - platform: gpio
     id: pwr_hold
