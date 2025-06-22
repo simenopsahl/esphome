@@ -155,6 +155,8 @@ packages:
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control
   control_auto_display: !include { file: functions/control_auto_display.yaml }
+  # remote page navigation
+  control_navigation: !include { file: functions/control_navigation.yaml }
 
   # Weather packages
   # Build icon set from .svg files

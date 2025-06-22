@@ -1,0 +1,27 @@
+# Display navigation from Home Assistant
+
+button:
+  # Previous page button
+  - platform: template
+    id: btn_previous_page
+    name: "Previous page"
+    icon: mdi:pan-left
+    entity_category: config
+    on_press:
+      - lvgl.page.previous:
+  # Home page button
+  - platform: template
+    id: btn_home_page
+    name: "Home page"
+    icon: mdi:home-variant
+    entity_category: config
+    on_press:
+      - script.execute: go_home
+  # Next page button
+  - platform: template
+    id: btn_next_page
+    name: "Next page"
+    icon: mdi:pan-right
+    entity_category: config
+    on_press:
+      - lvgl.page.next:
