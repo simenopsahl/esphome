@@ -4,7 +4,7 @@
 # Shared pins
 substitutions:
   mbus_i2c_shared: "false"
-  i2c_mbus_frequency: 50kHz
+  i2c_mbus_frequency: 400kHz
 
 i2c:
 # mBus Extension
@@ -17,4 +17,4 @@ i2c:
       allow_other_uses: $mbus_i2c_shared
     frequency: $i2c_mbus_frequency
 #    timeout: 10ms
-    scan: false
+    scan: true

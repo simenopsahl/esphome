@@ -27,6 +27,7 @@ substitutions:
   devicename: m5s-c3se-e93464
   location: "2etg, Stue"
   log_level: WARN
+#  log_baud_rate: "115200"
 #  mbus_i2c_shared: "true"
   internal_i2c_bus: i2c_mbus
   home_page: page_temperature
@@ -49,7 +50,11 @@ time:
         then:
           - script.execute: lvgl_time_update
 
+logger:
+  deassert_rts_dtr: true
+
 lvgl:
+  buffer_size: 75%
   pages:
     - id: page_airq
       pad_top: 34
@@ -62,7 +67,11 @@ lvgl:
         file: gui/functions/swipe_navigation.yaml
       widgets:
         - obj:
-            pad_all: 1
+            pad_top: 0
+            pad_bottom: 0
+            pad_left: 4
+            pad_right: 4
+            scrollable: false
             align: CENTER
             height: 100%
             width: 100%

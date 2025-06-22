@@ -17,6 +17,9 @@ packages:
 esphome:
   project:
     name: "M5Stack.Core S3 SE"
+#  libraries:
+#    - m5stack/M5GFX
+#    - m5stack/M5Unified
 
 esp32:
   board: m5stack-cores3
@@ -55,38 +58,34 @@ spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
 
-time:
-  - platform: pcf8563
-    i2c_id: $internal_i2c_bus
-    id: time_rtc
-    address: 0x51
-    update_interval: 10min
-  - platform: sntp
-    id: sntp_time
-    timezone: $time_timezone
-    on_time_sync:
-      then:
-        pcf8563.write_time:
+#time:
+#  - platform: pcf8563
+#    i2c_id: $internal_i2c_bus
+#    id: time_rtc
+#    address: 0x51
+#    update_interval: 10min
+#  - platform: sntp
+#    id: sntp_time
+#    timezone: $time_timezone
+#    on_time_sync:
+#      then:
+#        pcf8563.write_time:
 
 external_components:
 #  - source:
 #      type: git
-#      url: https://github.com/jesserockz/esphome-components
-#    components: [file]
+#      url: https://github.com/DaAwesomeP/esphome_m5stack_core_s3
+#      ref: DaAwesomeP_touch_interrupt_and_backlight
+#    components: [ esp32_m5stack_core_s3, aw9523, axp2101 ]
 #    refresh: 1d
   - source:
       type: git
       url: https://github.com/luka6000/esphome_m5stack_core_s3
       ref: v202502
+      # type: local
+      # path: ../../esphome_m5stack_core_s3/esphome/components/
     components: [ esp32_m5stack_core_s3, aw9523 ]
     refresh: 1d
-  # - source:
-  #     # type: git
-  #     # url: https://github.com/luka6000/M5CoreS3-Esphome
-  #     type: local
-  #     path: ../../M5CoreS3-Esphome/components/
-  #   components: [ m5cores3_display ]
-  #   refresh: 10s
 
 esp32_m5stack_core_s3:
   i2c_id: $internal_i2c_bus
@@ -166,10 +165,22 @@ touchscreen:
   - platform: ft63x6
     i2c_id: $internal_i2c_bus
     update_interval: 20ms
-#    on_touch:
-#      - logger.log:
-#          format: Touch %d at (%d, %d)
-#          args: [touch.id, touch.x, touch.y]
+#    interrupt_pin:
+#      aw9523: aw9523_1
+#      port: 1
+#      pin: 2
+#      mode:
+#        input: true
+#    reset_pin:
+#      aw9523: aw9523_1
+#      port: 0
+#      pin: 0
+#      mode:
+#        output: true
+    on_touch:
+      - logger.log:
+          format: Touch %d at (%d, %d)
+          args: [touch.id, touch.x, touch.y]
 
 binary_sensor:
   - platform: touchscreen
@@ -193,16 +204,16 @@ output:
           id(axp2101).write_byte(0x99, x );
 
 # https://devices.esphome.io/devices/M5Stack-Fire#wifi-issues-due-to-gpio15
-  - platform: gpio
-    id: wifi_fix_output
-    pin: $mbus23
+#  - platform: gpio
+#    id: wifi_fix_output
+#    pin: $mbus23
 
 light:
   # White
   - platform: monochromatic
     id: backlight_light
     output: backlight_output
-    default_transition_length: 100ms
+    default_transition_length: 250ms
     restore_mode: RESTORE_AND_ON
     initial_state:
       state: on
