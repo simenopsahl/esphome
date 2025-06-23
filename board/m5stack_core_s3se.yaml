@@ -24,7 +24,8 @@ esphome:
     board_upload.maximum_size: 16777216
 
 esp32:
-  board: m5stack-cores3
+#  board: m5stack-cores3
+  board: esp32s3box
   variant: ESP32S3
   flash_size: 16MB
   framework:

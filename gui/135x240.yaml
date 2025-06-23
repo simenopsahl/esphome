@@ -1,4 +1,4 @@
-# for horizontal 240x320 displays
+# for portrait 135x240 displays
 
 font: !include
   file: fonts/fonts.yaml
@@ -28,10 +28,10 @@ font: !include
 
   - &container_styles
     <<: !include styles/container_styles.yaml
-    container_pad_top: 0
-    container_pad_bottom: 0
-    container_pad_left: 4
-    container_pad_right: 4
+    container_pad_top: 2
+    container_pad_bottom: 2
+    container_pad_left: 0
+    container_pad_right: 0
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &button_layout
