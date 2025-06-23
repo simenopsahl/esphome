@@ -6,7 +6,6 @@
 
 substitutions:
   time_timezone: "Europe/Oslo"
-  i2c_internal_frequency: 100kHz
   mbus_i2c_shared: "false"
   internal_i2c_bus: i2c_internal
 
@@ -20,6 +19,9 @@ esphome:
 #  libraries:
 #    - m5stack/M5GFX
 #    - m5stack/M5Unified
+  platformio_options:
+    board_build.flash_mode: dio
+    board_upload.maximum_size: 16777216
 
 esp32:
   board: m5stack-cores3
@@ -27,6 +29,25 @@ esp32:
   flash_size: 16MB
   framework:
     type: esp-idf
+    advanced:
+      compiler_optimization: PERF
+    sdkconfig_options:
+      CONFIG_ESP32_DEFAULT_CPU_FREQ_240: "y"
+
+      # need to set a s3 compatible board for the adf-sdk to compile
+      # board specific code is not used though
+      CONFIG_ESP32_S3_BOX_BOARD: "y"
+      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
+      CONFIG_ESP32S3_DATA_CACHE_64KB:      "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B:  "y"
+
+      CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM: "16"
+      CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: "512"
+      CONFIG_TCPIP_RECVMBOX_SIZE: "512"
+
+      CONFIG_TCP_SND_BUF_DEFAULT: "65535"
+      CONFIG_TCP_WND_DEFAULT: "512000"
+      CONFIG_TCP_RECVMBOX_SIZE: "512"
 
 wifi:
   enable_btm: true
@@ -35,6 +56,9 @@ wifi:
 psram:
   mode: quad
   speed: 80MHz
+
+logger:
+  deassert_rts_dtr: true
 
 #i2c:
 # Int
@@ -58,12 +82,12 @@ spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
 
-#time:
-#  - platform: pcf8563
-#    i2c_id: $internal_i2c_bus
-#    id: time_rtc
-#    address: 0x51
-#    update_interval: 10min
+time:
+  - platform: pcf8563
+    i2c_id: $internal_i2c_bus
+    id: time_rtc
+    address: 0x51
+    update_interval: 10min
 #  - platform: sntp
 #    id: sntp_time
 #    timezone: $time_timezone

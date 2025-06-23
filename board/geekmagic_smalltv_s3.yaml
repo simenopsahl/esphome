@@ -21,6 +21,8 @@ esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   flash_size: 16MB
+  advanced:
+    compiler_optimization: PERF
   partitions: partitions/gm-s3-16MB.csv
 
 psram:

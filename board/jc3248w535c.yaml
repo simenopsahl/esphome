@@ -14,6 +14,8 @@ esp32:
   board: esp32s3box
   variant: ESP32S3
   flash_size: 16MB
+  advanced:
+    compiler_optimization: PERF
   framework:
     type: esp-idf
     sdkconfig_options:
