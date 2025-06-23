@@ -25,10 +25,6 @@ esphome:
     - delay: 5s
     - lvgl.widget.hide: boot_screen
 
-esp32:
-  framework:
-    type: esp-idf
-
 api:
   on_client_connected:
     then:

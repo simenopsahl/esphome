@@ -19,8 +19,6 @@ esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   flash_size: 16MB
-  advanced:
-    compiler_optimization: PERF
   framework:
     type: esp-idf
     # these versions prevent artifacting
@@ -35,6 +33,8 @@ esp32:
       CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
       CONFIG_SPIRAM_RODATA: y
       CONFIG_ESPTOOLPY_FLASHSIZE_16MB: y # fix warning about 2mb found
+    advanced:
+      compiler_optimization: PERF
 
 wifi:
   enable_btm: true

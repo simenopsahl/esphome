@@ -16,6 +16,12 @@ esp32:
   board: m5stack-atoms3
   variant: ESP32S3
   flash_size: 8MB
+  framework:
+    type: esp-idf
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 spi:
   clk_pin: $spi_clk_pin
@@ -51,8 +57,7 @@ light:
 # Button
 binary_sensor:
   - platform: gpio
-    name: Button
-    entity_category: diagnostic
+    id: btn_display
     pin:
       number: $button_pin
       inverted: true
@@ -65,24 +70,25 @@ binary_sensor:
       - logger.log: Button Pressed
       - display.page.show_next: display_lcd
       - component.update: display_lcd
+    name: Button
+    entity_category: diagnostic
 
-#display:
-#  - platform: ili9xxx
-#    model: st7789v
-#    id: display_lcd
-#    cs_pin: $disp_cs_pin
-#    dc_pin: $disp_dc_pin
-#    reset_pin: $disp_reset_pin
-#    data_rate: 40Mhz
-#    invert_colors: true
-#    update_interval: 1s
-#    dimensions:
-#      height: 128
-#      width: 128
-#      offset_height: 2
-#      offset_width: 1
+display:
+  - platform: ili9xxx
+    model: st7789v
+    id: display_lcd
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
+    data_rate: 40Mhz
+    invert_colors: true
+    update_interval: 1s
+    dimensions:
+      height: 128
+      width: 128
+      offset_height: 2
+      offset_width: 1
     # Rotate 180deg
 #    transform:
 #      mirror_x: true
 #      mirror_y: true
-#    pages:

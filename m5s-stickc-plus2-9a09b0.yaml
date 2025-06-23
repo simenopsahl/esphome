@@ -12,7 +12,7 @@ packages:
   multiplexer: !include board/extension/unit_pa_hub.yaml
 
   # --- GUI PACKAGES ---
-  color: !include gui/colors.yaml
+  color: !include gui/themes/colors.yaml
 
 substitutions:
   devicename: m5s-stickc-plus2-9a09b0
@@ -25,40 +25,12 @@ esphome:
   area: $location
   project: 
     version: "1.0.0"
-  on_boot:
-    then:
-      # Bypass sleep circuit arduino
-#      - lambda: |-
-#          pinMode(GPIO_NUM_4, OUTPUT);
-#          digitalWrite(GPIO_NUM_4, HIGH);
-#          gpio_hold_en(GPIO_NUM_4);
-      # Bypass sleep circuit esp-idf
-      - lambda: |-
-          gpio_set_direction(GPIO_NUM_4, GPIO_MODE_OUTPUT);
-          gpio_set_level(GPIO_NUM_4, 1);
-          gpio_hold_en(GPIO_NUM_4);
-          gpio_deep_sleep_hold_en();
-
-esp32:
-  framework:
-    type: esp-idf
 
 # 1.14 inch, 135*240 Colorful TFT LCD, ST7789v2
 display:
-  - platform:  ili9xxx
-    model: st7789v
-    id: display_lcd
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_reset_pin
-    invert_colors: true
-    update_interval: 5s
-    dimensions:
-      height: 240
-      width: 135
-      offset_height: 40
-      offset_width: 52
+  - id: !extend display_lcd
     # Rotate 270 swap dimensions
+#    dimensions:
 #      height: 135
 #      width: 240
 #      offset_height: 52
@@ -163,6 +135,18 @@ image:
     file: mdi:home-assistant
     type: binary
     resize: 24x24
+
+binary_sensor:
+  # Side Button
+  - id: !extend button_side
+    on_press:
+      - display.page.show: page_local
+      - component.update: display_lcd
+  # Front Button
+  - id: !extend button_front
+    on_press:
+      - display.page.show_next: display_lcd
+      - component.update: display_lcd
 
 sensor:
   # UNIT KMeterISO

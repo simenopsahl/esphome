@@ -14,8 +14,6 @@ esp32:
   board: esp32s3box
   variant: ESP32S3
   flash_size: 16MB
-  advanced:
-    compiler_optimization: PERF
   framework:
     type: esp-idf
     sdkconfig_options:
@@ -24,6 +22,8 @@ esp32:
       CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
       CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
       CONFIG_SPIRAM_RODATA: y
+    advanced:
+      compiler_optimization: PERF
 
 wifi:
   enable_btm: true

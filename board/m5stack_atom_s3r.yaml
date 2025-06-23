@@ -19,6 +19,7 @@ esphome:
       - "-DBOARD_HAS_PSRAM"
       - "-DARDUINO_USB_CDC_ON_BOOT=1"
       - "-mfix-esp32-psram-cache-issue"
+
 psram:
   mode: octal
   speed: 80MHz
@@ -27,6 +28,17 @@ esp32:
   board: m5stack-atoms3
   variant: esp32s3
   flash_size: 8MB
+  framework:
+    type: esp-idf
+#    version: 5.3.1
+#    platform_version: 6.9.0
+    # Custom sdkconfig options
+    sdkconfig_options: # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/kconfig.html#config-compiler-disable-gcc12-warnings
+      CONFIG_SPIFFS_DBG: n
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 spi:
   clk_pin: $spi_clk_pin
@@ -44,7 +56,7 @@ external_components:
       url: https://github.com/ssieb/esphome
       ref: lp5562
     components: [ lp5562 ]
-    refresh: 1min
+    refresh: 1d
 
 # https://www.reddit.com/r/Esphome/comments/1geelgf/what_would_it_take_to_port_led_driver_lp5562/
 lp5562:
@@ -100,8 +112,7 @@ light:
 # Button
 binary_sensor:
   - platform: gpio
-    name: Button
-    entity_category: diagnostic
+    id: btn_display
     pin:
       number: $button_pin
       inverted: true
@@ -112,26 +123,25 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button Pressed
-      - display.page.show_next: display_lcd
-      - component.update: display_lcd
+    name: Button
+    entity_category: diagnostic
 
-#display:
-#  - platform: ili9xxx
-#    model: st7789v
-#    id: display_lcd
-#    cs_pin: $disp_cs_pin
-#    dc_pin: $disp_dc_pin
-#    reset_pin: $disp_reset_pin
-#    data_rate: 40Mhz
-#    invert_colors: true
-#    update_interval: 1s
-#    dimensions:
-#      height: 128
-#      width: 128
-#      offset_height: 1
-#      offset_width: 2
+display:
+  - platform: ili9xxx
+    model: st7789v
+    id: display_lcd
+    cs_pin: $disp_cs_pin
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
+    data_rate: 40Mhz
+    invert_colors: true
+    update_interval: 5s
+    dimensions:
+      height: 128
+      width: 128
+      offset_height: 2
+      offset_width: 1
     # Rotate 180deg
-#    transform:
-#      mirror_x: true
-#      mirror_y: true
-#    pages:
+    transform:
+      mirror_x: false
+      mirror_y: false

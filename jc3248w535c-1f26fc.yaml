@@ -146,3 +146,24 @@ sensor:
       - or:
         - heartbeat: 900s
         - delta: 0.15
+
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: motion_simen
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: motion_gang
+  # Turn on display while room is occupied
+  - platform: template
+    id: motion_detected
+    lambda: !lambda |-
+      if ( (id(motion_simen).state) or (id(motion_gang).state) ) {
+        return true;
+      } else {
+        return false;
+      }
+    on_state: 
+      then:
+        - script.execute: display_on_off

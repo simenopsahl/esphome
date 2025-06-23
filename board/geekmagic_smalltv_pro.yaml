@@ -14,6 +14,8 @@ esphome:
 
 esp32:
   board: esp32dev
+  framework:
+    type: esp-idf
 
 spi:
   clk_pin: $spi_clk_pin

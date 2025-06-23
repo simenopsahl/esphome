@@ -24,6 +24,10 @@ esp32:
   advanced:
     compiler_optimization: PERF
   partitions: partitions/gm-s3-16MB.csv
+  framework:
+    type: esp-idf
+    advanced:
+      compiler_optimization: PERF
 
 psram:
   mode: octal

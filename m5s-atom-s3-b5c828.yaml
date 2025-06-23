@@ -10,7 +10,7 @@ packages:
   pir: !include board/module/unit_pir.yaml
 
   # --- GUI PACKAGES ---
-  color: !include gui/colors.yaml
+  color: !include gui/themes/colors.yaml
 
 substitutions:
   devicename: m5s-as3-b5c828
@@ -28,27 +28,9 @@ esphome:
   project:
     version: "1.0.0"
 
-esp32:
-  framework:
-    type: esp-idf
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
-
 display:
-  - platform: ili9xxx
-    model: st7789v
-    id: display_lcd
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_reset_pin
-    data_rate: 40Mhz
-    invert_colors: true
-    update_interval: 5s
+  - id: !extend display_lcd
     dimensions:
-      height: 128
-      width: 128
       offset_height: 1
       offset_width: 2
     # Rotate 180deg
