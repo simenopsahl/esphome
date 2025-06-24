@@ -4,7 +4,7 @@ packages:
 #  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
-  board: !include board/geekmagic_smalltv_s3.yaml
+  board: !include board/geekmagic_hellocubic_v2.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -17,13 +17,13 @@ packages:
   }}
 
 substitutions:
-  devicename: gm-smalltv-s3-d0c8bc
+  devicename: gm-hellocubic-v2-8847a4
 #  log_level: WARN
-  log_baud_rate: "115200"
+#  log_baud_rate: "115200"
   home_page: page_temperature
 
 esphome:
-  comment: "GeekMagic SmallTV S3"
+  comment: "GeekMagic HelloCubic V2"
   name: $devicename
   friendly_name: $devicename
   project:
@@ -41,7 +41,7 @@ time:
           - script.execute: lvgl_time_update
 
 lvgl:
-  buffer_size: 75%
+  buffer_size: 50%
 
 binary_sensor:
   # Call sensors from HA.
@@ -64,7 +64,3 @@ binary_sensor:
       then:
         - script.execute: display_on_off
 
-  # Touchpad
-  - id: !extend touch_pad
-    on_press:
-      - lvgl.page.next

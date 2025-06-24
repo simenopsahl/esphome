@@ -77,7 +77,7 @@
                 grid_cell_row_pos: 1
                 grid_cell_column_pos: 0
                 grid_cell_column_span: 2
-                grid_cell_x_align: CENTER
+                grid_cell_x_align: STRETCH
                 grid_cell_y_align: START
                 height: ${weather_row_2_height}
                 width: 100%

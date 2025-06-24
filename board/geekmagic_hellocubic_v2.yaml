@@ -1,0 +1,138 @@
+---
+# https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/
+# Base functions for:
+# GeekMagic SmallTV Pro
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/geekmagic_hellocubic_v2.yaml
+
+esphome:
+  project:
+    name: "GeekMagic.HelloCubic V2"
+
+esp32:
+  board: esp32dev
+  flash_size: 16MB
+  framework:
+    advanced:
+      compiler_optimization: PERF
+    type: esp-idf
+
+psram:
+
+i2c:
+# Internal
+  - id: i2c_internal
+    sda: $i2c_int_sda_pin
+    scl: $i2c_int_scl_pin
+    frequency: 100kHz
+#    timeout: 5ms
+    scan: true
+
+spi:
+  clk_pin: $spi_clk_pin
+  mosi_pin: $spi_mosi_pin
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: $disp_bl_pin
+    inverted: true
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 250ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+sensor:
+  - platform: mpu6050
+    address: 0x68
+    update_interval: 1s
+    accel_x:
+      id: mpu6050_accel_x
+      name: "Accel X"
+      entity_category: diagnostic
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    accel_y:
+      id: mpu6050_accel_y
+      name: "Accel Y"
+      entity_category: diagnostic
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    accel_z:
+      id: mpu6050_accel_z
+      name: "Accel Z"
+      entity_category: diagnostic
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    gyro_x:
+      id: mpu6050_gyro_x
+      name: "Gyro X"
+      entity_category: diagnostic
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    gyro_y:
+      id: mpu6050_gyro_y
+      name: "Gyro Y"
+      entity_category: diagnostic
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    gyro_z:
+      id: mpu6050_gyro_z
+      name: "Gyro Z"
+      entity_category: diagnostic
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    temperature:
+      id: temperature_mpu6050
+      name: "Temperature MPU6050"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 30
+
+display:
+  - platform: ili9xxx
+    id: display_lcd
+    model: st7789v
+    data_rate: 40MHz
+    dc_pin: $disp_dc_pin
+    reset_pin: $disp_reset_pin
+    spi_mode: MODE3
+    dimensions:
+      width: 240
+      height: 240
+      offset_height: 0
+      offset_width: 0
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: never

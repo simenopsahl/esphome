@@ -12,10 +12,18 @@ esphome:
   project:
     name: "GeekMagic.SmallTV S3"
   platformio_options:
-    board_build.arduino.memory_type: qio_opi
-    board_build.flash_mode: dio
-    board_build.psram_type: opi
+#    board_build.arduino.memory_type: qio #https://github.com/GeekMagicClock/GeekMagic-S3/pull/8
+    board_build.arduino.memory_type: qio_opi # https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/156
+    board_build.flash_mode: dio # HA Forum
+#    board_build.flash_mode: qio # AliExpress review
+    board_build.psram_type: opi # AliExpress review
     board_upload.maximum_ram_size: 524288
+    build_flags:
+#      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
+      - "-DBOARD_HAS_PSRAM"
+#      - "-DARDUINO_USB_CDC_ON_BOOT=0"
+#      - "-DARDUINO_USB_CDC_ON_BOOT=1"
+#      - "-mfix-esp32-psram-cache-issue"
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -63,7 +71,7 @@ binary_sensor:
   - platform: esp32_touch
     id: touch_pad
     pin: $touch_pin
-    threshold: 120000
+    threshold: 130000
     filters:
       # Small filter, to debounce the spurious events.
       - delayed_on: 10ms

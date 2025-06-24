@@ -33,11 +33,12 @@
             - label:
                 id: lbl_name_l
                 text: "Name: "
+                pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 0
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: CENTER
-                text_align: LEFT
+                text_align: RIGHT
                 text_font: font_sm
                 text_color: c_text_s
             - label:
@@ -54,11 +55,12 @@
             - label:
                 id: lbl_build_l
                 text: "Build: "
+                pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 1
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: CENTER
-                text_align: LEFT
+                text_align: RIGHT
                 text_font: font_sm
                 text_color: c_text_s
             - label:
@@ -77,11 +79,12 @@
             - label:
                 id: lbl_ssid_l
                 text: "SSID: "
+                pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 2
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: CENTER
-                text_align: LEFT
+                text_align: RIGHT
                 text_font: font_sm
                 text_color: c_text_s
             - label:
@@ -98,11 +101,12 @@
             - label:
                 id: lbl_ip_l
                 text: "IP: "
+                pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 3
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: CENTER
-                text_align: LEFT
+                text_align: RIGHT
                 text_font: font_sm
                 text_color: c_text_s
             - label:
@@ -119,11 +123,12 @@
             - label:
                 id: lbl_mac_l
                 text: "MAC: "
+                pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 4
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: CENTER
-                text_align: LEFT
+                text_align: RIGHT
                 text_font: font_sm
                 text_color: c_text_s
             - label:

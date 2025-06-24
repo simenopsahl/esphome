@@ -82,8 +82,8 @@ font: !include
     weather_column_1_width: 102
     weather_column_2_width: 134
     # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 54
-    weather_forecast_grid_pad_column: 3
+    weather_forecast_column_width: 52
+    weather_forecast_grid_pad_column: 2
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
@@ -95,7 +95,7 @@ font: !include
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
     initial_today_icon_src: "unknown_70"
-    initial_forecast_icon_src: "unknown_40"
+    initial_forecast_icon_src: "unknown_38"
 
   - &button_widget_vars
     width: 75
@@ -162,12 +162,12 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 40
+      size: 38
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 40
+      size: 38
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
