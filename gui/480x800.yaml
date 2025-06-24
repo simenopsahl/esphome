@@ -82,20 +82,19 @@ font: !include
     weather_column_1_width: 420
     weather_column_2_width: 360
     # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 80
-    #weather_forecast_grid_pad_column: 8 # must be static
-    weather_forecast_obj_radius: 3
-    weather_forecast_obj_pad_top: 2
-    weather_forecast_obj_pad_bottom: 2
-    #weather_forecast_obj_pad_row: 2 # must be static
-    #weather_forecast_obj_pad_column: 0 # must be static
-    # Font for the main temperature and forecast temperature
-    weather_forecast_temp_font: font_xl
+    weather_forecast_column_width: 160
+    weather_forecast_grid_pad_column: 20
+    weather_forecast_obj_radius: 6
+    weather_forecast_obj_pad_top: 0
+    weather_forecast_obj_pad_bottom: 0
+    # Font for the "Været nå" text
+    weather_today_condition_font: font_md
+    weather_today_temp_font: font_xl
+    # Font for the forecast temperature
+    weather_forecast_temp_font: font_lg
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    # Font for the "Været nå" text
-    weather_forecast_condition_font: font_md
-    initial_today_icon_src: "unknown_200"
+    initial_today_icon_src: "unknown_150"
     initial_forecast_icon_src: "unknown_80"
 
   - &button_widget_vars
@@ -174,9 +173,9 @@ packages:
   weather_icons_200: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 200
+      size: 150
   # Get todays weather and display it
   weather_today_200: !include
     file: weather/weather_today.yaml
     vars:
-      size: 200
+      size: 150

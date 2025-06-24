@@ -62,14 +62,14 @@
                   - label:
                       id: weather_temperature_today
                       text: "--°"
-                      text_font: ${weather_forecast_temp_font}
+                      text_font: ${weather_today_temp_font}
                       text_align: LEFT
                   - label:
                       id: weather_condition_today
                       text: "Været nå"
                       long_mode: wrap
                       scrollable: true
-                      text_font: ${weather_forecast_condition_font}
+                      text_font: ${weather_today_condition_font}
                       text_align: LEFT
 
             # The second row (forecast section)
@@ -86,7 +86,7 @@
                   type: GRID
                   grid_rows: [ content ]
                   grid_columns: [ content, content, content, content ]
-                  pad_column: 6
+                  pad_column: ${weather_forecast_grid_pad_column}
                   pad_row: 0
                 widgets:
                   # Forecast Item 0

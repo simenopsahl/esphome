@@ -101,4 +101,4 @@
                 text_color: c_gray
                 pad_all: 2
                 translate_x: ${clock_translate_x}
-                translate_y: -${clock_translate_y}
+                translate_y: ${clock_translate_y}

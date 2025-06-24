@@ -40,10 +40,10 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 96
-    clock_meter_width: 96
+    clock_meter_height: 98
+    clock_meter_width: 98
     clock_translate_x: 0
-    clock_translate_y: 35
+    clock_translate_y: 30
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
@@ -61,7 +61,7 @@ font: !include
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
     # 100 - 18 - 16 = 66
-    nordpool_row_2_height: 66
+    nordpool_row_2_height: 64
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 2
 
@@ -76,27 +76,26 @@ font: !include
     weather_row_2_height: 57
     # Calculation for this 128x128 screen:
     # Available width = 128px (screen) - 0px (left pad) - 0px (right pad) = 128px
-    # Total fr units = 1 + 1 = 2
-    # Column 1 width = (1 / 2) * 128px = 64px
-    # Column 2 width = (1 / 2) * 128px = 64px
-    weather_column_1_width: 64
-    weather_column_2_width: 64
+    # Total fr units = 3 + 4 = 7
+    # Column 1 width = (3 / 7) * 128px = ~55px
+    # Column 2 width = (4 / 7) * 128px = ~73px
+    weather_column_1_width: 55
+    weather_column_2_width: 73
     # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 70
-    #weather_forecast_grid_pad_column: 6 # must be static
-    weather_forecast_obj_radius: 2
+    weather_forecast_column_width: 30
+    weather_forecast_grid_pad_column: 1
+    weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
-    #weather_forecast_obj_pad_row: 0 # must be static
-    #weather_forecast_obj_pad_column: 0 # must be static
-    # Font for the main temperature and forecast temperature
-    weather_forecast_temp_font: font_xl
+    # Font for the "Været nå" text
+    weather_today_condition_font: font_lg
+    weather_today_temp_font: font_xl
+    # Font for the forecast temperature
+    weather_forecast_temp_font: font_md
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    # Font for the "Været nå" text
-    weather_forecast_condition_font: font_md
-    initial_today_icon_src: "unknown_60"
-    initial_forecast_icon_src: "unknown_34"
+    initial_today_icon_src: "unknown_50"
+    initial_forecast_icon_src: "unknown_28"
 
   - &button_widget_vars
     width: 75
@@ -163,19 +162,19 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 34
+      size: 28
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 34
+      size: 28
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 60
+      size: 50
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 60
+      size: 50

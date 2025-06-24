@@ -19,6 +19,7 @@ packages:
 substitutions:
   devicename: gm-smalltv-pro-ee703c
   log_level: WARN
+#  log_baud_rate: "115200"
   home_page: page_temperature
 
 esphome:
@@ -40,7 +41,7 @@ time:
           - script.execute: lvgl_time_update
 
 lvgl:
-  buffer_size: 25%
+  buffer_size: 50%
 
 binary_sensor:
   # Call sensors from HA.

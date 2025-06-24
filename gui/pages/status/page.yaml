@@ -27,8 +27,8 @@
           align: CENTER
           layout:
             type: GRID
-            grid_columns: [FR(1), FR(4)]
-            grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
+            grid_columns: [ content, content ]
+            grid_rows: [ FR(1), FR(1), FR(1), FR(1), FR(1) ]
           widgets:
             - label:
                 id: lbl_name_l

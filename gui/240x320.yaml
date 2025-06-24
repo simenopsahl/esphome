@@ -61,7 +61,7 @@ font: !include
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
     # 172 - 20 - 16 = 136
-    nordpool_row_2_height: 136
+    nordpool_row_2_height: 134
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 6
 
@@ -76,25 +76,24 @@ font: !include
     weather_row_2_height: 101
     # Calculation for this 240x320 screen:
     # Available width = 320px (screen) - 4px (left pad) - 4px (right pad) = 312px
-    # Total fr units = 1 + 1 = 2
-    # Column 1 width = (1 / 2) * 312px = 156px
-    # Column 2 width = (1 / 2) * 312px = 156px
-    weather_column_1_width: 156
-    weather_column_2_width: 156
+    # Total fr units = 5 + 6 = 11
+    # Column 1 width = (5 / 11) * 312px = ~142px
+    # Column 2 width = (6 / 11) * 312px = ~170px
+    weather_column_1_width: 142
+    weather_column_2_width: 170
     # Variables for the forecast objects at the bottom
     weather_forecast_column_width: 70
-    #weather_forecast_grid_pad_column: 6 # must be static
+    weather_forecast_grid_pad_column: 5
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
-    #weather_forecast_obj_pad_row: 0 # must be static
-    #weather_forecast_obj_pad_column: 0 # must be static
-    # Font for the main temperature and forecast temperature
-    weather_forecast_temp_font: font_xl
+    # Font for the "Været nå" text
+    weather_today_condition_font: font_lg
+    weather_today_temp_font: font_xl
+    # Font for the forecast temperature
+    weather_forecast_temp_font: font_md
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    # Font for the "Været nå" text
-    weather_forecast_condition_font: font_md
     initial_today_icon_src: "unknown_60"
     initial_forecast_icon_src: "unknown_34"
 

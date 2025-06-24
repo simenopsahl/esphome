@@ -11,11 +11,17 @@ packages:
 esphome:
   project:
     name: "GeekMagic.SmallTV Pro"
+  platformio_options:
+    build_flags: "-DBOARD_HAS_PSRAM"
 
 esp32:
+  # ESP32 N8XX
   board: esp32dev
+  flash_size: 8MB
   framework:
     type: esp-idf
+
+psram:
 
 spi:
   clk_pin: $spi_clk_pin
@@ -35,7 +41,7 @@ light:
   - platform: monochromatic
     id: backlight_light
     output: backlight_output
-    default_transition_length: 100ms
+    default_transition_length: 250ms
     restore_mode: RESTORE_AND_ON
     initial_state:
       state: on
@@ -53,11 +59,10 @@ binary_sensor:
     threshold: 1250
     filters:
       # Small filter, to debounce the spurious events.
-      - delayed_on: 10ms
-      - delayed_off: 10ms
+      - delayed_on: 20ms
+      - delayed_off: 50ms
     on_press:
       - logger.log: "Touch"
-      - lvgl.page.next
 #    on_click:
 #    - min_length: 50ms
 #      max_length: 500ms

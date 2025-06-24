@@ -13,7 +13,7 @@ esphome:
     name: "GeekMagic.SmallTV S3"
   platformio_options:
     board_build.arduino.memory_type: qio_opi
-    board_build.flash_mode: qio
+    board_build.flash_mode: dio
     board_build.psram_type: opi
     board_upload.maximum_ram_size: 524288
 
@@ -21,9 +21,7 @@ esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   flash_size: 16MB
-  advanced:
-    compiler_optimization: PERF
-  partitions: partitions/gm-s3-16MB.csv
+#  partitions: partitions/gm-s3-16MB.csv
   framework:
     type: esp-idf
     advanced:
@@ -36,7 +34,7 @@ psram:
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
-  interface: hardware
+#  interface: hardware
 
 output:
   - platform: ledc
@@ -48,7 +46,7 @@ light:
   - platform: monochromatic
     id: backlight_light
     output: backlight_output
-    default_transition_length: 100ms
+    default_transition_length: 250ms
     restore_mode: RESTORE_AND_ON
     initial_state:
       state: on
@@ -66,35 +64,37 @@ binary_sensor:
     id: touch_pad
     pin: $touch_pin
     threshold: 120000
-    name: "Touchpad"
-    entity_category: diagnostic
     filters:
       # Small filter, to debounce the spurious events.
       - delayed_on: 10ms
       - delayed_off: 10ms
-    on_click:
-    - min_length: 50ms
-      max_length: 500ms
-      then:
-        - lvgl.page.next:
-            animation: MOVE_LEFT
-            time: 300ms
-        - logger.log: "Short Touch"
-    - min_length: 500ms
-      max_length: 2000ms
-      then:
-        - if:
-            condition:
-            - light.is_off: backlight_light
-            then:
-            - light.turn_on: 
-                id: backlight_light
-        - if:
-            condition:
-            - light.is_on: backlight_light
-            then:
-            - lvgl.widget.redraw
-        - logger.log: "Long Touch"
+    on_press:
+      - logger.log: "Short Touch"
+#    on_click:
+#    - min_length: 50ms
+#      max_length: 500ms
+#      then:
+#        - lvgl.page.next:
+#            animation: MOVE_LEFT
+#            time: 300ms
+#        - logger.log: "Short Touch"
+#    - min_length: 500ms
+#      max_length: 2000ms
+#      then:
+#        - if:
+#            condition:
+#            - light.is_off: backlight_light
+#            then:
+#            - light.turn_on: 
+#                id: backlight_light
+#        - if:
+#            condition:
+#            - light.is_on: backlight_light
+#            then:
+#            - lvgl.widget.redraw
+#        - logger.log: "Long Touch"
+    name: "Touchpad"
+    entity_category: diagnostic
 
 display:
   - platform: ili9xxx
