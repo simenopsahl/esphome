@@ -40,10 +40,10 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 130
-    clock_meter_width: 130
+    clock_meter_height: 131
+    clock_meter_width: 131
     clock_translate_x: 0
-    clock_translate_y: 50
+    clock_translate_y: 55
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --

@@ -40,9 +40,9 @@ font: !include
     pad_row: 10
 
   - &clock_page_styles
-    clock_meter_height: 360
-    clock_meter_width: 360
-    clock_translate_x: 220
+    clock_meter_height: 384
+    clock_meter_width: 384
+    clock_translate_x: 180
     clock_translate_y: 0
 
   - &nordpool_page_styles

@@ -55,8 +55,8 @@ lvgl:
   buffer_size: 75%
   pages:
     - id: page_airq
-      pad_top: 34
-      pad_bottom: 34
+      pad_top: 32
+      pad_bottom: 32
       on_load:
         - lvgl.label.update:
             id: page_title
