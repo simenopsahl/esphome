@@ -3,6 +3,8 @@
 # Base functions for:
 # M5Stack Core S3SE
 #
+# https://community.home-assistant.io/t/m5stack-m5cores3-se-with-microwakeword/761965/5
+# https://github.com/luka6000/wake-word-voice-assistants/blob/main/m5stack-coreS3-se/m5stack-coreS3-se-spk.yaml
 
 substitutions:
   time_timezone: "Europe/Oslo"

@@ -1,19 +1,28 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
   hat: !include board/extension/hat_i2c.yaml
-  portabc: !include board/extension/port_abc_i2c.yaml
   env: !include board/module/hat_env_iii.yaml
 
   # --- GUI PACKAGES ---
-  color: !include gui/themes/colors.yaml
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/128x128.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.etg2_simen_temperature
+  }}
 
 substitutions:
   devicename: m5s-as3r-0387f4
+  log_level: WARN
+#  log_baud_rate: "115200"
+  home_page: page_temperature
 
 esphome:
   comment: "M5Stack Atom S3R 0387f4"
@@ -22,11 +31,62 @@ esphome:
   project:
     version: "1.0.0"
 
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
 binary_sensor:
   - id: !extend btn_display
     on_press:
-      - display.page.show_next: display_lcd
-      - component.update: display_lcd
+      - lvgl.page.next
+
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_stue_occupancy
+    id: motion_stue
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: motion_gang
+  # Turn on display while room is occupied
+  - platform: template
+    id: motion_detected
+    lambda: !lambda |-
+      if ( (id(motion_stue).state) or (id(motion_gang).state) ) {
+        return true;
+      } else {
+        return false;
+      }
+    on_state: 
+      then:
+        - script.execute: display_on_off
+
+lvgl:
+  top_layer:
+    - obj:
+        id: !extend titlebar
+        layout:
+          type: GRID
+          grid_columns: [ fr(1), fr(4), fr(1)]
+        widgets:
+          - label:
+              id: !extend page_title
+              hidden: true
+          - label:
+              id: !extend nav_clock
+              align: CENTER
+              text_align: CENTER
+              grid_cell_column_pos: 1
+              grid_cell_x_align: CENTER
+          - label:
+              id: !extend lbl_ha_status
+              grid_cell_column_pos: 2
 
 display:
   - id: !extend display_lcd
@@ -37,45 +97,8 @@ display:
     transform:
       mirror_x: true
       mirror_y: true
-    pages:
-      - id: page_local
-        lambda: |-
-          // Frame
-          //it.rectangle(0,  0, it.get_width(), it.get_height(), id(c_yellow));
-
-          it.print(-1, -2, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "Enhet");
-          it.print(it.get_width()+1, -2, id(f24b), id(c_gray), TextAlign::TOP_RIGHT, "°C");
-          
-          it.printf(it.get_width()/2, it.get_height()/2, id(f60b), id(c_white), TextAlign::CENTER, "%2.0f", id(temperature_local).state);
-
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image(-1, it.get_height()+1, id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), COLOR_OFF);
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image(it.get_width()+1, it.get_height()+1, id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), COLOR_OFF);
-          }
-
-          it.strftime(it.get_width()/2, it.get_height()+3, id(f18), id(c_gray), TextAlign::BOTTOM_CENTER, "%H:%M", id(time_homeassistant).now());
-      - id: page_room
-        lambda: |-
-          // Frame
-          //it.rectangle(0,  0, it.get_width(), it.get_height(), id(c_yellow));
-
-          it.print(-1, -2, id(f20b), id(c_gray), TextAlign::TOP_LEFT, "Rom");
-          it.print(it.get_width()+1, -2, id(f24b), id(c_gray), TextAlign::TOP_RIGHT, "°C");
-
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image(-1, it.get_height()+1, id(i_wifi), ImageAlign::BOTTOM_LEFT, id(c_green), COLOR_OFF);
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image(it.get_width()+1, it.get_height()+1, id(i_api), ImageAlign::BOTTOM_RIGHT, Color(0x00daff), COLOR_OFF);
-          }
-
-          it.strftime(it.get_width()/2, it.get_height()+3, id(f18), id(c_gray), TextAlign::BOTTOM_CENTER, "%H:%M", id(time_homeassistant).now());
+    auto_clear_enabled: false
+    update_interval: never
 
 sensor:
   # Combine sensors

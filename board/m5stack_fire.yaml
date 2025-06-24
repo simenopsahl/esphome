@@ -28,10 +28,10 @@ psram:
 esp32:
   board: m5stack-grey
   flash_size: 16MB
-  advanced:
-    compiler_optimization: PERF
   framework:
     type: esp-idf
+    advanced:
+      compiler_optimization: PERF
 
 wifi:
   enable_btm: true

@@ -3,28 +3,28 @@
 font: !include
   file: fonts/fonts.yaml
   vars:
-    text_sm: 14
+    text_sm: 16
     text_md: 18
-    text_lg: 22
-    text_xl: 26
-    text_xxl: 30
-    text_hg: 56
-    text_fl: 112
-    icons_sm: 18
+    text_lg: 20
+    text_xl: 22
+    text_xxl: 26
+    text_hg: 32
+    text_fl: 60
+    icons_sm: 20
     icons_md: 24
-    icons_lg: 32
-    icons_xl: 40
-    icons_xxl: 48
+    icons_lg: 28
+    icons_xl: 34
+    icons_xxl: 42
 
 .sizing:
   - &nav_widget_styles
-    height: 34
-    padding: 12
+    height: 30
+    padding: 2
 
   - &page_styles
     <<: !include styles/page_styles.yaml
-    page_pad_top: 34
-    page_pad_bottom: 34
+    page_pad_top: 30
+    page_pad_bottom: 30
 
   - &container_styles
     <<: !include styles/container_styles.yaml
@@ -49,19 +49,19 @@ font: !include
     # -- DISPLAY CONFIGURATION --
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
-    # 320  (2 * 2) = 312
-    nordpool_usable_page_width: 312
+    # 135  (2 * 0) = 135
+    nordpool_usable_page_width: 135
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 34) - (2 * 0) = 172
-    nordpool_usable_page_height: 172
+    # 240 - (2 * 30) - (2 * 2) = 176
+    nordpool_usable_page_height: 176
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 20 # text_md +2
-    nordpool_row_3_height: 16 # text_sm +2
+    nordpool_row_3_height: 18 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 312 - 20 - 16 = 136
-    nordpool_row_2_height: 136
+    # 176 - 20 - 18 = 138
+    nordpool_row_2_height: 138
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 6
 

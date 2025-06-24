@@ -1,37 +1,37 @@
-# for square 128x128 displays
+# for horizontal 240x320 displays
 
 font: !include
   file: fonts/fonts.yaml
   vars:
     text_sm: 14
-    text_md: 16
-    text_lg: 18
-    text_xl: 22
-    text_xxl: 26
-    text_hg: 32
-    text_fl: 60
+    text_md: 18
+    text_lg: 22
+    text_xl: 26
+    text_xxl: 30
+    text_hg: 56
+    text_fl: 112
     icons_sm: 18
-    icons_md: 20
-    icons_lg: 26
-    icons_xl: 34
-    icons_xxl: 44
+    icons_md: 24
+    icons_lg: 32
+    icons_xl: 40
+    icons_xxl: 48
 
 .sizing:
   - &nav_widget_styles
-    height: 28
-    padding: 4
+    height: 34
+    padding: 12
 
   - &page_styles
     <<: !include styles/page_styles.yaml
-    page_pad_top: 28
-    page_pad_bottom: 0
+    page_pad_top: 34
+    page_pad_bottom: 34
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 0
     container_pad_bottom: 0
-    container_pad_left: 0
-    container_pad_right: 0
+    container_pad_left: 4
+    container_pad_right: 4
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &button_layout
@@ -49,42 +49,42 @@ font: !include
     # -- DISPLAY CONFIGURATION --
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
-    # 128  (2 * 0) = 128
-    nordpool_usable_page_width: 128
+    # 320  (2 * 2) = 312
+    nordpool_usable_page_width: 312
     # Calculate the usable height for the page content area
-    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 128 - (1 * 28) - (2 * 0) = 100
-    nordpool_usable_page_height: 100
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 240 - (2 * 34) - (2 * 0) = 172
+    nordpool_usable_page_height: 172
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_row_1_height: 18 # text_md +2
+    nordpool_row_1_height: 20 # text_md +2
     nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 100 - 18 - 16 = 66
-    nordpool_row_2_height: 66
+    # 312 - 20 - 16 = 136
+    nordpool_row_2_height: 136
     # -- GRAPH CONFIGURATION --
-    nordpool_line_width: 2
+    nordpool_line_width: 6
 
   - &weather_page_styles
     # Variables for the main layout grid
-    # Calculation for this 128x128 screen:
-    # Available height = 128px (screen) - 28px (top pad) - 0px (bottom pad) = 100px
+    # Calculation for this 240x320 screen:
+    # Available height = 240px (screen) - 34px (top pad) - 34px (bottom pad) = 172px
     # Total fr units = 3 + 4 = 7
-    # Row 1 height = (3 / 7) * 100px = ~43px
-    # Row 2 height = (4 / 7) * 100px = ~57px
-    weather_row_1_height: 43
-    weather_row_2_height: 57
-    # Calculation for this 128x128 screen:
-    # Available width = 128px (screen) - 0px (left pad) - 0px (right pad) = 128px
+    # Row 1 height = (3 / 7) * 172px = ~74px
+    # Row 2 height = (4 / 7) * 172px = ~98px
+    weather_row_1_height: 74
+    weather_row_2_height: 98
+    # Calculation for this 240x320 screen:
+    # Available width = 320px (screen) - 2px (left pad) - 2px (right pad) = 312px
     # Total fr units = 1 + 1 = 2
-    # Column 1 width = (1 / 2) * 128px = 64px
-    # Column 2 width = (1 / 2) * 128px = 64px
-    weather_column_1_width: 64
-    weather_column_2_width: 64
+    # Column 1 width = (1 / 2) * 312px = 156px
+    # Column 2 width = (1 / 2) * 312px = 156px
+    weather_column_1_width: 156
+    weather_column_2_width: 156
     # Variables for the forecast objects at the bottom
     weather_forecast_column_width: 70
     #weather_forecast_grid_pad_column: 6 # must be static
-    weather_forecast_obj_radius: 2
+    weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
     #weather_forecast_obj_pad_row: 0 # must be static
@@ -119,7 +119,7 @@ lvgl:
   top_layer:
     widgets:
       - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
-#      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
+      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml }
   pages:
     - id: page_splash
