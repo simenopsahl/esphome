@@ -19,7 +19,7 @@ font: !include
 .sizing:
   - &nav_widget_styles
     height: 28
-    padding: 4
+    padding: 1
 
   - &page_styles
     <<: !include styles/page_styles.yaml
@@ -40,9 +40,9 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 170
-    clock_meter_width: 170
-    clock_translate_x: 110
+    clock_meter_height: 90
+    clock_meter_width: 90
+    clock_translate_x: 10
     clock_translate_y: 0
 
   - &nordpool_page_styles

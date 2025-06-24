@@ -3,9 +3,9 @@
 font: !include
   file: fonts/fonts.yaml
   vars:
-    text_sm: 16
-    text_md: 18
-    text_lg: 20
+    text_sm: 14
+    text_md: 16
+    text_lg: 18
     text_xl: 22
     text_xxl: 26
     text_hg: 32
@@ -28,8 +28,8 @@ font: !include
 
   - &container_styles
     <<: !include styles/container_styles.yaml
-    container_pad_top: 2
-    container_pad_bottom: 2
+    container_pad_top: 1
+    container_pad_bottom: 1
     container_pad_left: 0
     container_pad_right: 0
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
@@ -40,10 +40,10 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 170
-    clock_meter_width: 170
-    clock_translate_x: 110
-    clock_translate_y: 0
+    clock_meter_height: 130
+    clock_meter_width: 130
+    clock_translate_x: 0
+    clock_translate_y: 50
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
@@ -67,20 +67,20 @@ font: !include
 
   - &weather_page_styles
     # Variables for the main layout grid
-    # Calculation for this 240x320 screen:
-    # Available height = 240px (screen) - 34px (top pad) - 34px (bottom pad) = 172px
+    # Calculation for this 135x240 screen:
+    # Available height = 240px (screen) - 31px (top pad) - 31px (bottom pad) = 178px
     # Total fr units = 3 + 4 = 7
-    # Row 1 height = (3 / 7) * 172px = ~74px
-    # Row 2 height = (4 / 7) * 172px = ~98px
-    weather_row_1_height: 74
-    weather_row_2_height: 98
-    # Calculation for this 240x320 screen:
-    # Available width = 320px (screen) - 2px (left pad) - 2px (right pad) = 312px
+    # Row 1 height = (3 / 7) * 178px = ~76px
+    # Row 2 height = (4 / 7) * 178px = ~102px
+    weather_row_1_height: 76
+    weather_row_2_height: 102
+    # Calculation for this 135x240 screen:
+    # Available width = 135px (screen) - 0px (left pad) - 0px (right pad) = 135px
     # Total fr units = 1 + 1 = 2
-    # Column 1 width = (1 / 2) * 312px = 156px
-    # Column 2 width = (1 / 2) * 312px = 156px
-    weather_column_1_width: 156
-    weather_column_2_width: 156
+    # Column 1 width = (1 / 2) * 135px = 67px
+    # Column 2 width = (1 / 2) * 135px = 67px
+    weather_column_1_width: 67
+    weather_column_2_width: 67
     # Variables for the forecast objects at the bottom
     weather_forecast_column_width: 70
     #weather_forecast_grid_pad_column: 6 # must be static

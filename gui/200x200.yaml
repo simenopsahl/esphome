@@ -19,7 +19,7 @@ font: !include
 .sizing:
   - &nav_widget_styles
     height: 30
-    padding: 10
+    padding: 4
 
   - &page_styles
     <<: !include styles/page_styles.yaml
