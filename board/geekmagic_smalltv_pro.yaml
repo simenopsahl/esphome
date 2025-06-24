@@ -51,35 +51,24 @@ binary_sensor:
     id: touch_pad
     pin: $touch1_pin
     threshold: 1250
-    name: "Touchpad"
-    entity_category: diagnostic
     filters:
       # Small filter, to debounce the spurious events.
       - delayed_on: 10ms
       - delayed_off: 10ms
-    on_click:
-    - min_length: 50ms
-      max_length: 500ms
-      then:
-        - lvgl.page.next:
-            animation: MOVE_LEFT
-            time: 300ms
-        - logger.log: "Short Touch"
-    - min_length: 500ms
-      max_length: 2000ms
-      then:
-        - if:
-            condition:
-            - light.is_off: backlight_light
-            then:
-            - light.turn_on: 
-                id: backlight_light
-        - if:
-            condition:
-            - light.is_on: backlight_light
-            then:
-            - lvgl.widget.redraw
-        - logger.log: "Long Touch"
+    on_press:
+      - logger.log: "Touch"
+      - lvgl.page.next
+#    on_click:
+#    - min_length: 50ms
+#      max_length: 500ms
+#      then:
+#        - logger.log: "Short Touch"
+#    - min_length: 500ms
+#      max_length: 2000ms
+#      then:
+#        - logger.log: "Long Touch"
+    name: "Touchpad"
+    entity_category: diagnostic
 
 display:
   - platform: ili9xxx

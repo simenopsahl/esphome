@@ -7,13 +7,19 @@ packages:
   board: !include board/geekmagic_smalltv_pro.yaml
 
   # --- GUI PACKAGES ---
-  color: !include gui/themes/colors_night_owl.yaml
-#  lvgl_theme: !include gui/lvgl_night_owl_dark.yaml
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/240x240.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
 
 substitutions:
   devicename: gm-smalltv-pro-ee703c
   log_level: WARN
-  default_font: f20
+  home_page: page_temperature
 
 esphome:
   comment: "GeekMagic SmallTV Pro"
@@ -21,442 +27,43 @@ esphome:
   friendly_name: $devicename
   project:
     version: "1.0.0"
-  on_boot:
-    - delay: 5s
-    - lvgl.widget.hide: boot_screen
 
-api:
-  on_client_connected:
-    then:
-      - lvgl.widget.show: img_hastatus
-  on_client_disconnected:
-    then:
-      - lvgl.widget.hide: img_hastatus
-
-wifi:
-  on_connect:
-    then:
-      - lvgl.widget.show: img_wifistatus
-  on_disconnect:
-    then:
-      - lvgl.widget.hide: img_wifistatus
-
-lvgl:
-  log_level: WARN
-  color_depth: 16
-  disp_bg_color: 0x000000
-  bg_color: 0x000000
-  default_font: $default_font
-
-  buffer_size: 25%
-  style_definitions:
-    - id: header_footer
-      bg_color: c_bg_s
-      bg_opa: COVER
-      border_opa: TRANSP
-      radius: 0
-      pad_all: 0
-      pad_row: 0
-      pad_column: 0
-      border_color: c_dark_gray
-      text_color: c_text_p
-      width: 100%
-      height: 30
-    - id: date_style
-      align: center
-      text_color: c_gray
-      radius: 4
-      pad_all: 2
-  top_layer:
-    widgets:
-      - image:
-          id: img_wifistatus
-          align: top_left
-          y: 2
-          x: 2
-          hidden: true
-          src: i_wifi
-          image_recolor: c_green
-          image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-      - image:
-          id: img_hastatus
-          align: top_right
-          y: 2
-          x: -2
-          hidden: true
-          src: i_api
-          image_recolor: 0x00daff
-          image_recolor_opa: 100% #opacity defaults to 0% = must set this for recolor to take effect
-      # Boot screen
-      - obj:
-          id: boot_screen
-          width: 240
-          height: 210
-          align: BOTTOM_MID
-          pad_all: 0
-          border_width: 0
-          bg_color: 0x000000
-          widgets:
-            - image:
-                align: CENTER
-                src: boot_logo
-                y: -20
-            - spinner:
-                align: BOTTOM_MID
-                y: -15
-                height: 50
-                width: 50
-                spin_time: 1s
-                arc_length: 60deg
-                arc_width: 8
-                indicator:
-                  arc_color: c_purple
-                  arc_width: 8
-  pages:
-    - id: clock_page
-      widgets:
-        - obj:
-            align: TOP_MID
-            styles: header_footer
-            widgets:
-              - label:
-                  text: "Klokke"
-                  align: CENTER
-                  text_align: CENTER
-        - obj: # clock container
-            height: 210
-            width: 240
-            align: BOTTOM_MID
-            bg_color: 0x000000
-            pad_all: 0
-            border_width: 0
-            widgets:
-              - meter: # clock face
-                  height: 200
-                  width: 200
-                  align: CENTER
-                  border_width: 0
-                  bg_opa: TRANSP
-                  scales:
-                    - range_from: 0 # minutes scale
-                      range_to: 60
-                      angle_range: 360
-                      rotation: 270
-                      ticks:
-                        width: 1
-                        count: 61
-                        length: 10
-                        color: c_bg_s
-                      indicators:
-                        - line:
-                            id: minute_hand
-                            width: 3
-                            color: c_text_s
-                            r_mod: -4
-                            value: 0
-                    - range_from: 1 # hours scale for labels
-                      range_to: 12
-                      angle_range: 330
-                      rotation: 300
-                      ticks:
-                        width: 1
-                        count: 12
-                        length: 1
-                        major:
-                          stride: 1
-                          width: 4
-                          length: 10
-                          color: c_dark_gray
-                          label_gap: 12
-                    - range_from: 0 # hi-res hours scale for hand
-                      range_to: 720
-                      angle_range: 360
-                      rotation: 270
-                      ticks:
-                        count: 0
-                      indicators:
-                        - line:
-                            id: hour_hand
-                            width: 6
-                            color: c_text_p
-                            r_mod: -30
-                            value: 0
-              - label:
-                  id: day_label
-                  styles: date_style
-                  text_font: f18
-                  y: -30
-              - label:
-                  id: date_label
-                  styles: date_style
-                  text_font: f18
-                  y: 30
-
-    - id: status_page
-      widgets:
-        - obj:
-            align: TOP_MID
-            styles: header_footer
-            widgets:
-              - label:
-                  text: "Status"
-                  align: CENTER
-                  text_align: CENTER
-        - obj:
-            align: BOTTOM_MID
-            width: 240
-            height: 210
-            pad_all: 6
-            #pad_row: 6
-            #pad_column: 6
-            bg_color: 0x000000
-            border_opa: TRANSP
-            layout: # enable the GRID layout for the children widgets
-              type: GRID # split the rows and the columns proportionally
-              grid_columns: [FR(1), FR(4)]
-              grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1)]
-            widgets:
-              - label:
-                  id: lbl_name_l
-                  text: "Name: "
-                  grid_cell_column_pos: 0 # place the widget in
-                  grid_cell_row_pos: 0 # the corresponding cell
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_align: RIGHT
-                  text_font: f14
-                  text_color: c_text_s
-              - label:
-                  id: lbl_name
-                  text: "SmallTV Pro"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 0
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_font: f16
-                  text_color: c_text_p
-
-              - label:
-                  id: lbl_build_l
-                  text: "Build: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_align: RIGHT
-                  text_font: f14
-                  text_color: c_text_s
-              - label:
-                  id: lbl_build
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 1
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_font: f16
-                  text_color: c_text_p
-                  text:
-                    format: "%s - %s"
-                    args: [__DATE__, __TIME__]
-
-              - label:
-                  id: lbl_ssid_l
-                  text: "SSID: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_align: RIGHT
-                  text_font: f14
-                  text_color: c_text_s
-              - label:
-                  id: lbl_ssid
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 2
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_font: f16
-                  text_color: c_text_p
-          
-              - label:
-                  id: lbl_ip_l
-                  text: "IP: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_align: RIGHT
-                  text_font: f14
-                  text_color: c_text_s
-              - label:
-                  id: lbl_ip
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 3
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_font: f16
-                  text_color: c_text_p
-          
-              - label:
-                  id: lbl_mac_l
-                  text: "MAC: "
-                  grid_cell_column_pos: 0
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_align: RIGHT
-                  text_font: f14
-                  text_color: c_text_s
-              - label:
-                  id: lbl_mac
-                  text: "?"
-                  grid_cell_column_pos: 1
-                  grid_cell_row_pos: 4
-                  grid_cell_x_align: STRETCH
-                  grid_cell_y_align: STRETCH
-                  text_font: f16
-                  text_color: c_text_p
-
+# --- LVGL CLOCKS ---
 time:
-  - platform: homeassistant
-    id: !extend time_homeassistant
+  - id: !extend time_homeassistant
     on_time_sync:
-      - script.execute: time_update
+      - script.execute: lvgl_time_update
     on_time:
       - minutes: '*'
         seconds: 0
         then:
-          - script.execute: time_update
+          - script.execute: lvgl_time_update
 
-script:
-  - id: time_update
-    then:
-      - lvgl.indicator.update:
-          id: minute_hand
-          value: !lambda |-
-            return id(time_homeassistant).now().minute;
-      - lvgl.indicator.update:
-          id: hour_hand
-          value: !lambda |-
-            auto now = id(time_homeassistant).now();
-            return std::fmod(now.hour, 12) * 60 + now.minute;
-      - lvgl.label.update:
-          id: date_label
-          text: !lambda |-
-            static const char * const mon_names[] = {"JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEC"};
-            static char date_buf[8];
-            auto now = id(time_homeassistant).now();
-            snprintf(date_buf, sizeof(date_buf), "%s %2d", mon_names[now.month-1], now.day_of_month);
-            return date_buf;
-      - lvgl.label.update:
-          id: day_label
-          text: !lambda |-
-            static const char * const day_names[] = {"SØN", "MAN", "TIR", "ONS", "TOR", "FRE", "LØR"};
-            return day_names[id(time_homeassistant).now().day_of_week - 1];
+lvgl:
+  buffer_size: 25%
 
-image:
-  - id: i_wifi
-    file: mdi:wifi
-    type: binary
-    resize: 26x26
-  - id: i_api
-    file: mdi:home-assistant
-    resize: 26x26
-    type: binary
-  - file: https://esphome.io/_static/favicon-512x512.png
-    id: boot_logo
-    resize: 150x150
-    type: RGB565
-    transparency: alpha_channel
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: motion_simen
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: motion_gang
+  # Turn on display while room is occupied
+  - platform: template
+    id: motion_detected
+    lambda: !lambda |-
+      if ( (id(motion_simen).state) or (id(motion_gang).state) ) {
+        return true;
+      } else {
+        return false;
+      }
+    on_state: 
+      then:
+        - script.execute: display_on_off
 
-font:
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f14
-    size: 14
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f14b
-    size: 14
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f16
-    size: 16
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f16b
-    size: 16
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f18b
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f20
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f20b
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f24
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f24b
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f32
-    size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f32b
-    size: 32
-    glyphs: *norwegian-glyphs
+  # Touchpad
+  - id: !extend touch_pad
+    on_press:
+      - lvgl.page.next
