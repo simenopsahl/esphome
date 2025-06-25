@@ -40,8 +40,8 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 172
-    clock_meter_width: 172
+    clock_meter_height: 175
+    clock_meter_width: 175
     clock_translate_x: 110
     clock_translate_y: 0
 

@@ -18,7 +18,7 @@ text_sensor:
           - lvgl.label.update:
               id: weather_temperature_today
               text:
-                format: "%s °C"
+                format: "%s°C"
                 args: [ 'id(ha_weather_temperature).state.c_str()' ]
 
   - platform: homeassistant

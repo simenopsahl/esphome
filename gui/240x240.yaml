@@ -19,7 +19,7 @@ font: !include
 .sizing:
   - &nav_widget_styles
     height: 30
-    padding: 3
+    padding: 6
 
   - &page_styles
     <<: !include styles/page_styles.yaml
@@ -40,8 +40,8 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 205
-    clock_meter_width: 205
+    clock_meter_height: 206
+    clock_meter_width: 206
     clock_translate_x: 0
     clock_translate_y: 30
 
@@ -76,13 +76,13 @@ font: !include
     weather_row_2_height: 119
     # Calculation for this 240x240 screen:
     # Available width = 240px (screen) - 2px (left pad) - 2px (right pad) = 236px
-    # Total fr units = 3 + 4 = 7
-    # Column 1 width = (3 / 7) * 236px = 101.57px
-    # Column 2 width = (4 / 7) * 236px = 134.43px
-    weather_column_1_width: 102
-    weather_column_2_width: 134
+    # Total fr units = 3 + 5 = 8
+    # Column 1 width = (3 / 8) * 236px = ~88px
+    # Column 2 width = (5 / 8) * 236px = ~147px
+    weather_column_1_width: 88
+    weather_column_2_width: 147
     # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 52
+    weather_forecast_column_width: 50
     weather_forecast_grid_pad_column: 2
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0

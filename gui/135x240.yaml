@@ -3,13 +3,13 @@
 font: !include
   file: fonts/fonts.yaml
   vars:
-    text_sm: 14
-    text_md: 16
+    text_sm: 12
+    text_md: 14
     text_lg: 18
-    text_xl: 22
-    text_xxl: 26
-    text_hg: 32
-    text_fl: 40
+    text_xl: 24
+    text_xxl: 32
+    text_hg: 42
+    text_fl: 54
     icons_sm: 18
     icons_md: 20
     icons_lg: 24
@@ -40,10 +40,10 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 133
-    clock_meter_width: 133
+    clock_meter_height: 135
+    clock_meter_width: 135
     clock_translate_x: 0
-    clock_translate_y: 60
+    clock_translate_y: 80
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
@@ -56,14 +56,14 @@ font: !include
     # 240 - (1 * 26) - (2 * 1) = 212
     nordpool_usable_page_height: 212
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_row_1_height: 18 # text_md +2
-    nordpool_row_3_height: 16 # text_sm +2
+    nordpool_row_1_height: 16 # text_md +2
+    nordpool_row_3_height: 14 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 212 - 18 - 16 = 178
-    nordpool_row_2_height: 176
+    # 212 - 16 - 14 = 182
+    nordpool_row_2_height: 180
     # -- GRAPH CONFIGURATION --
-    nordpool_line_width: 6
+    nordpool_line_width: 4
 
   - &weather_page_styles
     # Variables for the main layout grid
@@ -76,26 +76,26 @@ font: !include
     weather_row_2_height: 121
     # Calculation for this 135x240 screen:
     # Available width = 135px (screen) - 0px (left pad) - 0px (right pad) = 135px
-    # Total fr units = 3 + 4 = 7
-    # Column 1 width = (3 / 7) * 135px = ~57px
-    # Column 2 width = (4 / 7) * 135px = ~78px
-    weather_column_1_width: 57
-    weather_column_2_width: 78
+    # Total fr units = 4 + 7 = 11
+    # Column 1 width = (4 / 11) * 135px = ~49px
+    # Column 2 width = (7 / 11) * 135px = ~85px
+    weather_column_1_width: 49
+    weather_column_2_width: 85
     # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 32
+    weather_forecast_column_width: 31
     weather_forecast_grid_pad_column: 1
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
     # Font for the "Været nå" text
-    weather_today_condition_font: font_lg
-    weather_today_temp_font: font_xl
+    weather_today_condition_font: font_md
+    weather_today_temp_font: font_lg
     # Font for the forecast temperature
-    weather_forecast_temp_font: font_md
+    weather_forecast_temp_font: font_sm
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_52"
-    initial_forecast_icon_src: "unknown_30"
+    initial_today_icon_src: "unknown_46"
+    initial_forecast_icon_src: "unknown_28"
 
   - &button_widget_vars
     width: 75
@@ -162,19 +162,19 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 30
+      size: 28
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 30
+      size: 28
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 52
+      size: 46
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 52
+      size: 46
