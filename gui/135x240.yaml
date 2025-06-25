@@ -9,22 +9,22 @@ font: !include
     text_xl: 22
     text_xxl: 26
     text_hg: 32
-    text_fl: 60
-    icons_sm: 20
-    icons_md: 24
-    icons_lg: 28
-    icons_xl: 34
-    icons_xxl: 42
+    text_fl: 40
+    icons_sm: 18
+    icons_md: 20
+    icons_lg: 24
+    icons_xl: 30
+    icons_xxl: 38
 
 .sizing:
   - &nav_widget_styles
-    height: 30
+    height: 26
     padding: 2
 
   - &page_styles
     <<: !include styles/page_styles.yaml
-    page_pad_top: 30
-    page_pad_bottom: 30
+    page_pad_top: 26
+    page_pad_bottom: 0
 
   - &container_styles
     <<: !include styles/container_styles.yaml
@@ -52,28 +52,28 @@ font: !include
     # 135  (2 * 0) = 135
     nordpool_usable_page_width: 135
     # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 30) - (2 * 2) = 176
-    nordpool_usable_page_height: 176
+    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
+    # 240 - (1 * 26) - (2 * 1) = 212
+    nordpool_usable_page_height: 212
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 18 # text_md +2
     nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 176 - 18 - 16 = 142
-    nordpool_row_2_height: 140
+    # 212 - 18 - 16 = 178
+    nordpool_row_2_height: 176
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 6
 
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 135x240 screen:
-    # Available height = 240px (screen) - 31px (top pad) - 31px (bottom pad) = 178px
+    # Available height = 240px (screen) - 27px (top pad) - 1px (bottom pad) = 212px
     # Total fr units = 3 + 4 = 7
-    # Row 1 height = (3 / 7) * 178px = ~76px
-    # Row 2 height = (4 / 7) * 178px = ~102px
-    weather_row_1_height: 76
-    weather_row_2_height: 102
+    # Row 1 height = (3 / 7) * 212px = ~89px
+    # Row 2 height = (4 / 7) * 212px = ~118px
+    weather_row_1_height: 90
+    weather_row_2_height: 121
     # Calculation for this 135x240 screen:
     # Available width = 135px (screen) - 0px (left pad) - 0px (right pad) = 135px
     # Total fr units = 3 + 4 = 7
@@ -118,7 +118,7 @@ lvgl:
   top_layer:
     widgets:
       - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
-      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
+#      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml }
   pages:
     - id: page_splash

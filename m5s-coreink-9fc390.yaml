@@ -1,7 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_coreink.yaml

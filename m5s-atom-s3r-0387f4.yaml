@@ -15,7 +15,7 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
-    entity_id: sensor.etg2_simen_temperature
+    entity_id: sensor.t22_temperature
   }}
 
 substitutions:
@@ -68,25 +68,26 @@ binary_sensor:
         - script.execute: display_on_off
 
 lvgl:
-  top_layer:
-    - obj:
-        id: !extend titlebar
-        layout:
-          type: GRID
-          grid_columns: [ fr(1), fr(4), fr(1)]
-        widgets:
-          - label:
-              id: !extend page_title
-              hidden: true
-          - label:
-              id: !extend nav_clock
-              align: CENTER
-              text_align: CENTER
-              grid_cell_column_pos: 1
-              grid_cell_x_align: CENTER
-          - label:
-              id: !extend lbl_ha_status
-              grid_cell_column_pos: 2
+  buffer_size: 75%
+#  top_layer:
+#    - obj:
+#        id: !extend titlebar
+#        layout:
+#          type: GRID
+#          grid_columns: [ fr(1), fr(4), fr(1)]
+#        widgets:
+#          - label:
+#              id: !extend page_title
+#              hidden: true
+#          - label:
+#              id: !extend nav_clock
+#              align: CENTER
+#              text_align: CENTER
+#              grid_cell_column_pos: 1
+#              grid_cell_x_align: CENTER
+#          - label:
+#              id: !extend lbl_ha_status
+#              grid_cell_column_pos: 2
 
 display:
   - id: !extend display_lcd
@@ -161,90 +162,3 @@ sensor:
       - or:
         - heartbeat: 900s
         - delta: 0.15
-
-font:
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f14
-    size: 14
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f20
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f20b
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f24
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f24b
-    size: 24
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f32
-    size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f32b
-    size: 32
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f60
-    size: 60
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f60b
-    size: 60
-    glyphs: *norwegian-glyphs
-
-image:
-  - id: i_wifi
-    file: mdi:wifi
-    type: binary
-    resize: 24x24
-  - id: i_api
-    file: mdi:home-assistant
-    type: binary
-    resize: 24x24

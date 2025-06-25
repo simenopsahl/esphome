@@ -9,7 +9,7 @@ font: !include
     text_xl: 24
     text_xxl: 28
     text_hg: 48
-    text_fl: 120
+    text_fl: 100
     icons_sm: 20
     icons_md: 22
     icons_lg: 26

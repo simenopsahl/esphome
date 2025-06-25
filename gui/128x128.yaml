@@ -9,21 +9,21 @@ font: !include
     text_xl: 22
     text_xxl: 26
     text_hg: 32
-    text_fl: 60
-    icons_sm: 18
-    icons_md: 20
-    icons_lg: 26
-    icons_xl: 34
-    icons_xxl: 44
+    text_fl: 40
+    icons_sm: 16
+    icons_md: 18
+    icons_lg: 22
+    icons_xl: 28
+    icons_xxl: 36
 
 .sizing:
   - &nav_widget_styles
-    height: 28
+    height: 24
     padding: 1
 
   - &page_styles
     <<: !include styles/page_styles.yaml
-    page_pad_top: 28
+    page_pad_top: 24
     page_pad_bottom: 0
 
   - &container_styles
@@ -40,8 +40,8 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 98
-    clock_meter_width: 98
+    clock_meter_height: 102
+    clock_meter_width: 102
     clock_translate_x: 0
     clock_translate_y: 30
 
@@ -53,27 +53,27 @@ font: !include
     nordpool_usable_page_width: 128
     # Calculate the usable height for the page content area
     # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 128 - (1 * 28) - (2 * 0) = 100
-    nordpool_usable_page_height: 100
+    # 128 - (1 * 24) - (2 * 0) = 104
+    nordpool_usable_page_height: 104
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 18 # text_md +2
     nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 100 - 18 - 16 = 66
-    nordpool_row_2_height: 64
+    # 104 - 18 - 16 = 70
+    nordpool_row_2_height: 68
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 2
 
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 128x128 screen:
-    # Available height = 128px (screen) - 28px (top pad) - 0px (bottom pad) = 100px
+    # Available height = 128px (screen) - 24px (top pad) - 0px (bottom pad) = 104px
     # Total fr units = 3 + 4 = 7
-    # Row 1 height = (3 / 7) * 100px = ~43px
-    # Row 2 height = (4 / 7) * 100px = ~57px
-    weather_row_1_height: 43
-    weather_row_2_height: 57
+    # Row 1 height = (3 / 7) * 104px = ~43px
+    # Row 2 height = (4 / 7) * 104px = ~57px
+    weather_row_1_height: 44
+    weather_row_2_height: 59
     # Calculation for this 128x128 screen:
     # Available width = 128px (screen) - 0px (left pad) - 0px (right pad) = 128px
     # Total fr units = 3 + 4 = 7
