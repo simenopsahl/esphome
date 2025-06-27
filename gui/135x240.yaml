@@ -34,6 +34,10 @@ font: !include
     container_pad_right: 0
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
+  - &boot_screen_styles
+    img_size: 110x110
+    spinner_size: 50
+
   - &button_layout
     <<: !include styles/button_layout.yaml
     pad_column: 5
@@ -119,7 +123,7 @@ lvgl:
     widgets:
       - <<: !include { file: widgets/header/widget_narrow.yaml, vars: { <<: *nav_widget_styles } }
 #      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
-      - <<: !include { file: widgets/boot_screen/widget.yaml }
+      - <<: !include { file: widgets/boot_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
   pages:
     - id: page_splash
       skip: true
@@ -142,7 +146,7 @@ lvgl:
 
     # nordpool prices
     - <<: !include
-        file: pages/nordpool/page.yaml
+        file: pages/nordpool/page_narrow.yaml
         vars:
           <<: [*page_styles, *container_styles, *nordpool_page_styles]
           page_title: "\U000F081F" # finance
@@ -165,7 +169,7 @@ packages:
   # header
   header_sensors: !include { file: widgets/header/sensors.yaml }
   # boot screen
-  boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml }
+  boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml, vars: { <<: *boot_screen_styles } }
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen

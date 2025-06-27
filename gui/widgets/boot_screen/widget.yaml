@@ -1,3 +1,6 @@
+# required vars:
+# - *boot_screen_styles
+
 # widgets:
   - obj:
       id: boot_screen
@@ -18,8 +21,8 @@
         - spinner:
             align: CENTER
             y: 90
-            height: 50
-            width: 50
+            height: ${spinner_size}
+            width: ${spinner_size}
             spin_time: 1s
             arc_length: 60deg
             arc_width: 8

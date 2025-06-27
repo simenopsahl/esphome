@@ -30,6 +30,7 @@ obj: # title bar
         id: page_title
         align: LEFT_MID
         x: ${padding} # RESOLUTION-SPECIFIC
+        text_font: mdi_lg
         text: " "
     - label: # clock
         id: nav_clock
