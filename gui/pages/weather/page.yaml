@@ -1,5 +1,11 @@
 # LVGL Weather forecast page
 
+# required vars:
+# - *page_styles
+# - *container_styles
+# - *weather_page_styles
+# - page_title
+
 # weather page
 #lvgl:
 #  pages:
@@ -12,7 +18,7 @@
     on_load:
       - lvgl.label.update:
           id: page_title
-          text: Vær
+          text: ${page_title}
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:

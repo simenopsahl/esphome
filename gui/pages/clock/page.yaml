@@ -1,6 +1,12 @@
 # https://esphome.io/cookbook/lvgl#an-analog-clock
 # LVGL analog clock
 
+# required vars:
+# - *page_styles
+# - *container_styles
+# - *clock_page_styles
+# - page_title
+
 # clock page
 #lvgl:
 #  pages:
@@ -13,7 +19,7 @@
     on_load:
       - lvgl.label.update:
           id: page_title
-          text: Klokke
+          text: ${page_title}
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:

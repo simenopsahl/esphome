@@ -138,19 +138,39 @@ lvgl:
         - script.execute: go_home
 
     # analog clock
-    - <<: !include { file: pages/clock/page.yaml, vars: { <<: [*page_styles, *container_styles, *clock_page_styles] } }
+    - <<: !include
+        file: pages/clock/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *clock_page_styles]
+          page_title: "Klokke"
 
     # room temperature
-    - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
+    - <<: !include
+        file: pages/temperature/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Temperatur"
 
     # nordpool prices
-    - <<: !include { file: pages/nordpool/page.yaml, vars: { <<: [*page_styles, *container_styles, *nordpool_page_styles] } }
+    - <<: !include
+        file: pages/nordpool/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *nordpool_page_styles]
+          page_title: "NordPool"
 
     # weather forecast
-    - <<: !include { file: pages/weather/page.yaml, vars: { <<: [*page_styles, *container_styles, *weather_page_styles] } }
+    - <<: !include
+        file: pages/weather/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *weather_page_styles]
+          page_title: "Vær"
 
     # device status
-    - <<: !include { file: pages/status/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
+    - <<: !include
+        file: pages/status/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Enhet"
 
 packages:
   # header

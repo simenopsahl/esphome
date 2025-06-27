@@ -38,6 +38,7 @@
             - label:
                 id: lbl_name_l
                 text: "Name: "
+                hidden: true
                 pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 0
@@ -60,6 +61,7 @@
             - label:
                 id: lbl_build_l
                 text: "Build: "
+                hidden: true
                 pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 1
@@ -84,6 +86,7 @@
             - label:
                 id: lbl_ssid_l
                 text: "SSID: "
+                hidden: true
                 pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 2
@@ -106,6 +109,7 @@
             - label:
                 id: lbl_ip_l
                 text: "IP: "
+                hidden: true
                 pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 3
@@ -128,6 +132,7 @@
             - label:
                 id: lbl_mac_l
                 text: "MAC: "
+                hidden: true
                 pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 4

@@ -19,6 +19,11 @@
 - "\U000F0141" # chevron-left
 - "\U000F0142" # chevron-right
 - "\U000F0140" # chevron-down
+# pages
+- "\U000F0954" # clock
+- "\U000F081F" # finance
+- "\U000F0595" # weather-partly-cloudy
+- "\U000F02FC" # information
 # status
 - "\U000F05A9" # wifi
 - "\U000F07D0" # home-assistant
@@ -30,8 +35,6 @@
 - "\U000F013B" # chemical-weapon
 
 - "\U000F01D8" # dots-horizontal
-- "\U000F042B" # printer-3d
-- "\U000F0E5B" # printer-3d-nozzle
 - "\U000F02E3" # bed
 - "\U000F1576" # lamps
 - "\U000F04B9" # sofa

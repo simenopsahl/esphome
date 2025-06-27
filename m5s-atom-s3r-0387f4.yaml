@@ -71,22 +71,22 @@ lvgl:
   buffer_size: 75%
 #  top_layer:
 #    - obj:
-#        id: !extend titlebar
+#        id: titlebar
 #        layout:
 #          type: GRID
 #          grid_columns: [ fr(1), fr(4), fr(1)]
 #        widgets:
 #          - label:
-#              id: !extend page_title
+#              id: page_title
 #              hidden: true
 #          - label:
-#              id: !extend nav_clock
+#              id: nav_clock
 #              align: CENTER
 #              text_align: CENTER
 #              grid_cell_column_pos: 1
 #              grid_cell_x_align: CENTER
 #          - label:
-#              id: !extend lbl_ha_status
+#              id: lbl_ha_status
 #              grid_cell_column_pos: 2
 
 display:

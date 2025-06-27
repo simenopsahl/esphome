@@ -1,5 +1,11 @@
 # LVGL NordPool Electricity price page
 
+# required vars:
+# - *page_styles
+# - *container_styles
+# - *nordpool_page_styles
+# - page_title
+
 # NordPool page
 #lvgl:
 #  pages:
@@ -12,7 +18,7 @@
     on_load:
       - lvgl.label.update:
           id: page_title
-          text: NordPool
+          text: ${page_title}
       - script.execute:
           id: nordpool_update_chart
           # Pass the variables to the script

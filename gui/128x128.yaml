@@ -19,7 +19,7 @@ font: !include
 .sizing:
   - &nav_widget_styles
     height: 24
-    padding: 1
+    padding: 4
 
   - &page_styles
     <<: !include styles/page_styles.yaml
@@ -117,7 +117,7 @@ lvgl:
   bg_color: 0x000000
   top_layer:
     widgets:
-      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
+      - <<: !include { file: widgets/header/widget_narrow.yaml, vars: { <<: *nav_widget_styles } }
 #      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml }
   pages:
@@ -127,19 +127,39 @@ lvgl:
         - script.execute: go_home
 
     # analog clock
-    - <<: !include { file: pages/clock/page.yaml, vars: { <<: [*page_styles, *container_styles, *clock_page_styles] } }
+    - <<: !include
+        file: pages/clock/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *clock_page_styles]
+          page_title: "\U000F0954" # clock
 
     # room temperature
-    - <<: !include { file: pages/temperature/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
+    - <<: !include
+        file: pages/temperature/page_narrow.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "\U000F050F" # thermometer
 
     # nordpool prices
-    - <<: !include { file: pages/nordpool/page.yaml, vars: { <<: [*page_styles, *container_styles, *nordpool_page_styles] } }
+    - <<: !include
+        file: pages/nordpool/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *nordpool_page_styles]
+          page_title: "\U000F081F" # finance
 
     # weather forecast
-    - <<: !include { file: pages/weather/page.yaml, vars: { <<: [*page_styles, *container_styles, *weather_page_styles] } }
+    - <<: !include
+        file: pages/weather/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *weather_page_styles]
+          page_title: "\U000F0595" # weather-partly-cloudy
 
     # device status
-    - <<: !include { file: pages/status/page.yaml, vars: { <<: [*page_styles, *container_styles] } }
+    - <<: !include
+        file: pages/status/page_narrow.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "\U000F02FC" # information
 
 packages:
   # header
