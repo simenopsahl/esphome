@@ -37,6 +37,8 @@ font: !include
   - &boot_screen_styles
     img_size: 150x150
     spinner_size: 50
+    logo_offset: 40
+    spinner_offset: 90
 
   - &button_layout
     <<: !include styles/button_layout.yaml

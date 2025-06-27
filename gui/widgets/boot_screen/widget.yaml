@@ -17,10 +17,10 @@
         - image:
             src: boot_logo
             align: CENTER
-            y: -36
+            y: -${logo_offset}
         - spinner:
             align: CENTER
-            y: 90
+            y: ${spinner_offset}
             height: ${spinner_size}
             width: ${spinner_size}
             spin_time: 1s
