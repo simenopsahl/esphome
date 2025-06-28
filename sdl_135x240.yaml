@@ -1,0 +1,58 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+#  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/128x128.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+substitutions:
+  devicename: sdl_128x128
+  log_level: INFO
+  home_page: page_temperature
+
+esphome:
+  comment: "Virtual ESPHome 128x128"
+  name: $devicename
+  friendly_name: $devicename
+  area: $location
+
+display:
+  - platform: sdl
+    #show_test_card: true
+    dimensions:
+      width: 135
+      height: 240
+    auto_clear_enabled: false
+
+touchscreen:
+  platform: sdl
+
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
+binary_sensor:
+  # Keep display on
+  - id: motion_detected
+    lambda: !lambda |-
+      return true;
+    on_state: 
+      then:
+        - script.execute: display_on_off

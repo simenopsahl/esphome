@@ -4,11 +4,10 @@ packages:
 #  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
-  board: !include board/geekmagic_smalltv_pro.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
-  lvgl: !include gui/240x240.yaml
+  lvgl: !include gui/128x128.yaml
 
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
@@ -17,17 +16,26 @@ packages:
   }}
 
 substitutions:
-  devicename: gm-smalltv-pro-ee703c
-  log_level: WARN
-#  log_baud_rate: "115200"
+  devicename: sdl_128x128
+  log_level: INFO
   home_page: page_temperature
 
 esphome:
-  comment: "GeekMagic SmallTV Pro"
+  comment: "Virtual ESPHome 128x128"
   name: $devicename
   friendly_name: $devicename
-  project:
-    version: "1.0.0"
+  area: $location
+
+display:
+  - platform: sdl
+    #show_test_card: true
+    dimensions:
+      width: 240
+      height: 240
+    auto_clear_enabled: false
+
+touchscreen:
+  platform: sdl
 
 # --- LVGL CLOCKS ---
 time:
@@ -40,31 +48,11 @@ time:
         then:
           - script.execute: lvgl_time_update
 
-lvgl:
-  buffer_size: 50%
-
 binary_sensor:
-  # Call sensors from HA.
-  - platform: homeassistant
-    entity_id: binary_sensor.etg2_simen_occupancy
-    id: motion_simen
-  - platform: homeassistant
-    entity_id: binary_sensor.etg2_gang_occupancy
-    id: motion_gang
-  # Turn on display while room is occupied
-  - platform: template
-    id: motion_detected
+  # Keep display on
+  - id: motion_detected
     lambda: !lambda |-
-      if ( (id(motion_simen).state) or (id(motion_gang).state) ) {
-        return true;
-      } else {
-        return false;
-      }
+      return true;
     on_state: 
       then:
         - script.execute: display_on_off
-
-  # Touchpad
-  - id: !extend touch_pad
-    on_press:
-      - lvgl.page.next
