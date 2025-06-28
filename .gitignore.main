@@ -1,0 +1,9 @@
+# Gitignore settings for ESPHome
+# This is an example and may include too much for your use-case.
+# You can modify this file to suit your needs.
+# https://gist.github.com/wizioo/c89847c7894ede628071
+
+/.esphome/
+/archive/
+/secrets.yaml
+sdl_*.yaml
