@@ -44,51 +44,51 @@
                 bg_opa: TRANSP
                 scales:
                   # Minor ticks
-                  - range_from: 0
-                    range_to: 60
-                    angle_range: 360
-                    rotation: 270
-                    ticks:
+                  - ticks:
                       width: 1
                       count: 61
                       length: 10
                       color: c_bg_s
+                    range_from: 0
+                    range_to: 60
+                    angle_range: 360
+                    rotation: 270
                     # Minuite hand
                     indicators:
                       - line:
                           id: minute_hand
-                          width: 3
+                          width: 2
                           color: c_text_s
                           r_mod: -4
                           value: 0
                   # Major ticks
-                  - range_from: 1
-                    range_to: 12
-                    angle_range: 330
-                    rotation: 300
-                    ticks:
+                  - ticks:
                       width: 1
                       count: 12
                       length: 1
-                      major:
-                        stride: 1
-                        width: 4
-                        length: 10
-                        color: c_dark_gray
-                        label_gap: 12
+#                      major:
+#                        stride: 1
+#                        width: 4
+#                        length: 10
+#                        color: c_dark_gray
+#                        label_gap: 12
+                    range_from: 1
+                    range_to: 12
+                    angle_range: 330
+                    rotation: 300
                   # Hour hand
-                  - range_from: 0
+                  - ticks:
+                      count: 0
+                    range_from: 0
                     range_to: 720
                     angle_range: 360
                     rotation: 270
-                    ticks:
-                      count: 0
                     indicators:
                       - line:
                           id: hour_hand
-                          width: 5
+                          width: 4
                           color: c_purple
-                          r_mod: -30
+                          r_mod: -12
                           value: 0
             - label:
                 id: day_label

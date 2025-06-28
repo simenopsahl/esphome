@@ -34,17 +34,18 @@
             type: FLEX
             flex_flow: COLUMN
             flex_align_main: SPACE_EVENLY
-            flex_align_cross: CENTER
           widgets:
             - label:
                 id: lbl_name
                 text: $devicename
                 text_align: CENTER
+                width: 100%
                 text_font: font_sm
                 text_color: c_text_p
             - label:
                 id: lbl_build
                 text_align: CENTER
+                width: 100%
                 text_font: font_sm
                 text_color: c_text_p
                 text:
@@ -54,17 +55,20 @@
                 id: lbl_ssid
                 text: "?"
                 text_align: CENTER
+                width: 100%
                 text_font: font_sm
                 text_color: c_text_p
             - label:
                 id: lbl_ip
                 text: "?"
                 text_align: CENTER
+                width: 100%
                 text_font: font_sm
                 text_color: c_text_p
             - label:
                 id: lbl_mac
                 text: "?"
                 text_align: CENTER
+                width: 100%
                 text_font: font_sm
                 text_color: c_text_p

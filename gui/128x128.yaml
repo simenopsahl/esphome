@@ -36,9 +36,10 @@ font: !include
 
   - &boot_screen_styles
     img_size: 90x90
-    spinner_size: 40
-    logo_offset: 20
-    spinner_offset: 30
+    spinner_size: 32
+    spinner_arc: 6
+    logo_offset: 22
+    spinner_offset: 38
 
   - &button_layout
     <<: !include styles/button_layout.yaml
@@ -46,10 +47,9 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 104
-    clock_meter_width: 104
+    clock_meter_size: 126
     clock_translate_x: 0
-    clock_translate_y: 30
+    clock_translate_y: 24
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
@@ -88,8 +88,8 @@ font: !include
     weather_column_1_width: 46
     weather_column_2_width: 81
     # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 31
-    weather_forecast_grid_pad_column: 1
+    weather_forecast_column_width: 38
+    weather_forecast_grid_pad_column: 2
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
@@ -134,7 +134,7 @@ lvgl:
 
     # analog clock
     - <<: !include
-        file: pages/clock/page.yaml
+        file: pages/clock/page_narrow.yaml
         vars:
           page_title: "\U000F0954" # clock
           <<: [*page_styles, *container_styles, *clock_page_styles]
@@ -155,7 +155,7 @@ lvgl:
 
     # weather forecast
     - <<: !include
-        file: pages/weather/page.yaml
+        file: pages/weather/page_narrow.yaml
         vars:
           page_title: "\U000F0595" # weather-partly-cloudy
           <<: [*page_styles, *container_styles, *weather_page_styles]

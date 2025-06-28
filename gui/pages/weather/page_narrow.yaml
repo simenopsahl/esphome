@@ -1,0 +1,233 @@
+# LVGL Weather forecast page
+
+# required vars:
+# - *page_styles
+# - *container_styles
+# - *weather_page_styles
+# - page_title
+
+# weather page
+#lvgl:
+#  pages:
+    id: page_weather
+    <<: !include ../../styles/page_styles.yaml
+    # REMOVED: `<<: *page_styles`
+    # ADDED: Use the variables passed from the parent file
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
+    on_load:
+      - lvgl.label.update:
+          id: page_title
+          text: ${page_title}
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      - obj:
+          <<: !include ../../styles/container_styles.yaml
+          # Use the passed-in variables for size
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
+          align: CENTER
+          layout:
+            type: GRID
+            grid_rows: [ content, content]
+            grid_columns: [ content, content]
+          widgets:
+            # Today's weather icon
+            - obj:
+                grid_cell_row_pos: 0
+                grid_cell_column_pos: 0
+                grid_cell_y_align: CENTER
+                grid_cell_x_align: CENTER
+                height: SIZE_CONTENT
+                width: SIZE_CONTENT
+                align: CENTER
+                widgets:
+                  - image:
+                      id: weather_condition_icon
+                      src: ${initial_today_icon_src}
+                      max_height: ${weather_row_1_height}
+                      max_width: ${weather_column_1_width}
+                
+            # Today's temperature and condition
+            - obj:
+                grid_cell_row_pos: 0
+                grid_cell_column_pos: 1
+                grid_cell_y_align: CENTER
+                height: ${weather_row_1_height}
+                width: ${weather_column_2_width}
+                bg_opa: TRANSP
+                layout:
+                  type: FLEX
+                  flex_flow: COLUMN
+                  flex_align_main: CENTER
+                  flex_align_cross: START
+                widgets:
+                  - label:
+                      id: weather_temperature_today
+                      text: "--°C"
+                      text_font: ${weather_today_temp_font}
+                      text_align: LEFT
+                  - label:
+                      id: weather_condition_today
+                      text: "Været nå"
+                      long_mode: wrap
+                      scrollable: true
+                      max_width: 90%
+                      text_font: ${weather_today_condition_font}
+                      text_align: LEFT
+
+            # The second row (forecast section)
+            - obj:
+                grid_cell_row_pos: 1
+                grid_cell_column_pos: 0
+                grid_cell_column_span: 2
+                grid_cell_x_align: STRETCH
+                grid_cell_y_align: START
+                height: ${weather_row_2_height}
+                width: 100%
+                bg_opa: TRANSP
+                layout:
+                  type: GRID
+                  grid_rows: [ content ]
+                  grid_columns: [ content, content, content, 0 ]
+                  pad_column: ${weather_forecast_grid_pad_column}
+                  pad_row: 0
+                widgets:
+                  # Forecast Item 0
+                  - obj:
+                      grid_cell_column_pos: 0
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: START
+                      height: 100%
+                      width: ${weather_forecast_column_width}
+                      bg_color: c_black
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                      # --- Widgets for this forecast item ---
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_0
+                            text: "??:??"
+                            text_font: ${weather_forecast_time_font}
+                            text_color: c_text_s
+#                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_0
+                            src: ${initial_forecast_icon_src}
+#                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_0
+                            text: "--°C"
+                            text_font: ${weather_forecast_temp_font}
+#                            height: SIZE_CONTENT
+
+                  # Forecast Item 1
+                  - obj:
+                      grid_cell_column_pos: 1
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: START
+                      height: 100%
+                      width: ${weather_forecast_column_width}
+                      bg_color: c_black
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_1
+                            text: "??:??"
+                            text_font: ${weather_forecast_time_font}
+                            text_color: c_text_s
+#                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_1
+                            src: ${initial_forecast_icon_src}
+#                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_1
+                            text: "--°C"
+                            text_font: ${weather_forecast_temp_font}
+#                            height: SIZE_CONTENT
+
+                  # Forecast Item 2
+                  - obj:
+                      grid_cell_column_pos: 2
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: START
+                      height: 100%
+                      width: ${weather_forecast_column_width}
+                      bg_color: c_black
+                      radius: ${weather_forecast_obj_radius}
+                      pad_top: ${weather_forecast_obj_pad_top}
+                      pad_bottom: ${weather_forecast_obj_pad_bottom}
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_2
+                            text: "??:??"
+                            text_font: ${weather_forecast_time_font}
+                            text_color: c_text_s
+#                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_2
+                            src: ${initial_forecast_icon_src}
+#                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_2
+                            text: "--°C"
+                            text_font: ${weather_forecast_temp_font}
+#                            height: SIZE_CONTENT
+
+                  # Forecast Item 3
+                  - obj:
+                      grid_cell_column_pos: 3
+                      grid_cell_row_pos: 0
+                      grid_cell_x_align: CENTER
+                      grid_cell_y_align: START
+                      hidden: true
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                      widgets:
+                        - label:
+                            id: forecast_timestamp_3
+                            text: "??:??"
+                            hidden: true
+                            text_font: ${weather_forecast_time_font}
+                            text_color: c_text_s
+                            height: SIZE_CONTENT
+                        - image:
+                            id: forecast_condition_icon_3
+                            src: ${initial_forecast_icon_src}
+                            hidden: true
+                            height: SIZE_CONTENT
+                        - label:
+                            id: forecast_temperature_3
+                            text: "--°C"
+                            hidden: true
+                            text_font: ${weather_forecast_temp_font}
+                            height: SIZE_CONTENT

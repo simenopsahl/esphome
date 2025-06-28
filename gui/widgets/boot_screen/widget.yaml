@@ -25,10 +25,10 @@
             width: ${spinner_size}
             spin_time: 1s
             arc_length: 60deg
-            arc_width: 8
+            arc_width: ${spinner_arc}
             arc_color: c_dark_gray
             indicator:
               arc_color: 0x18bcf2
-              arc_width: 8
+              arc_width: ${spinner_arc}
       on_press:
         - lvgl.widget.hide: boot_screen

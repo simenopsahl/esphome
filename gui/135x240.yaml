@@ -37,7 +37,8 @@ font: !include
   - &boot_screen_styles
     img_size: 110x110
     spinner_size: 50
-    logo_offset: 60
+    spinner_arc: 8
+    logo_offset: 40
     spinner_offset: 60
 
   - &button_layout
@@ -46,8 +47,7 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_height: 135
-    clock_meter_width: 135
+    clock_meter_size: 135
     clock_translate_x: 0
     clock_translate_y: 80
 
@@ -134,7 +134,7 @@ lvgl:
 
     # analog clock
     - <<: !include
-        file: pages/clock/page.yaml
+        file: pages/clock/page_narrow.yaml
         vars:
           <<: [*page_styles, *container_styles, *clock_page_styles]
           page_title: "\U000F0954" # clock
@@ -155,7 +155,7 @@ lvgl:
 
     # weather forecast
     - <<: !include
-        file: pages/weather/page.yaml
+        file: pages/weather/page_narrow.yaml
         vars:
           <<: [*page_styles, *container_styles, *weather_page_styles]
           page_title: "\U000F0595" # weather-partly-cloudy

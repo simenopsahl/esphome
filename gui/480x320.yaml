@@ -37,6 +37,7 @@ font: !include
   - &boot_screen_styles
     img_size: 200x200
     spinner_size: 50
+    spinner_arc: 8
     logo_offset: 60
     spinner_offset: 90
 
@@ -46,8 +47,7 @@ font: !include
     pad_row: 8
 
   - &clock_page_styles
-    clock_meter_height: 308
-    clock_meter_width: 308
+    clock_meter_size: 308
     clock_translate_x: 0
     clock_translate_y: 140
 
