@@ -17,15 +17,16 @@ packages:
     }
 
 substitutions:
-  devicename: sdl_128x128
+  devicename: sdl-128x128
   log_level: INFO
   home_page: page_temperature
+
+host:
 
 esphome:
   comment: "Virtual ESPHome 128x128"
   name: $devicename
   friendly_name: $devicename
-  area: $location
 
 display:
   - platform: sdl
@@ -48,12 +49,17 @@ time:
         seconds: 0
         then:
           - script.execute: lvgl_time_update
+  - id: !remove time_sntp
 
 binary_sensor:
   # Keep display on
-  - id: motion_detected
+  - platform: template
+    id: motion_detected
     lambda: !lambda |-
       return true;
-    on_state:
-      then:
-        - script.execute: display_on_off
+#    on_state:
+#      then:
+#        - script.execute: display_on_off
+
+script:
+  - id: !remove display_on_off
