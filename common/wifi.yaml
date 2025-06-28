@@ -5,8 +5,8 @@
 #
 # https://esphome.io/components/wifi.html
 #
-wifi:
-  id: component_wifi
+#wifi:
+#  id: component_wifi
 #  ssid: !secret wifi_ssid
 #  password: !secret wifi_password
 #  fast_connect: true
@@ -15,7 +15,20 @@ wifi:
 
 sensor:
   # https://esphome.io/components/sensor/wifi_signal.html
-  - platform: wifi_signal
+#  - platform: wifi_signal
+#    id: sensor_wifi_signal
+#    name: "WiFi Signal dB"
+#    entity_category: diagnostic
+#    device_class: "signal_strength"
+#    state_class: measurement
+#    disabled_by_default: true
+#    update_interval: 60s
+#    filters:
+#      - or:
+#          - heartbeat: 900s
+#          - delta: 1
+
+  - platform: template
     id: sensor_wifi_signal
     name: "WiFi Signal dB"
     entity_category: diagnostic
@@ -23,6 +36,8 @@ sensor:
     state_class: measurement
     disabled_by_default: true
     update_interval: 60s
+    lambda: |-
+      return 78.0;
     filters:
       - or:
           - heartbeat: 900s
@@ -30,44 +45,66 @@ sensor:
 
 text_sensor:
   # https://esphome.io/components/text_sensor/wifi_info
-  - platform: wifi_info
-    ip_address:
-      id: sensor_ip_address
-      name: "IP Address"
-      entity_category: diagnostic
-      disabled_by_default: true
-      address_0:
-        id: sensor_ip_address_0
-        name: "IP Address 0"
-        entity_category: diagnostic
-        disabled_by_default: true
-      address_1:
-        id: sensor_ip_address_1
-        name: "IP Address 1"
-        entity_category: diagnostic
-        disabled_by_default: true
-      address_2:
-        id: sensor_ip_address_2
-        name: "IP Address 2"
-        entity_category: diagnostic
-        disabled_by_default: true
-      address_3:
-        id: sensor_ip_address_3
-        name: "IP Address 3"
-        entity_category: diagnostic
-        disabled_by_default: true
-      address_4:
-        id: sensor_ip_address_4
-        name: "IP Address 4"
-        entity_category: diagnostic
-        disabled_by_default: true
-    ssid:
-      id: sensor_ssid
-      name: "Connected SSID"
-      entity_category: diagnostic
-      disabled_by_default: true
-    mac_address:
-      id: sensor_mac_address
-      name: "Mac Address"
-      entity_category: diagnostic
-      disabled_by_default: true
+#  - platform: wifi_info
+#    ip_address:
+#      id: sensor_ip_address
+#      name: "IP Address"
+#      entity_category: diagnostic
+#      disabled_by_default: true
+#      address_0:
+#        id: sensor_ip_address_0
+#        name: "IP Address 0"
+#        entity_category: diagnostic
+#        disabled_by_default: true
+#      address_1:
+#        id: sensor_ip_address_1
+#        name: "IP Address 1"
+#        entity_category: diagnostic
+#        disabled_by_default: true
+#      address_2:
+#        id: sensor_ip_address_2
+#        name: "IP Address 2"
+#        entity_category: diagnostic
+#        disabled_by_default: true
+#      address_3:
+#        id: sensor_ip_address_3
+#        name: "IP Address 3"
+#        entity_category: diagnostic
+#        disabled_by_default: true
+#      address_4:
+#        id: sensor_ip_address_4
+#        name: "IP Address 4"
+#        entity_category: diagnostic
+#        disabled_by_default: true
+#    ssid:
+#      id: sensor_ssid
+#      name: "Connected SSID"
+#      entity_category: diagnostic
+#      disabled_by_default: true
+#    mac_address:
+#      id: sensor_mac_address
+#      name: "Mac Address"
+#      entity_category: diagnostic
+#      disabled_by_default: true
+
+  - platform: template
+    id: sensor_ip_address
+    name: "IP Address"
+    entity_category: diagnostic
+    disabled_by_default: true
+    lambda: |-
+      return {"192.168.68.XXX"};
+  - platform: template
+    id: sensor_ssid
+    name: "Connected SSID"
+    entity_category: diagnostic
+    disabled_by_default: true
+    lambda: |-
+      return {"V_Nettet"};
+  - platform: template
+    id: sensor_mac_address
+    name: "Mac Address"
+    entity_category: diagnostic
+    disabled_by_default: true
+    lambda: |-
+      return {"a1:b2:c3:e4:f5:a6"};

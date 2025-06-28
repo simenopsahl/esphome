@@ -21,7 +21,7 @@ obj: # title bar
     - label: # wifi
         id: lbl_wifi_status
         align: LEFT_MID
-        hidden: true
+#        hidden: true
         text: "\U000F05A9" # wifi
         text_font: mdi_lg
         text_color: c_green
@@ -41,7 +41,7 @@ obj: # title bar
     - label: # HA_status
         id: lbl_ha_status
         align: RIGHT_MID
-        hidden: true
+#        hidden: true
         text: "\U000F07D0" # home-assistant
         text_font: mdi_lg
         text_color: c_ha_icon

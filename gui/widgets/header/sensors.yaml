@@ -1,14 +1,14 @@
-api:
-  on_client_connected:
-    - lvgl.widget.show: lbl_ha_status
-  on_client_disconnected:
-    - lvgl.widget.hide: lbl_ha_status
+#api:
+#  on_client_connected:
+#    - lvgl.widget.show: lbl_ha_status
+#  on_client_disconnected:
+#    - lvgl.widget.hide: lbl_ha_status
 
-wifi:
-  on_connect:
-    - lvgl.widget.show: lbl_wifi_status
-  on_disconnect:
-    - lvgl.widget.hide: lbl_wifi_status
+#wifi:
+#  on_connect:
+#    - lvgl.widget.show: lbl_wifi_status
+#  on_disconnect:
+#    - lvgl.widget.hide: lbl_wifi_status
 
 # extend does not work in package
 #time:
