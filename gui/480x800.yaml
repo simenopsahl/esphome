@@ -48,7 +48,7 @@ font: !include
 
   - &clock_page_styles
     clock_meter_size: 386
-    clock_translate_x: 180
+    clock_translate_x: 250
     clock_translate_y: 0
 
   - &nordpool_page_styles

@@ -17,6 +17,11 @@ esphome:
   friendly_name: ${friendly_name}
   area: $location
 
+esp32:
+  framework:
+    advanced:
+      assertion_level: DISABLE
+
 api:
   encryption:
     key: !secret homeassistant_api
