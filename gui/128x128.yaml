@@ -29,9 +29,9 @@ font: !include
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 0
-    container_pad_bottom: 0
-    container_pad_left: 0
-    container_pad_right: 0
+    container_pad_bottom: 8
+    container_pad_left: 6
+    container_pad_right: 6
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
@@ -78,8 +78,8 @@ font: !include
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 104px = ~43px
     # Row 2 height = (4 / 7) * 104px = ~57px
-    weather_row_1_height: 44
-    weather_row_2_height: 59
+    weather_row_1_height: 54
+    weather_row_2_height: 73
     # Calculation for this 128x128 screen:
     # Available width = 128px (screen) - 0px (left pad) - 0px (right pad) = 128px
     # Total fr units = 4 + 7 = 11

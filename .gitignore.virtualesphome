@@ -10,3 +10,4 @@
 !sdl_*.yaml
 **/sensors.yaml
 common/wifi.yaml
+!sdl_*.yaml

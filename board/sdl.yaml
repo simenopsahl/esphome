@@ -1,0 +1,80 @@
+# Virtual ESP32 Device
+
+host:
+
+display:
+  - platform: sdl
+    id: display_sdl
+#    show_test_card: true
+    dimensions:
+      width: 240
+      height: 320
+    auto_clear_enabled: false
+
+touchscreen:
+  - platform: sdl
+    id: touchscreen_sdl
+
+binary_sensor:
+  # Keep display on
+  - platform: template
+    id: motion_detected
+    lambda: !lambda |-
+      return true;
+#    on_state:
+#      then:
+#        - script.execute: display_on_off
+
+script:
+  - id: sdl_dummy_values
+    mode: single
+    then:
+      - lambda: |-
+          // Publish fake NordPool prices
+          id(nordpool_price_0).publish_state(43.3456);
+          id(nordpool_price_1).publish_state(38.5897);
+          id(nordpool_price_2).publish_state(23.56);
+          id(nordpool_price_3).publish_state(91.3319);
+          id(nordpool_price_4).publish_state(128.8413);
+          id(nordpool_price_5).publish_state(109.9209);
+          id(nordpool_price_6).publish_state(151.1928);
+          id(nordpool_price_7).publish_state(138.3022);
+          id(nordpool_price_8).publish_state(156.5842);
+
+          // Publish fake NordPool times
+          id(nordpool_time_0).publish_state("09:00");
+          id(nordpool_time_2).publish_state("11:00");
+          id(nordpool_time_4).publish_state("13:00");
+          id(nordpool_time_6).publish_state("15:00");
+          id(nordpool_time_8).publish_state("17:00");
+
+          // Publish fake T22 temperature
+          id(room_temp_value_homeassistant).publish_state(23.78);
+
+          // Publish fake weather conditions
+          id(ha_weather_condition).publish_state("partlycloudy");
+          id(ha_weather_temperature).publish_state("15.9");
+          id(ha_condition_today).publish_state("Delvis skyet");
+          id(ha_condition_0).publish_state("cloudy");
+          id(ha_weather_timestamp_0).publish_state("10:00");
+          id(ha_weather_temperature_0).publish_state(17.3);
+          id(ha_condition_1).publish_state("partlycloudy");
+          id(ha_weather_timestamp_1).publish_state("12:00");
+          id(ha_weather_temperature_0).publish_state(18.7);
+          id(ha_condition_2).publish_state("sunny");
+          id(ha_weather_timestamp_2).publish_state("14:00");
+          id(ha_weather_temperature_0).publish_state(20.1);
+          id(ha_condition_3).publish_state("partlycloudy");
+          id(ha_weather_timestamp_3).publish_state("16:00");
+          id(ha_weather_temperature_0).publish_state(20.9);
+
+interval:
+  - interval: 1min
+    then:
+      - script.execute: sdl_dummy_values
+
+esphome:
+  on_boot:
+    - priority: 300
+      then:
+        - script.execute: sdl_dummy_values

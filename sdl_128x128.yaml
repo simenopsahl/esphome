@@ -4,6 +4,7 @@ packages:
   #  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
+  virtual_esp: !include board/sdl.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -17,11 +18,9 @@ packages:
     }
 
 substitutions:
-  devicename: sdl-128x128
-  log_level: INFO
+  devicename: sdl-virtual-device
+  log_level: DEBUG
   home_page: page_temperature
-
-host:
 
 esphome:
   comment: "Virtual ESPHome 128x128"
@@ -29,15 +28,15 @@ esphome:
   friendly_name: $devicename
 
 display:
-  - platform: sdl
-    #show_test_card: true
+  - id: !extend display_sdl
     dimensions:
       width: 128
       height: 128
-    auto_clear_enabled: false
 
 touchscreen:
-  platform: sdl
+  - id: !extend touchscreen_sdl
+    on_release:
+      - lvgl.page.next
 
 # --- LVGL CLOCKS ---
 time:
@@ -50,16 +49,6 @@ time:
         then:
           - script.execute: lvgl_time_update
   - id: !remove time_sntp
-
-binary_sensor:
-  # Keep display on
-  - platform: template
-    id: motion_detected
-    lambda: !lambda |-
-      return true;
-#    on_state:
-#      then:
-#        - script.execute: display_on_off
 
 script:
   - id: !remove display_on_off

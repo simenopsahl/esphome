@@ -100,7 +100,7 @@ text_sensor:
     entity_category: diagnostic
     disabled_by_default: true
     lambda: |-
-      return {"V_Nettet"};
+      return {"V@Nettet"};
   - platform: template
     id: sensor_mac_address
     name: "Mac Address"
