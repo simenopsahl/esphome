@@ -7,3 +7,4 @@
 /archive/
 /secrets.yaml
 sdl_*.yaml
+/board/sdl.yaml
