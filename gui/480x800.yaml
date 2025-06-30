@@ -25,6 +25,16 @@ font: !include
     <<: !include styles/page_styles.yaml
     page_pad_top: 44
     page_pad_bottom: 44
+    screen_height: 480
+    screen_width: 800
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 480 - (2 * 44) - (2 * 2) = 388
+    usable_screen_height: 388
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 800  (2 * 10) = 780
+    usable_screen_width: 780
 
   - &container_styles
     <<: !include styles/container_styles.yaml
@@ -47,41 +57,35 @@ font: !include
     pad_row: 10
 
   - &clock_page_styles
-    clock_meter_size: 386
+    clock_meter_size: 460
     clock_translate_x: 250
     clock_translate_y: 0
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 800  (2 * 10) = 780
-    nordpool_usable_page_width: 780
-    # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 480 - (2 * 44) - (2 * 2) = 388
     nordpool_usable_page_height: 388
+    nordpool_usable_page_width: 780
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 32 # text_md +2
     nordpool_row_3_height: 28 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
     # 388 - 32 - 28 = 332
-    nordpool_row_2_height: 328
+    nordpool_row_2_height: 330
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 10
 
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 480x800 screen:
-    # Available height = 480px (screen) - 46px (top pad) - 46px (bottom pad) = 388px
+    # Available height = 388px
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 388px = ~166px
     # Row 2 height = (4 / 7) * 388px = ~221px
     weather_row_1_height: 166
     weather_row_2_height: 221
     # Calculation for this 480x800 screen:
-    # Available width = 800px (screen) - 10px (left pad) - 10px (right pad) = 780px
+    # Available width = 780px
     # Total fr units = 7 + 6 = 13
     # Column 1 width = (7 / 13) * 780px = 420px
     # Column 2 width = (6 / 13) * 780px = 360px
@@ -176,7 +180,7 @@ packages:
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
-  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*nordpool_page_styles] } }
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*page_styles, *nordpool_page_styles] } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control

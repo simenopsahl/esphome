@@ -25,13 +25,23 @@ font: !include
     <<: !include styles/page_styles.yaml
     page_pad_top: 24
     page_pad_bottom: 0
+    screen_height: 128
+    screen_width: 128
+    # Calculate the usable height for the page content area
+    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
+    # 128 - (1 * 24) - (2 * 0) = 104
+    usable_screen_height: 104
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 128  (2 * 6) = 116
+    usable_screen_width: 116
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 0
-    container_pad_bottom: 0
-    container_pad_left: 0
-    container_pad_right: 0
+    container_pad_bottom: 8
+    container_pad_left: 6
+    container_pad_right: 6
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
@@ -53,14 +63,8 @@ font: !include
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 128  (2 * 0) = 128
-    nordpool_usable_page_width: 128
-    # Calculate the usable height for the page content area
-    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 128 - (1 * 24) - (2 * 0) = 104
     nordpool_usable_page_height: 104
+    nordpool_usable_page_width: 116
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 16 # text_md +2
     nordpool_row_3_height: 14 # text_sm +2
@@ -74,19 +78,19 @@ font: !include
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 128x128 screen:
-    # Available height = 128px (screen) - 24px (top pad) - 0px (bottom pad) = 104px
+    # Available height = 104px
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 104px = ~43px
     # Row 2 height = (4 / 7) * 104px = ~57px
     weather_row_1_height: 44
     weather_row_2_height: 59
     # Calculation for this 128x128 screen:
-    # Available width = 128px (screen) - 0px (left pad) - 0px (right pad) = 128px
+    # Available width = 116px
     # Total fr units = 4 + 7 = 11
-    # Column 1 width = (4 / 11) * 128px = ~46px
-    # Column 2 width = (7 / 11) * 128px = ~81px
-    weather_column_1_width: 46
-    weather_column_2_width: 81
+    # Column 1 width = (4 / 11) * 116px = ~42px
+    # Column 2 width = (7 / 11) * 116px = ~73px
+    weather_column_1_width: 42
+    weather_column_2_width: 73
     # Variables for the forecast objects at the bottom
     weather_forecast_column_width: 38
     weather_forecast_grid_pad_column: 2
@@ -100,7 +104,7 @@ font: !include
     weather_forecast_temp_font: font_sm
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_42"
+    initial_today_icon_src: "unknown_38"
     initial_forecast_icon_src: "unknown_26"
 
   - &button_widget_vars
@@ -175,7 +179,7 @@ packages:
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
-  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: *nordpool_page_styles } }
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*page_styles, *nordpool_page_styles] } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control
@@ -198,9 +202,9 @@ packages:
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 42
+      size: 38
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 42
+      size: 38
