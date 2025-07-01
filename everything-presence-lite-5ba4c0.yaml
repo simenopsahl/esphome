@@ -6,10 +6,14 @@ substitutions:
   location: "1etg, Inngang"
 
 packages:
-  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
+  # --- COMMON PACKAGES ---
   <<: !include_dir_named bluetooth
   time: !include common/time.yaml
   status: !include common/status.yaml
+
+  # --- BOARD AND MODULES ---
+  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
+  tweaks: !include board/everything_presence_lite.yaml
 
 esphome:
   name: ${name}
@@ -21,132 +25,3 @@ esp32:
   framework:
     advanced:
       assertion_level: DISABLE
-
-api:
-  encryption:
-    key: !secret homeassistant_api
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  fast_connect: true
-  enable_btm: true
-  enable_rrm: true
-
-binary_sensor:
-  - id: !extend zone2_occupancy
-    disabled_by_default: false
-  - id: !extend zone3_occupancy
-    disabled_by_default: false
-  - id: !extend zone4_occupancy
-    disabled_by_default: false
-
-number:
-  - id: !extend zone2_begin_x
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone2_end_x
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone2_begin_y
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone2_end_y
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone_2_off_delay
-    disabled_by_default: false
-    entity_category: config
-
-  - id: !extend zone3_begin_x
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone3_end_x
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone3_begin_y
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone3_end_y
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone_3_off_delay
-    disabled_by_default: false
-    entity_category: config
-
-  - id: !extend zone4_begin_x
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone4_end_x
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone4_begin_y
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone4_end_y
-    disabled_by_default: false
-    entity_category: config
-  - id: !extend zone_4_off_delay
-    disabled_by_default: false
-    entity_category: config
-
-sensor:
-  - id: !extend target1_x
-    entity_category: diagnostic
-  - id: !extend target1_y
-    entity_category: diagnostic
-  - id: !extend target1_speed
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target1_resolution
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target1_angle
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target1_distance
-    entity_category: diagnostic
-
-  - id: !extend target2_x
-    entity_category: diagnostic
-  - id: !extend target2_y
-    entity_category: diagnostic
-  - id: !extend target2_speed
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target2_resolution
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target2_angle
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target2_distance
-    entity_category: diagnostic
-
-  - id: !extend target3_x
-    entity_category: diagnostic
-  - id: !extend target3_y
-    entity_category: diagnostic
-  - id: !extend target3_speed
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target3_resolution
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target3_angle
-    disabled_by_default: true
-    entity_category: diagnostic
-  - id: !extend target3_distance
-    entity_category: diagnostic
-
-  - id: !extend zone1_target_count
-    entity_category: diagnostic
-  - id: !extend zone2_target_count
-    disabled_by_default: false
-    entity_category: diagnostic
-  - id: !extend zone3_target_count
-    disabled_by_default: false
-    entity_category: diagnostic
-  - id: !extend zone4_target_count
-    disabled_by_default: false
-    entity_category: diagnostic

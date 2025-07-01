@@ -59,7 +59,7 @@ font: !include
   - &clock_page_styles
     clock_meter_size: 318
     clock_translate_x: 0
-    clock_translate_y: 140
+    clock_translate_y: 100
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --

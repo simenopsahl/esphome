@@ -26,6 +26,8 @@ obj: # navigation bar
         flex_grow: 1
         on_press:
           - lvgl.page.previous:
+              animation: OUT_LEFT
+              time: 300ms
         widgets:
           - label:
               align: CENTER
@@ -53,6 +55,8 @@ obj: # navigation bar
         flex_grow: 1
         on_press:
           - lvgl.page.next:
+              animation: OUT_RIGHT
+              time: 300ms
         widgets:
           - label:
               align: CENTER
