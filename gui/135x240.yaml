@@ -25,13 +25,23 @@ font: !include
     <<: !include styles/page_styles.yaml
     page_pad_top: 26
     page_pad_bottom: 0
+    screen_height: 240
+    screen_width: 135
+    # Calculate the usable height for the page content area
+    # (screen_height - (1 * top) - (1 * bottom))
+    # 240 - (1 * 27) - (1 * 10) = 203
+    usable_screen_height: 203
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 135  (2 * 4) = 123
+    usable_screen_width: 123
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 1
-    container_pad_bottom: 1
-    container_pad_left: 0
-    container_pad_right: 0
+    container_pad_bottom: 10
+    container_pad_left: 4
+    container_pad_right: 4
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
@@ -52,15 +62,6 @@ font: !include
     clock_translate_y: 80
 
   - &nordpool_page_styles
-    # -- DISPLAY CONFIGURATION --
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 135  (2 * 0) = 135
-    nordpool_usable_page_width: 135
-    # Calculate the usable height for the page content area
-    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 240 - (1 * 26) - (2 * 1) = 212
-    nordpool_usable_page_height: 212
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 16 # text_md +2
     nordpool_row_3_height: 14 # text_sm +2
@@ -74,14 +75,16 @@ font: !include
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 135x240 screen:
-    # Available height = 240px (screen) - 27px (top pad) - 1px (bottom pad) = 212px
+    weather_row_1: 3
+    weather_row_2: 4
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 212px = ~89px
     # Row 2 height = (4 / 7) * 212px = ~118px
     weather_row_1_height: 90
     weather_row_2_height: 121
     # Calculation for this 135x240 screen:
-    # Available width = 135px (screen) - 0px (left pad) - 0px (right pad) = 135px
+    weather_column_1: 4
+    weather_column_2: 7
     # Total fr units = 4 + 7 = 11
     # Column 1 width = (4 / 11) * 135px = ~49px
     # Column 2 width = (7 / 11) * 135px = ~85px
@@ -94,14 +97,14 @@ font: !include
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
     # Font for the "Været nå" text
-    weather_today_condition_font: font_md
-    weather_today_temp_font: font_lg
+    weather_today_condition_font: font_sm
+    weather_today_temp_font: font_md
     # Font for the forecast temperature
     weather_forecast_temp_font: font_sm
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_46"
-    initial_forecast_icon_src: "unknown_28"
+    initial_today_icon_src: "unknown_40"
+    initial_forecast_icon_src: "unknown_24"
 
   - &button_widget_vars
     width: 75
@@ -175,7 +178,7 @@ packages:
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
-  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: *nordpool_page_styles } }
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*page_styles, *nordpool_page_styles] } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control
@@ -188,19 +191,19 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 28
+      size: 24
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 28
+      size: 24
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 46
+      size: 40
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 46
+      size: 40

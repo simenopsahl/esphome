@@ -37,7 +37,7 @@
           widgets:
             - label:
                 id: lbl_name_l
-                text: "Name: "
+                text: "ID: "
                 pad_right: 2
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 0

@@ -30,8 +30,8 @@ esphome:
 display:
   - id: !extend display_sdl
     dimensions:
-      width: 480
-      height: 320
+      height: 480
+      width: 320
 
 # --- LVGL CLOCKS ---
 time:

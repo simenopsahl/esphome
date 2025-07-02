@@ -116,7 +116,6 @@
                 widgets:
                   - line:
                       id: lvgl_nordpool_line
-#                      height: ${nordpool_row_2_height}
                       width: 100%
                       align: CENTER
                       line_width: ${nordpool_line_width}

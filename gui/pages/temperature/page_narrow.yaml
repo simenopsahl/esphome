@@ -42,14 +42,11 @@
             - label: # temperature value
                 id: room_temp_value_widget_text
                 text: "--°C"
-#                height: SIZE_CONTENT
-#                max_width: 90%
                 pad_all: 0
                 text_font: font_fl
                 text_color: c_text_p
                 text_align: CENTER
                 align: CENTER
-#                translate_y: -${container_pad_bottom}
             - obj:
                 pad_all: 0
                 width: ${screen_width}
@@ -67,16 +64,13 @@
                       text: "\U000F050F"
                       text_font: mdi_lg
                       text_color: c_text_s
-#                      text_align: LEFT
                   - label: # area
                       id: room_temp_area
                       text: "Rom"
                       text_font: font_lg
                       text_color: c_text_s
-#                      text_align: CENTER
                   - label: # temperature unit
                       id: room_temp_unit
                       text: "°C"
                       text_font: font_lg
                       text_color: c_text_s
-#                      text_align: RIGHT

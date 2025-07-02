@@ -19,7 +19,7 @@ esphome:
       - script.execute:
           id: nordpool_initialize_graph_layout
           # Pass the variables to the script
-          graph_container_w: ${nordpool_usable_page_width}
+          graph_container_w: ${usable_screen_width}
           graph_container_h: ${nordpool_row_2_height}
           line_w: ${nordpool_line_width}
 

@@ -25,21 +25,31 @@ font: !include
     <<: !include styles/page_styles.yaml
     page_pad_top: 28
     page_pad_bottom: 0
+    screen_height: 200
+    screen_width: 200
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * top) - (1 * bottom))
+    # 200 - (1 * 30) - (1 * 6) = 164
+    usable_screen_height: 164
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 200 - (2 * 4) = 192
+    usable_screen_width: 192
 
   - &container_styles
     <<: !include styles/container_styles.yaml
-    container_pad_top: 0
-    container_pad_bottom: 1
-    container_pad_left: 1
-    container_pad_right: 1
+    container_pad_top: 2
+    container_pad_bottom: 6
+    container_pad_left: 4
+    container_pad_right: 4
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
-    img_size: 150x150
+    img_size: 140x140
     spinner_size: 50
     spinner_arc: 8
-    logo_offset: 40
-    spinner_offset: 90
+    logo_offset: 30
+    spinner_offset: 60
 
   - &button_layout
     <<: !include styles/button_layout.yaml
@@ -47,41 +57,34 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_size: 143
+    clock_meter_size: 190
     clock_translate_x: 0
-    clock_translate_y: 28
+    clock_translate_y: 34
 
   - &nordpool_page_styles
-    # -- DISPLAY CONFIGURATION --
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 200 - (2 * 1) = 198
-    nordpool_usable_page_width: 198
-    # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 200 - (1 * 28) - (1 * 1) = 171
-    nordpool_usable_page_height: 169
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 20 # text_md +2
     nordpool_row_3_height: 18 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 144 - 20 - 18 = 106
-    nordpool_row_2_height: 104
+    # 164 - 20 - 18 = 126
+    nordpool_row_2_height: 124
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 5
 
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 200x200 screen:
-    # Available height = 200px (screen) - 28px (top pad) - 1px (bottom pad) = 171px
+    weather_row_1: 3
+    weather_row_2: 4
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 171px = ~73px
     # Row 2 height = (4 / 7) * 171px = ~97px
     weather_row_1_height: 73
     weather_row_2_height: 97
     # Calculation for this 200x200 screen:
-    # Available width = 200px (screen) - 1px (left pad) - 1px (right pad) = 198px
+    weather_column_1: 3
+    weather_column_2: 5
     # Total fr units = 3 + 5 = 8
     # Column 1 width = (3 / 8) * 198px = ~74px
     # Column 2 width = (5 / 8) * 198px = ~124px
@@ -94,14 +97,14 @@ font: !include
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
     # Font for the "Været nå" text
-    weather_today_condition_font: font_lg
-    weather_today_temp_font: font_xl
+    weather_today_condition_font: font_md
+    weather_today_temp_font: font_lg
     # Font for the forecast temperature
     weather_forecast_temp_font: font_md
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_60"
-    initial_forecast_icon_src: "unknown_40"
+    initial_today_icon_src: "unknown_50"
+    initial_forecast_icon_src: "unknown_34"
 
   - &button_widget_vars
     width: 75
@@ -148,7 +151,7 @@ lvgl:
 
     # nordpool prices
     - <<: !include
-        file: pages/nordpool/page.yaml
+        file: pages/nordpool/page_narrow.yaml
         vars:
           <<: [*page_styles, *container_styles, *nordpool_page_styles]
           page_title: "NordPool"
@@ -162,7 +165,7 @@ lvgl:
 
     # device status
     - <<: !include
-        file: pages/status/page.yaml
+        file: pages/status/page_narrow.yaml
         vars:
           <<: [*page_styles, *container_styles]
           page_title: "Enhet"
@@ -175,7 +178,7 @@ packages:
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
-  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: *nordpool_page_styles } }
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*page_styles, *nordpool_page_styles] } }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control
@@ -188,19 +191,19 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 40
+      size: 34
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 40
+      size: 34
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 60
+      size: 50
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 60
+      size: 50
