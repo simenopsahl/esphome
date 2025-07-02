@@ -26,7 +26,7 @@ obj: # navigation bar
         flex_grow: 1
         on_press:
           - lvgl.page.previous:
-              animation: OUT_LEFT
+              animation: OUT_RIGHT
               time: 300ms
         widgets:
           - label:
@@ -55,7 +55,7 @@ obj: # navigation bar
         flex_grow: 1
         on_press:
           - lvgl.page.next:
-              animation: OUT_RIGHT
+              animation: OUT_LEFT
               time: 300ms
         widgets:
           - label:

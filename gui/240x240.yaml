@@ -28,28 +28,28 @@ font: !include
     screen_height: 240
     screen_width: 240
     # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (1 * 31) - (1 + 10) = 199
-    usable_screen_height: 199
+    # (screen_height - (1 * top) - (1 * bottom))
+    # 240 - (1 * 31) - (1 * 4) = 205
+    usable_screen_height: 205
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
-    # 240  (2 * 10) = 220
-    usable_screen_width: 220
+    # 240  (2 * 3) = 234
+    usable_screen_width: 234
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 1
-    container_pad_bottom: 10
-    container_pad_left: 10
-    container_pad_right: 10
+    container_pad_bottom: 4
+    container_pad_left: 3
+    container_pad_right: 3
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
     img_size: 160x160
     spinner_size: 50
     spinner_arc: 8
-    logo_offset: 50
-    spinner_offset: 90
+    logo_offset: 30
+    spinner_offset: 70
 
   - &button_layout
     <<: !include styles/button_layout.yaml
@@ -57,9 +57,9 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_size: 220
+    clock_meter_size: 226
     clock_translate_x: 0
-    clock_translate_y: 30
+    clock_translate_y: 38
 
   - &nordpool_page_styles
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
@@ -67,8 +67,8 @@ font: !include
     nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 199 - 18 - 16 = 165
-    nordpool_row_2_height: 163
+    # 205 - 18 - 16 = 171
+    nordpool_row_2_height: 168
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 6
 
@@ -97,8 +97,8 @@ font: !include
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
     # Font for the "Været nå" text
-    weather_today_condition_font: font_lg
-    weather_today_temp_font: font_xl
+    weather_today_condition_font: font_md
+    weather_today_temp_font: font_lg
     # Font for the forecast temperature
     weather_forecast_temp_font: font_md
     # Font for the forecast timestamp

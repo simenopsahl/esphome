@@ -29,27 +29,27 @@ font: !include
     screen_width: 320
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 32) - (2 * 1) = 174
-    usable_screen_height: 174
+    # 240 - (2 * 32) - (2 * 1) = 170
+    usable_screen_height: 170
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
-    # 320  (2 * 8) = 304
-    usable_screen_width: 304
+    # 320  (2 * 4) = 312
+    usable_screen_width: 312
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 1
     container_pad_bottom: 1
-    container_pad_left: 8
-    container_pad_right: 8
+    container_pad_left: 4
+    container_pad_right: 4
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
     img_size: 160x160
     spinner_size: 50
     spinner_arc: 8
-    logo_offset: 50
-    spinner_offset: 90
+    logo_offset: 34
+    spinner_offset: 70
 
   - &button_layout
     <<: !include styles/button_layout.yaml
@@ -57,8 +57,8 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_size: 220
-    clock_translate_x: 110
+    clock_meter_size: 186
+    clock_translate_x: 114
     clock_translate_y: 0
 
   - &nordpool_page_styles
@@ -67,7 +67,7 @@ font: !include
     nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 174 - 20 - 16 = 136
+    # 170 - 20 - 16 = 134
     nordpool_row_2_height: 134
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 6
@@ -103,8 +103,8 @@ font: !include
     weather_forecast_temp_font: font_md
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_60"
-    initial_forecast_icon_src: "unknown_34"
+    initial_today_icon_src: "unknown_66"
+    initial_forecast_icon_src: "unknown_36"
 
   - &button_widget_vars
     width: 75
@@ -191,19 +191,19 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 34
+      size: 36
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 34
+      size: 36
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 60
+      size: 66
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 60
+      size: 66

@@ -186,6 +186,8 @@
 
                   # Forecast Item 3
                   - obj:
+                      bg_color: c_black
+                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN

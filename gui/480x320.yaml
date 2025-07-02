@@ -29,8 +29,8 @@ font: !include
     screen_width: 320
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 480 - (2 * 40) - (2 * 4) = 392
-    usable_screen_height: 392
+    # 480 - (2 * 40) - (2 * 2) = 396
+    usable_screen_height: 396
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
     # 320  (2 * 6) = 308
@@ -38,8 +38,8 @@ font: !include
 
   - &container_styles
     <<: !include styles/container_styles.yaml
-    container_pad_top: 4
-    container_pad_bottom: 4
+    container_pad_top: 2
+    container_pad_bottom: 2
     container_pad_left: 6
     container_pad_right: 6
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
@@ -57,9 +57,9 @@ font: !include
     pad_row: 8
 
   - &clock_page_styles
-    clock_meter_size: 318
+    clock_meter_size: 320
     clock_translate_x: 0
-    clock_translate_y: 100
+    clock_translate_y: 170
 
   - &nordpool_page_styles
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
@@ -67,8 +67,8 @@ font: !include
     nordpool_row_3_height: 18 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 392 - 22 - 18 = 352
-    nordpool_row_2_height: 350
+    # 396 - 22 - 18 = 356
+    nordpool_row_2_height: 354
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 8
 

@@ -28,20 +28,20 @@ font: !include
     screen_height: 128
     screen_width: 128
     # Calculate the usable height for the page content area
-    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 128 - (1 * 24) - (2 * 0) = 104
-    usable_screen_height: 104
+    # (screen_height - (1 * top) - (1 * bottom))
+    # 128 - (1 * 24) - (1 * 6) = 104
+    usable_screen_height: 98
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
-    # 128  (2 * 6) = 116
-    usable_screen_width: 116
+    # 128  (2 * 3) = 122
+    usable_screen_width: 122
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 0
-    container_pad_bottom: 8
-    container_pad_left: 6
-    container_pad_right: 6
+    container_pad_bottom: 6
+    container_pad_left: 3
+    container_pad_right: 3
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
@@ -57,7 +57,7 @@ font: !include
     pad_row: 4
 
   - &clock_page_styles
-    clock_meter_size: 126
+    clock_meter_size: 120
     clock_translate_x: 0
     clock_translate_y: 24
 
@@ -67,8 +67,8 @@ font: !include
     nordpool_row_3_height: 14 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 104 - 16 - 14 = 74
-    nordpool_row_2_height: 74
+    # 98 - 16 - 14 = 68
+    nordpool_row_2_height: 68
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 2
 
@@ -92,7 +92,7 @@ font: !include
     weather_column_2_width: 73
     # Variables for the forecast objects at the bottom
     weather_forecast_column_width: 38
-    weather_forecast_grid_pad_column: 2
+    weather_forecast_grid_pad_column: 0
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
@@ -103,7 +103,7 @@ font: !include
     weather_forecast_temp_font: font_sm
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_38"
+    initial_today_icon_src: "unknown_40"
     initial_forecast_icon_src: "unknown_22"
 
   - &button_widget_vars
@@ -201,9 +201,9 @@ packages:
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 38
+      size: 40
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 38
+      size: 40
