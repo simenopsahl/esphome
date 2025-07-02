@@ -25,6 +25,16 @@ font: !include
     <<: !include styles/page_styles.yaml
     page_pad_top: 24
     page_pad_bottom: 0
+    screen_height: 128
+    screen_width: 128
+    # Calculate the usable height for the page content area
+    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
+    # 128 - (1 * 24) - (2 * 0) = 104
+    usable_screen_height: 104
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 128  (2 * 6) = 116
+    usable_screen_width: 116
 
   - &container_styles
     <<: !include styles/container_styles.yaml
@@ -53,13 +63,7 @@ font: !include
 
   - &nordpool_page_styles
     # -- DISPLAY CONFIGURATION --
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 128  (2 * 0) = 128
     nordpool_usable_page_width: 128
-    # Calculate the usable height for the page content area
-    # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 128 - (1 * 24) - (2 * 0) = 104
     nordpool_usable_page_height: 104
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 16 # text_md +2
@@ -67,41 +71,43 @@ font: !include
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
     # 104 - 16 - 14 = 74
-    nordpool_row_2_height: 72
+    nordpool_row_2_height: 74
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 2
 
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 128x128 screen:
-    # Available height = 128px (screen) - 24px (top pad) - 0px (bottom pad) = 104px
     # Total fr units = 3 + 4 = 7
+    weather_row_1: 3
+    weather_row_2: 4
     # Row 1 height = (3 / 7) * 104px = ~43px
     # Row 2 height = (4 / 7) * 104px = ~57px
     weather_row_1_height: 54
     weather_row_2_height: 73
     # Calculation for this 128x128 screen:
-    # Available width = 128px (screen) - 0px (left pad) - 0px (right pad) = 128px
     # Total fr units = 4 + 7 = 11
+    weather_column_1: 4
+    weather_column_2: 7
     # Column 1 width = (4 / 11) * 128px = ~46px
     # Column 2 width = (7 / 11) * 128px = ~81px
     weather_column_1_width: 46
     weather_column_2_width: 81
     # Variables for the forecast objects at the bottom
     weather_forecast_column_width: 38
-    weather_forecast_grid_pad_column: 2
+    weather_forecast_grid_pad_column: 0
     weather_forecast_obj_radius: 3
     weather_forecast_obj_pad_top: 0
     weather_forecast_obj_pad_bottom: 0
     # Font for the "Været nå" text
-    weather_today_condition_font: font_md
-    weather_today_temp_font: font_lg
+    weather_today_condition_font: font_sm
+    weather_today_temp_font: font_md
     # Font for the forecast temperature
     weather_forecast_temp_font: font_sm
     # Font for the forecast timestamp
     weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_42"
-    initial_forecast_icon_src: "unknown_26"
+    initial_today_icon_src: "unknown_40"
+    initial_forecast_icon_src: "unknown_22"
 
   - &button_widget_vars
     width: 75
@@ -155,7 +161,7 @@ lvgl:
 
     # weather forecast
     - <<: !include
-        file: pages/weather/page_narrow.yaml
+        file: pages/weather/page_narrow2.yaml
         vars:
           page_title: "\U000F0595" # weather-partly-cloudy
           <<: [*page_styles, *container_styles, *weather_page_styles]
@@ -188,19 +194,19 @@ packages:
   weather_icons_34: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 26
+      size: 22
   # Display weather forcast using icon set (defined above)
   weather_forcast_34: !include
     file: weather/weather_forecast.yaml
     vars:
-      size: 26
+      size: 22
   # Big icons for today weather
   weather_icons_60: !include
     file: weather/weather_icons.yaml
     vars:
-      size: 42
+      size: 40
   # Get todays weather and display it
   weather_today_60: !include
     file: weather/weather_today.yaml
     vars:
-      size: 42
+      size: 40

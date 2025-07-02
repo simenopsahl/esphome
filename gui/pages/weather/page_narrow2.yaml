@@ -32,74 +32,78 @@
           scrollable: ${container_scrollable}
           align: CENTER
           layout:
-            type: GRID
-            grid_rows: [ fr($weather_row_1), fr($weather_row_2) ]
-            grid_columns: [ content ]
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_cross: CENTER
+            flex_align_main: SPACE_EVENLY
+            flex_align_track: CENTER
+            pad_column: 0
+            pad_row: 0
           widgets:
             # The first row (today's weather)
             - obj:
-                grid_cell_row_pos: 0
-                grid_cell_column_pos: 0
-                grid_cell_y_align: STRETCH
                 layout:
-                  type: GRID
-                  grid_rows: [ content ]
-                  grid_columns: [ fr($weather_column_1), fr($weather_column_2) ]
-#                  grid_column_align: SPACE_EVENLY
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_cross: CENTER
+                  flex_align_main: SPACE_EVENLY
+                  flex_align_track: CENTER
+                  pad_column: 0
+                  pad_row: 0
+#                flex_grow: ${weather_row_1}
                 pad_all: 0
+                width: ${screen_width}
+                height: SIZE_CONTENT
                 widgets:
                   # Today's weather icon
                   - image:
-                      grid_cell_row_pos: 0
-                      grid_cell_column_pos: 0
                       id: weather_condition_icon
                       src: ${initial_today_icon_src}
-                      max_width: ${weather_column_1_width}
+#                      flex_grow: ${weather_column_1}
 
                   # Today's temperature and condition
                   - obj:
-                      grid_cell_row_pos: 0
-                      grid_cell_column_pos: 1
-#                      grid_cell_y_align: STRETCH
                       pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
-#                        flex_align_main: SPACE_EVENLY
+                        flex_align_cross: START
+                        flex_align_main: SPACE_EVENLY
+                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
+#                      flex_grow: ${weather_column_2}
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: weather_temperature_today
                             text: "--°C"
                             text_font: ${weather_today_temp_font}
-                            text_align: LEFT
                         - label:
                             id: weather_condition_today
                             text: "Været nå"
                             long_mode: wrap
                             scrollable: true
                             text_font: ${weather_today_condition_font}
-                            text_align: LEFT
 
             # The second row (forecast section)
             - obj:
-                grid_cell_row_pos: 1
-                grid_cell_column_pos: 0
-#                width: 100%
                 pad_all: 0
                 layout:
-                  type: GRID
-                  grid_rows: [ content ]
-                  grid_columns: [ fr(1), fr(1), fr(1) ]
-                  grid_column_align: SPACE_EVENLY
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_cross: CENTER
+                  flex_align_main: SPACE_AROUND
+                  flex_align_track: CENTER
                   pad_column: ${weather_forecast_grid_pad_column}
                   pad_row: 0
+#                flex_grow: ${weather_row_2}
+                width: ${screen_width}
+                height: SIZE_CONTENT
                 widgets:
                   # Forecast Item 0
                   - obj:
-                      grid_cell_column_pos: 0
-                      grid_cell_row_pos: 0
                       bg_color: c_black
                       pad_all: 0
                       layout:
@@ -109,6 +113,8 @@
 #                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       # --- Widgets for this forecast item ---
                       widgets:
                         - label:
@@ -126,8 +132,6 @@
 
                   # Forecast Item 1
                   - obj:
-                      grid_cell_column_pos: 1
-                      grid_cell_row_pos: 0
                       bg_color: c_black
                       pad_all: 0
                       layout:
@@ -137,6 +141,8 @@
 #                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: forecast_timestamp_1
@@ -153,8 +159,6 @@
 
                   # Forecast Item 2
                   - obj:
-                      grid_cell_column_pos: 2
-                      grid_cell_row_pos: 0
                       bg_color: c_black
                       pad_all: 0
                       layout:
@@ -164,6 +168,8 @@
 #                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: forecast_timestamp_2
@@ -180,8 +186,6 @@
 
                   # Forecast Item 3
                   - obj:
-                      grid_cell_column_pos: 2
-                      grid_cell_row_pos: 0
                       hidden: true
                       layout:
                         type: FLEX
@@ -190,6 +194,8 @@
 #                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: forecast_timestamp_3

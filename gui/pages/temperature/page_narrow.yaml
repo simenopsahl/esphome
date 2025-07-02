@@ -30,43 +30,53 @@
           pad_right: ${container_pad_right}
           scrollable: ${container_scrollable}
           align: CENTER
-#          layout:
-#            type: FLEX
-#            flex_flow: COLUMN
-#            flex_align_main: SPACE_BETWEEN
+          layout:
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_cross: CENTER
+            flex_align_main: SPACE_EVENLY
+            flex_align_track: CENTER
+            pad_column: 0
+            pad_row: 0
           widgets:
             - label: # temperature value
                 id: room_temp_value_widget_text
                 text: "--°C"
-                max_width: 90%
+#                height: SIZE_CONTENT
+#                max_width: 90%
+                pad_all: 0
                 text_font: font_fl
                 text_color: c_text_p
                 text_align: CENTER
                 align: CENTER
-                y: -${container_pad_bottom}
-            - label: # thermometer icon
-                id: room_temp_icon
-                text: "\U000F050F"
-                text_font: mdi_lg
-                text_color: c_text_s
-                text_align: LEFT
-                align: BOTTOM_LEFT
-#                translate_x: ${page_pad_top}
-#                translate_y: -${page_pad_top}
-            - label: # area
-                id: room_temp_area
-                text: "Rom"
-                text_font: font_lg
-                text_color: c_text_s
-                text_align: CENTER
-                align: BOTTOM_MID
-#                translate_y: -${page_pad_top}
-            - label: # temperature unit
-                id: room_temp_unit
-                text: "°C"
-                text_font: font_lg
-                text_color: c_text_s
-                text_align: RIGHT
-                align: BOTTOM_RIGHT
-#                translate_x: -${page_pad_top}
-#                translate_y: -${page_pad_top}
+#                translate_y: -${container_pad_bottom}
+            - obj:
+                pad_all: 0
+                width: ${screen_width}
+                height: SIZE_CONTENT
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_cross: CENTER
+                  flex_align_main: SPACE_AROUND
+                  pad_column: 0
+                  pad_row: 0
+                widgets:
+                  - label: # thermometer icon
+                      id: room_temp_icon
+                      text: "\U000F050F"
+                      text_font: mdi_lg
+                      text_color: c_text_s
+#                      text_align: LEFT
+                  - label: # area
+                      id: room_temp_area
+                      text: "Rom"
+                      text_font: font_lg
+                      text_color: c_text_s
+#                      text_align: CENTER
+                  - label: # temperature unit
+                      id: room_temp_unit
+                      text: "°C"
+                      text_font: font_lg
+                      text_color: c_text_s
+#                      text_align: RIGHT
