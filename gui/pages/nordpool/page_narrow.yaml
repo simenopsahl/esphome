@@ -37,18 +37,18 @@
           scrollable: ${container_scrollable}
           align: CENTER
           layout:
-            type: GRID
-            grid_columns: [ content ]
-            grid_rows: [ content, content, content]
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_main: SPACE_EVENLY
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+            pad_row: 0
+            pad_column: 0
           widgets:
             # --- TOP ROW: Price Labels ---
             - obj:
-                grid_cell_row_pos: 0
-                grid_cell_column_pos: 0
-                grid_cell_x_align: CENTER
-                grid_cell_y_align: END
+                height: SIZE_CONTENT
                 width: 100%
-                height: ${nordpool_row_1_height}
                 pad_all: 0
                 layout:
                   type: GRID
@@ -110,17 +110,12 @@
 
             # --- MIDDLE ROW: Price Graph ---
             - obj:
-                grid_cell_row_pos: 1
-                grid_cell_column_pos: 0
-                grid_cell_x_align: CENTER
-                grid_cell_y_align: CENTER
                 width: 100%
-                height: ${nordpool_row_2_height}
+                height: SIZE_CONTENT
                 pad_all: 0
                 widgets:
                   - line:
                       id: lvgl_nordpool_line
-                      height: ${nordpool_row_2_height}
                       width: 100%
                       align: CENTER
                       line_width: ${nordpool_line_width}
@@ -150,12 +145,8 @@
 
             # --- BOTTOM ROW: Time Labels ---
             - obj:
-                grid_cell_row_pos: 2
-                grid_cell_column_pos: 0
-                grid_cell_x_align: CENTER
-                grid_cell_y_align: START
                 width: 100%
-                height: ${nordpool_row_3_height}
+                height: SIZE_CONTENT
                 pad_all: 0
                 layout:
                   type: GRID

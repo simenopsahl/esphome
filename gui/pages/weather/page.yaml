@@ -32,86 +32,89 @@
           scrollable: ${container_scrollable}
           align: CENTER
           layout:
-            type: GRID
-            grid_rows: [ content, content]
-            grid_columns: [ content, content]
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_cross: CENTER
+            flex_align_main: SPACE_EVENLY
+            flex_align_track: CENTER
+            pad_column: 0
+            pad_row: 0
           widgets:
-            # Today's weather icon
+            # The first row (today's weather)
             - obj:
-                grid_cell_row_pos: 0
-                grid_cell_column_pos: 0
-                grid_cell_y_align: CENTER
-                grid_cell_x_align: CENTER
-                height: ${weather_row_1_height}
-                width: ${weather_column_1_width}
-                align: CENTER
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_cross: CENTER
+                  flex_align_main: SPACE_EVENLY
+                  flex_align_track: CENTER
+                  pad_column: 0
+                  pad_row: 0
+#                flex_grow: ${weather_row_1}
+                pad_all: 0
+                width: ${screen_width}
+                height: SIZE_CONTENT
                 widgets:
+                  # Today's weather icon
                   - image:
                       id: weather_condition_icon
                       src: ${initial_today_icon_src}
+#                      flex_grow: ${weather_column_1}
+
+                  # Today's temperature and condition
+                  - obj:
+                      pad_all: 0
+                      layout:
+                        type: FLEX
+                        flex_flow: COLUMN
+                        flex_align_cross: START
+                        flex_align_main: SPACE_EVENLY
+                        flex_align_track: CENTER
+                        pad_row: 0
+                        pad_column: 0
+#                      flex_grow: ${weather_column_2}
                       height: SIZE_CONTENT
-                
-            # Today's temperature and condition
-            - obj:
-                grid_cell_row_pos: 0
-                grid_cell_column_pos: 1
-                grid_cell_y_align: CENTER
-                height: ${weather_row_1_height}
-                width: ${weather_column_2_width}
-                bg_opa: TRANSP
-                layout:
-                  type: FLEX
-                  flex_flow: COLUMN
-                  flex_align_main: CENTER
-                  flex_align_cross: START
-                widgets:
-                  - label:
-                      id: weather_temperature_today
-                      text: "--°"
-                      text_font: ${weather_today_temp_font}
-                      text_align: LEFT
-                  - label:
-                      id: weather_condition_today
-                      text: "Været nå"
-                      long_mode: wrap
-                      scrollable: true
-                      text_font: ${weather_today_condition_font}
-                      text_align: LEFT
+                      width: SIZE_CONTENT
+                      widgets:
+                        - label:
+                            id: weather_temperature_today
+                            text: "--°C"
+                            text_font: ${weather_today_temp_font}
+                        - label:
+                            id: weather_condition_today
+                            text: "Været nå"
+                            long_mode: wrap
+                            scrollable: true
+                            text_font: ${weather_today_condition_font}
 
             # The second row (forecast section)
             - obj:
-                grid_cell_row_pos: 1
-                grid_cell_column_pos: 0
-                grid_cell_column_span: 2
-                grid_cell_x_align: STRETCH
-                grid_cell_y_align: START
-                height: ${weather_row_2_height}
-                width: 100%
-                bg_opa: TRANSP
+                pad_all: 0
                 layout:
-                  type: GRID
-                  grid_rows: [ content ]
-                  grid_columns: [ content, content, content, content ]
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_cross: CENTER
+                  flex_align_main: SPACE_AROUND
+                  flex_align_track: CENTER
                   pad_column: ${weather_forecast_grid_pad_column}
                   pad_row: 0
+#                flex_grow: ${weather_row_2}
+                width: ${screen_width}
+                height: SIZE_CONTENT
                 widgets:
                   # Forecast Item 0
                   - obj:
-                      grid_cell_column_pos: 0
-                      grid_cell_row_pos: 0
-                      grid_cell_x_align: CENTER
-                      grid_cell_y_align: START
-                      height: 100%
-                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: ${weather_forecast_obj_radius}
-                      pad_top: ${weather_forecast_obj_pad_top}
-                      pad_bottom: ${weather_forecast_obj_pad_bottom}
+                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-                        flex_align_track: CENTER
+#                        flex_align_track: CENTER
+                        pad_row: 0
+                        pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       # --- Widgets for this forecast item ---
                       widgets:
                         - label:
@@ -119,115 +122,89 @@
                             text: "??:??"
                             text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
-                            height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_0
                             src: ${initial_forecast_icon_src}
-                            height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_0
-                            text: "--°"
+                            text: "--°C"
                             text_font: ${weather_forecast_temp_font}
-                            height: SIZE_CONTENT
 
                   # Forecast Item 1
                   - obj:
-                      grid_cell_column_pos: 1
-                      grid_cell_row_pos: 0
-                      grid_cell_x_align: CENTER
-                      grid_cell_y_align: START
-                      height: 100%
-                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: ${weather_forecast_obj_radius}
-                      pad_top: ${weather_forecast_obj_pad_top}
-                      pad_bottom: ${weather_forecast_obj_pad_bottom}
+                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-                        flex_align_track: CENTER
+#                        flex_align_track: CENTER
+                        pad_row: 0
+                        pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: forecast_timestamp_1
                             text: "??:??"
                             text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
-                            height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_1
                             src: ${initial_forecast_icon_src}
-                            height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_1
-                            text: "--°"
+                            text: "--°C"
                             text_font: ${weather_forecast_temp_font}
-                            height: SIZE_CONTENT
 
                   # Forecast Item 2
                   - obj:
-                      grid_cell_column_pos: 2
-                      grid_cell_row_pos: 0
-                      grid_cell_x_align: CENTER
-                      grid_cell_y_align: START
-                      height: 100%
-                      width: ${weather_forecast_column_width}
                       bg_color: c_black
-                      radius: ${weather_forecast_obj_radius}
-                      pad_top: ${weather_forecast_obj_pad_top}
-                      pad_bottom: ${weather_forecast_obj_pad_bottom}
+                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-                        flex_align_track: CENTER
+#                        flex_align_track: CENTER
+                        pad_row: 0
+                        pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: forecast_timestamp_2
                             text: "??:??"
                             text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
-                            height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_2
                             src: ${initial_forecast_icon_src}
-                            height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_2
-                            text: "--°"
+                            text: "--°C"
                             text_font: ${weather_forecast_temp_font}
-                            height: SIZE_CONTENT
 
                   # Forecast Item 3
                   - obj:
-                      grid_cell_column_pos: 3
-                      grid_cell_row_pos: 0
-                      grid_cell_x_align: CENTER
-                      grid_cell_y_align: START
-                      height: 100%
-                      width: ${weather_forecast_column_width}
-                      bg_color: c_black
-                      radius: ${weather_forecast_obj_radius}
-                      pad_top: ${weather_forecast_obj_pad_top}
-                      pad_bottom: ${weather_forecast_obj_pad_bottom}
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-                        flex_align_track: CENTER
+#                        flex_align_track: CENTER
+                        pad_row: 0
+                        pad_column: 0
+                      height: SIZE_CONTENT
+                      width: SIZE_CONTENT
                       widgets:
                         - label:
                             id: forecast_timestamp_3
                             text: "??:??"
                             text_font: ${weather_forecast_time_font}
                             text_color: c_text_s
-                            height: SIZE_CONTENT
                         - image:
                             id: forecast_condition_icon_3
                             src: ${initial_forecast_icon_src}
-                            height: SIZE_CONTENT
                         - label:
                             id: forecast_temperature_3
-                            text: "--°"
+                            text: "--°C"
                             text_font: ${weather_forecast_temp_font}
-                            height: SIZE_CONTENT

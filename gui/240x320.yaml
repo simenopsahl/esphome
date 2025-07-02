@@ -62,9 +62,6 @@ font: !include
     clock_translate_y: 0
 
   - &nordpool_page_styles
-    # -- DISPLAY CONFIGURATION --
-    nordpool_usable_page_height: 174
-    nordpool_usable_page_width: 304
     # Proportions for the 3 rows in the grid layout (labels, graph, labels)
     nordpool_row_1_height: 20 # text_md +2
     nordpool_row_3_height: 16 # text_sm +2
@@ -78,14 +75,16 @@ font: !include
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 240x320 screen:
-    # Available height = 174px
+    weather_row_1: 3
+    weather_row_2: 4
     # Total fr units = 3 + 4 = 7
     # Row 1 height = (3 / 7) * 174px = ~74px
     # Row 2 height = (4 / 7) * 174px = ~99px
     weather_row_1_height: 74
     weather_row_2_height: 99
     # Calculation for this 240x320 screen:
-    # Available width = 304px
+    weather_column_1: 5
+    weather_column_2: 6
     # Total fr units = 5 + 6 = 11
     # Column 1 width = (5 / 11) * 304px = ~138px
     # Column 2 width = (6 / 11) * 304px = ~165px
