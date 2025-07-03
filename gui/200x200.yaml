@@ -20,6 +20,7 @@ font: !include
   - &nav_widget_styles
     height: 28
     padding: 4
+    page_title_font: font_md
 
   - &page_styles
     <<: !include styles/page_styles.yaml
@@ -147,7 +148,7 @@ lvgl:
         file: pages/temperature/page.yaml
         vars:
           <<: [*page_styles, *container_styles]
-          page_title: "Temperatur"
+          page_title: "Temp"
 
     # nordpool prices
     - <<: !include
