@@ -2,7 +2,8 @@
 # - height
 # - padding
 
-obj: # title bar
+# title bar
+obj:
   id: titlebar
   width: 100%
   height: ${height}
@@ -13,51 +14,68 @@ obj: # title bar
   bg_opa: COVER
   align: TOP_MID
   layout:
-    type: GRID
-    grid_rows: [ content ]
-    grid_columns: [fr(1), fr(3), fr(3), fr(1)]
+    type: FLEX
+    flex_flow: ROW
+    flex_align_main: SPACE_BETWEEN
+    flex_align_cross: CENTER
     pad_column: 1
   widgets:
-    - label: # wifi
-        id: lbl_wifi_status
-        align: LEFT_MID
-        hidden: true
-        text: "\U000F05A9" # wifi
-        text_font: mdi_lg
-        text_color: c_green
-        text_align: LEFT
-        grid_cell_row_pos: 0
-        grid_cell_column_pos: 0
-        grid_cell_x_align: start
-        grid_cell_y_align: center
-    - label: # title
-        id: page_title
-        align: LEFT_MID
-        x: ${padding} # RESOLUTION-SPECIFIC
-        text: " "
-        grid_cell_row_pos: 0
-        grid_cell_column_pos: 1
-        grid_cell_x_align: start
-        grid_cell_y_align: center
-    - label: # clock
-        id: nav_clock
-        align: RIGHT_MID
-        text_align: RIGHT
-        x: -${padding} # RESOLUTION-SPECIFIC
-        text: " "
-        grid_cell_row_pos: 0
-        grid_cell_column_pos: 2
-        grid_cell_x_align: end
-        grid_cell_y_align: center
-    - label: # HA_status
-        id: lbl_ha_status
-        align: RIGHT_MID
-        hidden: true
-        text: "\U000F07D0" # home-assistant
-        text_font: mdi_lg
-        text_color: c_ha_icon
-        text_align: RIGHT
-        grid_cell_row_pos: 0
-        grid_cell_column_pos: 3
-        grid_cell_x_align: end
-        grid_cell_y_align: center
+    # Left side
+    - obj:
+        height: SIZE_CONTENT
+        width: SIZE_CONTENT
+        pad_all: 0
+        layout:
+          type: FLEX
+          flex_flow: ROW
+          flex_align_main: START
+          flex_align_cross: CENTER
+          pad_column: 1
+        overflow_visible: true
+        widgets:
+          # wifi
+          - label:
+              id: lbl_wifi_status
+#              hidden: true
+              text: "\U000F05A9" # wifi
+              text_font: mdi_lg
+              text_color: c_green
+#              text_align: LEFT
+#              width: SIZE_CONTENT
+          # title
+          - label:
+              id: page_title
+              pad_left: ${padding} # RESOLUTION-SPECIFIC
+              text_font: ${page_title_font} # Icon or text
+              text: " "
+#              width: SIZE_CONTENT
+
+    # Right side
+    - obj:
+        height: SIZE_CONTENT
+        width: SIZE_CONTENT
+        pad_all: 0
+        layout:
+          type: FLEX
+          flex_flow: ROW
+          flex_align_main: END
+          flex_align_cross: CENTER
+          pad_column: 1
+        overflow_visible: true
+        widgets:
+          # clock
+          - label:
+              id: nav_clock
+#              text_align: RIGHT
+              pad_right: ${padding} # RESOLUTION-SPECIFIC
+              text: " "
+#              width: SIZE_CONTENT
+          # HA_status
+          - label:
+              id: lbl_ha_status
+#              hidden: true
+              text: "\U000F07D0" # home-assistant
+              text_font: mdi_lg
+              text_color: c_ha_icon
+#              text_align: RIGHT
+#              width: SIZE_CONTENT
