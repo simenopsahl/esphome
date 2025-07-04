@@ -13,7 +13,7 @@ packages:
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
-  lvgl: !include gui/135x240.yaml
+  lvgl: !include gui/240x135.yaml
 
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
