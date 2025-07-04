@@ -19,6 +19,8 @@ esp32:
   board: esp32dev
   flash_size: 8MB
   framework:
+    advanced:
+      compiler_optimization: PERF
     type: esp-idf
 
 psram:

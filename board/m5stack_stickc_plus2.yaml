@@ -19,6 +19,8 @@ esp32:
   board: esp32-pico-devkitm-2
   flash_size: 8MB
   framework:
+    advanced:
+      compiler_optimization: PERF
     type: esp-idf
 
 esphome:

@@ -31,6 +31,7 @@
 # air
 - "\U000F0D43" # air-filter
 - "\U000F050F" # thermometer
+- "\U000F0510" # thermometer-lines
 - "\U000F07E4" # molecule-co2
 - "\U000F013B" # chemical-weapon
 
@@ -38,6 +39,8 @@
 - "\U000F02E3" # bed
 - "\U000F1576" # lamps
 - "\U000F04B9" # sofa
+- "\U000F0292" # fridge-bottom
+- "\U000F0291" # fridge-top
 - "\U000F0D80" # home-floor-1
 - "\U000F0D81" # home-floor-2
 - "\U000F0F9B" # home-export-outline

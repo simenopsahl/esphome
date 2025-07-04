@@ -20,7 +20,7 @@ font: !include
   - &nav_widget_styles
     height: 26
     padding: 4
-    page_title_font: mdi_md
+    page_title_font: mdi_md # mdi-md or font_md
 
   - &page_styles
     <<: !include styles/page_styles.yaml
@@ -30,19 +30,19 @@ font: !include
     screen_width: 135
     # Calculate the usable height for the page content area
     # (screen_height - (1 * status_bar_height) - (2 * container_pad))
-    # 240 - (1 * 27) - (1 * 10) = 203
-    usable_screen_height: 203
+    # 240 - (1 * 27) - (1 * 8) = 205
+    usable_screen_height: 205
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
-    # 135  (2 * 6) = 123
-    usable_screen_width: 123
+    # 135  (2 * 3) = 129
+    usable_screen_width: 129
 
   - &container_styles
     <<: !include styles/container_styles.yaml
     container_pad_top: 1
-    container_pad_bottom: 10
-    container_pad_left: 4
-    container_pad_right: 4
+    container_pad_bottom: 8
+    container_pad_left: 3
+    container_pad_right: 3
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
 
   - &boot_screen_styles
@@ -68,7 +68,7 @@ font: !include
     nordpool_row_3_height: 14 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height)
-    # 203 - 16 - 14 = 173
+    # 205 - 16 - 14 = 175
     nordpool_row_2_height: 173
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 4

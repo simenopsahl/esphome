@@ -20,7 +20,7 @@ font: !include
   - &nav_widget_styles
     height: 44
     padding: 14
-    page_title_font: font_md
+    page_title_font: font_md # mdi-md or font_md
 
   - &page_styles
     <<: !include styles/page_styles.yaml

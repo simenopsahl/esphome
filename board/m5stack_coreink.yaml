@@ -75,11 +75,11 @@ output:
   - platform: ledc
     id: buzzer
     pin: $buzzer_pin
-  - platform: gpio
-    id: power_hold
-    pin:
-      number: $pwr_mos_pin
-      allow_other_uses: true
+#  - platform: gpio
+#    id: power_hold
+#    pin:
+#      number: $pwr_mos_pin
+#      allow_other_uses: true
 
 binary_sensor:
   # Power Button
@@ -174,21 +174,22 @@ binary_sensor:
     name: Stick Down
     entity_category: diagnostic
 
-  - platform: gpio
-    id: pwr_hold
-    name: Power Hold
-    entity_category: diagnostic
-    pin:
-      number: $pwr_mos_pin
-      allow_other_uses: true
-      ignore_strapping_warning: true
-      inverted: true
-    on_press:
-      then:
-        - logger.log: Power Hold
-    on_release:
-      then:
-        - logger.log: Power Hold Off
+# Power Hold
+#  - platform: gpio
+#    id: pwr_hold
+#    name: Power Hold
+#    entity_category: diagnostic
+#    pin:
+#      number: $pwr_mos_pin
+#      allow_other_uses: true
+#      ignore_strapping_warning: true
+#      inverted: true
+#    on_press:
+#      then:
+#        - logger.log: Power Hold
+#    on_release:
+#      then:
+#        - logger.log: Power Hold Off
 
 # Script for buzzer beep
 script:
@@ -270,35 +271,51 @@ sensor:
     device_class: battery
     unit_of_measurement: "%"
 
-#deep_sleep:
-#  id: sleep_battery
-#  run_duration: 120s
-#  sleep_duration: 180s
-#  wakeup_pin_mode: KEEP_AWAKE
+deep_sleep:
+  id: deep_sleep_battery
+  run_duration: 120s
+  sleep_duration: 180s
+  wakeup_pin_mode: KEEP_AWAKE
 #  wakeup_pin:
 #    number: $power_mos_pin
 #    allow_other_uses: true
-#  esp32_ext1_wakeup: 
-#    mode: ANY_HIGH
-#    pins: 
-#      - number: $power_mos_pin
+  esp32_ext1_wakeup: 
+    mode: ANY_HIGH
+    pins:
+#      - number: $rtc_wakeup_pin
+      - number: $pwr_mos_pin
 #        allow_other_uses: true
-#      - number: $stick_up_pin
-#        allow_other_uses: true
-#      - number: $stick_press_pin
-#        allow_other_uses: true
-#      - number: $stick_down_pin
-#        allow_other_uses: true
+      - number: $stick_up_pin
+        allow_other_uses: true
+      - number: $stick_press_pin
+        allow_other_uses: true
+      - number: $stick_down_pin
+        allow_other_uses: true
 
-#switch:
-  # Power MOS battery bypass
-#  - platform: gpio
-#    id: power_mos
-#    name: "Power MOS"
-#    entity_category: config
-#    pin:
-#      number: $power_mos_pin
-#      allow_other_uses: true
+switch:
+  # Power Hold
+  - platform: template
+    id: sw_pwr_hold
+    restore_mode: ALWAYS_ON
+    turn_on_action:
+      then:
+        - logger.log: Power Hold On
+        - lambda: |-
+            gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+            gpio_set_level(GPIO_NUM_12, 1);
+            gpio_hold_en(GPIO_NUM_12);
+            gpio_deep_sleep_hold_en();
+    turn_off_action:
+      then:
+        - logger.log: Power Hold Off
+        - lambda: |-
+            gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+            gpio_set_level(GPIO_NUM_12, 0);
+            gpio_hold_en(GPIO_NUM_12);
+            gpio_deep_sleep_hold_en();
+    name: Power Hold
+    entity_category: config
+    optimistic: true
 
 display:
   # 200 x 200 resolution
@@ -314,3 +331,41 @@ display:
     full_update_every: 1
 #    reset_duration: 2ms
     update_interval: never
+
+text_sensor:
+  - platform: template
+    id: wakeup_cause
+    lambda: return esp_sleep_get_wakeup_cause();
+    filters:
+      - lambda: |-
+          if (x == 0) {
+            return "ESP_SLEEP_WAKEUP_UNDEFINED";
+          } else if (x == 1) {
+            return "ESP_SLEEP_WAKEUP_ALL";
+          } else if (x == 2) {
+            return "ESP_SLEEP_WAKEUP_EXT0";
+          } else if (x == 3) {
+            return "ESP_SLEEP_WAKEUP_EXT1";
+          } else if (x == 4) {
+            return "ESP_SLEEP_WAKEUP_TIMER";
+          } else if (x == 5) {
+            return "ESP_SLEEP_WAKEUP_TOUCHPAD";
+          } else if (x == 6) {
+            return "ESP_SLEEP_WAKEUP_ULP";
+          } else if (x == 7) {
+            return "ESP_SLEEP_WAKEUP_GPIO";
+          } else if (x == 8) {
+            return "ESP_SLEEP_WAKEUP_UART";
+          } else if (x == 9) {
+            return "ESP_SLEEP_WAKEUP_WIFI";
+          } else if (x == 10) {
+            return "ESP_SLEEP_WAKEUP_COCPU";
+          } else if (x == 11) {
+            return "ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
+          } else if (x == 12) {
+            return "ESP_SLEEP_WAKEUP_BT";
+          } else {
+            return "UNKNOWN";
+          }
+    name: "Wakeup Cause"
+    entity_category: diagnostic

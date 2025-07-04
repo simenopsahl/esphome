@@ -17,6 +17,8 @@ esp32:
   variant: ESP32S3
   flash_size: 8MB
   framework:
+    advanced:
+      compiler_optimization: PERF
     type: esp-idf
 
 wifi:
@@ -68,8 +70,6 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button Pressed
-      - display.page.show_next: display_lcd
-      - component.update: display_lcd
     name: Button
     entity_category: diagnostic
 

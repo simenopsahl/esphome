@@ -55,3 +55,4 @@ substitutions:
   # Power MOS
   pwr_mos_pin: GPIO12
   bat_feedback: GPIO35
+  rtc_wakeup_pin: GPIO19
