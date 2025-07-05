@@ -5,7 +5,7 @@ Images might be out of date
 
 <details>
 
-<summary>128x128</summary>
+<summary>128x128 (Click to expand)</summary>
 
 | Boot screen  | Analog clock | Temperature  | NordPool | Weather  | Status |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
@@ -24,7 +24,7 @@ Images might be out of date
 
 </details>
 
-<details>
+<details open>
 
 <summary>240x135</summary>
 
