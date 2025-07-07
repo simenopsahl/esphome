@@ -52,32 +52,45 @@ display:
 #          it.fill(COLOR_OFF);
       - id: page_local
         lambda: |-
-          // Fill background.
-          it.fill( COLOR_ON );
+          // Determine if the current refresh number is even or odd.
+          auto refresh_count = id(recorded_display_refresh);
+          bool is_even_refresh = true; // Default to true (white background)
+          if (!isnan(refresh_count)) {
+            if (((int)refresh_count) % 2 != 0) {
+              is_even_refresh = false; // It's an odd number
+            }
+          }
 
-          //it.graph( 0, 0, id(graph_temperature_local), COLOR_OFF );
+          // Define the colors based on the refresh state.
+          auto bg_color = is_even_refresh ? COLOR_OFF : COLOR_ON;
+          auto text_color = is_even_refresh ? COLOR_ON : COLOR_OFF;
+
+          // Fill background.
+          it.fill( bg_color );
+
+          //it.graph( 0, 0, id(graph_temperature_local), text_color );
           
           // NAV
-          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, COLOR_OFF, COLOR_ON );
-          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, COLOR_OFF, COLOR_ON );
-          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, COLOR_OFF, COLOR_ON );
+          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, text_color, bg_color );
+          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, text_color, bg_color );
+          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, text_color, bg_color );
           // PAGE
-          it.print( it.get_width(), 0, id(f25b), COLOR_OFF, TextAlign::TOP_RIGHT, "Enhet" );
+          it.print( it.get_width(), 0, id(f25b), text_color, TextAlign::TOP_RIGHT, "Enhet" );
 
           // THERMOMETER
-          it.image( 0, it.get_height()/2, id(i_temp), ImageAlign::LEFT, COLOR_OFF, COLOR_ON );
+          it.image( 0, it.get_height()/2, id(i_temp), ImageAlign::LEFT, text_color, bg_color );
           // TEMPERATURE
-          it.printf( it.get_width()/2, it.get_height()/2, id(f120b), COLOR_OFF, TextAlign::CENTER, "%2.0f", id(temperature_local).state );
+          it.printf( it.get_width()/2, it.get_height()/2, id(f120b), text_color, TextAlign::CENTER, "%2.0f", id(temperature_local).state );
           // UNIT
-          it.print( it.get_width(), it.get_height()/2, id(f25b), COLOR_OFF, TextAlign::RIGHT, "°C" );
+          it.print( it.get_width(), it.get_height()/2, id(f25b), text_color, TextAlign::RIGHT, "°C" );
 
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, COLOR_OFF, COLOR_ON );
+            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, text_color, bg_color );
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, COLOR_OFF, COLOR_ON );
+            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, text_color, bg_color );
           }
 
           // Refresh Timestamp
@@ -85,45 +98,58 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f18), COLOR_OFF, TextAlign::BOTTOM_CENTER, "@ %s", str );
+          it.printf( it.get_width()/2, it.get_height(), id(f18), text_color, TextAlign::BOTTOM_CENTER, "@ %s", str );
       - id: page_info
         lambda: |-
+          // Determine if the current refresh number is even or odd.
+          auto refresh_count = id(recorded_display_refresh);
+          bool is_even_refresh = true; // Default to true (white background)
+          if (!isnan(refresh_count)) {
+            if (((int)refresh_count) % 2 != 0) {
+              is_even_refresh = false; // It's an odd number
+            }
+          }
+
+          // Define the colors based on the refresh state.
+          auto bg_color = is_even_refresh ? COLOR_OFF : COLOR_ON;
+          auto text_color = is_even_refresh ? COLOR_ON : COLOR_OFF;
+
           // Fill background.
-          it.fill( COLOR_OFF );
+          it.fill( bg_color );
 
           // NAV
-          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, COLOR_ON, COLOR_OFF );
-          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, COLOR_ON, COLOR_OFF );
-          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, COLOR_ON, COLOR_OFF );
+          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, text_color, bg_color );
+          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, text_color, bg_color );
+          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, text_color, bg_color );
           // PAGE
-          it.image( it.get_width(), 0, id(i_info), ImageAlign::TOP_RIGHT, COLOR_ON, COLOR_OFF );
+          it.image( it.get_width(), 0, id(i_info), ImageAlign::TOP_RIGHT, text_color, bg_color );
           
           // BATTERY
-          it.print( 0, 57, id(f18), COLOR_ON, TextAlign::BOTTOM_LEFT, "Batteri: " );
-          it.printf( it.get_width() - 15, 55, id(f20b), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f", id(bat_adc).state );
-          it.print( it.get_width(), 57, id(f16), COLOR_ON, TextAlign::BOTTOM_RIGHT, "V" );
+          it.print( 0, 57, id(f18), text_color, TextAlign::BOTTOM_LEFT, "Batteri: " );
+          it.printf( it.get_width() - 15, 55, id(f20b), text_color, TextAlign::BOTTOM_RIGHT, "%.2f", id(bat_adc).state );
+          it.print( it.get_width(), 57, id(f16), text_color, TextAlign::BOTTOM_RIGHT, "V" );
 
           // DEVICE
-          //it.print( it.get_width()/2, 70, id(f20), COLOR_ON, TextAlign::BOTTOM_CENTER, "ESPHome" );
+          //it.print( it.get_width()/2, 70, id(f20), text_color, TextAlign::BOTTOM_CENTER, "ESPHome" );
           // NAME
-          it.printf( it.get_width()/2, 87, id(f20), COLOR_ON, TextAlign::BOTTOM_CENTER, "%s", App.get_name().c_str() );
+          it.printf( it.get_width()/2, 87, id(f20), text_color, TextAlign::BOTTOM_CENTER, "%s", App.get_name().c_str() );
 
           // NETWORK
-          //it.print( it.get_width()/2, 110, id(f20), COLOR_ON, TextAlign::BOTTOM_CENTER, "Nettverk" );
+          //it.print( it.get_width()/2, 110, id(f20), text_color, TextAlign::BOTTOM_CENTER, "Nettverk" );
           // SSID
-          it.printf( it.get_width()/2, 117, id(f20b), COLOR_ON, TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( it.get_width()/2, 117, id(f20b), text_color, TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( it.get_width()/2, 143, id(f20b), COLOR_ON, TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( it.get_width()/2, 143, id(f20b), text_color, TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( it.get_width()/2, 169, id(f20b), COLOR_ON, TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( it.get_width()/2, 169, id(f20b), text_color, TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, COLOR_ON, COLOR_OFF );
+            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, text_color, bg_color );
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, COLOR_ON, COLOR_OFF );
+            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, text_color, bg_color );
           }
 
           // Refresh Timestamp
@@ -131,41 +157,54 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f18), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str );
+          it.printf( it.get_width()/2, it.get_height(), id(f18), text_color, TextAlign::BOTTOM_CENTER, "@ %s", str );
       - id: page_room
         lambda: |-
+          // Determine if the current refresh number is even or odd.
+          auto refresh_count = id(recorded_display_refresh);
+          bool is_even_refresh = true; // Default to true (white background)
+          if (!isnan(refresh_count)) {
+            if (((int)refresh_count) % 2 != 0) {
+              is_even_refresh = false; // It's an odd number
+            }
+          }
+
+          // Define the colors based on the refresh state.
+          auto bg_color = is_even_refresh ? COLOR_OFF : COLOR_ON;
+          auto text_color = is_even_refresh ? COLOR_ON : COLOR_OFF;
+
           // Fill background.
-          it.fill(COLOR_OFF);
+          it.fill(bg_color);
 
           // Show loading screen before data is received.
           if ( id(initial_data_received) == false ) {
-            it.printf( it.get_width()/2, it.get_height()/2, id(f20b), COLOR_ON, TextAlign::CENTER, "Venter på data..." );
+            it.printf( it.get_width()/2, it.get_height()/2, id(f20b), text_color, TextAlign::CENTER, "Venter på data..." );
           } else {
 
             // NAV
-            it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, COLOR_ON, COLOR_OFF );
-            it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, COLOR_ON, COLOR_OFF );
-            it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, COLOR_ON, COLOR_OFF );
+            it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, text_color, bg_color );
+            it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, text_color, bg_color );
+            it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, text_color, bg_color );
             // PAGE
-            it.print( it.get_width(), 0, id(f25b), COLOR_ON, TextAlign::TOP_RIGHT, "Rom" );
+            it.print( it.get_width(), 0, id(f25b), text_color, TextAlign::TOP_RIGHT, "Rom" );
 
             // GRAPH
-            // it.graph( 0, 0, id(graph_temperature_room), COLOR_ON );
+            // it.graph( 0, 0, id(graph_temperature_room), text_color );
             
             // THERMOMETER
-            it.image( 0, it.get_height()/2, id(i_temp), ImageAlign::LEFT, COLOR_ON, COLOR_OFF );
+            it.image( 0, it.get_height()/2, id(i_temp), ImageAlign::LEFT, text_color, bg_color );
             // TEMPERATURE
-            it.printf( it.get_width()/2, it.get_height()/2, id(f120b), COLOR_ON, TextAlign::CENTER, "%2.0f", id(temperature_feels_like).state );
+            it.printf( it.get_width()/2, it.get_height()/2, id(f120b), text_color, TextAlign::CENTER, "%2.0f", id(temperature_feels_like).state );
             // UNIT
-            it.print( it.get_width(), it.get_height()/2, id(f25b), COLOR_ON, TextAlign::RIGHT, "°C" );
+            it.print( it.get_width(), it.get_height()/2, id(f25b), text_color, TextAlign::RIGHT, "°C" );
 
             // Show wifi icon.
             if ( id(component_wifi).is_connected() ) {
-              it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, COLOR_ON, COLOR_OFF );
+              it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, text_color, bg_color );
             }
             // Show HA icon.
             if ( id(component_api).is_connected() ) {
-              it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, COLOR_ON, COLOR_OFF );
+              it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, text_color, bg_color );
             }
 
             // Refresh Timestamp
@@ -173,7 +212,7 @@ display:
             char str[17];
             time_t currTime = id(time_homeassistant).now().timestamp;
             strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-            it.printf( it.get_width()/2, it.get_height(), id(f18), COLOR_ON, TextAlign::BOTTOM_CENTER, "@ %s", str );
+            it.printf( it.get_width()/2, it.get_height(), id(f18), text_color, TextAlign::BOTTOM_CENTER, "@ %s", str );
           }
 
 font:

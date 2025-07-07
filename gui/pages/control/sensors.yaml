@@ -1,0 +1,50 @@
+# control page lvgl sensors
+
+# in widgets/header/sensors.yaml
+#time:
+# extend time component
+#  - id: !extend time_homeassistant
+#    on_time_sync:
+#      - script.execute: time_update
+#    on_time:
+#      - minutes: '*'
+#        seconds: 0
+#        then:
+#          - script.execute: time_update
+
+# extend backlight
+light:
+  - id: !extend light_backlight
+    on_state:
+      - lvgl.widget_update:
+          id: lvgl_backlight_switch
+          state:
+            checked: !lambda return id(local_light).current_values.is_on();
+
+# backlight sensor
+sensor:
+  - platform: template
+    id: backlight_brightness
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: |-
+      auto light_state = id(light_backlight).state;
+      if (light_state.has_value()) {
+        return light_state->brightness * 100 / 255;
+      }
+      return {};
+    update_interval: 1s
+
+  - platform: homeassistant
+    id: backlight_brightness_homeassistant
+    entity_id: light.${devicename}_backlight
+    attribute: brightness
+    on_value:
+      - lvgl.slider.update:
+          id: lvgl_backlight_slider
+          value: !lambda |-
+            if (isnan(x)) {
+              return 0;
+            } else {
+              return round(x/255*100);
+            }

@@ -1,0 +1,208 @@
+# LVGL device control page
+
+# required vars:
+# - *page_styles
+# - *container_styles
+# - page_title
+
+# control page
+#lvgl:
+#  pages:
+    id: page_control
+    <<: !include ../../styles/page_styles.yaml
+    # REMOVED: `<<: *page_styles`
+    # ADDED: Use the variables passed from the parent file
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
+    on_load:
+      - lvgl.label.update:
+          id: page_title
+          text: ${page_title}
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      - obj:
+          <<: !include ../../styles/container_styles.yaml
+          # Use the passed-in variables for size
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
+          align: CENTER
+          layout:
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_main: SPACE_EVENLY
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+            pad_row: 0
+            pad_column: 0
+          widgets:
+            # --- Row 1: Device Name ---
+            - obj:
+                # This is a container for a single row
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_name_l
+                      text: "ID: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+#                      text_align: RIGHT
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_name
+                      text: $devicename
+                      pad_right: ${container_pad_right}
+#                      text_align: LEFT
+                      text_font: font_md
+                      text_color: c_text_p
+
+            # --- Row 2: Build Info ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_build_l
+                      text: "Build: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+#                      text_align: RIGHT
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_build
+                      pad_right: ${container_pad_right}
+#                      text_align: LEFT
+                      text_font: font_md
+                      text_color: c_text_p
+                      text:
+                          format: "%s - %s"
+                          args: [__DATE__, __TIME__]
+
+            # --- Row 3: SSID ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_ssid_l
+                      text: "SSID: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+#                      text_align: RIGHT
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_ssid
+                      text: "?"
+                      pad_right: ${container_pad_right}
+#                      text_align: LEFT
+                      text_font: font_md
+                      text_color: c_text_p
+
+            # --- Row 4: IP Address ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_ip_l
+                      text: "IP: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+#                      text_align: RIGHT
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_ip
+                      text: "?"
+                      pad_right: ${container_pad_right}
+#                      text_align: LEFT
+                      text_font: font_md
+                      text_color: c_text_p
+    
+            # --- Row 5: MAC Address ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_mac_l
+                      text: "MAC: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+#                      text_align: RIGHT
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_mac
+                      text: "?"
+                      pad_right: ${container_pad_right}
+#                      text_align: LEFT
+                      text_font: font_md
+                      text_color: c_text_p

@@ -205,6 +205,14 @@ touchscreen:
 #      mode:
 #        output: true
     on_touch:
+      - if:
+          condition:
+            - light.is_off: backlight_light
+          then:
+            - light.turn_on:
+                id: backlight_light
+                brightness: 40%
+    on_update:
       - logger.log:
           format: Touch %d at (%d, %d)
           args: [touch.id, touch.x, touch.y]
