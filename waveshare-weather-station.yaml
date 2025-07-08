@@ -24,29 +24,10 @@ esphome:
 
 # Now render everything on the ePaper screen.
 display:
-  - platform: waveshare_epaper
-    id: display_eink
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    busy_pin: $disp_busy_pin
-    reset_pin: $disp_reset_pin
+  - id: !extend display_eink
     model: 4.20in
-#    reset_duration: 2ms
-    update_interval: never
     rotation: 270°
     pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_ON);
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_OFF);
-      - id: page_clear
-        lambda: |-
-          // Clear screen.
-          it.clear();
       - id: page_content
         lambda: |-
           // Map weather states to MDI characters.
@@ -86,92 +67,47 @@ display:
             };
           
           // Fill background.
-          it.fill(COLOR_OFF);
+          it.fill(id(epaper_bg_color));
 
           // Show loading screen before data is received.
           if (id(initial_data_received) == false) {
-            it.printf(it.get_width()/2, it.get_height()/2, id(font_medium), COLOR_ON, TextAlign::TOP_CENTER, "Venter på data...");
+            it.printf(it.get_width()/2, it.get_height()/2, id(font_medium), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
           } else {
 
             // Weather Condition
             if (id(weather_condition_now).state == id(weather_condition_next).state) {
-              it.printf(it.get_width()/2, 1, id(font_mdi), COLOR_ON, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+              it.printf(it.get_width()/2, 1, id(font_mdi), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
             } else {
-              it.printf(90, 1, id(font_mdi), COLOR_ON, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
-              it.printf(it.get_width()/2, 25, id(font_medium), COLOR_ON, TextAlign::TOP_CENTER, "->");
-              it.printf(210, 1, id(font_mdi), COLOR_ON, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_next).state.c_str()].c_str());
+              it.printf(90, 1, id(font_mdi), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+              it.printf(it.get_width()/2, 25, id(font_medium), id(epaper_text_color), TextAlign::TOP_CENTER, "->");
+              it.printf(210, 1, id(font_mdi), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_next).state.c_str()].c_str());
             }
             
             // Ute Temperature
-            it.graph(0, 72, id(graph_ute), COLOR_ON);
-            it.printf(181, 74, id(font_medium), COLOR_ON, TextAlign::TOP_LEFT, "Ute");
-            it.printf(180, 104, id(font_large), COLOR_ON, TextAlign::TOP_LEFT, "%2.0f", id(temperature_ute).state);
-            it.printf(299, 136, id(font_medium), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
+            it.graph(0, 72, id(graph_ute), id(epaper_text_color));
+            it.printf(181, 74, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "Ute");
+            it.printf(180, 104, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_ute).state);
+            it.printf(299, 136, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
 
             // Foran Temperature
-            it.graph(0, 177, id(graph_foran), COLOR_ON);
-            it.printf(181, 179, id(font_medium), COLOR_ON, TextAlign::TOP_LEFT, "Foran");
-            it.printf(180, 209, id(font_large), COLOR_ON, TextAlign::TOP_LEFT, "%2.0f", id(temperature_foran).state);
-            it.printf(299, 241, id(font_medium), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
+            it.graph(0, 177, id(graph_foran), id(epaper_text_color));
+            it.printf(181, 179, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "Foran");
+            it.printf(180, 209, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_foran).state);
+            it.printf(299, 241, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
 
             // Bak Temperature
-            it.graph(0, 282, id(graph_bak), COLOR_ON);
-            it.printf(181, 284, id(font_medium), COLOR_ON, TextAlign::TOP_LEFT, "Bak");
-            it.printf(180, 314, id(font_large), COLOR_ON, TextAlign::TOP_LEFT, "%2.0f", id(temperature_bak).state);
-            it.printf(299, 346, id(font_medium), COLOR_ON, TextAlign::TOP_RIGHT, "°C");
+            it.graph(0, 282, id(graph_bak), id(epaper_text_color));
+            it.printf(181, 284, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "Bak");
+            it.printf(180, 314, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_bak).state);
+            it.printf(299, 346, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
 
             // Refresh Timestamp
             // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
             char str[17];
             time_t currTime = id(time_homeassistant).now().timestamp;
             strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-            it.printf(it.get_width()/2, 379, id(font_small), COLOR_ON, TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
+            it.printf(it.get_width()/2, 379, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
           }
-
-# Buttons in Home Assistant
-button:
-  - platform: template
-    name: "Repair Screen"
-    entity_category: config
-    on_press:
-      - script.wait: update_screen
-      - logger.log: "Trying to repair screen"
-      - repeat: 
-          count: 5
-          then:
-            - script.wait: update_screen
-            - script.wait: repair_script
-            - script.execute: repair_script
-      - script.wait: repair_script
-      - logger.log: "Repair script finished"
-      - display.page.show: page_content
-  - platform: template
-    name: "Main Screen"
-    entity_category: config
-    on_press:
-      - script.wait: update_screen
-      - script.wait: repair_script
-      - display.page.show: page_content
-
-# Script for updating screen - Refresh display and publish refresh count and time.
-script:
-  - id: repair_script
-    then:
-      - display.page.show: page_black
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "Black screen"
-      - delay: 15s
-      - display.page.show: page_clear
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "Clear screen"
-      - delay: 15s
-      - display.page.show: page_white
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "White screen"
-      - delay: 15s
 
 # Include custom fonts
 font:

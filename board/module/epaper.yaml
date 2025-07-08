@@ -3,6 +3,9 @@
 # Common functions for devices with an epaper display
 #
 
+substitutions:
+  home_page: page_content
+
 time:
   - platform: homeassistant
     id: !extend time_homeassistant
@@ -34,20 +37,52 @@ script:
       - lambda: 'id(recorded_display_refresh) += 1;'
       - lambda: 'id(display_last_update).publish_state(id(time_homeassistant).now().timestamp);'
 
-# Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
+  - id: repair_script
+    then:
+      - display.page.show: page_black
+      - component.update: display_eink
+      - lambda: 'id(recorded_display_refresh) += 1;'
+      - logger.log: "Black screen"
+      - delay: 20s
+      - display.page.show: page_white
+      - component.update: display_eink
+      - lambda: 'id(recorded_display_refresh) += 1;'
+      - logger.log: "White screen"
+      - delay: 20s
+      - display.page.show: page_black
+      - component.update: display_eink
+      - lambda: 'id(recorded_display_refresh) += 1;'
+      - logger.log: "Black screen"
+      - delay: 20s
+
+
 globals:
+  # Detecting if the display needs to be refreshed.
   - id: data_updated
     type: bool
     restore_value: no
     initial_value: 'false'
+  # Tracking if initial data has been received.
   - id: initial_data_received
     type: bool
     restore_value: no
     initial_value: 'false'
+  # Tracking display refresh count
   - id: recorded_display_refresh
     type: int
     restore_value: yes
     initial_value: '0'
+
+  - id: epaper_bg_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'COLOR_OFF' # Default to white background
+  - id: epaper_text_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'COLOR_ON' # Default to black text
 
 # Buttons in Home Assistant
 button:
@@ -56,6 +91,22 @@ button:
     entity_category: config
     on_press:
       - script.execute: update_screen
+
+  - platform: template
+    name: "Repair Screen"
+    entity_category: config
+    on_press:
+      - script.wait: update_screen
+      - logger.log: "Trying to repair screen"
+      - repeat: 
+          count: 5
+          then:
+            - script.wait: update_screen
+            - script.wait: repair_script
+            - script.execute: repair_script
+      - script.wait: repair_script
+      - logger.log: "Repair script finished"
+      - display.page.show: $home_page
 
 sensor:
   # Create sensors for monitoring remotely.
@@ -71,3 +122,17 @@ sensor:
     state_class: "total_increasing"
     entity_category: "diagnostic"
     lambda: 'return id(recorded_display_refresh);'
+    # Alternate epaper colors
+    on_value:
+      then:
+        - lambda: |-
+            // This C++ logic updates the color globals
+            if (((int)x) % 2 == 0) {
+              // On even refreshes, set White background, Black text
+              id(epaper_bg_color) = COLOR_OFF;
+              id(epaper_text_color) = COLOR_ON;
+            } else {
+              // On odd refreshes, set Black background, White text
+              id(epaper_bg_color) = COLOR_ON;
+              id(epaper_text_color) = COLOR_OFF;
+            }

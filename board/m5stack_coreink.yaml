@@ -7,6 +7,7 @@
 
 substitutions:
   time_timezone: "Europe/Oslo"
+  home_page: page_content
 
 # Pins for this model
 packages:
@@ -35,6 +36,18 @@ esphome:
             gpio_set_level(GPIO_NUM_12, 1);
             gpio_hold_en(GPIO_NUM_12);
             gpio_deep_sleep_hold_en();
+    - priority: -100
+      then:
+        - component.update: display_eink
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) == true;'
+        # Wait a bit longer so all the items are received
+        - delay: 5s
+        - logger.log: "Initial sensor data received: Refreshing display..."
+        - lambda: 'id(initial_data_received) = true;'
+        - display.page.show: $home_page
+        - script.execute: update_screen
 
 esp32:
   board: m5stack-coreink
@@ -331,6 +344,15 @@ display:
     full_update_every: 1
 #    reset_duration: 2ms
     update_interval: never
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill(id(epaper_text_color));
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill(id(epaper_bg_color));
 
 # text_sensor:
 #   - platform: template

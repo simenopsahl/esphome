@@ -22,25 +22,11 @@ esphome:
 
 # Now render everything on the ePaper screen.
 display:
-  - platform: waveshare_epaper
-    id: display_eink
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    busy_pin: $disp_busy_pin
-    reset_pin: $disp_reset_pin
+  - id: !extend display_eink
     reset_duration: 2ms
     model: 7.50in-bV2
-    update_interval: never
     rotation: 90°
     pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_ON);
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_OFF);
       - id: page_content
         lambda: |-
           // Map weather states to MDI characters.
@@ -80,11 +66,11 @@ display:
             };
           
           // Fill background.
-          it.fill(COLOR_OFF);
+          it.fill(id(epaper_bg_color));
 
           // Show loading screen before data is received.
           if (id(initial_data_received) == false) {
-            it.printf(240, 390, id(font_large), TextAlign::TOP_CENTER, "Venter på data...");
+            it.printf(240, 390, id(font_large), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
           } else {
 
             // Weather Section
@@ -92,74 +78,74 @@ display:
             //it.printf(134, 0, id(font_mdi_large), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
             //it.printf(234, 31, id(font_large), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature).state);
             // Now Measured and forecasted
-            it.printf(120, 0, id(font_mdi_large), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
-            it.printf(220, 15, id(font_small), TextAlign::TOP_LEFT, "Målt:");
-            it.printf(220, 40, id(font_large), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
-            it.printf(320, 15, id(font_small), TextAlign::TOP_LEFT, "Meldt:");
-            it.printf(320, 40, id(font_large), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_forecast).state);
+            it.printf(120, 0, id(font_mdi_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+            it.printf(220, 15, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "Målt:");
+            it.printf(220, 40, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
+            it.printf(320, 15, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "Meldt:");
+            it.printf(320, 40, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_forecast).state);
             
-            it.printf(55, 100, id(font_small), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
-            it.printf(20, 118, id(font_mdi_medium), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
-            it.printf(55, 188, id(font_small), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
+            it.printf(55, 100, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
+            it.printf(20, 118, id(font_mdi_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
+            it.printf(55, 188, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
             
-            it.printf(147, 100, id(font_small), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
-            it.printf(112, 118, id(font_mdi_medium), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
-            it.printf(147, 188, id(font_small), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
+            it.printf(147, 100, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
+            it.printf(112, 118, id(font_mdi_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
+            it.printf(147, 188, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
             
-            it.printf(236, 100, id(font_small), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
-            it.printf(205, 118, id(font_mdi_medium), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
-            it.printf(236, 188, id(font_small), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
+            it.printf(236, 100, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
+            it.printf(205, 118, id(font_mdi_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
+            it.printf(236, 188, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
             
-            it.printf(330, 100, id(font_small), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
-            it.printf(298, 118, id(font_mdi_medium), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
-            it.printf(330, 188, id(font_small), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
+            it.printf(330, 100, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
+            it.printf(298, 118, id(font_mdi_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
+            it.printf(330, 188, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
             
-            it.printf(425, 100, id(font_small), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_4).state.c_str());
-            it.printf(390, 118, id(font_mdi_medium), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_4).state.c_str()].c_str());
-            it.printf(425, 188, id(font_small), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_4).state);
+            it.printf(425, 100, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_4).state.c_str());
+            it.printf(390, 118, id(font_mdi_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_4).state.c_str()].c_str());
+            it.printf(425, 188, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_4).state);
 
 
             // FolloRen Section
-            it.image(2, 240, id(i_recycle));
-            it.printf(50, 244, id(font_medium), TextAlign::TOP_LEFT, "FolloRen");
-            it.printf(50, 265, id(font_medium), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
+            it.image(2, 240, id(i_recycle), id(epaper_text_color), id(epaper_bg_color));
+            it.printf(50, 244, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
+            it.printf(50, 265, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
             
-            it.image(230, 240, id(i_trash_can));
-            it.printf(255, 288, id(font_large), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
-            
-            it.image(365, 240, id(i_newspaper));
-            it.printf(390, 288, id(font_large), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
+            it.image(230, 240, id(i_trash_can), id(epaper_text_color), id(epaper_bg_color));
+            it.printf(255, 288, id(font_large), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
+
+            it.image(365, 240, id(i_newspaper), id(epaper_text_color), id(epaper_bg_color));
+            it.printf(390, 288, id(font_large), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
 
 
             // NordPool Section
-            it.graph(5, 360, id(graph_nordpool));
-            it.printf(5, 340, id(font_small), TextAlign::TOP_LEFT, "%s", id(nordpool_time_0).state.c_str());
-            it.printf(5, 533, id(font_medium), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state);
-            it.printf(it.get_width()/2, 340, id(font_small), TextAlign::TOP_CENTER, "%s", id(nordpool_time_4).state.c_str());
-            it.printf(it.get_width()/2, 533, id(font_medium), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state);
-            it.printf(475, 340, id(font_small), TextAlign::TOP_RIGHT, "%s", id(nordpool_time_8).state.c_str());
-            it.printf(475, 533, id(font_medium), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state);
+            it.graph(5, 360, id(graph_nordpool), id(epaper_text_color));
+            it.printf(5, 340, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(nordpool_time_0).state.c_str());
+            it.printf(5, 533, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state);
+            it.printf(it.get_width()/2, 340, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(nordpool_time_4).state.c_str());
+            it.printf(it.get_width()/2, 533, id(font_medium), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state);
+            it.printf(475, 340, id(font_small), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(nordpool_time_8).state.c_str());
+            it.printf(475, 533, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state);
 
 
             // Bus Section
-            it.printf(270, 583, id(font_medium), TextAlign::TOP_CENTER, "Bregnefaret");
-            it.printf(280, 612, id(font_small), TextAlign::TOP_LEFT, "510 Drøbak");
-            it.printf(280, 633, id(font_small), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_0).state.c_str());
-            it.printf(260, 622, id(font_medium), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_0).state.c_str());
+            it.printf(270, 583, id(font_medium), id(epaper_text_color), TextAlign::TOP_CENTER, "Bregnefaret");
+            it.printf(280, 612, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
+            it.printf(280, 633, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_0).state.c_str());
+            it.printf(260, 622, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_0).state.c_str());
 
-            it.printf(280, 660, id(font_small), TextAlign::TOP_LEFT, "510 Drøbak");
-            it.printf(280, 679, id(font_small), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_1).state.c_str());
-            it.printf(260, 668, id(font_medium), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_1).state.c_str());
+            it.printf(280, 660, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
+            it.printf(280, 679, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_1).state.c_str());
+            it.printf(260, 668, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_1).state.c_str());
 
-            it.printf(280, 706, id(font_small), TextAlign::TOP_LEFT, "510 Drøbak");
-            it.printf(280, 725, id(font_small), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_2).state.c_str());
-            it.printf(260, 714, id(font_medium), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_2).state.c_str());
+            it.printf(280, 706, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
+            it.printf(280, 725, id(font_small), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_2).state.c_str());
+            it.printf(260, 714, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_2).state.c_str());
 
 
             // Car Section
-            it.image(8, 630, id(i_car));
-            it.printf(10, 679, id(font_large), TextAlign::TOP_LEFT, "%2.0f km", id(car_battery_range).state);
-            it.printf(10, 700, id(font_large), TextAlign::TOP_LEFT, "%2.0f%%", id(car_battery_percent).state);
+            it.image(8, 630, id(i_car), id(epaper_text_color), id(epaper_bg_color));
+            it.printf(10, 679, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f km", id(car_battery_range).state);
+            it.printf(10, 700, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f%%", id(car_battery_percent).state);
 
 
             // Refresh Timestamp
@@ -167,46 +153,8 @@ display:
             char str[17];
             time_t currTime = id(time_homeassistant).now().timestamp;
             strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-            it.printf(it.get_width()/2, 775, id(font_small), TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
+            it.printf(it.get_width()/2, 775, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
           }
-
-# Buttons in Home Assistant
-button:
-  - platform: template
-    name: "Repair Screen"
-    entity_category: config
-    on_press:
-      - script.wait: update_screen
-      - logger.log: "Trying to repair screen"
-      - repeat: 
-          count: 5
-          then:
-            - script.wait: update_screen
-            - script.wait: repair_script
-            - script.execute: repair_script
-      - script.wait: repair_script
-      - logger.log: "Repair script finished"
-      - display.page.show: page_content
-
-# Script for updating screen - Refresh display and publish refresh count and time.
-script:
-  - id: repair_script
-    then:
-      - display.page.show: page_black
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "Black screen"
-      - delay: 20s
-      - display.page.show: page_white
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "White screen"
-      - delay: 20s
-      - display.page.show: page_black
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "Black screen"
-      - delay: 20s
 
 # Include custom fonts
 font:

@@ -27,29 +27,10 @@ esphome:
 
 # Now render everything on the ePaper screen.
 display:
-  - platform: waveshare_epaper
-    id: display_eink
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    busy_pin: $disp_busy_pin
-    reset_pin: $disp_reset_pin
+  - id: !extend display_eink
     model: 4.20in-v2
-#    reset_duration: 2ms
-    update_interval: never
     rotation: 270°
     pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_ON);
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(COLOR_OFF);
-      - id: page_clear
-        lambda: |-
-          // Clear screen.
-          it.clear();
       - id: page_content
         lambda: |-
           // Map weather states to MDI characters.
@@ -131,50 +112,7 @@ display:
             it.printf(150, 379, id(font_small), COLOR_ON, TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
           }
 
-# Buttons in Home Assistant
-button:
-  - platform: template
-    name: "Repair Screen"
-    entity_category: config
-    on_press:
-      - script.wait: update_screen
-      - logger.log: "Trying to repair screen"
-      - repeat: 
-          count: 5
-          then:
-            - script.wait: update_screen
-            - script.wait: repair_script
-            - script.execute: repair_script
-      - script.wait: repair_script
-      - logger.log: "Repair script finished"
-      - display.page.show: page_content
-  - platform: template
-    name: "Main Screen"
-    entity_category: config
-    on_press:
-      - script.wait: update_screen
-      - script.wait: repair_script
-      - display.page.show: page_content
 
-# Script for updating screen - Refresh display and publish refresh count and time.
-script:
-  - id: repair_script
-    then:
-      - display.page.show: page_black
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "Black screen"
-      - delay: 15s
-      - display.page.show: page_clear
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "Clear screen"
-      - delay: 15s
-      - display.page.show: page_white
-      - component.update: display_eink
-      - lambda: 'id(recorded_display_refresh) += 1;'
-      - logger.log: "White screen"
-      - delay: 15s
 
 # Include custom fonts
 font:
