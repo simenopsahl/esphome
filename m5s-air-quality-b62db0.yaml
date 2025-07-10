@@ -29,6 +29,9 @@ display:
     pages:
       - id: page_local
         lambda: |-
+          // Set graph color
+          id(trace_temperature_room)->set_line_color( id(epaper_text_color) );
+
           // Fill background.
           it.fill(id(epaper_text_color));
 
@@ -107,6 +110,9 @@ display:
           it.printf( it.get_width()/2, it.get_height()+3, id(f14), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
       - id: page_room
         lambda: |-
+          // Set graph color
+          id(trace_temperature_room)->set_line_color( id(epaper_text_color) );
+          
           // Fill background.
           it.fill(id(epaper_bg_color));
 
@@ -212,7 +218,8 @@ graph:
     height: 50
     border: false
     traces:
-      - sensor: temperature_feels_like
+      - id: trace_temperature_room
+        sensor: temperature_feels_like
         line_thickness: 6
         continuous: true
 #  - id: graph_temperature_local

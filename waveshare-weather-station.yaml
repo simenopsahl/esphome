@@ -66,6 +66,11 @@ display:
               {"windy-variant", "\U000F059E"},
             };
           
+          // Set graph color
+          id(trace_temperature_ute)->set_line_color( id(epaper_text_color) );
+          id(trace_temperature_foran)->set_line_color( id(epaper_text_color) );
+          id(trace_temperature_bak)->set_line_color( id(epaper_text_color) );
+          
           // Fill background.
           it.fill(id(epaper_bg_color));
 
@@ -213,34 +218,31 @@ text_sensor:
 graph:
   - id: graph_ute
     duration: 12h
-#    x_grid: 15min
-#    y_grid: 1.0
     width: 180
     height: 96
     border: false
     traces:
-      - sensor: temperature_ute
+      - id: trace_temperature_ute
+        sensor: temperature_ute
         line_thickness: 6
         continuous: true
   - id: graph_foran
     duration: 12h
-#    x_grid: 15min
-#    y_grid: 1.0
     width: 180
     height: 96
     border: false
     traces:
-      - sensor: temperature_foran
+      - id: trace_temperature_foran
+        sensor: temperature_foran
         line_thickness: 6
         continuous: true
   - id: graph_bak
     duration: 12h
-#    x_grid: 15min
-#    y_grid: 1.0
     width: 180
     height: 96
     border: false
     traces:
-      - sensor: temperature_bak
+      - id: trace_temperature_bak
+        sensor: temperature_bak
         line_thickness: 6
         continuous: true

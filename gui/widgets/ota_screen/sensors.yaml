@@ -1,0 +1,10 @@
+
+ota:
+  id: !extend component_ota
+  on_begin:
+    - lvgl.widget.show: ota_screen
+  on_progress:
+    - lvgl.bar.update:
+        id: lvgl_ota_progress
+        value: !lambda "return (int)x;"
+    - lambda: "id(display_lvgl).loop();"

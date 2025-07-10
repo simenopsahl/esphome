@@ -55,7 +55,6 @@ script:
       - logger.log: "Black screen"
       - delay: 20s
 
-
 globals:
   # Detecting if the display needs to be refreshed.
   - id: data_updated

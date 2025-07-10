@@ -65,6 +65,9 @@ display:
               {"windy-variant", "\U000F059E"},
             };
           
+          // Set graph color
+          id(trace_nordpool)->set_line_color( id(epaper_text_color) );
+
           // Fill background.
           it.fill(id(epaper_bg_color));
 
@@ -418,7 +421,8 @@ graph:
     width: 470
     height: 170
     traces:
-      - sensor: nordpool_sensor
+      - id: trace_nordpool
+        sensor: nordpool_sensor
         line_thickness: 8
 
 

@@ -121,6 +121,7 @@ script:
       - lvgl.page.show: ${home_page}
 
 lvgl:
+  id: display_lvgl
   default_font: font_md
   theme: !include themes/main.yaml
   disp_bg_color: 0x000000
@@ -130,6 +131,7 @@ lvgl:
       - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
 #      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
+      - <<: !include { file: widgets/ota_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
   pages:
     - id: page_splash
       skip: true
@@ -176,6 +178,8 @@ packages:
   header_sensors: !include { file: widgets/header/sensors.yaml }
   # boot screen
   boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml, vars: { <<: *boot_screen_styles } }
+  # ota screen
+  ota_screen_sensors: !include { file: widgets/ota_screen/sensors.yaml, vars: { <<: *boot_screen_styles } }
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
