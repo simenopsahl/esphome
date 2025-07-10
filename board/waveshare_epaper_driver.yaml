@@ -8,6 +8,9 @@ packages:
   pins: !include pins/waveshare_epaper_driver.yaml
   epaper: !include module/epaper.yaml
 
+substitutions:
+  home_page: page_content
+
 esphome:
   project:
     name: "Waveshare.EPaper"
@@ -22,7 +25,7 @@ esphome:
         - delay: 5s
         - logger.log: "Initial sensor data received: Refreshing display..."
         - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: page_content
+        - display.page.show: ${home_page}
         - script.execute: update_screen
 
 esp32:

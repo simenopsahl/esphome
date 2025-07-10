@@ -9,6 +9,7 @@ substitutions:
   devicename: waveshare-weather-station
   location: "2etg, Ellen & Svein"
   log_level: WARN
+  home_page: page_content
 
 #external_components:
 #  - source: github://pr#6209

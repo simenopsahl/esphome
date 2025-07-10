@@ -11,6 +11,7 @@ substitutions:
   devicename: waveshare-display-board
   location: "1etg, Kjøkken"
   log_level: WARN
+  home_page: page_content
 
 esphome:
   comment: "E-Ink Kjøkken Display"
