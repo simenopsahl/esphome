@@ -21,3 +21,10 @@ M5Stack: ATOM Mate HAT, ATOM Port ABC, Unit pA Hub and more
 Sensors and peripherals  
 M5Stack: HAT ENV.III, Unit ENV.IV, Unit PIR  
 ePaper basic functions and scripts
+ 
+### [gui](gui)
+Modular LVGL layout
+
+Inspired by / credit to:  
+https://github.com/RyanEwen/esphome-lvgl  
+https://github.com/agillis/esphome-modular-lvgl-buttons
