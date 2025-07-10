@@ -1,7 +1,6 @@
 # ESPHome Config
  
-Split configuration for ESPHome.
-
+Split configuration for ESPHome.  
 Mostly M5Stack products
 
 ### [board](board)
@@ -24,6 +23,8 @@ ePaper basic functions and scripts
  
 ### [gui](gui)
 Modular LVGL layout
+
+---
 
 Inspired by / credit to:  
 https://github.com/RyanEwen/esphome-lvgl  
