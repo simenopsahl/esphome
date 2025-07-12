@@ -1,7 +1,6 @@
 # required vars:
 # - uid
-# - text
-# - text_font
+# - entity_id
 
 sensor:
   - id: ${uid}_homeassistant

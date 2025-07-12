@@ -10,6 +10,14 @@ packages:
   env_iii: !include board/module/hat_env_iii.yaml
   env_iv: !include board/module/unit_env_iv.yaml
 
+  # --- FEATURE PACKAGES ---
+  combined_env_sensors: !include features/combined_env_sensors.yaml
+  nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
+    light_id: rgb_led,
+    light_brightness: 60%,
+    light_flash_brightness: 90%
+  }}
+
 substitutions:
   devicename: m5s-as3-lite-b6873c
   location: "1etg, Kjøkken"
@@ -23,72 +31,48 @@ esphome:
   project:
     version: "1.0.0"
 
-esp32:
-  framework:
-    type: esp-idf
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
-
 sensor:
   # Combine sensors
-  - platform: combination
-    type: median
-    id: temperature_local
-    name: "Temperature"
-    device_class: "temperature"
-    state_class: "measurement"
+  - id: !extend temperature_local
     sources:
-      # ENV III
+      # Base BTC
+#      - source: temperature_sht30_base_btc
+      # HAT ENV III
       - source: temperature_sht30_hat_env
       - source: temperature_qmp6988_hat_env
-      # ENV IV
+      # Unit ENV III
+#      - source: temperature_sht30_unit_env
+#      - source: temperature_qmp6988_unit_env
+      # Unit ENV IV
       - source: temperature_bmp280_unit_env
       - source: temperature_sht40_unit_env
-      # ENV Pro
+      # Unit ENV Pro
 #      - source: temperature_bme688
-      # CO2
+      # Unit CO2
 #      - source: temperature_scd40_unit_co2
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15
 
-  - platform: combination
-    type: median
-    id: humidity_local
-    name: "Humidity"
-    device_class: "humidity"
-    state_class: "measurement"
+  - id: !extend humidity_local
     sources:
-      # ENV III
+      # Base BTC
+#      - source: humidity_sht30_base_btc
+      # HAT ENV III
       - source: humidity_sht30_hat_env
-      # ENV IV
+      # Unit ENV III
+#      - source: humidity_sht30_unit_env
+      # Unit ENV IV
       - source: humidity_sht40_unit_env
-      # ENV Pro
+      # Unit ENV Pro
 #      - source: humidity_bme688
-      # CO2
+      # Unit CO2
 #      - source: humidity_scd40_unit_co2
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15
 
-  - platform: combination
-    type: median
-    id: pressure_local
-    name: "Pressure"
-    device_class: "atmospheric_pressure"
-    state_class: "measurement"
+  - id: !extend pressure_local
     sources:
-      # ENV III
+      # HAT ENV III
       - source: pressure_qmp6988_hat_env
-      # ENV IV
+      # Unit ENV III
+#      - source: pressure_qmp6988_unit_env
+      # Unit ENV IV
       - source: pressure_bmp280_unit_env
-      # ENV Pro
+      # Unit ENV Pro
 #      - source: pressure_bme688
-    filters:
-      - or:
-        - heartbeat: 900s
-        - delta: 0.15

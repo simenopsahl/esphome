@@ -19,21 +19,10 @@
             src: boot_logo
             align: CENTER
             y: -${logo_offset}
-        - spinner:
+        - bar:
+            id: lvgl_ota_progress
             align: CENTER
             y: ${spinner_offset}
-            height: ${spinner_size}
-            width: ${spinner_size}
-            spin_time: 1s
-            arc_length: 60deg
-            arc_width: ${spinner_arc}
-            arc_color: c_dark_gray
-            indicator:
-              arc_color: 0x18bcf2
-              arc_width: ${spinner_arc}
-        - bar:
-            align: BOTTOM_MID
-            y: -${spinner_arc}
 #            height: ${spinner_size}
             width: 80%
             bg_color: c_dark_gray

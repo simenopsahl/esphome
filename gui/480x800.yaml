@@ -122,6 +122,7 @@ script:
 
 lvgl:
   id: display_lvgl
+  buffer_size: 75%
   default_font: font_md
   theme: !include themes/main.yaml
   disp_bg_color: 0x000000

@@ -1,0 +1,95 @@
+# required vars:
+# - light_id
+# - light_brightness
+# - light_flash_brightness
+
+sensor:
+  - platform: homeassistant
+    id: nordpool_price_percent
+    entity_id: sensor.nordpool_price_percent_to_avg_netto
+    on_value:
+      - if:
+          condition:
+            sensor.in_range:
+              id: nordpool_price_percent
+              below: 35
+          then:
+            - light.turn_on:
+                id: ${light_id}
+                effect: pulse
+                brightness: ${light_flash_brightness}
+                red: 0%
+                blue: 0%
+                green: 100%
+          else:
+            - if:
+                condition:
+                  sensor.in_range:
+                    id: nordpool_price_percent
+                    below: 60
+                then:
+                  - light.turn_on:
+                      id: ${light_id}
+                      effect: none
+                      brightness: ${light_brightness}
+                      red: 0%
+                      blue: 0%
+                      green: 100%
+                else:
+                  - if:
+                      condition:
+                        sensor.in_range:
+                          id: nordpool_price_percent
+                          below: 80
+                      then:
+                        - light.turn_on:
+                            id: ${light_id}
+                            effect: none
+                            brightness: ${light_brightness}
+                            red: 50%
+                            blue: 0%
+                            green: 100%
+                      else:
+                        - if:
+                            condition:
+                              sensor.in_range:
+                                id: nordpool_price_percent
+                                below: 105
+                            then:
+                              - light.turn_on:
+                                  id: ${light_id}
+                                  effect: none
+                                  brightness: ${light_brightness}
+                                  red: 100%
+                                  blue: 0%
+                                  green: 100%
+                            else:
+                              - if:
+                                  condition:
+                                    sensor.in_range:
+                                      id: nordpool_price_percent
+                                      below: 130
+                                  then:
+                                    - light.turn_on:
+                                        id: ${light_id}
+                                        effect: none
+                                        brightness: ${light_brightness}
+                                        red: 100%
+                                        blue: 0%
+                                        green: 60%
+                                  else:
+                                    - if:
+                                        condition:
+                                          sensor.in_range:
+                                            id: nordpool_price_percent
+                                            above: 130
+                                        then:
+                                          - light.turn_on:
+                                              id: ${light_id}
+                                              effect: none
+                                              brightness: ${light_brightness}
+                                              red: 100%
+                                              blue: 0%
+                                              green: 0%
+                                        else:
+                                          - light.turn_off: ${light_id}

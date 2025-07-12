@@ -37,6 +37,21 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
+#external_components:
+#  - source:
+#      type: git
+#      url: https://github.com/ssieb/custom_components
+#    components: [ip5306]
+
+#ip5306:
+#  battery_level:
+#    id: ip5306_battery_level
+#    name: Battery Level
+#  charger_connected:
+#    id: ip5306_charger_connected
+#  charge_full:
+#    id: ip5306_charge_full
+
 spi:
   clk_pin: $spi_clk_pin
   mosi_pin: $spi_mosi_pin
