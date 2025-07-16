@@ -29,8 +29,8 @@ substitutions:
 
 esphome:
   comment: "M5Stack Atom S3R 0387f4"
-  name: $devicename
-  friendly_name: $devicename
+  name: ${devicename}
+  friendly_name: ${devicename}
   project:
     version: "1.0.0"
 

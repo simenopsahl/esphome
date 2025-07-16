@@ -10,11 +10,11 @@ uart:
 # mBus Extension
   - id: uart_mbus
     tx_pin:
-      number: $mbus16
-      allow_other_uses: $mbus_uart_shared
+      number: ${mbus16}
+      allow_other_uses: ${mbus_uart_shared}
     rx_pin:
-      number: $mbus15
-      allow_other_uses: $mbus_uart_shared
+      number: ${mbus15}
+      allow_other_uses: ${mbus_uart_shared}
     baud_rate: 9600
     rx_buffer_size: 256
 

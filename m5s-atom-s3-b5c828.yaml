@@ -37,16 +37,16 @@ substitutions:
   devicename: m5s-as3-b5c828
   location: "2etg, Bod"
   log_level: WARN
-  pir_in_pin: $in_port_abc_pin
+  pir_in_pin: ${in_port_abc_pin}
   env_i2c_bus: i2c_port_abc
   gyro_i2c_bus: i2c_port_abc
   home_page: page_temperature
 
 esphome:
   comment: "M5Stack Atom S3 @ Bod"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
   project:
     version: "1.0.0"
 

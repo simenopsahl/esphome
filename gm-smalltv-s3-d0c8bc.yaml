@@ -24,8 +24,8 @@ substitutions:
 
 esphome:
   comment: "GeekMagic SmallTV S3"
-  name: $devicename
-  friendly_name: $devicename
+  name: ${devicename}
+  friendly_name: ${devicename}
   project:
     version: "1.0.0"
 

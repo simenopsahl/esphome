@@ -9,7 +9,7 @@ substitutions:
 
 # i2c Multiplexer
 tca9548a:
-  - i2c_id: $multiplexer_i2c_bus
+  - i2c_id: ${multiplexer_i2c_bus}
     id: multiplex_pa_hub
     address: 0x70
     channels:

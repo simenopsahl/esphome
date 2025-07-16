@@ -9,7 +9,7 @@ substitutions:
 # UNIT ENV IV
 sensor:
   - platform: bmp280_i2c
-    i2c_id: $env_i2c_bus
+    i2c_id: ${env_i2c_bus}
     id: unit_env_bmp280_sensor
     temperature:
       id: temperature_bmp280_unit_env
@@ -38,7 +38,7 @@ sensor:
     update_interval: 10s
 
   - platform: sht4x
-    i2c_id: $env_i2c_bus
+    i2c_id: ${env_i2c_bus}
     id: unit_env_sht40_sensor
     temperature:
       id: temperature_sht40_unit_env

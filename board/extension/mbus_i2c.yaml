@@ -10,11 +10,11 @@ i2c:
 # mBus Extension
   - id: i2c_mbus
     sda:
-      number: $mbus17
-      allow_other_uses: $mbus_i2c_shared
+      number: ${mbus17}
+      allow_other_uses: ${mbus_i2c_shared}
     scl:
-      number: $mbus18
-      allow_other_uses: $mbus_i2c_shared
-    frequency: $i2c_mbus_frequency
+      number: ${mbus18}
+      allow_other_uses: ${mbus_i2c_shared}
+    frequency: ${i2c_mbus_frequency}
 #    timeout: 10ms
     scan: true

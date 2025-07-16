@@ -11,7 +11,7 @@ sensor:
   - platform: pmsx003
     type: PMSX003
     id: pmsx003_sensor
-    uart_id: $module_air_quality_uart_bus
+    uart_id: ${module_air_quality_uart_bus}
     update_interval: 120s
     pm_1_0:
       id: pm1_pmsa003

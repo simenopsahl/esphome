@@ -16,9 +16,9 @@ substitutions:
 
 esphome:
   comment: "VVB Temp V2"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
 
 esp32:
   framework: 

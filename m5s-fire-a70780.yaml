@@ -36,9 +36,9 @@ substitutions:
 
 esphome:
   comment: "M5Stack Fire @ Stue"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
 
 # --- LVGL CLOCKS ---
 time:

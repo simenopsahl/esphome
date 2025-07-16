@@ -8,7 +8,7 @@ substitutions:
 
 sensor:
   - platform: bme280_i2c
-    i2c_id: $bme280_i2c_bus
+    i2c_id: ${bme280_i2c_bus}
     id: bme280_sensor
     temperature:
       id: temperature_bme280
@@ -40,6 +40,6 @@ sensor:
         - sliding_window_moving_average:
             window_size: 6
             send_every: 3
-    address: $bme280_address
+    address: ${bme280_address}
     iir_filter: 8x
     update_interval: 10s

@@ -4,8 +4,8 @@
 uart:
 # Grove port
   - id: uart_alt
-    tx_pin: $alt_tx_pin
-    rx_pin: $alt_rx_pin
+    tx_pin: ${alt_tx_pin}
+    rx_pin: ${alt_rx_pin}
     baud_rate: 9600
     rx_buffer_size: 256
 

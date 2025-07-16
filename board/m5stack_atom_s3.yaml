@@ -26,18 +26,18 @@ wifi:
   enable_rrm: true
 
 spi:
-  clk_pin: $spi_clk_pin
-  mosi_pin: $spi_mosi_pin
+  clk_pin: ${spi_clk_pin}
+  mosi_pin: ${spi_mosi_pin}
 
 # IR
 remote_transmitter:
-  pin: $ir_pin
+  pin: ${ir_pin}
   carrier_duty_percent: 50%
 
 output:
   - platform: ledc
     id: backlight_output
-    pin: $disp_bl_pin
+    pin: ${disp_bl_pin}
     frequency: 500Hz
     min_power: 0.2
     max_power: 1.0
@@ -61,7 +61,7 @@ binary_sensor:
   - platform: gpio
     id: btn_display
     pin:
-      number: $button_pin
+      number: ${button_pin}
       inverted: true
       mode:
         input: true
@@ -77,9 +77,9 @@ display:
   - platform: ili9xxx
     model: st7789v
     id: display_lcd
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_reset_pin
+    cs_pin: ${disp_cs_pin}
+    dc_pin: ${disp_dc_pin}
+    reset_pin: ${disp_reset_pin}
     data_rate: 40Mhz
     invert_colors: true
     update_interval: 1s

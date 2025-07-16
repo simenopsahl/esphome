@@ -2,14 +2,14 @@
 # https://docs.m5stack.com/en/unit/PIR
 
 substitutions:
-  pir_in_pin: $in_grove_pin
+  pir_in_pin: ${in_grove_pin}
 
 # UNIT PIR
 binary_sensor:
   - platform: gpio
     id: pir_sensor
     pin:
-      number: $pir_in_pin
+      number: ${pir_in_pin}
       mode:
         input: true
     filters:

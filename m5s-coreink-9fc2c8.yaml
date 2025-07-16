@@ -24,9 +24,9 @@ substitutions:
 
 esphome:
   comment: "M5Stack CoreInk @ Simen"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
   project: 
     version: "1.0.0"
 

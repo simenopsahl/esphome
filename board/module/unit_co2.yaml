@@ -8,7 +8,7 @@ substitutions:
 # UNIT CO2
 sensor:
   - platform: scd4x
-    i2c_id: $co2_i2c_bus
+    i2c_id: ${co2_i2c_bus}
     id: unit_co2_scd40_sensor
     co2:
       id: co2_scd40_unit_co2

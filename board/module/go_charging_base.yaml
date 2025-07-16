@@ -8,7 +8,7 @@ light:
   - platform: esp32_rmt_led_strip
     id: go_base_side_light
     rgb_order: GRB
-    pin: $mbus23
+    pin: ${mbus23}
     num_leds: 10
 #    rmt_channel: 1
     rmt_symbols: 256

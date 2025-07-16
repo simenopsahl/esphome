@@ -8,7 +8,7 @@ substitutions:
 # SHT30
 sensor:
   - platform: sht3xd
-    i2c_id: $base_btc_i2c_bus
+    i2c_id: ${base_btc_i2c_bus}
     id: base_btc_sht30_sensor
     temperature:
       id: temperature_sht30_base_btc

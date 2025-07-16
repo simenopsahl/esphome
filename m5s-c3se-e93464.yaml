@@ -37,8 +37,9 @@ substitutions:
 
 esphome:
   comment: 'M5Stack Core3 SE @ Stue'
-  name: $devicename
-  friendly_name: $devicename
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
   project:
     version: "1.0.0"
 

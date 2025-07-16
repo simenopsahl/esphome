@@ -45,7 +45,7 @@ esphome:
         - delay: 5s
         - logger.log: "Initial sensor data received: Refreshing display..."
         - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: $home_page
+        - display.page.show: ${home_page}
         - script.execute: update_screen
 
 esp32:
@@ -61,8 +61,8 @@ wifi:
   enable_rrm: true
 
 spi:
-  clk_pin: $spi_clk_pin
-  mosi_pin: $spi_mosi_pin
+  clk_pin: ${spi_clk_pin}
+  mosi_pin: ${spi_mosi_pin}
 
 time:
   - platform: pcf8563
@@ -80,21 +80,21 @@ time:
 output:
   - platform: gpio
     id: sen55_enable
-    pin: $sen55_pwr_pin
+    pin: ${sen55_pwr_pin}
   - platform: gpio
     id: power_hold
     pin:
-      number: $pwr_mos_pin
+      number: ${pwr_mos_pin}
       allow_other_uses: true
   - platform: ledc
     id: buzzer
-    pin: $buzzer_pin
+    pin: ${buzzer_pin}
 
 light:
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
-    pin: $rgb_pin
+    pin: ${rgb_pin}
     num_leds: 1
 #    rmt_channel: 0 # Not for ESP-IDF
     rmt_symbols: 384
@@ -132,7 +132,7 @@ binary_sensor:
     name: "Button A"
     entity_category: diagnostic
     pin:
-      number: $button_a_pin
+      number: ${button_a_pin}
       ignore_strapping_warning: true
       mode:
         input: true
@@ -151,7 +151,7 @@ binary_sensor:
     name: "Button B"
     entity_category: diagnostic
     pin:
-      number: GPIO08
+      number: ${button_b_pin}
 #      ignore_strapping_warning: true
       mode:
         input: true
@@ -172,7 +172,7 @@ binary_sensor:
     name: Button Power
     entity_category: diagnostic
     pin:
-      number: $button_pwr_pin
+      number: ${button_pwr_pin}
 #      ignore_strapping_warning: true
       inverted: true
     on_press:
@@ -202,7 +202,7 @@ binary_sensor:
     name: Power Hold
     entity_category: diagnostic
     pin:
-      number: $pwr_mos_pin
+      number: ${pwr_mos_pin}
       allow_other_uses: true
       ignore_strapping_warning: true
       inverted: true
@@ -334,11 +334,11 @@ display:
   - platform: waveshare_epaper
     id: display_eink
     model: 1.54inv2
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_rst_pin
+    cs_pin: ${disp_cs_pin}
+    dc_pin: ${disp_dc_pin}
+    reset_pin: ${disp_rst_pin}
     busy_pin:
-      number: $disp_busy_pin
+      number: ${disp_busy_pin}
       inverted: false
     full_update_every: 1
 #    reset_duration: 2ms

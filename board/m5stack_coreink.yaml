@@ -46,7 +46,7 @@ esphome:
         - delay: 5s
         - logger.log: "Initial sensor data received: Refreshing display..."
         - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: $home_page
+        - display.page.show: ${home_page}
         - script.execute: update_screen
 
 esp32:
@@ -61,8 +61,8 @@ wifi:
   enable_rrm: true
 
 spi:
-  clk_pin: $spi_clk_pin
-  mosi_pin: $spi_mosi_pin
+  clk_pin: ${spi_clk_pin}
+  mosi_pin: ${spi_mosi_pin}
 
 # i2c RTC only with one additional i2c bus
 #time:
@@ -72,7 +72,7 @@ spi:
 #    update_interval: 10min
 #  - platform: sntp
 #    id: sntp_time
-#    timezone: $time_timezone
+#    timezone: ${time_timezone}
 #    on_time_sync:
 #      then:
 #        pcf8563.write_time:
@@ -81,17 +81,17 @@ light:
   # Enable status LED
   - platform: status_led
     id: status_light
-    pin: $led_pin
+    pin: ${led_pin}
 
 # Buzzer
 output:
   - platform: ledc
     id: buzzer
-    pin: $buzzer_pin
+    pin: ${buzzer_pin}
 #  - platform: gpio
 #    id: power_hold
 #    pin:
-#      number: $pwr_mos_pin
+#      number: ${pwr_mos_pin}
 #      allow_other_uses: true
 
 binary_sensor:
@@ -100,7 +100,7 @@ binary_sensor:
 #    id: button_side
 #    name: Side Button
 #    pin:
-#      number: $button_side_pin
+#      number: ${button_side_pin}
 #      inverted: true
 #      mode:
 #        input: true
@@ -116,7 +116,7 @@ binary_sensor:
     name: Top Button
     entity_category: diagnostic
     pin:
-      number: $button_top_pin
+      number: ${button_top_pin}
       inverted: true
       mode:
         input: true
@@ -133,7 +133,7 @@ binary_sensor:
   - platform: gpio
     id: stick_up
     pin:
-      number: $stick_up_pin
+      number: ${stick_up_pin}
 #      allow_other_uses: true
       inverted: true
       mode:
@@ -152,7 +152,7 @@ binary_sensor:
   - platform: gpio
     id: stick_press
     pin:
-      number: $stick_press_pin
+      number: ${stick_press_pin}
 #      allow_other_uses: true
       inverted: true
       mode:
@@ -171,7 +171,7 @@ binary_sensor:
   - platform: gpio
     id: stick_down
     pin:
-      number: $stick_down_pin
+      number: ${stick_down_pin}
 #      allow_other_uses: true
       inverted: true
       mode:
@@ -191,7 +191,7 @@ binary_sensor:
   - platform: gpio
     id: pwr_hold
     pin:
-      number: $pwr_mos_pin
+      number: ${pwr_mos_pin}
 #      allow_other_uses: true
       ignore_strapping_warning: true
       inverted: true
@@ -231,7 +231,7 @@ sensor:
   
   # Battery voltage
   - platform: adc
-    pin: $bat_feedback
+    pin: ${bat_feedback}
     id: bat_adc
     update_interval: 10s
     samples: 10
@@ -286,15 +286,15 @@ sensor:
 #  esp32_ext1_wakeup:
 #    mode: ANY_HIGH
 #    pins:
-#      - number: $rtc_wakeup_pin
-#      - number: $pwr_mos_pin
+#      - number: ${rtc_wakeup_pin}
+#      - number: ${pwr_mos_pin}
 #        allow_other_uses: true
 #        inverted: true
-#      - number: $stick_up_pin
+#      - number: ${stick_up_pin}
 #        allow_other_uses: true
-#      - number: $stick_press_pin
+#      - number: ${stick_press_pin}
 #        allow_other_uses: true
-#      - number: $stick_down_pin
+#      - number: ${stick_down_pin}
 #        allow_other_uses: true
 
 #switch:
@@ -335,11 +335,11 @@ display:
   - platform: waveshare_epaper
     id: display_eink
     model: 1.54inv2
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
-    reset_pin: $disp_reset_pin
+    cs_pin: ${disp_cs_pin}
+    dc_pin: ${disp_dc_pin}
+    reset_pin: ${disp_reset_pin}
     busy_pin:
-      number: $disp_busy_pin
+      number: ${disp_busy_pin}
       inverted: false
     full_update_every: 1
 #    reset_duration: 2ms

@@ -42,8 +42,8 @@ esp32:
 
 i2c:
   id: i2c_bus
-  sda: $i2c_int_sda_pin
-  scl: $i2c_int_scl_pin
+  sda: ${i2c_int_sda_pin}
+  scl: ${i2c_int_scl_pin}
   frequency: 200kHz
   scan: true
 
@@ -75,7 +75,7 @@ api:
 binary_sensor:
   - platform: gpio
     pin:
-      number: $button_left_pin
+      number: ${button_left_pin}
       inverted: true
     name: "left button"
     entity_category: diagnostic
@@ -84,7 +84,7 @@ binary_sensor:
   - platform: gpio
     pin: 
       inverted: true
-      number: $button_mid_pin
+      number: ${button_mid_pin}
       mode: INPUT_PULLUP
     name: "middle button"
     entity_category: diagnostic
@@ -92,7 +92,7 @@ binary_sensor:
       - switch.toggle: displaycontrol
   - platform: gpio
     pin: 
-      number: $button_right_pin
+      number: ${button_right_pin}
       inverted: true
     name: "right button"
     entity_category: diagnostic
@@ -170,7 +170,7 @@ sensor:
     update_interval: 60s
   - platform: adc
     id: battery_voltage
-    pin: $bat_feedback
+    pin: ${bat_feedback}
     name: "Battery"
     update_interval: 10s
     device_class: battery
@@ -195,7 +195,7 @@ sensor:
     unit_of_measurement: '%'
   - platform: adc
     id: light_sensor
-    pin: $light_sensor_pin
+    pin: ${light_sensor_pin}
     name: "Illuminance"
     state_class: measurement
     device_class: ILLUMINANCE
@@ -224,7 +224,7 @@ sensor:
 
 output:
   - platform: ledc
-    pin: $buzzer_pin
+    pin: ${buzzer_pin}
     id: rtttl_out
 
 rtttl:
@@ -235,7 +235,7 @@ light:
     id: ehmtx_light
     variant: ws2812
     type: GRB
-    pin: $led_matrix_pin
+    pin: ${led_matrix_pin}
     num_leds: 256
     color_correct: [30%, 30%, 30%]
     gamma_correct: 2.0

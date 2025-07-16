@@ -8,8 +8,8 @@ substitutions:
 i2c:
 # Port ABC
   - id: i2c_port_abc
-    sda: $i2c_port_abc_sda_pin
-    scl: $i2c_port_abc_scl_pin
-    frequency: $i2c_port_abc_frequency
+    sda: ${i2c_port_abc_sda_pin}
+    scl: ${i2c_port_abc_scl_pin}
+    frequency: ${i2c_port_abc_frequency}
 #    timeout: 10ms
     scan: true

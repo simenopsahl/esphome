@@ -33,9 +33,9 @@ substitutions:
 
 esphome:
   comment: "M5Stack StickC Plus2 @ Bad"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
   project: 
     version: "1.0.0"
 

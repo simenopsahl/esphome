@@ -36,18 +36,18 @@ psram:
 # https://community.home-assistant.io/t/jc3248w535-guition-3-5-config/791363
 spi:
   - type: quad
-    clk_pin: $spi_clk_pin
+    clk_pin: ${spi_clk_pin}
     data_pins: [$spi_data1_pin, $spi_data2_pin, $spi_data3_pin, $spi_data4_pin]
 
 i2c:
   - id: i2c_internal
-    sda: $i2c_int_sda_pin
-    scl: $i2c_int_scl_pin
+    sda: ${i2c_int_sda_pin}
+    scl: ${i2c_int_scl_pin}
 
 output:
   - platform: ledc
     id: backlight_output
-    pin: $disp_bl_pin
+    pin: ${disp_bl_pin}
 
 light:
   # White
@@ -71,7 +71,7 @@ display:
     model: JC4832W535
     data_rate: 40MHz
     cs_pin:
-      number: $disp_cs_pin
+      number: ${disp_cs_pin}
       ignore_strapping_warning: true
     draw_from_origin: true
     update_interval: 5s
@@ -91,3 +91,7 @@ touchscreen:
       swap_xy: false   # 0=false, 90=true, 180=false, 270=true
       mirror_x: false  # 0=false, 90=true, 180=true, 270=false
       mirror_y: false   # 0=false, 90=false, 180=true, 270=true
+#    on_update:
+#      - logger.log:
+#          format: Touch %d at (%d, %d)
+#          args: [ 'touch->id', 'touch->x', 'touch->y' ]

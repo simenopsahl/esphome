@@ -18,7 +18,7 @@ light:
   - platform: esp32_rmt_led_strip
     id: rgb_led_m5go
     rgb_order: GRB
-    pin: $m5go_rgb_led
+    pin: ${m5go_rgb_led}
     num_leds: 10
     # RMT 0 channels will be occupied by IR
 #    rmt_channel: 1

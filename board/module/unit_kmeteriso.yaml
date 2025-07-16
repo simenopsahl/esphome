@@ -8,7 +8,7 @@ substitutions:
 # UNIT KMeterISO
 sensor:
   - platform: kmeteriso
-    i2c_id: $kmeteriso_i2c_bus
+    i2c_id: ${kmeteriso_i2c_bus}
     id: kmeteriso_sensor
     temperature:
       id: temperature_kmeteriso

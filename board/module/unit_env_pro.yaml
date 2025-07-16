@@ -9,7 +9,7 @@ substitutions:
 # UNIT ENV Pro
 bme68x_bsec2_i2c:
   id: bme68x_bsec_component
-  i2c_id: $env_i2c_bus
+  i2c_id: ${env_i2c_bus}
   address: 0x77
   model: BME688
   sample_rate: LP

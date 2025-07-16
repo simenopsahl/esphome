@@ -7,8 +7,8 @@ substitutions:
 i2c:
 # Internal
   - id: i2c_internal
-    sda: $i2c_int_sda_pin
-    scl: $i2c_int_scl_pin
-    frequency: $i2c_internal_frequency
+    sda: ${i2c_int_sda_pin}
+    scl: ${i2c_int_scl_pin}
+    frequency: ${i2c_internal_frequency}
 #    timeout: 5ms
     scan: true

@@ -67,27 +67,27 @@ logger:
 # Int
 #  - id: i2c_internal
 #    sda:
-#      number: $i2c_int_sda_pin
-#      allow_other_uses: $mbus_i2c_shared
+#      number: ${i2c_int_sda_pin}
+#      allow_other_uses: ${mbus_i2c_shared}
 #    scl:
-#      number: $i2c_int_scl_pin
-#      allow_other_uses: $mbus_i2c_shared
-#    frequency: $i2c_internal_frequency
+#      number: ${i2c_int_scl_pin}
+#      allow_other_uses: ${mbus_i2c_shared}
+#    frequency: ${i2c_internal_frequency}
 #    scan: true
 # Ext PINs
 #  - id: i2c_bus
-#    sda: $i2c_bus_sda_pin
-#    scl: $i2c_bus_scl_pin
+#    sda: ${i2c_bus_sda_pin}
+#    scl: ${i2c_bus_scl_pin}
 #    frequency: 200kHz
 #    scan: true
 
 spi:
-  clk_pin: $spi_clk_pin
-  mosi_pin: $spi_mosi_pin
+  clk_pin: ${spi_clk_pin}
+  mosi_pin: ${spi_mosi_pin}
 
 time:
   - platform: pcf8563
-    i2c_id: $internal_i2c_bus
+    i2c_id: ${internal_i2c_bus}
     id: time_rtc
     address: 0x51
     update_interval: 10min
@@ -115,10 +115,10 @@ external_components:
     refresh: 1d
 
 esp32_m5stack_core_s3:
-  i2c_id: $internal_i2c_bus
+  i2c_id: ${internal_i2c_bus}
 
 i2c_device:
-  i2c_id: $internal_i2c_bus
+  i2c_id: ${internal_i2c_bus}
   id: axp2101
   address: 0x34
 
@@ -133,15 +133,15 @@ i2c_device:
 
 #i2s_audio:
 #  - id: i2s_shared
-#    i2s_lrclk_pin: $i2s_lrclk_pin
-#    i2s_bclk_pin: $i2s_bclk_pin
-#    i2s_mclk_pin: $i2s_mclk_pin
+#    i2s_lrclk_pin: ${i2s_lrclk_pin}
+#    i2s_bclk_pin: ${i2s_bclk_pin}
+#    i2s_mclk_pin: ${i2s_mclk_pin}
 
 #microphone:
 #  - platform: i2s_audio
 #    i2s_audio_id: i2s_shared
 #    id: microphone_i2s
-#    i2s_din_pin: $i2s_din_pin
+#    i2s_din_pin: ${i2s_din_pin}
 #    pdm: false
 #    adc_type: external
 #    sample_rate: 16000
@@ -151,14 +151,14 @@ i2c_device:
 #  - platform: i2s_audio
 #    i2s_audio_id: i2s_shared
 #    id: speaker_i2s
-#    i2s_dout_pin: $i2s_dout_pin
+#    i2s_dout_pin: ${i2s_dout_pin}
 #    dac_type: external
 #    sample_rate: 16000
 #    bits_per_sample: 16bit
 #    channel: right
 
 aw9523:
-  i2c_id: $internal_i2c_bus
+  i2c_id: ${internal_i2c_bus}
   id: aw9523_1
   address: 0x58
 
@@ -166,8 +166,8 @@ display:
   - platform: ili9xxx
     id: display_lcd
     model: M5Stack
-    cs_pin: $disp_cs_pin
-    dc_pin: $disp_dc_pin
+    cs_pin: ${disp_cs_pin}
+    dc_pin: ${disp_dc_pin}
     dimensions:
       height: 240
       width: 320
@@ -190,7 +190,8 @@ display:
 
 touchscreen:
   - platform: ft63x6
-    i2c_id: $internal_i2c_bus
+    i2c_id: ${internal_i2c_bus}
+    id: touchscreen_ft63x6
     update_interval: 20ms
 #    interrupt_pin:
 #      aw9523: aw9523_1
@@ -212,10 +213,10 @@ touchscreen:
             - light.turn_on:
                 id: backlight_light
                 brightness: 40%
-    on_update:
-      - logger.log:
-          format: Touch %d at (%d, %d)
-          args: [touch.id, touch.x, touch.y]
+#    on_update:
+#      - logger.log:
+#          format: Touch %d at (%d, %d)
+#          args: [ 'touch->id', 'touch->x', 'touch->y' ]
 
 binary_sensor:
   - platform: touchscreen
@@ -241,7 +242,7 @@ output:
 # https://devices.esphome.io/devices/M5Stack-Fire#wifi-issues-due-to-gpio15
 #  - platform: gpio
 #    id: wifi_fix_output
-#    pin: $mbus23
+#    pin: ${mbus23}
 
 light:
   # White

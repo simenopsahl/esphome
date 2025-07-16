@@ -17,9 +17,9 @@ substitutions:
 
 esphome:
   comment: "E-Ink E&S Display"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
   project:
     version: "1.0"
 

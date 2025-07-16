@@ -26,9 +26,9 @@ substitutions:
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Kjøkken"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location}
   project:
     version: "1.0.0"
 

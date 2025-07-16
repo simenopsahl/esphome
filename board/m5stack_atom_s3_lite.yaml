@@ -63,7 +63,7 @@ light:
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
-    pin: $rgb_pin
+    pin: ${rgb_pin}
     num_leds: 1
     # RMT 0 channels will be occupied by IR
 #    rmt_channel: 1
@@ -131,7 +131,7 @@ binary_sensor:
     name: Button
     entity_category: diagnostic
     pin:
-      number: $button_pin
+      number: ${button_pin}
       inverted: true
 #      mode:
 #        input: true

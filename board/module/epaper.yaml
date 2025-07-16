@@ -105,7 +105,7 @@ button:
             - script.execute: repair_script
       - script.wait: repair_script
       - logger.log: "Repair script finished"
-      - display.page.show: $home_page
+      - display.page.show: ${home_page}
 
 sensor:
   # Create sensors for monitoring remotely.
