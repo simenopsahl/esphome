@@ -126,12 +126,12 @@ sensor:
       then:
         - lambda: |-
             // This C++ logic updates the color globals
-            if (((int)x) % 2 == 0) {
-              // On even refreshes, set White background, Black text
-              id(epaper_bg_color) = COLOR_OFF;
-              id(epaper_text_color) = COLOR_ON;
-            } else {
-              // On odd refreshes, set Black background, White text
+            if (((int)x) % 5 == 0) {
+              // On refreshes 0, 5, 10, etc., set Black background, White text
               id(epaper_bg_color) = COLOR_ON;
               id(epaper_text_color) = COLOR_OFF;
+            } else {
+              // On all other refreshes, set White background, Black text
+              id(epaper_bg_color) = COLOR_OFF;
+              id(epaper_text_color) = COLOR_ON;
             }

@@ -1,5 +1,10 @@
 # Personal settings for Everything Presence Lite
 
+esp32:
+  framework:
+    advanced:
+      assertion_level: DISABLE
+
 api:
   reboot_timeout: 90min
   encryption:

@@ -14,7 +14,7 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
     light_id: rgb_led,
-    light_brightness: 60%,
+    light_brightness: 80%,
     light_flash_brightness: 90%
   }}
 

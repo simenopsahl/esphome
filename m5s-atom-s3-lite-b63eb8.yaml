@@ -15,18 +15,28 @@ packages:
 
 substitutions:
   devicename: m5s-as3-lite-b63eb8
-  location: "Ute, Bod"
-  pir_in_pin: $in_port_abc_pin
+  location_1: "Ute, Bod"
+  location_2: "Ute, Foran"
+  pir_in_pin: ${in_port_abc_pin}
   env_i2c_bus: i2c_port_abc
   log_level: WARN
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Ute, Bod"
-  name: $devicename
-  friendly_name: $devicename
-  area: $location
+  name: ${devicename}
+  friendly_name: ${devicename}
+  area: ${location_1}
   project:
     version: "1.0.0"
+  # Define areas (optional)
+  areas:
+    - id: area_ute_foran
+      name: ${location_2}
+  # Define devices
+  devices:
+    - id: device_ute_foran
+      name: ${devicename}_sub
+      area_id: area_ute_foran
 
 sensor:
   # Combine sensors
@@ -77,6 +87,7 @@ sensor:
   - platform: combination
     type: median
     id: temperature_ute
+    device_id: device_ute_foran
     name: "Ute Temperature"
     device_class: "temperature"
     state_class: "measurement"
@@ -104,6 +115,7 @@ sensor:
   - platform: combination
     type: median
     id: humidity_ute
+    device_id: device_ute_foran
     name: "Ute Humidity"
     device_class: "humidity"
     state_class: "measurement"
@@ -128,6 +140,7 @@ sensor:
   - platform: combination
     type: median
     id: pressure_ute
+    device_id: device_ute_foran
     name: "Ute Pressure"
     device_class: "atmospheric_pressure"
     state_class: "measurement"

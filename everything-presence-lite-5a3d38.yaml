@@ -20,8 +20,3 @@ esphome:
   name_add_mac_suffix: false
   friendly_name: ${friendly_name}
   area: $location
-
-esp32:
-  framework:
-    advanced:
-      assertion_level: DISABLE

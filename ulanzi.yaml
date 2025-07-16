@@ -51,7 +51,7 @@ ehmtxv2:
     - id: phone
       lameid: 43641
     - id: car
-      lameid: 1172
+      lameid: 2819
     - id: cat
       lameid: 12200
     - id: sleeping
@@ -59,7 +59,7 @@ ehmtxv2:
     - id: ha
       lameid: 7956
     - id: temp
-      lameid: 2422
+      lameid: 12144
     - id: plug
       lameid: 48588
     - id: humidity
@@ -79,7 +79,7 @@ ehmtxv2:
     - id: cctv
       lameid: 15642
     - id: person
-      lameid: 5869
+      lameid: 40354
     - id: mail
       lameid: 55030
     - id: folloren1
