@@ -2,6 +2,85 @@
 # PINs for ESP32 upesy_wroom
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO21
+        scl: GPIO22
+      uart:
+        tx0: GPIO1
+        rx0: GPIO3
+        tx2: GPIO17
+        rx2: GPIO16
+      hspi:
+        clk: GPIO14
+        mosi: GPIO13
+        miso: GPIO12
+        cs: GPIO15
+      vspi:
+        clk: GPIO18
+        mosi: GPIO23
+        miso: GPIO19
+        cs: GPIO5
+      dac:
+        p1: GPIO25
+        p2: GPIO26
+      adc:
+        p1_0: GPIO36
+        p1_3: GPIO39
+        p1_4: GPIO32
+        p1_5: GPIO33
+        p1_6: GPIO34
+        p1_7: GPIO35
+        p2_0: GPIO4
+        p2_1: GPIO0
+        p2_2: GPIO2
+        p2_3: GPIO15
+        p2_4: GPIO13
+        p2_5: GPIO12
+        p2_6: GPIO14
+        p2_7: GPIO27
+        p2_8: GPIO25
+        p2_9: GPIO26
+      rtc_gpio:
+        p0: GPIO36
+        p3: GPIO39
+        p4: GPIO34
+        p5: GPIO35
+        p6: GPIO25
+        p7: GPIO26
+        p8: GPIO33
+        p9: GPIO32
+        p10: GPIO4
+        p11: GPIO0
+        p12: GPIO2
+        p13: GPIO15
+        p14: GPIO13
+        p15: GPIO12
+        p16: GPIO14
+        p17: GPIO27
+      card:
+        cmd: GPIO15
+        clk: GPIO14
+        dat0: GPIO2
+        dat1: GPIO4
+        dat2: GPIO12
+        dat3: GPIO13
+      touch:
+        p0: GPIO4
+        p1: GPIO0
+        p2: GPIO2
+        p3: GPIO15
+        p4: GPIO13
+        p5: GPIO12
+        p6: GPIO14
+        p7: GPIO27
+        p8: GPIO33
+        p9: GPIO32
+    
+    light:
+      led: GPIO2
+
   # i2c
   i2c_int_sda_pin: GPIO21
   i2c_int_scl_pin: GPIO22

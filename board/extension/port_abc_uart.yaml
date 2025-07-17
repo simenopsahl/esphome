@@ -5,8 +5,8 @@
 uart:
 # Port ABC
   - id: uart_port_abc
-    tx_pin: ${tx_port_abc_pin}
-    rx_pin: ${rx_port_abc_pin}
+    tx_pin: ${pin.ext.uart.port_abc.tx}
+    rx_pin: ${pin.ext.uart.port_abc.rx}
     baud_rate: 115200
     rx_buffer_size: 256
 

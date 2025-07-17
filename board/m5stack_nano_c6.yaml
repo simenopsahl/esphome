@@ -26,12 +26,12 @@ esp32:
 # Enable status LED
 status_led:
   id: status_light
-  pin: ${led_pin}
+  pin: ${pin.light.led}
 
 switch:
   - platform: gpio
     id: rgb_switch
-    pin: ${rgb_pwr_pin}
+    pin: ${pin.int.rgb_pwr}
     restore_mode: RESTORE_DEFAULT_ON
     name: "RGB on/off"
     entity_category: config
@@ -41,7 +41,7 @@ light:
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
-    pin: ${rgb_pin}
+    pin: ${pin.light.rgb}
     num_leds: 1
     chipset: WS2812
     is_rgbw: true
@@ -83,7 +83,7 @@ binary_sensor:
     name: Button
     entity_category: diagnostic
     pin:
-      number: ${button_pin}
+      number: ${pin.btn}
       inverted: true
     filters:
       - delayed_off: 10ms

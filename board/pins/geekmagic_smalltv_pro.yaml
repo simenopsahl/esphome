@@ -4,6 +4,24 @@
 # PINs for GeekMagic SmallTV Pro
 
 substitutions:
+  pin:
+    spi:
+      clk: GPIO18
+      mosi: GPIO23
+      disp:
+        dc: GPIO2
+        reset: GPIO4
+
+    light:
+      disp_bl: GPIO25
+    
+    audio:
+      buzzer: GPIO12
+    
+    btn:
+      touch1: GPIO32
+      touch2: GPIO33
+
   # Internal
   spi_clk_pin: GPIO18
   spi_mosi_pin: GPIO23

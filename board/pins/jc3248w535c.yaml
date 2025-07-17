@@ -2,6 +2,79 @@
 # PINs for Sunton module ESP32-S3 with Guition 3.5" display
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO4
+        scl: GPIO8
+      spi:
+        clk: GPIO47
+        dat1: GPIO21
+        dat2: GPIO48
+        dat3: GPIO40
+        dat4: GPIO39
+        disp:
+          cs: GPIO45
+        card:
+          clk: GPIO12
+          mosi: GPIO11
+          miso: GPIO13
+          cs: GPIO10
+      bat_feedback: GPIO5
+    
+    light:
+      disp_bl: GPIO1
+    
+    audio:
+      i2s_lrclk: GPIO2
+      i2s_bclk: GPIO42
+      i2s_mclk: GPIO00
+      i2s_dout: GPIO41
+    
+    ext:
+      i2c:
+        hc100:
+          sda: GPIO18
+          scl: GPIO17
+        jst125:
+          sda: GPIO17
+          scl: GPIO18
+        grove:
+          sda: GPIO17
+          scl: GPIO18
+      uart:
+        hc100:
+          tx: GPIO17
+          rx: GPIO18
+        jst125:
+          tx: GPIO18
+          rx: GPIO17
+        grove:
+          tx: GPIO17
+          rx: GPIO18
+      gpio:
+        hc100:
+          in: GPIO17
+          out: GPIO18
+        jst125:
+          in: GPIO18
+          out: GPIO17
+        grove:
+          in: GPIO17
+          out: GPIO18
+      jst125:
+        p1: GPIO5
+        p2: GPIO6
+        p3: GPIO7
+        p4: GPIO15
+        p5: GPIO16
+        p6: GPIO46
+        p7: GPIO9
+        p8: GPIO14
+    
+    btn:
+      boot: GPIO0
+
 # Internal
   # I2C
   i2c_int_sda_pin: GPIO4 # io04

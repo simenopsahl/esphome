@@ -46,13 +46,13 @@ psram:
 
 i2c:
   - id: i2c_internal
-    sda: ${i2c_int_sda_pin}
-    scl: ${i2c_int_scl_pin}
+    sda: ${pin.int.i2c.sda}
+    scl: ${pin.int.i2c.scl}
 
 output:
   - platform: ledc
     id: backlight_output
-    pin: ${disp_bl_pin}
+    pin: ${pin.light.disp_bl}
     frequency: 1220Hz
 
 light:
@@ -77,10 +77,10 @@ display:
       width: 800
     color_order: RGB
     rotation: 90
-    de_pin: ${disp_de_pin}
-    hsync_pin: ${disp_hsync_pin}
-    vsync_pin: ${disp_vsync_pin}
-    pclk_pin: ${disp_pclk_pin}
+    de_pin: ${pin.int.disp.de}
+    hsync_pin: ${pin.int.disp.hsync}
+    vsync_pin: ${pin.int.disp.vsync}
+    pclk_pin: ${pin.int.disp.pclk}
     pclk_inverted: true
     pclk_frequency: 14MHz
     hsync_front_porch: 8
@@ -90,9 +90,9 @@ display:
     vsync_pulse_width: 4
     vsync_back_porch: 8
     data_pins:
-      red: [ $disp_r1_pin, $disp_r2_pin, $disp_r3_pin, $disp_r4_pin, $disp_r5_pin ]
-      green: [ $disp_g1_pin, $disp_g2_pin, $disp_g3_pin, $disp_g4_pin, $disp_g5_pin, $disp_g6_pin ]
-      blue: [ $disp_b1_pin, $disp_b2_pin, $disp_b3_pin, $disp_b4_pin, $disp_b5_pin ]
+      red: [ $pin.int.disp.red.r1, $pin.int.disp.red.r2, $pin.int.disp.red.r3, $pin.int.disp.red.r4, $pin.int.disp.red.r5 ]
+      green: [ $pin.int.disp.green.g1, $pin.int.disp.green.g2, $pin.int.disp.green.g3, $pin.int.disp.green.g4, $pin.int.disp.green.g5, $pin.int.disp.green.g6 ]
+      blue: [ $pin.int.disp.blue.b1, $pin.int.disp.blue.b2, $pin.int.disp.blue.b3, $pin.int.disp.blue.b4, $pin.int.disp.blue.b5 ]
     update_interval: never
     auto_clear_enabled: false
 

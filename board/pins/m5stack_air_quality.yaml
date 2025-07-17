@@ -3,6 +3,52 @@
 # PINs for m5stack PM2.5 Air Qualityy
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO11
+        scl: GPIO12
+      spi:
+        clk: GPIO5
+        mosi: GPIO6
+        disp:
+          cs: GPIO4
+          dc: GPIO3
+          reset: GPIO2
+          busy: GPIO1
+      sen55_pwr: GPIO10
+      pwr_mos: GPIO46
+      bat_feedback: GPIO14
+    
+    light:
+      rgb: GPIO21
+    
+    audio:
+#      i2s_lrclk: GPIO13
+#      mic: GPIO34
+      spk_1: GPIO26
+      buzzer: GPIO9
+    
+    ext:
+      i2c:
+        grove:
+          sda: GPIO13
+          scl: GPIO15
+      uart:
+        grove:
+          tx: GPIO15
+          rx: GPIO13
+      gpio:
+        grove:
+          in: GPIO13
+          out: GPIO15
+    
+    btn:
+      pwr: GPIO42
+      a: GPIO0
+      b: GPIO8
+
+
   # Internal
   i2c_int_sda_pin: GPIO11
   i2c_int_scl_pin: GPIO12

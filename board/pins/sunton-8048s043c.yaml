@@ -2,6 +2,58 @@
 # PINs for Sunton moduleESP32-S3 with Guition 3.5" display
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO19
+        scl: GPIO20
+      disp:
+        de: GPIO40
+        pclk: GPIO42
+        hsync: GPIO39
+        vsync: GPIO41
+        red:
+          r1: GPIO45
+          r2: GPIO48
+          r3: GPIO47
+          r4: GPIO21
+          r5: GPIO14
+        green:
+          g1: GPIO5
+          g2: GPIO6
+          g3: GPIO7
+          g4: GPIO15
+          g5: GPIO16
+          g6: GPIO4
+        blue:
+          b1: GPIO8
+          b2: GPIO3
+          b3: GPIO46
+          b4: GPIO9
+          b5: GPIO1
+      bat_feedback: GPIO5
+    
+    light:
+      disp_bl: GPIO2
+    
+    ext:
+      p2_hc100:
+        p3: GPIO17
+        p4: GPIO18
+      p3_jst125:
+        p1: GPIO17
+        p2: GPIO18
+        p3: GPIO19
+        p4: GPIO20
+      p4_jst125:
+        p1: GPIO19
+        p2: GPIO11
+        p3: GPIO12
+        p4: GPIO13
+    
+    btn:
+      boot: GPIO0
+
 # Internal
   # I2C
   i2c_int_sda_pin: GPIO19 # 19

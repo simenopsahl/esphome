@@ -3,6 +3,25 @@
 # PINs for Ulanzi TC001
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO21
+        scl: GPIO22
+      bat_feedback: GPIO34
+    
+    light:
+      sensor: GPIO35
+      led_matrix: GPIO32
+    
+    audio:
+      buzzer: GPIO15
+    
+    btn:
+      left: GPIO26
+      mid: GPIO27
+      right: GPIO14
+
   # Internal
   i2c_int_sda_pin: GPIO21
   i2c_int_scl_pin: GPIO22

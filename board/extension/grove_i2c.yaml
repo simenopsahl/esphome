@@ -9,10 +9,10 @@ i2c:
 # Grove port
   - id: i2c_grove
     sda:
-      number: ${i2c_grove_sda_pin}
+      number: ${pin.ext.i2c.grove.sda}
       allow_other_uses: ${grove_shared}
     scl:
-      number: ${i2c_grove_scl_pin}
+      number: ${pin.ext.i2c.grove.scl}
       allow_other_uses: ${grove_shared}
     frequency: ${i2c_grove_frequency}
 #    timeout: 5ms

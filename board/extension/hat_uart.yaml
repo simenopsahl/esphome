@@ -11,10 +11,10 @@ uart:
 # Mate HAT
   - id: uart_hat
     tx_pin:
-      number: ${tx_uart_hat_pin}
+      number: ${pin.ext.uart.hat.tx}
       allow_other_uses: ${hat_shared}
     rx_pin:
-      number: ${rx_uart_hat_pin}
+      number: ${pin.ext.uart.hat.rx}
       allow_other_uses: ${hat_shared}
     baud_rate: 115200
     rx_buffer_size: 256

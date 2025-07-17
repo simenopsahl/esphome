@@ -3,15 +3,15 @@
 # https://esphome.io/components/sensor/sht3xd.html
 
 substitutions:
-  m5go_port_b_in: $mbus4
-  m5go_port_b_out: $mbus10
-  m5go_port_c_rx: $mbus15
-  m5go_port_c_tx: $mbus16
-  m5go_pogo_sda: $mbus17
-  m5go_pogo_scl: $mbus18
-  m5go_ir_tx: $mbus22
-  m5go_rgb_led: $mbus23
-  m5go_mic: $mbus26
+  m5go_port_b_in: ${pin.ext.mbus.p4}
+  m5go_port_b_out: ${pin.ext.mbus.p10}
+  m5go_port_c_rx: ${pin.ext.mbus.p15}
+  m5go_port_c_tx: ${pin.ext.mbus.p16}
+  m5go_pogo_sda: ${pin.ext.mbus.p17}
+  m5go_pogo_scl: ${pin.ext.mbus.p18}
+  m5go_ir_tx: ${pin.ext.mbus.p22}
+  m5go_rgb_led: ${pin.ext.mbus.p23}
+  m5go_mic: ${pin.ext.mbus.p26}
 
 # RGB SK6812-2020
 light:

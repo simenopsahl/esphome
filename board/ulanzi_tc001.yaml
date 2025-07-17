@@ -42,8 +42,8 @@ esp32:
 
 i2c:
   id: i2c_bus
-  sda: ${i2c_int_sda_pin}
-  scl: ${i2c_int_scl_pin}
+  sda: ${pin.int.i2c.sda}
+  scl: ${pin.int.i2c.scl}
   frequency: 200kHz
   scan: true
 
@@ -75,7 +75,7 @@ api:
 binary_sensor:
   - platform: gpio
     pin:
-      number: ${button_left_pin}
+      number: ${pin.btn.left}
       inverted: true
     name: "left button"
     entity_category: diagnostic
@@ -84,7 +84,7 @@ binary_sensor:
   - platform: gpio
     pin: 
       inverted: true
-      number: ${button_mid_pin}
+      number: ${pin.btn.mid}
       mode: INPUT_PULLUP
     name: "middle button"
     entity_category: diagnostic
@@ -92,7 +92,7 @@ binary_sensor:
       - switch.toggle: displaycontrol
   - platform: gpio
     pin: 
-      number: ${button_right_pin}
+      number: ${pin.btn.right}
       inverted: true
     name: "right button"
     entity_category: diagnostic
@@ -170,7 +170,7 @@ sensor:
     update_interval: 60s
   - platform: adc
     id: battery_voltage
-    pin: ${bat_feedback}
+    pin: ${pin.bat_feedback}
     name: "Battery"
     update_interval: 10s
     device_class: battery
@@ -195,7 +195,7 @@ sensor:
     unit_of_measurement: '%'
   - platform: adc
     id: light_sensor
-    pin: ${light_sensor_pin}
+    pin: ${pin.light.sensor}
     name: "Illuminance"
     state_class: measurement
     device_class: ILLUMINANCE
@@ -224,7 +224,7 @@ sensor:
 
 output:
   - platform: ledc
-    pin: ${buzzer_pin}
+    pin: ${pin.audio.buzzer}
     id: rtttl_out
 
 rtttl:
@@ -232,10 +232,10 @@ rtttl:
 
 light:
   - platform: neopixelbus
-    id: ehmtx_light
+    id: light_ehmtx
     variant: ws2812
     type: GRB
-    pin: ${led_matrix_pin}
+    pin: ${pin.light.led_matrix}
     num_leds: 256
     color_correct: [30%, 30%, 30%]
     gamma_correct: 2.0
@@ -243,10 +243,10 @@ light:
     name: "Light"
     on_turn_on:
       lambda: |-
-        id(ehmtx_display)->set_enabled(false);
+        id(display_ehmtx)->set_enabled(false);
     on_turn_off:
       lambda: |-
-        id(ehmtx_display)->set_enabled(true);
+        id(display_ehmtx)->set_enabled(true);
 
 time:
   - platform: homeassistant
@@ -255,7 +255,7 @@ time:
         - ds1307.write_time:
   - platform: ds1307
     update_interval: never
-    id: ehmtx_time
+    id: time_ehmtx
     on_time: 
       # Every day at 08:00
       - seconds: 0
@@ -271,8 +271,8 @@ time:
 
 display:
   - platform: addressable_light
-    id: ehmtx_display
-    addressable_light_id: ehmtx_light
+    id: display_ehmtx
+    addressable_light_id: light_ehmtx
     width: 32
     height: 8
     pixel_mapper: |-

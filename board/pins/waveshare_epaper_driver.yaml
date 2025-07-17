@@ -3,15 +3,79 @@
 # PINs for Waveshare e-paper ESP32 driver board
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO21
+        scl: GPIO22
+      uart:
+        tx0: GPIO1
+        rx0: GPIO3
+        tx1: GPIO10
+        rx1: GPIO9
+        tx2: GPIO17
+        rx2: GPIO16
+      spi:
+        clk: GPIO13
+        mosi: GPIO14
+        disp:
+          cs: GPIO15
+          dc: GPIO27
+          reset: GPIO26
+          busy: GPIO25
+      vspi:
+        clk: GPIO18
+        mosi: GPIO23
+        miso: GPIO19
+        cs: GPIO5
+      dac:
+        p1: GPIO25
+        p2: GPIO26
+      adc:
+        p0: GPIO36
+        p1: GPIO39
+        p2: GPIO32
+        p3: GPIO33
+        p4: GPIO34
+        p5: GPIO35
+        p6: GPIO4
+        p7: GPIO0
+        p8: GPIO2
+        p9: GPIO15
+        p10: GPIO13
+        p11: GPIO12
+        p12: GPIO14
+        p13: GPIO27
+        p14: GPIO25
+        p15: GPIO26
+      flash:
+        cmd: GPIO11
+        clk: GPIO6
+        dat0: GPIO7
+        dat1: GPIO8
+        dat2: GPIO9
+        dat3: GPIO10
+      touch:
+        p0: GPIO4
+        p1: GPIO0
+        p2: GPIO2
+        p3: GPIO15
+        p4: GPIO13
+        p5: GPIO12
+        p6: GPIO14
+        p7: GPIO27
+        p8: GPIO33
+        p9: GPIO32
+
   # i2c
   i2c_sda_pin: GPIO21
   i2c_scl_pin: GPIO22
   # UART
-  tx0__pin: GPIO1
+  tx0_pin: GPIO1
   rx0_pin: GPIO3
-  tx1__pin: GPIO10
+  tx1_pin: GPIO10
   rx1_pin: GPIO9
-  tx2__pin: GPIO17
+  tx2_pin: GPIO17
   rx2_pin: GPIO16
   # SPI
   spi_clk_pin: GPIO13

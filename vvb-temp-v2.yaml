@@ -38,7 +38,7 @@ wifi:
 
 one_wire:
   - platform: gpio
-    pin: GPIO4
+    pin: ${pin.adc.p2_0}
     id: bus_b
 
 #dallasng:

@@ -3,6 +3,57 @@
 # PINs for m5stack ATOM S3
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO38
+        scl: GPIO39
+      spi:
+        clk: GPIO17
+        mosi: GPIO21
+        disp:
+          cs: GPIO15
+          dc: GPIO33
+          reset: GPIO34
+
+    light:
+      disp_bl: GPIO16
+      ir: GPIO4
+
+    ext:
+      i2c:
+        grove:
+          sda: GPIO2
+          scl: GPIO1
+        hat:
+          sda: GPIO6
+          scl: GPIO5
+        port_abc:
+          sda: GPIO38
+          scl: GPIO39
+      uart:
+        grove:
+          tx: GPIO1
+          rx: GPIO2
+        hat:
+          tx: GPIO6
+          rx: GPIO5
+        port_abc:
+          tx: GPIO6
+          rx: GPIO5
+      gpio:
+        grove:
+          in: GPIO1
+          out: GPIO2
+        hat:
+          in: GPIO8
+          out: GPIO7
+        port_abc:
+          in: GPIO8
+          out: GPIO7
+
+    btn: GPIO41
+
   # Internal
   i2c_int_sda_pin: GPIO38
   i2c_int_scl_pin: GPIO39

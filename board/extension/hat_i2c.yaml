@@ -11,10 +11,10 @@ i2c:
 # Mate HAT
   - id: i2c_hat
     sda:
-      number: ${i2c_hat_sda_pin}
+      number: ${pin.ext.i2c.hat.sda}
       allow_other_uses: ${hat_shared}
     scl:
-      number: ${i2c_hat_scl_pin}
+      number: ${pin.ext.i2c.hat.scl}
       allow_other_uses: ${hat_shared}
     frequency: ${i2c_hat_frequency}
 #    timeout: 10ms

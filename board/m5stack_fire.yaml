@@ -53,9 +53,9 @@ wifi:
 #    id: ip5306_charge_full
 
 spi:
-  clk_pin: ${spi_clk_pin}
-  mosi_pin: ${spi_mosi_pin}
-#  miso_pin: ${spi_miso_pin}
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+#  miso_pin: ${pin.int.spi.miso}
 
 # IR
 #remote_transmitter:
@@ -68,9 +68,9 @@ display:
   - platform: ili9xxx
     id: display_lcd
     model: M5STACK
-    cs_pin: ${disp_cs_pin}
-    dc_pin: ${disp_dc_pin}
-    reset_pin: ${disp_rs_pin}
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin: ${pin.int.spi.disp.reset}
     data_rate: 20Mhz
     invert_colors: true
     color_palette: 8BIT
@@ -89,11 +89,11 @@ output:
   # backlight output
   - platform: ledc
     id: backlight_output
-    pin: ${disp_bl_pin}
+    pin: ${pin.light.disp_bl}
   # Buzzer
   - platform: ledc
     id: buzzer
-    pin: ${spk_l_pin}
+    pin: ${pin.audio.buzzer}
 
 light:
   - platform: monochromatic # backlight
@@ -109,7 +109,7 @@ light:
 
 # Speaker (only got buzzer to work)
 #i2s_audio:
-#  i2s_lrclk_pin: ${i2s_lrclk_pin}
+#  i2s_lrclk_pin: ${pin.int.audio.i2s_lrclk}
 
 #media_player:
 #  - platform: i2s_audio
@@ -126,7 +126,7 @@ binary_sensor:
     name: "Button A"
     entity_category: diagnostic
     pin:
-      number: ${button_a_pin}
+      number: ${pin.btn.a}
       inverted: true
     filters:
       - delayed_off: 10ms
@@ -141,7 +141,7 @@ binary_sensor:
     name: "Button B"
     entity_category: diagnostic
     pin:
-      number: ${button_b_pin}
+      number: ${pin.btn.b}
       inverted: true
     filters:
       - delayed_off: 10ms
@@ -156,7 +156,7 @@ binary_sensor:
     name: "Button C"
     entity_category: diagnostic
     pin:
-      number: ${button_c_pin}
+      number: ${pin.btn.c}
       inverted: true
     filters:
       - delayed_off: 10ms

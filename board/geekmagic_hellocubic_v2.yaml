@@ -25,20 +25,21 @@ psram:
 i2c:
 # Internal
   - id: i2c_internal
-    sda: ${i2c_int_sda_pin}
-    scl: ${i2c_int_scl_pin}
+    sda: ${pin.i2c.sda}
+    scl: ${pin.i2c.scl}
     frequency: 100kHz
 #    timeout: 5ms
     scan: true
 
 spi:
-  clk_pin: ${spi_clk_pin}
-  mosi_pin: ${spi_mosi_pin}
+  clk_pin: ${pin.spi.clk}
+  mosi_pin: ${pin.spi.mosi}
+  interface: hardware
 
 output:
   - platform: ledc
     id: backlight_output
-    pin: ${disp_bl_pin}
+    pin: ${pin.light.disp_bl}
     inverted: true
 
 light:
@@ -125,8 +126,8 @@ display:
     id: display_lcd
     model: st7789v
     data_rate: 40MHz
-    dc_pin: ${disp_dc_pin}
-    reset_pin: ${disp_reset_pin}
+    dc_pin: ${pin.spi.disp.dc}
+    reset_pin: ${pin.spi.disp.reset}
     spi_mode: MODE3
     dimensions:
       width: 240

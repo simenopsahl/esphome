@@ -9,39 +9,39 @@ packages:
 i2c:
   # Grove 1
   - id: ic2_grove_1
-    sda: ${g2}
-    scl: ${g1}
+    sda: ${pin.ext.gpio.p2}
+    scl: ${pin.ext.gpio.p1}
     scan: true
   # Grove 2
   - id: ic2_grove_2
-    sda: ${g3}
-    scl: ${g4}
+    sda: ${pin.ext.gpio.p3}
+    scl: ${pin.ext.gpio.p4}
     scan: true
   # Grove 3
   - id: ic2_grove_3
-    sda: ${g5}
-    scl: ${g6}
+    sda: ${pin.ext.gpio.p5}
+    scl: ${pin.ext.gpio.p6}
     scan: true
   # Grove 4
   - id: ic2_grove_4
-    sda: ${g11}
-    scl: ${g10}
+    sda: ${pin.ext.gpio.p11}
+    scl: ${pin.ext.gpio.p10}
     scan: true
   # Grove 5
   - id: ic2_grove_5
-    sda: ${g7}
-    scl: ${g9}
+    sda: ${pin.ext.gpio.p7}
+    scl: ${pin.ext.gpio.p9}
     scan: true
   # Grove 6
   - id: ic2_grove_6
-    sda: ${g13}
-    scl: ${g15}
+    sda: ${pin.ext.gpio.p13}
+    scl: ${pin.ext.gpio.p15}
     scan: true
 
 sensor:
   # Battery voltage
   - platform: adc
-    pin: ${g8}
+    pin: ${pin.ext.gpio.p8}
     id: bat_adc
     update_interval: 2s
     samples: 10

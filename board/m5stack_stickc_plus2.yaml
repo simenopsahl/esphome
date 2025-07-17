@@ -58,14 +58,14 @@ psram:
   speed: 80MHz
 
 spi:
-  clk_pin: ${spi_clk_pin}
-  mosi_pin: ${spi_mosi_pin}
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
 
 light:
   # Enable status LED
   - platform: status_led
     id: status_light
-    pin: ${led_pin}
+    pin: ${pin.light.led}
   # TFT Backlight
   - platform: monochromatic
     output:  backlight_output
@@ -82,11 +82,11 @@ output:
   # Buzzer
   - platform: ledc
     id: buzzer
-    pin: ${buzzer_pin}
+    pin: ${pin.audio.buzzer}
   # TFT Backlight
   - platform: ledc
     id: backlight_output
-    pin: ${disp_bl_pin}
+    pin: ${pin.light.disp_bl}
     frequency: 256Hz
     channel: 7
     min_power: 15%
@@ -102,9 +102,9 @@ display:
   - platform:  ili9xxx
     model: st7789v
     id: display_lcd
-    cs_pin: ${disp_cs_pin}
-    dc_pin: ${disp_dc_pin}
-    reset_pin: ${disp_reset_pin}
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin: ${pin.int.spi.disp.reset}
     invert_colors: true
     update_interval: 5s
     dimensions:
@@ -126,7 +126,7 @@ binary_sensor:
   - platform: gpio
     id: button_side
     pin:
-      number: ${button_side_pin}
+      number: ${pin.btn.side}
       allow_other_uses: true
       inverted: true
     filters:
@@ -142,7 +142,7 @@ binary_sensor:
   - platform: gpio
     id: button_front
     pin:
-      number: ${button_front_pin}
+      number: ${pin.btn.front}
       allow_other_uses: true
       inverted: true
     filters:
@@ -160,7 +160,7 @@ binary_sensor:
 #    name: Power Hold
 #    entity_category: diagnostic
 #    pin:
-#      number: ${pwr_mos_pin}
+#      number: ${pin.int.pwr_mos}
 #      allow_other_uses: true
 #      inverted: true
 #    on_press:
@@ -196,7 +196,7 @@ script:
 sensor:
   # Battery voltage
   - platform: adc
-    pin: ${bat_feed_back}
+    pin: ${pin.int.bat_feedback}
     id: bat_adc
     update_interval: 10s
     attenuation: 12db
@@ -257,11 +257,11 @@ deep_sleep:
     mode: ANY_HIGH
     pins:
 #      - number: $rtc_wakeup_pin
-      - number: ${pwr_mos_pin}
+      - number: ${pin.int.pwr_mos}
 #        allow_other_uses: true
-      - number: ${button_side_pin}
+      - number: ${pin.btn.side}
         allow_other_uses: true
-      - number: ${button_front_pin}
+      - number: ${pin.btn.front}
         allow_other_uses: true
 
 switch:
@@ -331,15 +331,15 @@ text_sensor:
 #i2s_audio:
 #  id: i2s_bus
 #  i2s_lrclk_pin:
-#    number: ${i2s_lrclk_pin}
+#    number: ${pin.audio.i2s_lrclk}
 #    allow_other_uses: ${hat_shared}
 #  i2s_bclk_pin:
-#    number: ${i2s_bclk_pin}
+#    number: ${pin.audio.i2s_bclk}
 #    allow_other_uses: ${hat_shared}
 
 #microphone:
 #  - platform: i2s_audio
-#    i2s_din_pin: ${mic_pin}
+#    i2s_din_pin: ${pin.audio.mic}
 #    i2s_audio_id: i2s_bus
 #    adc_type: external
 #    pdm: true

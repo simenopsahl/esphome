@@ -3,6 +3,83 @@
 # PINs for m5stack Fire
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO21
+        scl: GPIO22
+      spi:
+        clk: GPIO18
+        mosi: GPIO23
+        miso: GPIO19
+        disp:
+          cs: GPIO14
+          dc: GPIO27
+          reset: GPIO33
+        card:
+          cs: GPIO4
+    
+    light:
+      disp_bl: GPIO32
+      rgb: GPIO15
+    
+    audio:
+      i2s_lrclk: GPIO13
+      mic: GPIO34
+      buzzer: GPIO25
+      spk_l: GPIO25
+      spk_r: GPIO26
+    
+    ext:
+      i2c:
+        mbus:
+          sda: GPIO21
+          scl: GPIO22
+        grove:
+          sda: GPIO21
+          scl: GPIO22
+      uart:
+        mbus:
+          tx: GPIO17
+          rx: GPIO16
+        grove:
+          tx: GPIO17
+          rx: GPIO16
+      gpio:
+        mbus:
+          in: GPIO36
+          out: GPIO26
+        grove:
+          in: GPIO36
+          out: GPIO26
+      mbus:
+        p2: GPIO35
+        p4: GPIO36
+        p7: GPIO23
+        p8: GPIO25
+        p9: GPIO19
+        p10: GPIO26
+        p11: GPIO18
+        p13: GPIO3
+        p14: GPIO2
+        p15: GPIO16
+        p16: GPIO17
+        p17: GPIO21
+        p18: GPIO22
+        p19: GPIO2
+        p20: GPIO5
+        p21: GPIO12
+        p22: GPIO13
+        p23: GPIO15
+        p24: GPIO0
+        p26: GPIO34
+
+    btn:
+      a: GPIO39
+      b: GPIO38
+      c: GPIO37
+
+
   # Internal
   i2c_int_sda_pin: GPIO21
   i2c_int_scl_pin: GPIO22

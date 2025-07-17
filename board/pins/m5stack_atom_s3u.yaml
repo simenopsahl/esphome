@@ -3,6 +3,37 @@
 # PINs for m5stack ATOM S3U
 
 substitutions:
+  pin:
+    light:
+      rgb: GPIO35
+      ir: GPIO12
+    
+    audio:
+      i2s_bclk: GPIO38
+      mic: GPIO39
+    
+    ext:
+      i2c:
+        grove:
+          sda: GPIO2
+          scl: GPIO1
+      uart:
+        grove:
+          tx: GPIO1
+          rx: GPIO2
+      gpio:
+        grove:
+          in: GPIO1
+          out: GPIO2
+      hat:
+        p14_adc: GPIO14
+        p17_adc: GPIO17
+        p42: GPIO42
+        p40_clk_out: GPIO40
+    
+    btn: GPIO41
+
+
   # Internal
   i2s_bclk_pin: GPIO38
   # GROVE

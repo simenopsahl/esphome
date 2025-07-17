@@ -3,6 +3,31 @@
 # PINs for m5stack Nano C6
 
 substitutions:
+  pin:
+    int:
+      rgb_pwr: GPIO19
+    
+    light:
+      rgb: GPIO20
+      led: GPIO7
+      ir: GPIO3
+    
+    ext:
+      i2c:
+        grove:
+          sda: GPIO2
+          scl: GPIO1
+      uart:
+        grove:
+          tx: GPIO1
+          rx: GPIO2
+      gpio:
+        grove:
+          in: GPIO1
+          out: GPIO2
+    
+    btn: GPIO9
+
   # Internal
   rgb_pwr_pin: GPIO19
   # GROVE

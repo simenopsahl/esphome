@@ -3,6 +3,88 @@
 # PINs for m5stack Core S3SE
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO12
+        scl: GPIO11
+      spi:
+        clk: GPIO36
+        mosi: GPIO37
+        miso: GPIO35
+        disp:
+          cs: GPIO3
+          dc: GPIO35
+        card:
+          cs: GPIO4
+#      pwr_mos: GPIO4
+#      bat_feedback: GPIO38
+    
+#    light:
+#      disp_bl: GPIO27
+#      led: GPIO19
+#      ir: GPIO19
+    
+    audio:
+      i2s_lrclk: GPIO33
+      i2s_wck: GPIO33
+      i2s_bclk: GPIO34
+      i2s_mclk: GPIO0
+      i2s_din: GPIO14
+      i2s_dat1: GPIO14
+      i2s_dout: GPIO13
+      i2s_dato: GPIO13
+    
+    ext:
+      i2c:
+        mbus:
+          sda: GPIO2
+          scl: GPIO1
+        grove:
+          sda: GPIO2
+          scl: GPIO1
+      uart:
+        mbus:
+          tx: GPIO43
+          rx: GPIO44
+        grove:
+          tx: GPIO17
+          rx: GPIO18
+      gpio:
+        mbus:
+          in: GPIO8
+          out: GPIO9
+        grove:
+          in: GPIO8
+          out: GPIO9
+      mbus:
+        p2: GPIO10
+        p4: GPIO8
+        p7: GPIO37
+        p8: GPIO5
+        p9: GPIO35
+        p10: GPIO9
+        p11: GPIO36
+        p13: GPIO44
+        p14: GPIO43
+        p15: GPIO18
+        p16: GPIO17
+        p17: GPIO12
+        p18: GPIO11
+        p19: GPIO2
+        p20: GPIO1
+        p21: GPIO6
+        p22: GPIO7
+        p23: GPIO13
+        p24: GPIO0
+        p26: GPIO14
+
+#    btn:
+#      power: GPIO35
+#      side: GPIO39
+#      front: GPIO37
+
+
   # Internal
   i2c_int_sda_pin: GPIO12
   i2c_int_scl_pin: GPIO11

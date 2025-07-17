@@ -51,7 +51,7 @@ light:
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
-    pin: ${rgb_pin}
+    pin: ${pin.light.rgb}
     num_leds: 1
     rmt_symbols: 384
     chipset: sk6812
@@ -88,7 +88,7 @@ binary_sensor:
     name: Button
     entity_category: diagnostic
     pin:
-      number: ${button_pin}
+      number: ${pin.btn}
       inverted: true
     filters:
       - delayed_off: 10ms

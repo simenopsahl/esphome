@@ -11,4 +11,4 @@ esp32:
   board: upesy_wroom
 
 status_led:
-  pin: ${led_pin}
+  pin: ${pin.light.led}

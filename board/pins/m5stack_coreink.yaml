@@ -3,6 +3,81 @@
 # PINs for m5stack CoreInk
 
 substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO21
+        scl: GPIO22
+      spi:
+        clk: GPIO18
+        mosi: GPIO23
+        miso: GPIO34
+        disp:
+          cs: GPIO9
+          dc: GPIO15
+          busy: GPIO4
+          reset: GPIO0
+      pwr_mos: GPIO12
+      bat_feedback: GPIO35
+      rtc_wakeup: GPIO19
+    
+    light:
+      led: GPIO10
+    
+    audio:
+      buzzer: GPIO2
+
+    ext:
+      i2c:
+        mbus:
+          sda: GPIO21
+          scl: GPIO22
+        grove:
+          sda: GPIO32
+          scl: GPIO33
+        hat:
+          sda: GPIO25
+          scl: GPIO26
+      uart:
+        mbus:
+          tx: GPIO14
+          rx: GPIO23
+        grove:
+          tx: GPIO33
+          rx: GPIO32
+        hat:
+          tx: GPIO25
+          rx: GPIO26
+      gpio:
+        mbus:
+          in: GPIO36
+          out: GPIO26
+        grove:
+          in: GPIO33
+          out: GPIO32
+        hat:
+          in: GPIO36
+          out: GPIO26
+      mbus:
+        p7: GPIO13
+        p8: GPIO14
+        p9: GPIO21
+        p10: GPIO22
+        p11: GPIO18
+        p12: GPIO36
+        p13: GPIO34
+        p14: GPIO26
+        p15: GPIO23
+        p16: GPIO25
+
+    btn:
+      stick:
+        up: GPIO37
+        press: GPIO38
+        down: GPIO39
+      top: GPIO5
+      side: GPIO27
+
   # Internal
   i2c_int_sda_pin: GPIO21
   i2c_int_scl_pin: GPIO22

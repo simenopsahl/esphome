@@ -3,6 +3,45 @@
 # PINs for m5stack ATOM Lite
 
 substitutions:
+  pin:
+    light:
+      rgb: GPIO27
+      ir: GPIO12
+    
+    ext:
+      i2c:
+        grove:
+          sda: GPIO26
+          scl: GPIO32
+        hat:
+          sda: GPIO19
+          scl: GPIO22
+        port_abc:
+          sda: GPIO21
+          scl: GPIO25
+      uart:
+        grove:
+          tx: GPIO32
+          rx: GPIO26
+        hat:
+          tx: GPIO22
+          rx: GPIO19
+        port_abc:
+          tx: GPIO19
+          rx: GPIO22
+      gpio:
+        grove:
+          in: GPIO32
+          out: GPIO26
+        hat:
+          in: GPIO33
+          out: GPIO23
+        port_abc:
+          in: GPIO33
+          out: GPIO23
+    
+    btn: GPIO39
+
   # GROVE
   i2c_grove_sda_pin: GPIO26
   i2c_grove_scl_pin: GPIO32

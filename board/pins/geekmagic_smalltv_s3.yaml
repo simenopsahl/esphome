@@ -5,6 +5,21 @@
 # PINs for GeekMagic SmallTV S3
 
 substitutions:
+  pin:
+    spi:
+      clk: GPIO12
+      mosi: GPIO11
+      disp:
+        cs: GPIO1
+        dc: GPIO7
+        reset: GPIO6
+
+    light:
+      disp_bl: GPIO14
+    
+    btn:
+      touch: GPIO9
+
   # Internal
   spi_clk_pin: GPIO12
   spi_mosi_pin: GPIO11
