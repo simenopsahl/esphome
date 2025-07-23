@@ -17,14 +17,18 @@ packages:
   }}
 
 substitutions:
-  devicename: s8048s043c-89f954
-  log_level: INFO
-  home_page: page_analog_clock
+  common:
+    log_level: INFO
+#    log_baud_rate: "115200"
+  device:
+    name: s8048s043c-89f954
+  display:
+    home_page: page_analog_clock
 
 esphome:
   comment: 'Sunton 4.3"'
-  name: ${devicename}
-  friendly_name: ${devicename}
+  name: ${device.name}
+  friendly_name: ${device.name}
   project:
     version: "1.0.0"
 
@@ -58,7 +62,7 @@ lvgl:
       pad_bottom: 44
       on_load:
         - lvgl.label.update:
-            id: page_title
+            id: lbl_page_title
             text: Skjerm
       <<: !include
         file: gui/functions/swipe_navigation.yaml

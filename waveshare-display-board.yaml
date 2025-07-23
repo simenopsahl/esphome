@@ -8,16 +8,20 @@ packages:
   board: !include board/waveshare_epaper_driver.yaml
 
 substitutions:
-  devicename: waveshare-display-board
-  location: "1etg, Kjøkken"
-  log_level: WARN
-  home_page: page_content
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: waveshare-display-board
+    location: "1etg, Kjøkken"
+  display:
+    home_page: page_content
 
 esphome:
   comment: "E-Ink Kjøkken Display"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0.0"
 

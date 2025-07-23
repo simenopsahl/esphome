@@ -2,13 +2,16 @@
 # i2c internal
 
 substitutions:
-  i2c_internal_frequency: 100kHz
+  extension:
+    i2c:
+      internal:
+        frequency: 100kHz
 
 i2c:
 # Internal
   - id: i2c_internal
     sda: ${pin.int.i2c.sda}
     scl: ${pin.int.i2c.scl}
-    frequency: ${i2c_internal_frequency}
+    frequency: ${extension.i2c.internal.frequency}
 #    timeout: 5ms
     scan: true

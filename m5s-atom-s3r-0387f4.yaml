@@ -22,15 +22,18 @@ packages:
   }}
 
 substitutions:
-  devicename: m5s-as3r-0387f4
-  log_level: WARN
-#  log_baud_rate: "115200"
-  home_page: page_temperature
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-as3r-0387f4
+  display:
+    home_page: page_temperature
 
 esphome:
   comment: "M5Stack Atom S3R 0387f4"
-  name: ${devicename}
-  friendly_name: ${devicename}
+  name: ${device.name}
+  friendly_name: ${device.name}
   project:
     version: "1.0.0"
 

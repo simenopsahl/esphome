@@ -7,18 +7,18 @@ packages:
   board: !include board/esp32doit_devkit_v1.yaml
 
 substitutions:
-  devicename: vvb-temp-v2
-  location: "1etg, Bad"
-  log_level: WARN
-
-#external_components:
-#  - source: github://nrandell/dallasng
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: vvb-temp-v2
+    location: "1etg, Bad"
 
 esphome:
   comment: "VVB Temp V2"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 esp32:
   framework: 
@@ -38,16 +38,11 @@ wifi:
 
 one_wire:
   - platform: gpio
-    pin: ${pin.adc.p2_0}
+    pin: ${pin.int.adc.p2_0}
     id: bus_b
-
-#dallasng:
-#  - pin: GPIO4
-#    id: bus_b
 
 sensor:
   - platform: dallas_temp
-#  - platform: dallasng
     address: 0x1707235305e77e28
     name: "Topp Temperature"
     device_class: "temperature"
@@ -57,7 +52,6 @@ sensor:
 #        - heartbeat: 900s
 #        - delta: 0.15
   - platform: dallas_temp
-#  - platform: dallasng
     address: 0x7ef0d9451f64ff28
     name: "Bunn Temperature"
     device_class: "temperature"

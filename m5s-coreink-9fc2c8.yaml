@@ -16,17 +16,24 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
 substitutions:
-  devicename: m5s-coreink-9fc2c8
-  location: "2etg, Simen"
-  i2c_grove_frequency: 40kHz
-  log_level: WARN
-  home_page: page_room
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-coreink-9fc2c8
+    location: "2etg, Simen"
+  external:
+    i2c:
+      grove:
+        frequency: 40kHz
+  display:
+    home_page: page_room
 
 esphome:
   comment: "M5Stack CoreInk @ Simen"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project: 
     version: "1.0.0"
 
@@ -275,7 +282,7 @@ binary_sensor:
   # Stick Up
   - id: !extend stick_up
     on_press:
-      - display.page.show: page_local
+      - display.page.show: ${display.home_page}
       - script.execute: update_screen
   # Stick Press
   - id: !extend stick_press

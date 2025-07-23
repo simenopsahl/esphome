@@ -17,7 +17,7 @@
     pad_bottom: ${page_pad_bottom}
     on_load:
       - lvgl.label.update:
-          id: page_title
+          id: lbl_page_title
           text: ${page_title}
     <<: !include
       file: ../../functions/swipe_navigation.yaml

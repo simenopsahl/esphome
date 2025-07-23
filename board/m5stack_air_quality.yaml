@@ -7,7 +7,8 @@
 
 substitutions:
   time_timezone: "Europe/Oslo"
-  home_screen: page_content
+  display:
+    home_page: page_content
 
 # Pins for this model
 packages:
@@ -45,7 +46,7 @@ esphome:
         - delay: 5s
         - logger.log: "Initial sensor data received: Refreshing display..."
         - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: ${home_page}
+        - display.page.show: ${display.home_page}
         - script.execute: update_screen
 
 esp32:

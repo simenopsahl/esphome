@@ -44,7 +44,7 @@ obj:
 #              width: SIZE_CONTENT
           # title
           - label:
-              id: page_title
+              id: lbl_page_title
               pad_left: ${padding} # RESOLUTION-SPECIFIC
               text_font: ${page_title_font} # Icon or text
               text: " "

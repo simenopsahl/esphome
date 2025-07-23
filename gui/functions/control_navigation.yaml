@@ -5,7 +5,7 @@ button:
   - platform: template
     id: btn_previous_page
     name: "Previous page"
-    icon: mdi:pan-left
+    icon: mdi:page-previous
     entity_category: config
     on_press:
       - lvgl.page.previous:
@@ -21,7 +21,16 @@ button:
   - platform: template
     id: btn_next_page
     name: "Next page"
-    icon: mdi:pan-right
+    icon: mdi:page-next
     entity_category: config
     on_press:
       - lvgl.page.next:
+
+text_sensor:
+  # Current page text sensor
+  - platform: lvgl
+    id: sensor_current_page
+    widget: lbl_page_title
+    name: "Current page"
+    icon: mdi:page-layout-header
+    entity_category: diagnostic

@@ -9,16 +9,22 @@ packages:
   bme280: !include board/module/bme280_i2c.yaml
 
 substitutions:
-  devicename: ble-relay1
-  log_level: WARN
-  location: "1etg, Kjøkken"
-  i2c_internal_frequency: 100kHz
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: ble-relay1
+    location: "1etg, Kjøkken"
+  extension:
+    i2c:
+      internal:
+        frequency: 100kHz
 
 esphome:
   comment: "BLE Relay"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 esp32:
     framework:

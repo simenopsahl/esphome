@@ -16,16 +16,20 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
 substitutions:
-  devicename: m5s-coreink-9fc390
-  location: "1etg, Inngang"
-  log_level: WARN
-  home_page: page_room
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-coreink-9fc390
+    location: "1etg, Inngang"
+  display:
+    home_page: page_room
 
 esphome:
   comment: "M5Stack CoreInk @ Inngang"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project: 
     version: "1.0.0"
 
@@ -274,7 +278,7 @@ binary_sensor:
   # Stick Up
   - id: !extend stick_up
     on_press:
-      - display.page.show: page_local
+      - display.page.show: ${display.home_page}
       - script.execute: update_screen
   # Stick Press
   - id: !extend stick_press

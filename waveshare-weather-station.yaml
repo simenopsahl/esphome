@@ -6,10 +6,14 @@ packages:
   board: !include board/waveshare_epaper_driver.yaml
 
 substitutions:
-  devicename: waveshare-weather-station
-  location: "2etg, Ellen & Svein"
-  log_level: WARN
-  home_page: page_content
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: waveshare-weather-station
+    location: "2etg, Ellen & Svein"
+  display:
+    home_page: page_content
 
 #external_components:
 #  - source: github://pr#6209
@@ -17,9 +21,9 @@ substitutions:
 
 esphome:
   comment: "E-Ink E&S Display"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0"
 

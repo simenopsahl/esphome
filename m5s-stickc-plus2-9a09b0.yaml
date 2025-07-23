@@ -25,17 +25,20 @@ packages:
   }}
 
 substitutions:
-  devicename: m5s-stickc-plus2-9a09b0
-  log_level: WARN
-#  log_baud_rate: "115200"
-  location: "1etg, Bad"
-  home_page: page_temperature
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-stickc-plus2-9a09b0
+    location: "1etg, Bad"
+  display:
+    home_page: page_temperature
 
 esphome:
   comment: "M5Stack StickC Plus2 @ Bad"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project: 
     version: "1.0.0"
 

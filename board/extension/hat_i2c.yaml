@@ -4,18 +4,21 @@
 
 # HAT Shared pins
 substitutions:
-  hat_shared: "false"
-  i2c_hat_frequency: 50kHz
+  extension:
+    i2c:
+      hat:
+        shared: "false"
+        frequency: 50kHz
 
 i2c:
 # Mate HAT
   - id: i2c_hat
     sda:
       number: ${pin.ext.i2c.hat.sda}
-      allow_other_uses: ${hat_shared}
+      allow_other_uses: ${extension.i2c.hat.shared}
     scl:
       number: ${pin.ext.i2c.hat.scl}
-      allow_other_uses: ${hat_shared}
-    frequency: ${i2c_hat_frequency}
+      allow_other_uses: ${extension.i2c.hat.shared}
+    frequency: ${extension.i2c.hat.frequency}
 #    timeout: 10ms
     scan: false

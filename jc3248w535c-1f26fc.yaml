@@ -20,14 +20,18 @@ packages:
   }}
 
 substitutions:
-  devicename: jc3248w535c-1f26fc
-  log_level: WARN
-  home_page: page_analog_clock
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: jc3248w535c-1f26fc
+  display:
+    home_page: page_analog_clock
 
 esphome:
   comment: 'Guition 3.5"'
-  name: ${devicename}
-  friendly_name: ${devicename}
+  name: ${device.name}
+  friendly_name: ${device.name}
   project:
     version: "1.0.0"
 

@@ -118,7 +118,7 @@ font: !include
 script:
   - id: go_home
     then:
-      - lvgl.page.show: ${home_page}
+      - lvgl.page.show: ${display.home_page}
 
 lvgl:
   id: display_lvgl

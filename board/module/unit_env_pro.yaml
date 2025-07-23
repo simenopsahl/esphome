@@ -4,12 +4,13 @@
 # https://github.com/Chill-Division/M5Stack-ESPHome/blob/
 
 substitutions:
-  env_i2c_bus: i2c_grove
+  module:
+    env_i2c_bus: i2c_grove
 
 # UNIT ENV Pro
 bme68x_bsec2_i2c:
   id: bme68x_bsec_component
-  i2c_id: ${env_i2c_bus}
+  i2c_id: ${module.env_i2c_bus}
   address: 0x77
   model: BME688
   sample_rate: LP

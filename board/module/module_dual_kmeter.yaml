@@ -4,12 +4,13 @@
 # https://github.com/Chill-Division/M5Stack-ESPHome/
 
 substitutions:
-  kmeteriso_i2c_bus: i2c_grove
+  module:
+    kmeteriso_i2c_bus: i2c_grove
 
 # UNIT KMeterISO
 sensor:
   - platform: kmeteriso
-    i2c_id: ${kmeteriso_i2c_bus}
+    i2c_id: ${module.kmeteriso_i2c_bus}
     id: kmeteriso_sensor
     temperature:
       id: temperature_kmeteriso

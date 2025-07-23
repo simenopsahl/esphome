@@ -13,16 +13,20 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
 substitutions:
-  devicename: m5s-air-quality-b62db0
-  location: "2etg, Gang"
-  log_level: WARN
-  home_page: page_info
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-air-quality-b62db0
+    location: "2etg, Gang"
+  display:
+    home_page: page_info
 
 esphome:
   comment: "M5Stack AirQuality @ Trapp"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0.0"
 

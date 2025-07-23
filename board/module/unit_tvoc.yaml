@@ -3,12 +3,13 @@
 # https://esphome.io/components/sensor/sgp30.html
 
 substitutions:
-  tvoc_i2c_bus: i2c_grove
+  module:
+    tvoc_i2c_bus: i2c_grove
 
 # UNIT TVOC/eCO2
 sensor:
   - platform: sgp30
-    i2c_id: ${tvoc_i2c_bus}
+    i2c_id: ${module.tvoc_i2c_bus}
     id: unit_tvoc_sgp30_sensor
     eco2:
       id: eco2_sgp30

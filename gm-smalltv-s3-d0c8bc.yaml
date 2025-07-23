@@ -17,15 +17,18 @@ packages:
   }}
 
 substitutions:
-  devicename: gm-smalltv-s3-d0c8bc
-#  log_level: WARN
-  log_baud_rate: "115200"
-  home_page: page_temperature
+  common:
+#    log_level: WARN
+    log_baud_rate: "115200"
+  device:
+    name: gm-smalltv-s3-d0c8bc
+  display:
+    home_page: page_temperature
 
 esphome:
   comment: "GeekMagic SmallTV S3"
-  name: ${devicename}
-  friendly_name: ${devicename}
+  name: ${device.name}
+  friendly_name: ${device.name}
   project:
     version: "1.0.0"
 

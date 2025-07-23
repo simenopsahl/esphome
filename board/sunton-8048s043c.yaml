@@ -90,9 +90,25 @@ display:
     vsync_pulse_width: 4
     vsync_back_porch: 8
     data_pins:
-      red: [ $pin.int.disp.red.r1, $pin.int.disp.red.r2, $pin.int.disp.red.r3, $pin.int.disp.red.r4, $pin.int.disp.red.r5 ]
-      green: [ $pin.int.disp.green.g1, $pin.int.disp.green.g2, $pin.int.disp.green.g3, $pin.int.disp.green.g4, $pin.int.disp.green.g5, $pin.int.disp.green.g6 ]
-      blue: [ $pin.int.disp.blue.b1, $pin.int.disp.blue.b2, $pin.int.disp.blue.b3, $pin.int.disp.blue.b4, $pin.int.disp.blue.b5 ]
+      red:
+        - ${pin.int.disp.red.r1}
+        - ${pin.int.disp.red.r2}
+        - ${pin.int.disp.red.r3}
+        - ${pin.int.disp.red.r4}
+        - ${pin.int.disp.red.r5}
+      green:
+        - ${pin.int.disp.green.g1}
+        - ${pin.int.disp.green.g2}
+        - ${pin.int.disp.green.g3}
+        - ${pin.int.disp.green.g4}
+        - ${pin.int.disp.green.g5}
+        - ${pin.int.disp.green.g6}
+      blue:
+        - ${pin.int.disp.blue.b1}
+        - ${pin.int.disp.blue.b2}
+        - ${pin.int.disp.blue.b3}
+        - ${pin.int.disp.blue.b4}
+        - ${pin.int.disp.blue.b5}
     update_interval: never
     auto_clear_enabled: false
 

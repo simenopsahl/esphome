@@ -29,16 +29,20 @@ packages:
   }}
 
 substitutions:
-  devicename: m5s-fire-a70780
-  location: "2etg, Stue"
-  log_level: WARN
-  home_page: page_nordpool
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-fire-a70780
+    location: "2etg, Stue"
+  display:
+    home_page: page_nordpool
 
 esphome:
   comment: "M5Stack Fire @ Stue"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 # --- LVGL CLOCKS ---
 time:

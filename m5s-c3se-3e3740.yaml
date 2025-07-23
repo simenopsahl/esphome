@@ -27,18 +27,22 @@ packages:
   }}
 
 substitutions:
-  devicename: m5s-c3se-3e3740
-  log_level: WARN
-#  log_baud_rate: "115200"
-#  mbus_i2c_shared: "true"
-  internal_i2c_bus: i2c_mbus
-  log_baud_rate: "115200"
-  home_page: page_analog_clock
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-c3se-3e3740
+    location: "1etg, Kjøkken"
+  module:
+    internal:
+      i2c_bus: i2c_mbus
+  display:
+    home_page: page_analog_clock
 
 esphome:
   comment: 'M5Stack Core3 SE'
-  name: ${devicename}
-  friendly_name: ${devicename}
+  name: ${device.name}
+  friendly_name: ${device.name}
   project:
     version: "1.0.0"
 
@@ -62,7 +66,7 @@ lvgl:
       pad_bottom: 34
       on_load:
         - lvgl.label.update:
-            id: page_title
+            id: lbl_page_title
             text: Luftkvalitet
       <<: !include
         file: gui/functions/swipe_navigation.yaml

@@ -14,15 +14,18 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
 substitutions:
-  devicename: m5s-as3-lite-970ab4
-  location: "2etg, Simen"
-  log_level: WARN
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-as3-lite-970ab4
+    location: "2etg, Simen"
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Simen"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0.0"
 

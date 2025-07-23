@@ -37,7 +37,11 @@ psram:
 spi:
   - type: quad
     clk_pin: ${pin.int.spi.clk}
-    data_pins: [$pin.int.spi.dat1, $pin.int.spi.dat2, $pin.int.spi.dat3, $pin.int.spi.dat4]
+    data_pins:
+      - ${pin.int.spi.dat1}
+      - ${pin.int.spi.dat2}
+      - ${pin.int.spi.dat3}
+      - ${pin.int.spi.dat4}
 
 i2c:
   - id: i2c_internal

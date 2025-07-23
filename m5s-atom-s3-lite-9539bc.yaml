@@ -15,16 +15,22 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
 substitutions:
-  devicename: m5s-as3-lite-9539bc
-  location: "2etg, Ellen & Svein"
-  i2c_grove_frequency: 40kHz
-  log_level: WARN
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-as3-lite-9539bc
+    location: "2etg, Ellen & Svein"
+  extension:
+    i2c:
+      grove:
+        frequency: 40kHz
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Ellen & Svein"
-  name: ${devicename}
-  friendly_name: ${devicename}
-  area: ${location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0.0"
 

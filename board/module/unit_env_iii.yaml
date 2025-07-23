@@ -4,12 +4,13 @@
 # https://esphome.io/components/sensor/qmp6988.html
 
 substitutions:
-  env_i2c_bus: i2c_grove
+  module:
+    env_i2c_bus: i2c_grove
 
 #ENV.III
 sensor:
   - platform: sht3xd
-    i2c_id: ${env_i2c_bus}
+    i2c_id: ${module.env_i2c_bus}
     id: unit_env_sht30_sensor
     temperature:
       id: temperature_sht30_unit_env
@@ -31,7 +32,7 @@ sensor:
     update_interval: 10s
 
   - platform: qmp6988
-    i2c_id: ${env_i2c_bus}
+    i2c_id: ${module.env_i2c_bus}
     id: unit_env_qmp6988_sensor
     temperature:
       id: temperature_qmp6988_unit_env

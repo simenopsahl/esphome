@@ -88,7 +88,7 @@ spi:
 
 time:
   - platform: pcf8563
-    i2c_id: ${internal_i2c_bus}
+    i2c_id: ${module.internal.i2c_bus}
     id: time_rtc
     address: 0x51
     update_interval: 10min
@@ -116,10 +116,10 @@ external_components:
     refresh: 1d
 
 esp32_m5stack_core_s3:
-  i2c_id: ${internal_i2c_bus}
+  i2c_id: ${module.internal.i2c_bus}
 
 i2c_device:
-  i2c_id: ${internal_i2c_bus}
+  i2c_id: ${module.internal.i2c_bus}
   id: axp2101
   address: 0x34
 
@@ -159,7 +159,7 @@ i2c_device:
 #    channel: right
 
 aw9523:
-  i2c_id: ${internal_i2c_bus}
+  i2c_id: ${module.internal.i2c_bus}
   id: aw9523_1
   address: 0x58
 
@@ -191,7 +191,7 @@ display:
 
 touchscreen:
   - platform: ft63x6
-    i2c_id: ${internal_i2c_bus}
+    i2c_id: ${module.internal.i2c_bus}
     id: touchscreen_ft63x6
     update_interval: 20ms
 #    interrupt_pin:
