@@ -14,7 +14,7 @@ bme68x_bsec2_i2c:
   address: 0x77
   model: BME688
   sample_rate: LP
-  operating_age: 28d
+  operating_age: 4d
   state_save_interval: 6h
 sensor:
   - platform: bme68x_bsec2
@@ -202,6 +202,7 @@ text_sensor:
     id: combined_iaq_classification_bme688
     name: "CombinedIAQ classification"
     icon: "mdi:checkbox-marked-circle-outline"
+    entity_category: diagnostic
     lambda: |-
       auto iaq_ = int(id(iaq_bme688).state);
       if (iaq_ < 0) {
