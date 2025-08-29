@@ -34,12 +34,6 @@ esphome:
   project:
     version: "1.0.0"
 
-esp32:
-  framework:
-    type: esp-idf
-    version: 5.4.0
-    platform_version: espressif32 @ 6.10.0
-
 i2c:
   - id: !extend i2c_grove
     scan: false

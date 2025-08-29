@@ -10,7 +10,7 @@
 substitutions:
   common:
     log_level: DEBUG
-    log_baud_rate: "0"
+    log_baud_rate: "115200"
 
 logger:
   id: component_logger

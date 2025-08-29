@@ -29,7 +29,7 @@ packages:
 substitutions:
   common:
     log_level: WARN
-#    log_baud_rate: "115200"
+#    log_baud_rate: "0"
   device:
     name: m5s-c3se-e93464
     location: "2etg, Stue"

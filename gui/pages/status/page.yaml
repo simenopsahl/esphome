@@ -67,7 +67,7 @@
                   # Value Label
                   - label:
                       id: lbl_name
-                      text: $devicename
+                      text: ${device.name}
                       pad_right: ${container_pad_right}
 #                      text_align: LEFT
                       text_font: font_md

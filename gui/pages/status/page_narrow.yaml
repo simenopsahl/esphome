@@ -41,7 +41,7 @@
           widgets:
             - label:
                 id: lbl_name
-                text: $devicename
+                text: ${device.name}
                 text_align: CENTER
                 width: 100%
                 text_font: font_sm

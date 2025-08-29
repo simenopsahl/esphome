@@ -30,13 +30,12 @@ esp32:
   board: esp32s3box
   variant: ESP32S3
   flash_size: 16MB
+  cpu_frequency: 240MHz
   framework:
     type: esp-idf
     advanced:
       compiler_optimization: PERF
     sdkconfig_options:
-      CONFIG_ESP32_DEFAULT_CPU_FREQ_240: "y"
-
       # need to set a s3 compatible board for the adf-sdk to compile
       # board specific code is not used though
 #      CONFIG_ESP32_S3_BOX_BOARD: "y"

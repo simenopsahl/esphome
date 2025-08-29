@@ -22,6 +22,10 @@ esp32:
   board: esp32-c6-devkitm-1
   variant: esp32c6
   flash_size: 4MB
+  framework:
+    type: esp-idf
+#    version: 5.4.0
+#    platform_version: espressif32 @ 6.10.0
 
 # Enable status LED
 status_led:

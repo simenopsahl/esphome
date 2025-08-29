@@ -19,6 +19,7 @@ esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   flash_size: 16MB
+  cpu_frequency: 240MHz
   framework:
     type: esp-idf
     # these versions prevent artifacting
@@ -27,7 +28,6 @@ esp32:
     # Required to achieve sufficient PSRAM bandwidth
     sdkconfig_options:
 #      COMPILER_OPTIMIZATION_SIZE: y
-      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: y
       CONFIG_ESP32S3_DATA_CACHE_64KB: y
       CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
       CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
