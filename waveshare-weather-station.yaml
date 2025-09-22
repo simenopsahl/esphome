@@ -70,108 +70,71 @@ display:
               {"windy", "\U000F059D"},
               {"windy-variant", "\U000F059E"},
             };
-          
+
           // Set graph color
           id(trace_temperature_ute)->set_line_color( id(epaper_text_color) );
           id(trace_temperature_foran)->set_line_color( id(epaper_text_color) );
           id(trace_temperature_bak)->set_line_color( id(epaper_text_color) );
-          
+
           // Fill background.
           it.fill(id(epaper_bg_color));
 
           // Show loading screen before data is received.
           if (id(initial_data_received) == false) {
-            it.printf(it.get_width()/2, it.get_height()/2, id(font_medium), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
+            it.printf(it.get_width()/2, it.get_height()/2, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
           } else {
 
             // Weather Condition
             if (id(weather_condition_now).state == id(weather_condition_next).state) {
-              it.printf(it.get_width()/2, 1, id(font_mdi), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+              it.printf(it.get_width()/2, 1, id(mdi_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
             } else {
-              it.printf(90, 1, id(font_mdi), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
-              it.printf(it.get_width()/2, 25, id(font_medium), id(epaper_text_color), TextAlign::TOP_CENTER, "->");
-              it.printf(210, 1, id(font_mdi), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_next).state.c_str()].c_str());
+              it.printf(90, 1, id(mdi_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+              it.printf(it.get_width()/2, 15, id(mdi_md), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
+              it.printf(210, 1, id(mdi_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_next).state.c_str()].c_str());
             }
             
             // Ute Temperature
             it.graph(0, 72, id(graph_ute), id(epaper_text_color));
-            it.printf(181, 74, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "Ute");
-            it.printf(180, 104, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_ute).state);
-            it.printf(299, 136, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
+            it.print(181, 74, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "Ute");
+            it.printf(180, 90, id(font_fl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_ute).state);
+            it.printf(it.get_width()-2, 120, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
 
             // Foran Temperature
             it.graph(0, 177, id(graph_foran), id(epaper_text_color));
-            it.printf(181, 179, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "Foran");
-            it.printf(180, 209, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_foran).state);
-            it.printf(299, 241, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
+            it.print(181, 179, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "Foran");
+            it.printf(180, 195, id(font_fl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_foran).state);
+            it.printf(it.get_width()-2, 225, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
 
             // Bak Temperature
             it.graph(0, 282, id(graph_bak), id(epaper_text_color));
-            it.printf(181, 284, id(font_medium), id(epaper_text_color), TextAlign::TOP_LEFT, "Bak");
-            it.printf(180, 314, id(font_large), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_bak).state);
-            it.printf(299, 346, id(font_medium), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
+            it.print(181, 284, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "Bak");
+            it.printf(180, 300, id(font_fl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f", id(temperature_bak).state);
+            it.printf(it.get_width()-2, 330, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
 
             // Refresh Timestamp
             // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
             char str[17];
             time_t currTime = id(time_homeassistant).now().timestamp;
             strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-            it.printf(it.get_width()/2, 379, id(font_small), id(epaper_text_color), TextAlign::TOP_CENTER, "Oppdatert kl %s", str);
+            it.printf(it.get_width()/2, it.get_height()-1, id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Oppdatert kl %s", str);
           }
 
 # Include custom fonts
-font:
-  - id: font_small
-    #file: 'fonts/segoeui.ttf'
-    file: 'gui/fonts/GothamRnd-Bold.ttf'
-    size: 20
-    glyphs: &norwegian-glyphs [ ' ', '<', '>', ',', '-', '.', ':', '%', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - id: font_medium
-    #file: 'fonts/segoeuib.ttf'
-    file: 'gui/fonts/GothamRnd-Bold.ttf'
-    size: 32
-    glyphs: *norwegian-glyphs
-  - id: font_large
-    #file: 'fonts/seguisb.ttf'
-    file: 'gui/fonts/GothamRnd-Bold.ttf'
-    size: 64
-    glyphs: *norwegian-glyphs
-  # Include Material Design Icons font
-  # Thanks to https://community.home-assistant.io/t/display-materialdesign-icons-on-esphome-attached-to-screen/199790/16
-  - file: 'gui/fonts/materialdesignicons-webfont.ttf'
-    id: font_mdi
-    size: 70
-    glyphs: &mdi-weather-glyphs
-      - "\U000F0590" # mdi-weather-cloudy
-      - "\U000F0F2F" # mdi-weather-cloudy-alert
-      - "\U000F0E6E" # mdi-weather-cloudy-arrow-right
-      - "\U000F0591" # mdi-weather-fog
-      - "\U000F0592" # mdi-weather-hail
-      - "\U000F0F30" # mdi-weather-hazy
-      - "\U000F0898" # mdi-weather-hurricane
-      - "\U000F0593" # mdi-weather-lightning
-      - "\U000F067E" # mdi-weather-lightning-rainy
-      - "\U000F0594" # mdi-weather-night
-      - "\U000F0F31" # mdi-weather-night-partly-cloudy
-      - "\U000F0595" # mdi-weather-partly-cloudy
-      - "\U000F0F32" # mdi-weather-partly-lightning
-      - "\U000F0F33" # mdi-weather-partly-rainy
-      - "\U000F0F34" # mdi-weather-partly-snowy
-      - "\U000F0F35" # mdi-weather-partly-snowy-rainy
-      - "\U000F0596" # mdi-weather-pouring
-      - "\U000F0597" # mdi-weather-rainy
-      - "\U000F0598" # mdi-weather-snowy
-      - "\U000F0F36" # mdi-weather-snowy-heavy
-      - "\U000F067F" # mdi-weather-snowy-rainy
-      - "\U000F0599" # mdi-weather-sunny
-      - "\U000F0F37" # mdi-weather-sunny-alert
-      - "\U000F14E4" # mdi-weather-sunny-off
-      - "\U000F059A" # mdi-weather-sunset
-      - "\U000F059B" # mdi-weather-sunset-down
-      - "\U000F059C" # mdi-weather-sunset-up
-      - "\U000F0F38" # mdi-weather-tornado
-      - "\U000F059D" # mdi-weather-windy
-      - "\U000F059E" # mdi-weather-windy-variant
+font: !include
+  file: gui/fonts/fonts.yaml
+  vars:
+    text_sm: 18
+    text_md: 20
+    text_lg: 24
+    text_xl: 28
+    text_xxl: 32
+    text_hg: 40
+    text_fl: 62
+    icons_sm: 34
+    icons_md: 40
+    icons_lg: 48
+    icons_xl: 58
+    icons_xxl: 70
 
 # Check if person is home
 binary_sensor:
