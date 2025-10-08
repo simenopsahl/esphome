@@ -23,7 +23,7 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
-    entity_id: sensor.etg2_simen_temperature
+    entity_id: sensor.etg1_stue_temperature
   }}
 
 substitutions:
@@ -32,7 +32,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-3e3740
-    location: "1etg, Kjøkken"
+    location: "1etg, TV Stue"
   module:
     internal:
       i2c_bus: i2c_mbus
@@ -40,7 +40,7 @@ substitutions:
     home_page: page_analog_clock
 
 esphome:
-  comment: 'M5Stack Core3 SE'
+  comment: 'M5Stack Core3 SE @ TV Stue'
   name: ${device.name}
   friendly_name: ${device.name}
   project:

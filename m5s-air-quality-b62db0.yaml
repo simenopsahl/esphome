@@ -33,6 +33,7 @@ esphome:
 display:
   # 200 x 200 resolution
   - id: !extend display_eink
+    rotation: 180
     pages:
       - id: page_local
         lambda: |-

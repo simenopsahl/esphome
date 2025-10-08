@@ -27,7 +27,7 @@ substitutions:
     location: "1etg, TV Stue"
 
 esphome:
-  comment: "M5Stack NanoC6 1d8ec8"
+  comment: "M5Stack NanoC6 @ TV Stue"
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
