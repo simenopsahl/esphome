@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/geekmagic_hellocubic_v2.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "GeekMagic.HelloCubic V2"
@@ -18,7 +23,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
-    type: esp-idf
+    type: ${device.framework.type}
 
 psram:
 

@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/geekmagic_smalltv_pro.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "GeekMagic.SmallTV Pro"
@@ -21,7 +26,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
-    type: esp-idf
+    type: ${device.framework.type}
 
 psram:
 

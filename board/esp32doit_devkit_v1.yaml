@@ -7,5 +7,16 @@
 packages:
   pins: !include pins/esp32doit-devkit-v1.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esp32:
   board: esp32doit-devkit-v1
+  framework: 
+    type: ${device.framework.type}
+
+wifi:
+  enable_btm: true
+  enable_rrm: true

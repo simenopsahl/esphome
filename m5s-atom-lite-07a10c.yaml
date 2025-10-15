@@ -20,6 +20,8 @@ substitutions:
   device:
     name: m5s-a-l-07a10c
     location: "Loft"
+    framework:
+      type: esp-idf
   lvgl:
     home_page: page_analog_clock
 
@@ -30,10 +32,6 @@ esphome:
   area: ${device.location}
   project:
     version: "1.0.0"
-
-esp32:
-  framework:
-    type: esp-idf
 
 sensor:
   # Combine sensors

@@ -14,6 +14,8 @@ substitutions:
     location: "2etg, Ellen & Svein"
   display:
     home_page: page_content
+    framework:
+      type: arduino
 
 #external_components:
 #  - source: github://pr#6209

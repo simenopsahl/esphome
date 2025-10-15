@@ -20,6 +20,8 @@ substitutions:
   device:
     name: m5s-as3-lite-970dec
     location: "2etg, Toalett"
+    framework:
+      type: esp-idf
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Toalett"

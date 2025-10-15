@@ -10,6 +10,9 @@ packages:
 
 substitutions:
   home_page: page_content
+  device:
+    framework:
+      type: arduino
 
 esphome:
   project:
@@ -31,7 +34,7 @@ esphome:
 esp32:
   board: esp32dev
   framework:
-    type: arduino
+    type: ${device.framework.type}
 
 # Pins for Waveshare ePaper ESP Board
 spi:

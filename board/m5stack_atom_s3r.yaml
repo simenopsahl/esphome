@@ -9,6 +9,11 @@ packages:
   pins: !include pins/m5stack_atom_s3r.yaml
   i2c_int: !include extension/internal_i2c.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "M5Stack.Atom S3R"
@@ -31,7 +36,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
-    type: esp-idf
+    type: ${device.framework.type}
 #    version: 5.3.1
 #    platform_version: 6.9.0
     # Custom sdkconfig options

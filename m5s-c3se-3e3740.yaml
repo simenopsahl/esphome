@@ -33,6 +33,8 @@ substitutions:
   device:
     name: m5s-c3se-3e3740
     location: "1etg, TV Stue"
+    framework:
+      type: esp-idf
   module:
     internal:
       i2c_bus: i2c_mbus

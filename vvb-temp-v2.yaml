@@ -13,20 +13,14 @@ substitutions:
   device:
     name: vvb-temp-v2
     location: "1etg, Bad"
+    framework:
+      type: esp-idf
 
 esphome:
   comment: "VVB Temp V2"
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
-
-esp32:
-  framework: 
-    type: esp-idf
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
 
 #i2c:
 #  scl: GPIO22

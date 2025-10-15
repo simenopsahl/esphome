@@ -16,6 +16,8 @@ substitutions:
   device:
     name: ulanzi
     location: "1etg, TV Stue"
+    framework:
+      type: esp-idf
 
 esphome:
   comment: "Ulanzi TC001 Pixel Clock @ Stue"
@@ -27,7 +29,7 @@ esphome:
 
 ehmtxv2:
   id: rgb8x32
-  icons2html: true
+  icons2html: false
   iconscache: true
   icon_indicator: false
   time_component: time_ehmtx

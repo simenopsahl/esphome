@@ -12,6 +12,11 @@
 packages:
   pins: !include pins/ulanzi_tc001.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 external_components:
   - source:
       type: git
@@ -36,7 +41,7 @@ esphome:
 esp32:
   board: esp32dev
   framework:
-    type: arduino
+    type: ${device.framework.type}
     advanced:
       ignore_efuse_custom_mac: true
 
@@ -231,10 +236,26 @@ rtttl:
   output: rtttl_out
 
 light:
-  - platform: neopixelbus
+#  - platform: neopixelbus
+#    id: light_ehmtx
+#    variant: ws2812
+#    type: GRB
+#    pin: ${pin.light.led_matrix}
+#    num_leds: 256
+#    color_correct: [30%, 30%, 30%]
+#    gamma_correct: 2.0
+#    restore_mode: ALWAYS_OFF
+#    name: "Light"
+#    on_turn_on:
+#      lambda: |-
+#        id(display_ehmtx)->set_enabled(false);
+#    on_turn_off:
+#      lambda: |-
+#        id(display_ehmtx)->set_enabled(true);
+  - platform: esp32_rmt_led_strip
     id: light_ehmtx
-    variant: ws2812
-    type: GRB
+    chipset: ws2812
+    rgb_order: GRB
     pin: ${pin.light.led_matrix}
     num_leds: 256
     color_correct: [30%, 30%, 30%]

@@ -8,6 +8,9 @@
 substitutions:
   time_timezone: "Europe/Oslo"
   home_page: page_content
+  device:
+    framework:
+      type: esp-idf
 
 # Pins for this model
 packages:
@@ -54,7 +57,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
-    type: esp-idf
+    type: ${device.framework.type}
 
 wifi:
   enable_btm: true

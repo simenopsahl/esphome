@@ -6,6 +6,11 @@
 packages:
   pins: !include pins/sunton-8048s043c.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: 'Sunton.4,3" 800x480'
@@ -21,7 +26,7 @@ esp32:
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:
-    type: esp-idf
+    type: ${device.framework.type}
     # these versions prevent artifacting
     version: 5.0.0
     platform_version: 6.8.1

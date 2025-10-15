@@ -22,6 +22,8 @@ substitutions:
   device:
     name: m5s-coreink-9fc390
     location: "1etg, Inngang"
+    framework:
+      type: esp-idf
   display:
     home_page: page_room
 

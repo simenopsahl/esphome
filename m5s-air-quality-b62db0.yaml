@@ -19,6 +19,8 @@ substitutions:
   device:
     name: m5s-air-quality-b62db0
     location: "2etg, Gang"
+    framework:
+      type: esp-idf
   display:
     home_page: page_info
 

@@ -31,6 +31,8 @@ substitutions:
   device:
     name: m5s-stickc-plus2-9a09b0
     location: "1etg, Bad"
+    framework:
+      type: esp-idf
   display:
     home_page: page_temperature
 

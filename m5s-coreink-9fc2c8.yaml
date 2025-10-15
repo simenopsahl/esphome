@@ -22,6 +22,8 @@ substitutions:
   device:
     name: m5s-coreink-9fc2c8
     location: "2etg, Simen"
+    framework:
+      type: esp-idf
   external:
     i2c:
       grove:

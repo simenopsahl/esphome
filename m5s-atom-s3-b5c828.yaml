@@ -40,6 +40,8 @@ substitutions:
   device:
     name: m5s-as3-b5c828
     location: "2etg, Bod"
+    framework:
+      type: esp-idf
   module:
     pir_in_pin: ${pin.ext.gpio.port_abc.in}
     env_i2c_bus: i2c_port_abc

@@ -9,6 +9,9 @@
 substitutions:
   hat_shared: "false"
   grove_shared: "false"
+  device:
+    framework:
+      type: esp-idf
 
 # Pins for this model
 packages:
@@ -21,7 +24,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
-    type: esp-idf
+    type: ${device.framework.type}
 
 esphome:
   project:

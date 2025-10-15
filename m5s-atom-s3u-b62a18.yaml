@@ -23,6 +23,8 @@ substitutions:
   device:
     name: m5s-as3u-b62a18
     location: "1etg, Kjøkken"
+    framework:
+      type: esp-idf
 
 esphome:
   comment: "M5Stack Atom S3U @ Kjøkken"

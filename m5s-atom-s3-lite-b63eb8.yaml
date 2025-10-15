@@ -21,6 +21,8 @@ substitutions:
     name: m5s-as3-lite-b63eb8
     location_1: "Ute, Bod"
     location_2: "Ute, Foran"
+    framework:
+      type: esp-idf
   module:
     pir_in_pin: ${pin.ext.gpio.port_abc.in}
     env_i2c_bus: i2c_port_abc

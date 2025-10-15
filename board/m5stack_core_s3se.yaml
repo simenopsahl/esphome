@@ -10,6 +10,9 @@ substitutions:
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
   internal_i2c_bus: i2c_internal
+  device:
+    framework:
+      type: esp-idf
 
 # Pins for this model
 packages:
@@ -32,7 +35,7 @@ esp32:
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:
-    type: esp-idf
+    type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
     sdkconfig_options:

@@ -21,6 +21,8 @@ substitutions:
   device:
     name: m5s-as3-lite-9539bc
     location: "2etg, Ellen & Svein"
+    framework:
+      type: esp-idf
   extension:
     i2c:
       grove:

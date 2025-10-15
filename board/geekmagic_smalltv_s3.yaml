@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/geekmagic_smalltv_s3.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "GeekMagic.SmallTV S3"
@@ -31,7 +36,7 @@ esp32:
   flash_size: 16MB
 #  partitions: partitions/gm-s3-16MB.csv
   framework:
-    type: esp-idf
+    type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
 

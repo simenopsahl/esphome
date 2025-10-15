@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/m5stack_atom_s3_lite.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "M5Stack.Atom S3 Lite"
@@ -19,7 +24,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
-    type: esp-idf
+    type: ${device.framework.type}
 
 wifi:
   enable_btm: true

@@ -25,6 +25,8 @@ substitutions:
   device:
     name: m5s-nano-c6-1d8ec8
     location: "1etg, TV Stue"
+    framework:
+      type: esp-idf
 
 esphome:
   comment: "M5Stack NanoC6 @ TV Stue"

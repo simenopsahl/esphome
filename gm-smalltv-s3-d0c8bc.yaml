@@ -22,6 +22,8 @@ substitutions:
     log_baud_rate: "115200"
   device:
     name: gm-smalltv-s3-d0c8bc
+    framework:
+      type: esp-idf
   display:
     home_page: page_temperature
 

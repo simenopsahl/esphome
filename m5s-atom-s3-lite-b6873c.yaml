@@ -25,6 +25,8 @@ substitutions:
   device:
     name: m5s-as3-lite-b6873c
     location: "1etg, Kjøkken"
+    framework:
+      type: esp-idf
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Trapp"

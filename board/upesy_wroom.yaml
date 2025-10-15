@@ -7,8 +7,15 @@
 packages:
   pins: !include pins/upesy_wroom.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esp32:
   board: upesy_wroom
+    framework:
+      type: ${device.framework.type}
 
 status_led:
   pin: ${pin.light.led}

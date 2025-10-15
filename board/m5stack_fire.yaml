@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/m5stack_fire.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "M5Stack.Fire"
@@ -29,7 +34,7 @@ esp32:
   board: m5stack-grey
   flash_size: 16MB
   framework:
-    type: esp-idf
+    type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
 

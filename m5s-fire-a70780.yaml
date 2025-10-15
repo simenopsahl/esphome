@@ -35,6 +35,8 @@ substitutions:
   device:
     name: m5s-fire-a70780
     location: "2etg, Stue"
+    framework:
+      type: esp-idf
   display:
     home_page: page_nordpool
 

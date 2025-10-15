@@ -8,6 +8,11 @@
 packages:
   pins: !include pins/m5stack_nano_c6.yaml
 
+substitutions:
+  device:
+    framework:
+      type: esp-idf
+
 esphome:
   project:
     name: "M5Stack.Nano C6"
@@ -23,7 +28,7 @@ esp32:
   variant: esp32c6
   flash_size: 4MB
   framework:
-    type: esp-idf
+    type: ${device.framework.type}
 #    version: 5.4.0
 #    platform_version: espressif32 @ 6.10.0
 

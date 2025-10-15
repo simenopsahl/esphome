@@ -25,6 +25,8 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: jc3248w535c-1f26fc
+    framework:
+      type: esp-idf
   display:
     home_page: page_analog_clock
 

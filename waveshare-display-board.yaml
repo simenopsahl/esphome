@@ -14,6 +14,8 @@ substitutions:
   device:
     name: waveshare-display-board
     location: "1etg, Kjøkken"
+    framework:
+      type: arduino
   display:
     home_page: page_content
 
