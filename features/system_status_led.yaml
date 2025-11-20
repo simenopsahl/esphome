@@ -59,7 +59,7 @@ script:
                 red: 0%
                 green: 100%
                 blue: 10%
-                brightness: 50%
+                brightness: 10%
                 effect: none
             - script.stop:
                 id: led_system_status
@@ -74,7 +74,7 @@ script:
                 red: 100%
                 green: 100%
                 blue: 100%
-                brightness: 50%
+                brightness: 20%
                 effect: none
             - script.stop:
                 id: led_system_status
@@ -89,7 +89,7 @@ script:
                 red: 100%
                 green: 80%
                 blue: 0
-                brightness: 50%
+                brightness: 30%
                 effect: "Fast Pulse"
             - script.stop:
                 id: led_system_status
@@ -100,7 +100,7 @@ script:
           red: 100%
           green: 0
           blue: 0
-          brightness: 50%
+          brightness: 40%
           effect: "Fast Pulse"
 
 
@@ -112,7 +112,7 @@ script:
           red: 0%
           green: 0%
           blue: 100%
-          brightness: 50%
+          brightness: 30%
           effect: "Slow Pulse"
 
   - id: led_working_status_2
@@ -123,5 +123,5 @@ script:
           red: 80%
           green: 0%
           blue: 80%
-          brightness: 50%
+          brightness: 30%
           effect: "Slow Pulse"
