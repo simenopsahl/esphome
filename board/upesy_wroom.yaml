@@ -14,8 +14,8 @@ substitutions:
 
 esp32:
   board: upesy_wroom
-    framework:
-      type: ${device.framework.type}
+  framework:
+    type: ${device.framework.type}
 
 status_led:
   pin: ${pin.light.led}

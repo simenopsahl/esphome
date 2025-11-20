@@ -94,12 +94,11 @@ time:
     id: time_rtc
     address: 0x51
     update_interval: 10min
-#  - platform: sntp
-#    id: sntp_time
-#    timezone: $time_timezone
-#    on_time_sync:
-#      then:
-#        pcf8563.write_time:
+  - platform: sntp
+    id: !extend time_sntp
+    on_time_sync:
+      then:
+        pcf8563.write_time:
 
 external_components:
 #  - source:

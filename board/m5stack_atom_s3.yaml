@@ -4,14 +4,14 @@
 # M5Stack AtomS3
 #
 
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_atom_s3.yaml
-
 substitutions:
   device:
     framework:
       type: esp-idf
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3.yaml
 
 esphome:
   project:

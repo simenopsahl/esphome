@@ -21,7 +21,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/lubeda/EsphoMaTrixv2
-      ref: 2025.7.1
+      ref: 2025.10.3
     refresh: 60s
     components: [ ehmtxv2 ]
 
@@ -256,6 +256,7 @@ light:
     id: light_ehmtx
     chipset: ws2812
     rgb_order: GRB
+    max_refresh_rate: 30ms
     pin: ${pin.light.led_matrix}
     num_leds: 256
     color_correct: [30%, 30%, 30%]

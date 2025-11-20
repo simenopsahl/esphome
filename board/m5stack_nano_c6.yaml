@@ -4,14 +4,15 @@
 # M5Stack NanoC6
 #
 
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_nano_c6.yaml
-
 substitutions:
   device:
     framework:
       type: esp-idf
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_nano_c6.yaml
+  status_led: !include ../features/system_status_led.yaml
 
 esphome:
   project:
@@ -98,13 +99,6 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button Pressed
-      - script.execute: led_wifi
-      - script.wait: led_wifi
-      - delay: 1000ms
-      - script.execute: led_homeassistant
-      - script.wait: led_homeassistant
-      - delay: 1000ms
-      - script.execute: led_default_state
     on_click:
       min_length: 1000ms
       max_length: 5000ms
@@ -112,70 +106,3 @@ binary_sensor:
         - logger.log: Button Held
         - light.turn_off:
             id: rgb_led
-
-# Script for status LED
-script:
-  - id: led_wifi
-    then:
-      - if:
-          condition:
-            wifi.connected:
-          then:
-            - light.turn_on:
-                id: rgb_led
-                brightness: 30%
-                red: 0%
-                green: 100%
-                blue: 0%
-            - delay: 400ms
-            - light.turn_off:
-                id: rgb_led
-            - delay: 200ms
-            - light.turn_on:
-                id: rgb_led
-                brightness: 30%
-                red: 0%
-                green: 100%
-                blue: 0%
-            - delay: 400ms
-          else:
-            - light.turn_off:
-                id: rgb_led
-  - id: led_homeassistant
-    then:
-      - if:
-          condition:
-            api.connected:
-          then:
-            - light.turn_on:
-                id: rgb_led
-                brightness: 30%
-                red: 0%
-                green: 10%
-                blue: 100%
-            - delay: 400ms
-            - light.turn_off:
-                id: rgb_led
-            - delay: 200ms
-            - light.turn_on:
-                id: rgb_led
-                brightness: 30%
-                red: 0%
-                green: 10%
-                blue: 100%
-            - delay: 400ms
-          else:
-            - light.turn_off:
-                id: rgb_led
-  - id: led_default_state
-    then:
-      - light.turn_on:
-          id: rgb_led
-          brightness: 25%
-          red: 100%
-          green: 0%
-          blue: 0%
-      - delay: 200ms
-      - light.turn_on:
-          id: rgb_led
-          effect: "Slow Blink"
