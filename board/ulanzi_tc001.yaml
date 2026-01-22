@@ -21,7 +21,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/lubeda/EsphoMaTrixv2
-      ref: 2025.10.3
+      ref: 2025.12.0
     refresh: 60s
     components: [ ehmtxv2 ]
 
@@ -69,8 +69,10 @@ globals:
     initial_value: '40'
 
 api:
-  services:
-    - service: tune
+  # Enable custom Home Assistant services for EHMTXv2
+  custom_services: true
+  actions:
+    - action: tune
       variables:
         tune: string
       then:
@@ -271,8 +273,7 @@ light:
         id(display_ehmtx)->set_enabled(true);
 
 time:
-  - platform: homeassistant
-    id: !extend time_homeassistant
+  - id: !extend time_homeassistant
     on_time_sync:
         - ds1307.write_time:
   - platform: ds1307

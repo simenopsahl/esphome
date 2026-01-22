@@ -6,6 +6,7 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_stickc_plus2.yaml
   hat: !include board/extension/hat_i2c.yaml
+  internal: !include board/extension/internal_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
 #  grove: !include board/extension/grove_i2c.yaml
 #  co2: !include board/module/unit_co2.yaml
@@ -46,9 +47,7 @@ esphome:
 
 # --- LVGL CLOCKS ---
 time:
-  - id: !extend time_homeassistant
-    on_time_sync:
-      - script.execute: lvgl_time_update
+  - id: !extend time_rtc
     on_time:
       - minutes: '*'
         seconds: 0

@@ -73,9 +73,7 @@ spi:
 #    i2c_id: i2c_internal
 #    address: 0x51
 #    update_interval: 10min
-#  - platform: sntp
-#    id: sntp_time
-#    timezone: ${time_timezone}
+#  - id: !extend time_homeassistant
 #    on_time_sync:
 #      then:
 #        pcf8563.write_time:

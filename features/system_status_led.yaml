@@ -12,8 +12,6 @@ globals:
     type: bool
     initial_value: "false"
 
-
-
 ##### CATCH SYSTEM EVENTS #####
 esphome:
   on_boot:
@@ -41,8 +39,6 @@ api:
     then:
       - lambda: 'id(api_ok) = false;'
       - script.execute: led_system_status
-
-
 
 ##### ASSIGN COLORS TO LED #####
 script:
@@ -102,7 +98,6 @@ script:
           blue: 0
           brightness: 40%
           effect: "Fast Pulse"
-
 
   - id: led_working_status_1
     # WORKING MODE 1 - blue (slow pulse)

@@ -7,7 +7,7 @@ substitutions:
 
 packages:
   # --- COMMON PACKAGES ---
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
   time: !include common/time.yaml
   status: !include common/status.yaml
 

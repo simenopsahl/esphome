@@ -51,10 +51,7 @@ esphome:
 
 # --- LVGL CLOCKS ---
 time:
-  - id: !extend time_homeassistant
-    on_time_sync:
-      - script.execute: lvgl_time_update
-      - pcf8563.write_time:
+  - id: !extend time_rtc
     on_time:
       - minutes: '*'
         seconds: 0

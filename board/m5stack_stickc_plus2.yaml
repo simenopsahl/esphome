@@ -64,6 +64,16 @@ spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
 
+time:
+  - platform: bm8563
+    i2c_id: i2c_internal
+    id: time_rtc
+    update_interval: 10min
+  - id: !extend time_homeassistant
+    on_time_sync:
+      then:
+        bm8563.write_time:
+
 light:
   # Enable status LED
   - platform: status_led
@@ -247,6 +257,66 @@ sensor:
     entity_category: diagnostic
     device_class: battery
     unit_of_measurement: "%"
+    # MPU6886 IMU
+  - platform: mpu6886
+    i2c_id: i2c_internal
+    id: mpu6886_sensor
+    accel_x:
+      id: mpu6886_accel_x
+      name: "MPU6886 Accel X"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    accel_y:
+      id: mpu6886_accel_y
+      name: "MPU6886 Accel Y"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    accel_z:
+      id: mpu6886_accel_z
+      name: "MPU6886 Accel z"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    gyro_x:
+      id: mpu6886_gyro_x
+      name: "MPU6886 Gyro X"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    gyro_y:
+      id: mpu6886_gyro_y
+      name: "MPU6886 Gyro Y"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    gyro_z:
+      id: mpu6886_gyro_z
+      name: "MPU6886 Gyro z"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    temperature:
+      id: mpu6886_temperature
+      name: "MPU6886 Temperature"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
 
 deep_sleep:
   id: deep_sleep_battery

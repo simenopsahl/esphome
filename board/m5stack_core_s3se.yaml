@@ -89,16 +89,15 @@ spi:
 #  miso_pin: ${pin.int.spi.miso}
 
 time:
-  - platform: pcf8563
+  - platform: bm8563
     i2c_id: ${module.internal.i2c_bus}
     id: time_rtc
     address: 0x51
     update_interval: 10min
-  - platform: sntp
-    id: !extend time_sntp
+  - id: !extend time_homeassistant
     on_time_sync:
       then:
-        pcf8563.write_time:
+        bm8563.write_time:
 
 external_components:
 #  - source:

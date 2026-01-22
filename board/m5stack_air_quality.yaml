@@ -1,5 +1,5 @@
 ---
-# https://docs.m5stack.com/en/core/AirQ
+# https://docs.m5stack.com/en/core/Air_Quality
 # https://devices.esphome.io/devices/M5Stack-AirQ
 # Base functions for:
 # M5Stack PM2.5 Air Quality
@@ -75,8 +75,7 @@ time:
     id: time_rtc
     address: 0x51
     update_interval: 10min
-  - platform: sntp
-    id: !extend time_sntp
+  - id: !extend time_homeassistant
     on_time_sync:
       then:
         pcf8563.write_time:

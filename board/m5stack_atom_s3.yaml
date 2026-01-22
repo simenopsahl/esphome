@@ -97,3 +97,65 @@ display:
 #    transform:
 #      mirror_x: true
 #      mirror_y: true
+
+#sensor:
+    # MPU6886 IMU
+#  - platform: mpu6886
+#    i2c_id: i2c_internal
+#    id: mpu6886_sensor
+#    accel_x:
+#      id: mpu6886_accel_x
+#      name: "MPU6886 Accel X"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 3
+#            send_every: 2
+#    accel_y:
+#      id: mpu6886_accel_y
+#      name: "MPU6886 Accel Y"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 3
+#            send_every: 2
+#    accel_z:
+#      id: mpu6886_accel_z
+#      name: "MPU6886 Accel z"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 3
+#            send_every: 2
+#    gyro_x:
+#      id: mpu6886_gyro_x
+#      name: "MPU6886 Gyro X"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 3
+#            send_every: 2
+#    gyro_y:
+#      id: mpu6886_gyro_y
+#      name: "MPU6886 Gyro Y"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 3
+#            send_every: 2
+#    gyro_z:
+#      id: mpu6886_gyro_z
+#      name: "MPU6886 Gyro z"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 3
+#            send_every: 2
+#    temperature:
+#      id: mpu6886_temperature
+#      name: "MPU6886 Temperature"
+#      disabled_by_default: true
+#      filters:
+#        - sliding_window_moving_average:
+#            window_size: 6
+#            send_every: 3

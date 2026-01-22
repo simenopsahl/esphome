@@ -8,15 +8,15 @@ packages:
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
-  co2: !include board/module/unit_co2.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
   tvoc: !include board/module/unit_tvoc.yaml
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
     light_id: rgb_led,
-    light_brightness: 50%,
-    light_flash_brightness: 70%
+    light_brightness: 80%,
+    light_flash_brightness: 90%
   }}
 
 substitutions:
@@ -50,12 +50,12 @@ sensor:
 #      - source: temperature_sht30_unit_env
 #      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
-#      - source: temperature_bmp280_unit_env
-#      - source: temperature_sht40_unit_env
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
       # Unit ENV Pro
 #      - source: temperature_bme688
       # Unit CO2
-      - source: temperature_scd40_unit_co2
+#      - source: temperature_scd40_unit_co2
 
   - id: !extend humidity_local
     sources:
@@ -66,11 +66,11 @@ sensor:
       # Unit ENV III
 #      - source: humidity_sht30_unit_env
       # Unit ENV IV
-#      - source: humidity_sht40_unit_env
+      - source: humidity_sht40_unit_env
       # Unit ENV Pro
 #      - source: humidity_bme688
       # Unit CO2
-      - source: humidity_scd40_unit_co2
+#      - source: humidity_scd40_unit_co2
 
   - id: !extend pressure_local
     sources:
@@ -79,6 +79,6 @@ sensor:
       # Unit ENV III
 #      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
-#      - source: pressure_bmp280_unit_env
+      - source: pressure_bmp280_unit_env
       # Unit ENV Pro
 #      - source: pressure_bme688
