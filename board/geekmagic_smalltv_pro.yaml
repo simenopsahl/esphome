@@ -83,9 +83,24 @@ binary_sensor:
     entity_category: diagnostic
 
 display:
-  - platform: ili9xxx
-    id: display_lcd
+#  - platform: ili9xxx
+#    id: display_lcd
+#    model: st7789v
+#    data_rate: 40MHz
+#    dc_pin: ${pin.spi.disp.dc}
+#    reset_pin: ${pin.spi.disp.reset}
+#    spi_mode: MODE3
+#    dimensions:
+#      width: 240
+#      height: 240
+#      offset_height: 0
+#      offset_width: 0
+#    invert_colors: true
+#    auto_clear_enabled: false
+#    update_interval: never
+  - platform: mipi_spi
     model: st7789v
+    id: display_lcd
     data_rate: 40MHz
     dc_pin: ${pin.spi.disp.dc}
     reset_pin: ${pin.spi.disp.reset}

@@ -110,9 +110,23 @@ binary_sensor:
     entity_category: diagnostic
 
 display:
-  - platform: ili9xxx
-    id: display_lcd
+#  - platform: ili9xxx
+#    id: display_lcd
+#    model: st7789v #gc9a01a
+    #data_rate: 40MHz
+    #cs_pin: ${pin.spi.disp.cs}
+#    dc_pin: ${pin.spi.disp.dc}
+#    reset_pin: ${pin.spi.disp.reset}
+#    spi_mode: MODE3
+#    dimensions:
+#      width: 240
+#      height: 240
+#    invert_colors: true
+#    auto_clear_enabled: false
+#    update_interval: never
+  - platform: mipi_spi
     model: st7789v #gc9a01a
+    id: display_lcd
     #data_rate: 40MHz
     #cs_pin: ${pin.spi.disp.cs}
     dc_pin: ${pin.spi.disp.dc}
@@ -121,6 +135,7 @@ display:
     dimensions:
       width: 240
       height: 240
+    data_rate: 40Mhz
     invert_colors: true
     auto_clear_enabled: false
     update_interval: never
