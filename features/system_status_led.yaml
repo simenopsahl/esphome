@@ -120,3 +120,21 @@ script:
           blue: 80%
           brightness: 30%
           effect: "Slow Pulse"
+
+# Extend led effects with custom ones that use the brightness defined in the package
+light:
+  - id: !extend rgb_led
+    effects:
+      - pulse:
+          name: "Fast Pulse"
+          update_interval: 400ms
+          transition_length: 400ms
+          max_brightness: 40%
+      - pulse:
+          name: "Slow Pulse"
+          update_interval: 1s
+          max_brightness: 30%
+      - pulse:
+          name: "Breath"
+          update_interval: 2.5s
+          max_brightness: 30%

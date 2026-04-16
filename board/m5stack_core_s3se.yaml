@@ -164,22 +164,39 @@ aw9523:
   address: 0x58
 
 display:
-  - platform: ili9xxx
-    id: display_lcd
-    model: M5Stack
-    cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin: ${pin.int.spi.disp.dc}
-    dimensions:
-      height: 240
-      width: 320
+#  - platform: ili9xxx
+#    id: display_lcd
+#    model: M5Stack
+#    cs_pin: ${pin.int.spi.disp.cs}
+#    dc_pin: ${pin.int.spi.disp.dc}
+#    dimensions:
+#      height: 240
+#      width: 320
 #      offset_height: 2
 #      offset_width: 1
     # Rotate 180deg
 #    transform:
 #      mirror_x: true
 #      mirror_y: true
+#    invert_colors: true
+#    color_palette: 8BIT
+#    reset_pin:
+#      aw9523: aw9523_1
+#      port: 1
+#      pin: 1
+#      mode:
+#        output: true
+#    update_interval: 5s
+#    auto_clear_enabled: false
+  - platform: mipi_spi
+    id: display_lcd
+    model: ili9342
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    dimensions:
+      height: 240
+      width: 320
     invert_colors: true
-    color_palette: 8BIT
     reset_pin:
       aw9523: aw9523_1
       port: 1

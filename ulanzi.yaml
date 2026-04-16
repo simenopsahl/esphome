@@ -107,7 +107,7 @@ ehmtxv2:
   on_start_running:
     then:
       lambda: |-
-        ESP_LOGD(TAG, "remove default clock and set new color");
+        ESP_LOGD("ehmtx", "remove default clock and set new color");
         id(rgb8x32)->set_clock_color(160,240,160);
         id(rgb8x32)->set_weekday_color(155,155,155);
         id(rgb8x32)->set_today_color(240,160,160);
@@ -120,32 +120,32 @@ ehmtxv2:
 
 binary_sensor:
   - platform: homeassistant
-    id: sonos_amp_mute
-    entity_id: media_player.sonos_amp
+    id: powernode_mute
+    entity_id: media_player.powernode_stue
     attribute: is_volume_muted
     on_state:
       then:
         - if:
             condition:
-              - binary_sensor.is_off: sonos_amp_mute
+              - binary_sensor.is_off: powernode_mute
             then:
               lambda: |-
-                ESP_LOGD(TAG, "Sonos Amp unmuted");
+                ESP_LOGD("ehmtx", "PowerNode unmuted");
                 id(rgb8x32)->icon_screen("vol_mute", "Lyd", 0, 2, true, 40,240,40);
                 id(rgb8x32)->force_screen("vol_mute");
         - if:
             condition:
-              - binary_sensor.is_on: sonos_amp_mute
+              - binary_sensor.is_on: powernode_mute
             then:
               lambda: |-
-                ESP_LOGD(TAG, "Sonos Amp muted");
+                ESP_LOGD("ehmtx", "PowerNode muted");
                 id(rgb8x32)->icon_screen("vol_mute", "Dempet", 0, 2, true, 240,40,40);
                 id(rgb8x32)->force_screen("vol_mute");
 
 sensor:
   - platform: homeassistant
-    id: sonos_amp_vol
-    entity_id: media_player.sonos_amp
+    id: powernode_vol
+    entity_id: media_player.powernode_stue
     attribute: volume_level
     filters:
       - multiply: 100
@@ -154,36 +154,36 @@ sensor:
       then:
         lambda: |-
           char text[3];
-          sprintf(text,"%2.0f", id(sonos_amp_vol).state);
-          ESP_LOGD(TAG, "Sonos Amp volume changed");
+          sprintf(text,"%2.0f", id(powernode_vol).state);
+          ESP_LOGD("ehmtx", "PowerNode volume changed");
           id(rgb8x32)->icon_screen("vol_up", text, 0, 1, true, 240,240,240);
           id(rgb8x32)->force_screen("vol_up");
 
 text_sensor:
   - platform: homeassistant
-    id: sonos_amp_source
-    entity_id: media_player.sonos_amp
+    id: powernode_source
+    entity_id: media_player.powernode_stue
     attribute: source
     on_value:
       then:
         - if:
             condition:
               text_sensor.state:
-                id: sonos_amp_source
-                state: 'TV'
+                id: powernode_source
+                state: 'Samsung TV'
             then:
               lambda: |-
-                ESP_LOGD(TAG, "Sonos Amp source TV");
+                ESP_LOGD("ehmtx", "PowerNode source TV");
                 id(rgb8x32)->icon_screen("arrow_up", "TV", 0, 2, true, 40,240,240);
                 id(rgb8x32)->force_screen("arrow_up");
         - if:
             condition:
               text_sensor.state:
-                id: sonos_amp_source
-                state: 'Line-in'
+                id: powernode_source
+                state: 'Denon DP400'
             then:
               lambda: |-
-                ESP_LOGD(TAG, "Sonos Amp source Line-in");
+                ESP_LOGD("ehmtx", "PowerNode source Line-in");
                 id(rgb8x32)->icon_screen("arrow_down", "Platespiller", 0, 2, true, 240,240,40);
                 id(rgb8x32)->force_screen("arrow_down");
         - if:
@@ -191,14 +191,14 @@ text_sensor:
               not:
                 or:
                   - text_sensor.state:
-                      id: sonos_amp_source
-                      state: 'Line-in'
+                      id: powernode_source
+                      state: 'Denon DP400'
                   - text_sensor.state:
-                      id: sonos_amp_source
-                      state: 'TV'
+                      id: powernode_source
+                      state: 'Samsung TV'
             then:
               lambda: |-
-                ESP_LOGD(TAG, "Sonos Amp source Other");
+                ESP_LOGD("ehmtx", "PowerNode source Other");
                 id(rgb8x32)->icon_screen("vol_mute", "Source ?", 0, 2, true, 240,40,240);
                 id(rgb8x32)->force_screen("vol_mute");
 

@@ -129,6 +129,7 @@ sensor:
 
 lvgl:
   buffer_size: 15%
+  rotation: 180
   pages:
     - id: !remove page_temperature
     - id: page_temperature
@@ -274,7 +275,6 @@ display:
     dimensions:
       offset_height: 1
       offset_width: 2
-    # Rotate 180deg
-    transform:
-      mirror_x: true
-      mirror_y: true
+#    transform:
+#      mirror_x: true
+#      mirror_y: true

@@ -125,7 +125,7 @@ lvgl:
   buffer_size: 75%
   default_font: font_md
   theme: !include themes/main.yaml
-  disp_bg_color: 0x000000
+  bottom_layer: 0x000000
   bg_color: 0x000000
   top_layer:
     widgets:

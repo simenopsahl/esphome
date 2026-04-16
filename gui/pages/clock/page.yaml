@@ -59,7 +59,7 @@
                           id: minute_hand
                           width: 3
                           color: c_text_s
-                          r_mod: -4
+                          length: -4
                           value: 0
                   # Major ticks
                   - range_from: 1
@@ -81,14 +81,14 @@
                     range_to: 720
                     angle_range: 360
                     rotation: 270
-                    ticks:
-                      count: 0
+#                    ticks:
+#                      count: 0
                     indicators:
                       - line:
                           id: hour_hand
                           width: 5
                           color: c_purple
-                          r_mod: -30
+                          length: -30
                           value: 0
             - label:
                 id: day_label

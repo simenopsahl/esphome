@@ -22,7 +22,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_info
+    home_page: page_local
 
 esphome:
   comment: "M5Stack AirQuality @ Trapp"
