@@ -8,6 +8,9 @@ substitutions:
   device:
     framework:
       type: esp-idf
+  module:
+    internal:
+      i2c_bus: i2c_internal
 
 # Pins for this model
 packages:
@@ -26,17 +29,21 @@ esphome:
       - "-mfix-esp32-psram-cache-strategy=memw"
 
 # PSRAM is shared with UART bus tx17/rx16
-psram:
-  mode: quad
-  speed: 80MHz
+#psram:
+#  mode: quad
+#  speed: 80MHz
 
 esp32:
-  board: m5stack-grey
+#  board: m5stack-grey
+  variant: ESP32
   flash_size: 16MB
+  cpu_frequency: 240MHz
   framework:
     type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
+      minimum_chip_revision: 3.1
+      sram1_as_iram: true
 
 wifi:
   enable_btm: true
@@ -70,19 +77,6 @@ spi:
 
 # 320x240 ILI9342C LCD
 display:
-#  - platform: ili9xxx
-#    id: display_lcd
-#    model: M5STACK
-#    cs_pin: ${pin.int.spi.disp.cs}
-#    dc_pin: ${pin.int.spi.disp.dc}
-#    reset_pin: ${pin.int.spi.disp.reset}
-#    data_rate: 20Mhz
-#    invert_colors: true
-#    color_palette: 8BIT
-#    update_interval: 5s
-#    dimensions:
-#      height: 240
-#      width: 320
   - platform: mipi_spi
     id: display_lcd
     model: ili9342
@@ -236,5 +230,5 @@ script:
       - output.set_level:
           id: buzzer
           level: "1%"
-      - delay: 50ms
+      - delay: 30ms
       - output.turn_off: buzzer

@@ -1,33 +1,53 @@
 ---
 # https://docs.m5stack.com/en/module/DualKmeter%20Module13.2
-# https://esphome.io/components/sensor/pmsx003.html
+# https://github.com/m5stack/esphome-yaml/tree/main/components/dual_kmeter
 # https://github.com/Chill-Division/M5Stack-ESPHome/
 
 substitutions:
   module:
-    kmeteriso_i2c_bus: i2c_grove
+    kmeteriso_i2c_bus: i2c_mbus
 
-# UNIT KMeterISO
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: [dual_kmeter]
+
+# Module13.2 Dual Kmeter
 sensor:
-  - platform: kmeteriso
+  - platform: dual_kmeter
     i2c_id: ${module.kmeteriso_i2c_bus}
-    id: kmeteriso_sensor
-    temperature:
-      id: temperature_kmeteriso
-      name: "Temperature KMeterISO"
-      device_class: "temperature"
-      state_class: "measurement"
-      filters:
-        - sliding_window_moving_average:
-            window_size: 6
-            send_every: 6
-    internal_temperature:
-      id: temperature_kmeteriso_internal
-      name: "Temperature KMeterISO Internal"
-      device_class: "temperature"
-      state_class: "measurement"
-      filters:
-        - sliding_window_moving_average:
-            window_size: 6
-            send_every: 6
-    update_interval: 5s
+    id: dual_kmeter_internal_sensor
+    channel: INTERNAL
+    update_interval: 60s
+    name: "Temperature DualKMeter Internal"
+    device_class: "temperature"
+    state_class: "measurement"
+    disabled_by_default: true
+    entity_category: diagnostic
+    filters:
+      - sliding_window_moving_average:
+          window_size: 6
+          send_every: 6
+  - platform: dual_kmeter
+    i2c_id: ${module.kmeteriso_i2c_bus}
+    id: dual_kmeter_1_sensor
+    channel: KMETER_1
+    update_interval: 30s
+    name: "Temperature DualKMeter 1"
+    device_class: "temperature"
+    state_class: "measurement"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+  - platform: dual_kmeter
+    i2c_id: ${module.kmeteriso_i2c_bus}
+    id: dual_kmeter_2_sensor
+    channel: KMETER_2
+    update_interval: 30s
+    name: "Temperature DualKMeter 2"
+    device_class: "temperature"
+    state_class: "measurement"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2

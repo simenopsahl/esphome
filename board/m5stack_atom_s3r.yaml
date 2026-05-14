@@ -10,6 +10,11 @@ packages:
   i2c_int: !include extension/internal_i2c.yaml
 
 substitutions:
+  time_timezone: "Europe/Oslo"
+  mbus_i2c_shared: "false"
+  module:
+    internal:
+      i2c_bus: i2c_internal
   device:
     framework:
       type: esp-idf
@@ -30,13 +35,14 @@ psram:
   speed: 80MHz
 
 esp32:
-  board: m5stack-atoms3
+#  board: m5stack-atoms3
   variant: esp32s3
   flash_size: 8MB
+  cpu_frequency: 240MHz
   framework:
+    type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
-    type: ${device.framework.type}
 #    version: 5.3.1
 #    platform_version: 6.9.0
     # Custom sdkconfig options
@@ -58,44 +64,43 @@ spi:
 #  rmt_symbols: 144
 
 external_components:
-  - source:
-      type: git
-      url: https://github.com/ssieb/esphome
-      ref: lp5562
+  - source: github://m5stack/esphome-yaml/components
     components: [ lp5562 ]
-    refresh: 1d
 
-# https://www.reddit.com/r/Esphome/comments/1geelgf/what_would_it_take_to_port_led_driver_lp5562/
 lp5562:
-  - i2c_id: i2c_internal
+  - i2c_id: ${module.internal.i2c_bus}
+    id: led_lp5562
+    use_internal_clk: true
+    high_pwm_freq: true
+    logarithmic_dimming: true
+    red_current: 15.5
+    green_current: 16.5
+    blue_current: 22.5
+    white_current: 21.5
 
 output:
   - platform: lp5562
-    id: backlight_red
-    channel: 0
+    lp5562_id: led_lp5562
+    id: lp5562_red_channel
+    channel: red
   - platform: lp5562
-    id: backlight_green
-    channel: 1
+    lp5562_id: led_lp5562
+    id: lp5562_green_channel
+    channel: green
   - platform: lp5562
-    id: backlight_blue
-    channel: 2
+    lp5562_id: led_lp5562
+    id: lp5562_blue_channel
+    channel: blue
   - platform: lp5562
-    id: backlight_white
-    channel: 3
-
-#switch:
-#  - platform: gpio
-#    id: backlight_white
-#    pin: $backlight_pin
-#    restore_mode: ALWAYS_ON
-#    name: "Backlight"
-#    entity_category: config
+    lp5562_id: led_lp5562
+    id: lp5562_white_channel
+    channel: white
 
 light:
   # White
   - platform: monochromatic
     id: backlight_light
-    output: backlight_white
+    output: lp5562_white_channel
     restore_mode: RESTORE_DEFAULT_ON
     initial_state:
       state: on
@@ -105,15 +110,15 @@ light:
     entity_category: config
   # RGBW
 #  - platform: rgbw
-#    id: backlight_light
-#    red: backlight_red
-#    green: backlight_green
-#    blue: backlight_blue
-#    white: backlight_white
+#    id: backlight_rgbw
+#    red: lp5562_red_channel
+#    green: lp5562_green_channel
+#    blue: lp5562_blue_channel
+#    white: lp5562_white_channel
 #    color_interlock: true
 #    default_transition_length: 100ms
-#    restore_mode: ALWAYS_ON
-#    name: "Backlight"
+#    restore_mode: RESTORE_DEFAULT_ON
+#    name: "Backlight RGBW"
 #    entity_category: config
 
 # Button

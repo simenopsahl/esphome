@@ -8,6 +8,7 @@ substitutions:
       i2c:
         sda: GPIO12
         scl: GPIO11
+        int: GPIO21
       spi:
         clk: GPIO36
         mosi: GPIO37
@@ -24,7 +25,7 @@ substitutions:
 #      disp_bl: GPIO27
 #      led: GPIO19
 #      ir: GPIO19
-    
+
     audio:
       i2s_lrclk: GPIO33
       i2s_wck: GPIO33

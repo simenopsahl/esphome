@@ -3,12 +3,13 @@
 # https://esphome.io/components/sensor/scd4x.html
 
 substitutions:
-  co2_i2c_bus: i2c_grove
+  module:
+    co2_i2c_bus: i2c_grove
 
 # UNIT CO2
 sensor:
   - platform: scd4x
-    i2c_id: ${co2_i2c_bus}
+    i2c_id: ${module.co2_i2c_bus}
     id: unit_co2_scd40_sensor
     co2:
       id: co2_scd40_unit_co2

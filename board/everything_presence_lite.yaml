@@ -92,4 +92,4 @@ sensor:
 
 select:
   - id: !extend tracking_behaviour
-    initial_option: Above + Speed and Resolution
+    initial_option: Above + Distance and Angle

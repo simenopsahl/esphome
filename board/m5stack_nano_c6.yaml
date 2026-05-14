@@ -25,9 +25,10 @@ esphome:
 #    board_build.arduino.memory_type: qio_opi
 
 esp32:
-  board: esp32-c6-devkitm-1
+#  board: esp32-c6-devkitm-1
   variant: esp32c6
   flash_size: 4MB
+  cpu_frequency: 160MHz
   framework:
     type: ${device.framework.type}
 #    version: 5.4.0

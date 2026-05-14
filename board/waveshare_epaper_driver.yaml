@@ -32,9 +32,15 @@ esphome:
         - script.execute: update_screen
 
 esp32:
-  board: esp32dev
+#  board: esp32dev
+  variant: ESP32
+  flash_size: 4MB
+  cpu_frequency: 240MHz
   framework:
     type: ${device.framework.type}
+    advanced:
+      compiler_optimization: PERF
+      sram1_as_iram: true
 
 # Pins for Waveshare ePaper ESP Board
 spi:

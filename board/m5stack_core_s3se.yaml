@@ -9,7 +9,9 @@
 substitutions:
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
-  internal_i2c_bus: i2c_internal
+  module:
+    internal:
+      i2c_bus: i2c_internal
   device:
     framework:
       type: esp-idf
@@ -29,9 +31,8 @@ esphome:
     board_upload.maximum_size: 16777216
 
 esp32:
-#  board: m5stack-cores3
-  board: esp32s3box
-  variant: ESP32S3
+#  board: esp32s3box
+  variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:
@@ -93,75 +94,62 @@ time:
     i2c_id: ${module.internal.i2c_bus}
     id: time_rtc
     address: 0x51
-    update_interval: 10min
+    update_interval: 15min
   - id: !extend time_homeassistant
     on_time_sync:
       then:
         bm8563.write_time:
 
 external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/DaAwesomeP/esphome_m5stack_core_s3
-#      ref: DaAwesomeP_touch_interrupt_and_backlight
-#    components: [ esp32_m5stack_core_s3, aw9523, axp2101 ]
-#    refresh: 1d
-  - source:
-      type: git
-      url: https://github.com/luka6000/esphome_m5stack_core_s3
-      ref: v202502
-      # type: local
-      # path: ../../esphome_m5stack_core_s3/esphome/components/
-    components: [ esp32_m5stack_core_s3, aw9523 ]
-    refresh: 1d
+  - source: github://m5stack/esphome-yaml/components
+    components: [axp2101, aw88298, aw9523b]
 
-esp32_m5stack_core_s3:
+# PMU
+axp2101:
+  id: axp2101_pmu
   i2c_id: ${module.internal.i2c_bus}
 
-i2c_device:
+# IO Expander
+aw9523b:
   i2c_id: ${module.internal.i2c_bus}
-  id: axp2101
-  address: 0x34
-
-#audio_adc:
-#  - platform: es7210
-#    i2c_id: i2c_internal
-#    address: 0x40
-#    id: adc_es7210
-#    bits_per_sample: 16bit
-#    sample_rate: 16000
-#    mic_gain: 24
+  id: aw9523b_hub
+  p0_drive_mode: PUSH_PULL
+  interrupt_pin: ${pin.int.i2c.int}
 
 #i2s_audio:
-#  - id: i2s_shared
-#    i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
-#    i2s_bclk_pin: ${pin.audio.i2s_bclk}
-#    i2s_mclk_pin: ${pin.audio.i2s_mclk}
-
+#  id: i2s_shared
+#  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+#  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+#  i2s_mclk_pin:
+#    number: ${pin.audio.i2s_mclk}
+#audio_adc:
+#  - platform: es7210
+#    i2c_id: ${module.internal.i2c_bus}
+#    id: adc_es7210
+#    address: 0x40
+#    bits_per_sample: 16bit
+#    sample_rate: 16000
+#    mic_gain: 36
+#audio_dac:
+#  - platform: aw88298
+#    i2c_id: ${module.internal.i2c_bus}
+#    id: dac_aw88298
+#    sample_rate: 48000
 #microphone:
 #  - platform: i2s_audio
 #    i2s_audio_id: i2s_shared
 #    id: microphone_i2s
 #    i2s_din_pin: ${pin.audio.i2s_din}
-#    pdm: false
 #    adc_type: external
 #    sample_rate: 16000
 #    bits_per_sample: 16bit
-#    channel: right
 #speaker:
 #  - platform: i2s_audio
 #    i2s_audio_id: i2s_shared
 #    id: speaker_i2s
-#    i2s_dout_pin: ${pin.audio.i2s_dout}
 #    dac_type: external
-#    sample_rate: 16000
-#    bits_per_sample: 16bit
-#    channel: right
-
-aw9523:
-  i2c_id: ${module.internal.i2c_bus}
-  id: aw9523_1
-  address: 0x58
+#    i2s_dout_pin: ${pin.audio.i2s_dout}
+#    audio_dac: dac_aw88298
 
 display:
   - platform: mipi_spi
@@ -169,6 +157,9 @@ display:
     model: ili9342
     cs_pin: ${pin.int.spi.disp.cs}
     dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin:
+      aw9523b_id: aw9523b_hub
+      number: 9
     dimensions:
       height: 240
       width: 320
@@ -177,12 +168,6 @@ display:
       mirror_x: false
       mirror_y: false
     invert_colors: true
-    reset_pin:
-      aw9523: aw9523_1
-      port: 1
-      pin: 1
-      mode:
-        output: true
     update_interval: 5s
     auto_clear_enabled: false
 
@@ -192,18 +177,19 @@ touchscreen:
     id: touchscreen_ft63x6
     update_interval: 20ms
 #    interrupt_pin:
-#      aw9523: aw9523_1
-#      port: 1
-#      pin: 2
-#      mode:
-#        input: true
-#    reset_pin:
-#      aw9523: aw9523_1
-#      port: 0
-#      pin: 0
-#      mode:
-#        output: true
+#      aw9523b_id: aw9523b_hub
+#      number: 10
+    reset_pin:
+      aw9523b_id: aw9523b_hub
+      number: 0
     on_touch:
+      - lambda: |-
+            ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                touch.x,
+                touch.y,
+                touch.x_raw,
+                touch.y_raw
+                );  
       - if:
           condition:
             - light.is_off: backlight_light
@@ -227,15 +213,36 @@ binary_sensor:
     y_max: 240
 
 output:
-  - platform: template
+  - platform: axp2101
+    type: range
+    channel: DLDO1
     id: backlight_output
-    type: float
-    min_power: 0.20
-    max_power: 0.28
-    write_action:
-      - lambda: >-
-          uint8_t x = state * 100 ;
-          id(axp2101).write_byte(0x99, x );
+    min_voltage: 2600
+    max_voltage: 3300
+
+  - platform: axp2101
+    channel: ALDO1
+    voltage: 1800
+
+  - platform: axp2101
+    channel: ALDO2
+    voltage: 3300
+  
+  - platform: axp2101
+    channel: BLDO1
+    voltage: 2800
+  
+  - platform: axp2101
+    channel: BLDO2
+    voltage: 1500
+
+  - platform: axp2101
+    channel: DCDC1
+    voltage: 3300
+
+  - platform: axp2101
+    channel: DCDC3
+    voltage: 3300
 
 # https://devices.esphome.io/devices/M5Stack-Fire#wifi-issues-due-to-gpio15
 #  - platform: gpio
@@ -259,3 +266,34 @@ light:
     #       uint8_t light;
     #       if (id(axp2101).read_byte(0x99, &light))
     #         id(backlight).turn_on().set_brightness( (( light << 5 ) - 641 ) /255 );
+
+switch:
+  - platform: gpio
+    id: sw_bus_out_en
+    name: "BUS_OUT_EN"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 1
+    # BUS_OUT_EN = 1
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+
+  - platform: gpio
+    id: sw_usb_otg_en
+    name: "USB_OTG_EN"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 5
+    # USB_OTG_EN = 0
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+
+  - platform: gpio
+    id: sw_boost_en
+    name: "BOOST_EN"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 15
+    # BOOST_EN
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config

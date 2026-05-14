@@ -2,10 +2,14 @@
 # https://docs.m5stack.com/en/unit/DLight%20Unit
 # https://esphome.io/components/sensor/bh1750.html
 
+substitutions:
+  module:
+    dlight_i2c_bus: i2c_grove
+
 # Unit DLight
 sensor:
   - platform: bh1750
-    i2c_id: i2c_grove
+    i2c_id: ${module.dlight_i2c_bus}
     id: light_bh1750_unit
     name: "Unit Illuminance"
     device_class: "illuminance"

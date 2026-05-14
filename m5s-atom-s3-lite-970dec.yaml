@@ -5,7 +5,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
-  hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iv: !include board/module/unit_env_iv.yaml
   env_pro: !include board/module/unit_env_pro.yaml

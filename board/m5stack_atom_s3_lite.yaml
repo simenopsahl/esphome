@@ -19,9 +19,10 @@ esphome:
     name: "M5Stack.Atom S3 Lite"
 
 esp32:
-  board: m5stack-atoms3
+#  board: m5stack-atoms3
   variant: esp32s3
   flash_size: 8MB
+  cpu_frequency: 240MHz
   framework:
     advanced:
       compiler_optimization: PERF
@@ -31,28 +32,6 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-# Output that blinks the LED
-#output:
-#  - platform: template
-#    id: status_output
-#    type: binary
-#    write_action:
-#    - if:
-#        condition:
-#          lambda: return (state);
-#        then:
-#          - light.turn_on:
-#              id: rgb_led
-#              transition_length: 0ms
-#              brightness: 30%
-#              red: 100%
-#              green: 0%
-#              blue: 0%
-#        else:
-#          - light.turn_off:
-#              id: rgb_led
-#              transition_length: 0ms
-
 # IR
 #remote_transmitter:
 #  pin: ${pin.light.ir}
@@ -60,11 +39,6 @@ wifi:
 #  rmt_symbols: 144
 
 light:
-  # Enable status LED
-#  - platform: status_led
-#    id: status_light
-#    output: status_output
-
   # RGB WS2812C-2020
   - platform: esp32_rmt_led_strip
     id: rgb_led
@@ -106,30 +80,6 @@ light:
       blue: 0%
     name: "LED"
     entity_category: config
-#  - platform: partition
-#    id: led1
-#    segments: 
-#      id: led
-#      from: 0
-#      to: 1
-#  - platform: partition
-#    id: led2
-#    segments: 
-#      id: led
-#      from: 1
-#      to: 1
-#  - platform: partition
-#    id: led3
-#    segments: 
-#      id: led
-#      from: 2
-#      to: 2
-#  - platform: partition
-#    id: led4
-#    segments: 
-#      id: led
-#      from: 2
-#      to: 3
 
 # Button
 binary_sensor:

@@ -12,7 +12,7 @@ packages:
   status: !include common/status.yaml
 
   # --- BOARD AND MODULES ---
-  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
+  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha.yaml@main
   tweaks: !include board/everything_presence_lite.yaml
 
 esphome:

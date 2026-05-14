@@ -6,3 +6,4 @@
 #
 bluetooth_proxy:
   active: false
+  connection_slots: 2

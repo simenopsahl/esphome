@@ -56,6 +56,8 @@ esphome:
 esp32:
   board: m5stack-stamps3
   variant: esp32s3
+  flash_size: 8MB
+  cpu_frequency: 240MHz
   framework:
     advanced:
       compiler_optimization: PERF
@@ -70,15 +72,15 @@ spi:
   mosi_pin: ${pin.int.spi.mosi}
 
 time:
-  - platform: pcf8563
+  - platform: bm8563
     i2c_id: i2c_internal
     id: time_rtc
     address: 0x51
-    update_interval: 10min
+    update_interval: 15min
   - id: !extend time_homeassistant
     on_time_sync:
       then:
-        pcf8563.write_time:
+        bm8563.write_time:
 
 output:
   - platform: gpio

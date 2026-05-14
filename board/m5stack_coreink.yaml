@@ -8,6 +8,9 @@
 substitutions:
   time_timezone: "Europe/Oslo"
   home_page: page_content
+  module:
+    internal:
+      i2c_bus: i2c_internal
   device:
     framework:
       type: esp-idf
@@ -54,9 +57,13 @@ esphome:
 
 esp32:
   board: m5stack-coreink
+  variant: esp32
+  flash_size: 4MB
+  cpu_frequency: 240MHz
   framework:
     advanced:
       compiler_optimization: PERF
+      sram1_as_iram: true
     type: ${device.framework.type}
 
 wifi:
@@ -69,14 +76,14 @@ spi:
 
 # i2c RTC only with one additional i2c bus
 #time:
-#  - platform: pcf8563
-#    i2c_id: i2c_internal
-#    address: 0x51
-#    update_interval: 10min
+#  - platform: bm8563
+#    i2c_id: ${module.internal.i2c_bus}
+#    id: time_rtc
+#    update_interval: 15min
 #  - id: !extend time_homeassistant
 #    on_time_sync:
 #      then:
-#        pcf8563.write_time:
+#        bm8563.write_time:
 
 light:
   # Enable status LED
@@ -219,7 +226,7 @@ script:
       - output.set_level:
           id: buzzer
           level: "1%"
-      - delay: 50ms
+      - delay: 30ms
       - output.turn_off: buzzer
 
 sensor:
