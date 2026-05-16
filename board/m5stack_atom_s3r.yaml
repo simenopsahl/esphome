@@ -71,12 +71,12 @@ lp5562:
   - i2c_id: ${module.internal.i2c_bus}
     id: led_lp5562
     use_internal_clk: true
-    high_pwm_freq: true
-    logarithmic_dimming: true
-    red_current: 15.5
-    green_current: 16.5
-    blue_current: 22.5
-    white_current: 21.5
+#    high_pwm_freq: true
+#    logarithmic_dimming: true
+#    red_current: 15.5
+#    green_current: 16.5
+#    blue_current: 22.5
+    white_current: 17.5
 
 output:
   - platform: lp5562
@@ -139,20 +139,6 @@ binary_sensor:
     entity_category: diagnostic
 
 display:
-#  - platform: ili9xxx
-#    model: st7789v
-#    id: display_lcd
-#    cs_pin: ${pin.int.spi.disp.cs}
-#    dc_pin: ${pin.int.spi.disp.dc}
-#    reset_pin: ${pin.int.spi.disp.reset}
-#    data_rate: 40Mhz
-#    invert_colors: true
-#    update_interval: 5s
-#    dimensions:
-#      height: 128
-#      width: 128
-#      offset_height: 2
-#      offset_width: 1
   - platform: mipi_spi
     model: st7789v
     id: display_lcd

@@ -1,7 +1,6 @@
 ---
 #
-# The esp32_ble_tracker component creates a global hub so that you can track
-# bluetooth low energy devices using your ESP32 node.
+# The bluetooth_proxy component expands Home Assistant's Bluetooth functionality.
 # https://esphome.io/components/bluetooth_proxy.html
 #
 bluetooth_proxy:

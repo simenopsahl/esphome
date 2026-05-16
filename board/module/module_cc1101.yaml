@@ -1,0 +1,191 @@
+---
+# https://docs.m5stack.com/en/module/Module_CC1101
+# https://esphome.io/components/cc1101/
+# WIP
+
+substitutions:
+  module:
+    cc1101:
+      # General settings
+      frequency: 868.95MHz
+      output_power: 10
+      symbol_rate: 2400
+      # Tuner settings
+      filter_bandwidth: 58.0kHz
+      fsk_deviation: 25.4kHz
+      # Packet Mode settings
+      packet_mode: "true"
+      num_preamble: 0
+
+# Module CC1101
+cc1101:
+  # Hardware settings
+  cs_pin: ${pin.ext.mbus.p8}
+  gdo0_pin: ${pin.ext.mbus.p22}
+  gdo2_pin: ${pin.ext.mbus.p2}
+  # General settings
+  frequency: ${module.cc1101.frequency}
+  output_power: ${module.cc1101.output_power}
+  symbol_rate: ${module.cc1101.symbol_rate}
+  # Tuner settings
+  filter_bandwidth: ${module.cc1101.filter_bandwidth}
+  fsk_deviation: ${module.cc1101.fsk_deviation}
+  # Packet Mode settings
+  packet_mode: ${module.cc1101.packet_mode}
+  num_preamble: ${module.cc1101.num_preamble}
+  on_packet:
+    - lambda: |-
+        char hex[256];  // Size appropriately for your data
+        ESP_LOGD("cc1101",
+              "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u",
+              format_hex_to(hex, x),
+              freq_offset,
+              rssi,
+              lqi);
+    - sensor.template.publish:
+        id: cc1101_rssi
+        state: !lambda 'return rssi;'
+    - sensor.template.publish:
+        id: cc1101_lqi
+        state: !lambda 'return lqi;'
+
+# Adjustments
+number:
+  - platform: template
+    id: cc1101_frequency
+    name: "CC1101 Frequency"
+    entity_category: config
+    device_class: frequency
+    unit_of_measurement: MHz
+    min_value: 300
+    max_value: 928
+    step: 0.01
+    restore_value: true
+    optimistic: true
+    initial_value: 868.95
+    mode: box
+    disabled_by_default: true
+    on_value:
+      - cc1101.set_frequency:
+          value: !lambda "return x * 1e6;"
+  - platform: template
+    id: cc1101_output_power
+    name: "CC1101 Output Power"
+    entity_category: config
+    device_class: signal_strength
+    unit_of_measurement: dBm
+    min_value: -30
+    max_value: 10
+    step: 1
+    restore_value: true
+    optimistic: true
+    initial_value: 10
+    mode: slider
+    disabled_by_default: true
+    on_value:
+      - cc1101.set_output_power:
+          value: !lambda "return x;"
+select:
+  - platform: template
+    id: cc1101_modulation_type
+    name: "CC1101 Modulation Type"
+    icon: "mdi:signal-variant"
+    entity_category: config
+    options:
+      - "ASK/OOK"
+      - "2-FSK"
+      - "4-FSK"
+      - "GFSK"
+      - "MSK"
+    restore_value: true
+    optimistic: true
+    initial_option: "ASK/OOK"
+    mode: dropdown
+    disabled_by_default: true
+    on_option:
+      - cc1101.set_modulation_type:
+          value: !lambda "return x;"
+  - platform: template
+    id: cc1101_symbol_rate
+    name: "CC1101 Symbol Rate"
+    icon: "mdi:speedometer"
+    entity_category: config
+    options:
+      - 1200
+      - 2400
+      - 4800
+      - 9600
+      - 19200
+      - 38400
+      - 48000
+    restore_value: true
+    optimistic: true
+    initial_option: 2400
+    mode: dropdown
+    disabled_by_default: true
+    on_option:
+      - cc1101.set_symbol_rate:
+          value: !lambda "return x;"
+  - platform: template
+    id: cc1101_rx_attenuation
+    name: "CC1101 RX Attenuation"
+    icon: "mdi:broadcast"
+    entity_category: config
+    options:
+      - "0dB"
+      - "6dB"
+      - "12dB"
+      - "18dB"
+    restore_value: true
+    optimistic: true
+    initial_option: "0dB"
+    mode: dropdown
+    disabled_by_default: true
+    on_option:
+      - cc1101.set_rx_attenuation:
+          value: !lambda "return x;"
+switch:
+  - platform: template
+    id: cc1101_rx
+    name: "CC1101 Receive"
+    icon: "mdi:email-arrow-left"
+    entity_category: config
+    restore_value: true
+    optimistic: true
+    initial_state: off
+    disabled_by_default: true
+    on_turn_on:
+      - cc1101.begin_rx:
+    on_turn_off:
+      - cc1101.set_idle:
+button:
+  - platform: template
+    id: cc1101_idle
+    name: "CC1101 Idle"
+    icon: "mdi:email-lock"
+    entity_category: config
+    on_press:
+      - cc1101.set_idle:
+
+# Diagnostics
+sensor:
+  - platform: template
+    id: cc1101_rssi
+    name: "CC1101 Last RSSI"
+    update_interval: never
+    device_class: signal_strength
+    entity_category: diagnostic
+    unit_of_measurement: dBm
+    state_class: measurement
+    accuracy_decimals: 1
+    disabled_by_default: true
+  - platform: template
+    id: cc1101_lqi
+    name: "CC1101 Last LQI"
+    icon: "mdi:link-variant"
+    update_interval: never
+    unit_of_measurement: "LQI"
+    entity_category: diagnostic
+    state_class: measurement
+    accuracy_decimals: 0
+    disabled_by_default: true

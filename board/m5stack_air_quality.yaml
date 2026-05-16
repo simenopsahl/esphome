@@ -26,7 +26,7 @@ esphome:
     - priority: 800
       then:
         - output.turn_on: sen55_enable
-        - pcf8563.read_time
+        - bm8563.read_time
     - priority: 800
       then:
         # Bypass sleep circuit arduino
@@ -54,7 +54,7 @@ esphome:
         - script.execute: update_screen
 
 esp32:
-  board: m5stack-stamps3
+#  board: m5stack-stamps3
   variant: esp32s3
   flash_size: 8MB
   cpu_frequency: 240MHz

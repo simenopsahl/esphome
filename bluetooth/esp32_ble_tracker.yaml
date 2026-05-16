@@ -12,7 +12,9 @@ esp32_ble_tracker:
 # Only enable bluetooth proxy on HA connecttion
 api:
   on_client_connected:
+    - delay: 45s
     - esp32_ble_tracker.start_scan:
         continuous: true
   on_client_disconnected:
+    - delay: 5s
     - esp32_ble_tracker.stop_scan:

@@ -87,7 +87,9 @@ logger:
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
-#  miso_pin: ${pin.int.spi.miso}
+  miso_pin: 
+    number: ${pin.int.spi.miso}
+    allow_other_uses: true
 
 time:
   - platform: bm8563
@@ -156,7 +158,9 @@ display:
     id: display_lcd
     model: ili9342
     cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin: ${pin.int.spi.disp.dc}
+    dc_pin:
+      number: ${pin.int.spi.disp.dc}
+      allow_other_uses: true
     reset_pin:
       aw9523b_id: aw9523b_hub
       number: 9

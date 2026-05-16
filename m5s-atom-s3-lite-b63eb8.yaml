@@ -9,6 +9,7 @@ packages:
   env_iv: !include board/module/unit_env_iv.yaml
   env_iii: !include board/module/unit_env_iii.yaml
   pir: !include board/module/unit_pir.yaml
+  tmos: !include board/module/unit_tmos_pir.yaml
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
@@ -26,6 +27,7 @@ substitutions:
   module:
     pir_in_pin: ${pin.ext.gpio.port_abc.in}
     env_i2c_bus: i2c_port_abc
+    tmos_i2c_bus: i2c_port_abc
 
 esphome:
   comment: "M5Stack Atom S3 Lite @ Ute, Bod"

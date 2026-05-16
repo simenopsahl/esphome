@@ -1,0 +1,98 @@
+# Personal settings for Everything Presence Pro
+# https://github.com/EverythingSmartHome/everything-presence-pro
+# https://docs.everythingsmart.io/s/products/doc/everything-presence-pro-nh3fIXmow9
+
+esp32:
+  framework:
+    advanced:
+      assertion_level: DISABLE
+      compiler_optimization : PERF
+      minimum_chip_revision: 3.1
+
+api:
+  reboot_timeout: 90min
+  encryption:
+    key: !secret homeassistant_api
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  reboot_timeout: 30min
+  fast_connect: true
+  passive_scan: true
+  enable_btm: true
+  enable_rrm: true
+
+bluetooth_proxy:
+  active: false
+  connection_slots: 2
+esp32_ble:
+  max_connections: 4
+
+binary_sensor:
+  - id: !extend ld2450_zone2_occupancy
+    disabled_by_default: false
+  - id: !extend ld2450_zone3_occupancy
+    disabled_by_default: false
+  - id: !extend ld2450_zone4_occupancy
+    disabled_by_default: false
+
+number:
+  - id: !extend ld2450_zone_2_off_delay
+    disabled_by_default: false
+
+  - id: !extend ld2450_zone_3_off_delay
+    disabled_by_default: false
+
+  - id: !extend ld2450_zone_4_off_delay
+    disabled_by_default: false
+
+sensor:
+  - id: !extend ld2450_target1_speed
+    disabled_by_default: true
+  - id: !extend ld2450_target1_resolution
+    disabled_by_default: true
+  - id: !extend ld2450_target1_angle
+    disabled_by_default: true
+
+  - id: !extend ld2450_target2_speed
+    disabled_by_default: true
+  - id: !extend ld2450_target2_resolution
+    disabled_by_default: true
+  - id: !extend ld2450_target2_angle
+    disabled_by_default: true
+
+  - id: !extend ld2450_target3_speed
+    disabled_by_default: true
+  - id: !extend ld2450_target3_resolution
+    disabled_by_default: true
+  - id: !extend ld2450_target3_angle
+    disabled_by_default: true
+
+  - id: !extend ld2450_zone2_target_count
+    disabled_by_default: false
+  - id: !extend ld2450_zone3_target_count
+    disabled_by_default: false
+  - id: !extend ld2450_zone4_target_count
+    disabled_by_default: false
+
+select:
+  # Hide 24V relay mode (NO/NC)
+  - id: !extend relay_contact_mode
+    disabled_by_default: true
+  # Hide 24V relay presence outoput
+  - id: !extend system_alarm_mode
+    disabled_by_default: true
+  - id: !extend firmware_network
+    disabled_by_default: true
+  - id: !extend firmware_co2
+    disabled_by_default: true
+  - id: !extend firmware_ble
+    disabled_by_default: true
+  - id: !extend ld2450_tracking_behaviour
+    initial_option: Above + Distance and Angle
+
+switch:
+  # Hide 24V relay control
+  - id: !extend system_alarm_relay
+    disabled_by_default: true

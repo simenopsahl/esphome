@@ -40,10 +40,15 @@ esphome:
 
 esp32:
   board: esp32dev
+  variant: esp32
+  flash_size: 4MB
+  cpu_frequency: 240MHz
   framework:
     type: ${device.framework.type}
     advanced:
+      compiler_optimization: PERF
       ignore_efuse_custom_mac: true
+      sram1_as_iram: true
 
 i2c:
   id: i2c_bus

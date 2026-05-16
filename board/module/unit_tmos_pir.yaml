@@ -1,22 +1,37 @@
 ---
 # https://docs.m5stack.com/en/unit/UNIT-TMOS%20PIR
+# https://docs.m5stack.com/en/homeassistant/sensor/unit_tmos_pir
 
 substitutions:
   module:
     tmos_i2c_bus: i2c_grove
 
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: sths34pf80
+
 # UNIT TMOS PIR
-#binary_sensor:
-#  - platform: gpio
-#    pin:
-#      number: $pir_in_pin
-#      mode:
-#        input: true
-#    filters:
-#      - delayed_on_off: 1s
-#      - delayed_off: !lambda 'return id(tmos_off_latency).state * 1000;'
-#    name: "TMOS Sensor"
-#    device_class: motion
+sensor:
+  - platform: sths34pf80
+    i2c_id: ${module.tmos_i2c_bus}
+    id: tmos_sensor
+    pres_flag:
+      id: sths34pf80_presence
+      name: "TMOS Presence Detected"
+      device_class: occupancy
+      filters:
+        - delayed_on_off: 1s
+        - delayed_off: !lambda 'return id(tmos_off_latency).state * 1000;'
+    mot_flag:
+      id: sths34pf80_motion
+      name: "TMOS Motion Detected"
+      device_class: motion
+    presence_threshold: 200
+    motion_threshold: 200
+    presence_hysteresis: 50
+    motion_hysteresis: 50
+    odr: 8
+    update_interval: 1s
 
 # Adjustable off delay
 number:
@@ -28,7 +43,7 @@ number:
     unit_of_measurement: s
     min_value: 0
     max_value: 120
-    step: 30
+    step: 10
     restore_value: true
     optimistic: true
     initial_value: 30

@@ -59,7 +59,7 @@ time:
           - script.execute: lvgl_time_update
 
 lvgl:
-  buffer_size: 75%
+  buffer_size: 40%
   pages:
     - id: page_airq
       pad_top: 32

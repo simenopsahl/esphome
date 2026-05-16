@@ -1,0 +1,24 @@
+---
+#
+# The esp32_ble component in ESPHome sets up the Bluetooth LE stack on the device
+# so that a Esp32 Ble Server can run.
+# https://esphome.io/components/esp32_ble/
+#
+
+# BLE is delayed on boot,
+# then enabled once WiFi is connected.
+esp32_ble:
+  enable_on_boot: false
+  max_connections: 4
+
+wifi:
+  on_connect:
+    - delay: 15s
+    - if:
+        condition:
+          ble.enabled:
+        then:
+          - ble.disable
+          - delay: 5s
+    - delay: 10s
+    - ble.enable

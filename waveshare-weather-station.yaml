@@ -12,10 +12,10 @@ substitutions:
   device:
     name: waveshare-weather-station
     location: "2etg, Ellen & Svein"
+    framework:
+      type: esp-idf
   display:
     home_page: page_content
-    framework:
-      type: arduino
 
 #external_components:
 #  - source: github://pr#6209
