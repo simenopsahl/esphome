@@ -7,12 +7,12 @@ substitutions:
 
 packages:
   # --- COMMON PACKAGES ---
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
   time: !include common/time.yaml
   status: !include common/status.yaml
 
   # --- BOARD AND MODULES ---
-  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha.yaml@main
+  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
   tweaks: !include board/everything_presence_lite.yaml
 
 esphome:
