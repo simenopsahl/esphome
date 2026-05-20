@@ -20,21 +20,10 @@ esphome:
   project:
     name: "M5Stack.Fire"
     version: "2.7"
-  platformio_options:
-    build_flags:
-      - "-DARDUINO_M5STACK_FIRE"
-      - "-DBOARD_HAS_PSRAM"
-      - "-DARDUINO_USB_CDC_ON_BOOT=1"
-      - "-mfix-esp32-psram-cache-issue"
-      - "-mfix-esp32-psram-cache-strategy=memw"
-
-# PSRAM is shared with UART bus tx17/rx16
-#psram:
-#  mode: quad
-#  speed: 80MHz
 
 esp32:
-#  board: m5stack-grey
+# ESP32-D0WDQ6@Dual-core processor, Main frequency 240MHz
+# PSRAM: 8MB Quad
   variant: ESP32
   flash_size: 16MB
   cpu_frequency: 240MHz
@@ -44,6 +33,11 @@ esp32:
       compiler_optimization: PERF
       minimum_chip_revision: 3.1
       sram1_as_iram: true
+
+# PSRAM is shared with UART bus tx17/rx16
+#psram:
+#  mode: quad
+#  speed: 80MHz
 
 wifi:
   enable_btm: true

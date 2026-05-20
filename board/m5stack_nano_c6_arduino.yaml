@@ -20,9 +20,10 @@ esphome:
 #    board_build.arduino.memory_type: qio_opi
 
 esp32:
-  board: esp32-c6-devkitm-1
+# ESP32-C6FH4@RISC-V single-core, main frequency 160MHz, supports CDC
   variant: esp32c6
   flash_size: 4MB
+  cpu_frequency: 160MHz
 
 # Enable status LED
 status_led:

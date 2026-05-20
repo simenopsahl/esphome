@@ -16,19 +16,24 @@ esphome:
     name: 'Sunton.3,5" 320x480'
 
 esp32:
-  board: esp32s3box
+# ESP32-S3R8 (Dual-core, 240MHz)
+# PSRAM: 8MB Octal
   variant: ESP32S3
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:
-    type: ${device.framework.type}
-    sdkconfig_options:
-      CONFIG_ESP32S3_DATA_CACHE_64KB: y
-      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
-      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
-      CONFIG_SPIRAM_RODATA: y
     advanced:
       compiler_optimization: PERF
+      execute_from_psram: true
+    sdkconfig_options:
+      # Cache optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation for large RGB graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
 
 wifi:
   enable_btm: true

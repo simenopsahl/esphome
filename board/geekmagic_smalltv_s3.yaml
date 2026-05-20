@@ -31,7 +31,7 @@ esphome:
 #      - "-mfix-esp32-psram-cache-issue"
 
 esp32:
-  board: esp32-s3-devkitc-1
+#  board: esp32-s3-devkitc-1
   variant: esp32s3
   flash_size: 16MB
 #  partitions: partitions/gm-s3-16MB.csv
@@ -39,6 +39,7 @@ esp32:
     type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
+      execute_from_psram: true
 
 psram:
   mode: octal

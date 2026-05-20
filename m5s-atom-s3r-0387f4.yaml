@@ -1,15 +1,16 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
   hat: !include board/extension/hat_i2c.yaml
-  env: !include board/module/hat_env_iii.yaml
+#  env: !include board/module/hat_env_iii.yaml
+  dlight: !include board/module/hat_dlight.yaml
 
   # --- FEATURE PACKAGES ---
-  combined_env_sensors: !include features/combined_env_sensors.yaml
+#  combined_env_sensors: !include features/combined_env_sensors.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -76,7 +77,7 @@ binary_sensor:
         - script.execute: display_on_off
 
 lvgl:
-  buffer_size: 75%
+  buffer_size: 40%
 #  top_layer:
 #    - obj:
 #        id: titlebar
@@ -99,25 +100,25 @@ lvgl:
 
 display:
   - id: !extend display_lcd
-    dimensions:
-      offset_height: 1
-      offset_width: 2
+#    dimensions:
+#      offset_height: 1
+#      offset_width: 2
     # Rotate 180deg
-    transform:
-      mirror_x: true
-      mirror_y: true
+#    transform:
+#      mirror_x: true
+#      mirror_y: true
     auto_clear_enabled: false
     update_interval: never
 
-sensor:
+#sensor:
   # Combine sensors
-  - id: !extend temperature_local
-    sources:
+#  - id: !extend temperature_local
+#    sources:
       # Base BTC
 #      - source: temperature_sht30_base_btc
       # HAT ENV III
-      - source: temperature_sht30_hat_env
-      - source: temperature_qmp6988_hat_env
+#      - source: temperature_sht30_hat_env
+#      - source: temperature_qmp6988_hat_env
       # Unit ENV III
 #      - source: temperature_sht30_unit_env
 #      - source: temperature_qmp6988_unit_env
@@ -129,12 +130,12 @@ sensor:
       # Unit CO2
 #      - source: temperature_scd40_unit_co2
 
-  - id: !extend humidity_local
-    sources:
+#  - id: !extend humidity_local
+#    sources:
       # Base BTC
 #      - source: humidity_sht30_base_btc
       # HAT ENV III
-      - source: humidity_sht30_hat_env
+#      - source: humidity_sht30_hat_env
       # Unit ENV III
 #      - source: humidity_sht30_unit_env
       # Unit ENV IV
@@ -144,10 +145,10 @@ sensor:
       # Unit CO2
 #      - source: humidity_scd40_unit_co2
 
-  - id: !extend pressure_local
-    sources:
+#  - id: !extend pressure_local
+#    sources:
       # HAT ENV III
-      - source: pressure_qmp6988_hat_env
+#      - source: pressure_qmp6988_hat_env
       # Unit ENV III
 #      - source: pressure_qmp6988_unit_env
       # Unit ENV IV

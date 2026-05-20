@@ -49,6 +49,10 @@ esphome:
   project:
     version: "1.0.0"
 
+api:
+  max_send_queue: 10
+  batch_delay: 200ms
+
 # --- LVGL CLOCKS ---
 time:
   - id: !extend time_rtc

@@ -17,28 +17,9 @@ substitutions:
 packages:
   pins: !include pins/m5stack_stickc_plus2.yaml
 
-esp32:
-#  board: esp32-pico-devkitm-2
-  variant: ESP32
-  flash_size: 8MB
-  cpu_frequency: 240MHz
-  framework:
-    advanced:
-      compiler_optimization: PERF
-      sram1_as_iram: true
-    type: ${device.framework.type}
-
 esphome:
   project:
     name: "M5Stack.StickC Plus2"
-  platformio_options:
-#    board_build.arduino.partitions: default_8MB.csv
-#    board_build.f_flash: 80000000L
-    build_flags:
-      - "-w" # https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/build_flags.html
-      - "-DBOARD_HAS_PSRAM"
-      - "-DARDUINO_USB_CDC_ON_BOOT=1"
-      - "-mfix-esp32-psram-cache-issue"
   on_boot:
     - priority: 800
       then:
@@ -54,13 +35,29 @@ esphome:
             gpio_hold_en(GPIO_NUM_4);
             gpio_deep_sleep_hold_en();
 
-wifi:
-  enable_btm: true
-  enable_rrm: true
+esp32:
+# ESP32-PICO-V3-02@Dual-Core Processor, up to 240MHz
+# PSRAM: 2MB Quad
+  variant: esp32
+  flash_size: 8MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      sram1_as_iram: true
+    sdkconfig_options:
+      # Memory allocation rules for display buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
 
 psram:
   mode: quad
-  speed: 80MHz
+  speed: 40MHz
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 spi:
   clk_pin: ${pin.int.spi.clk}

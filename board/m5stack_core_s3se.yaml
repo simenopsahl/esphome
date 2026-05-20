@@ -23,45 +23,35 @@ packages:
 esphome:
   project:
     name: "M5Stack.Core S3 SE"
-#  libraries:
-#    - m5stack/M5GFX
-#    - m5stack/M5Unified
-  platformio_options:
-    board_build.flash_mode: dio
-    board_upload.maximum_size: 16777216
 
 esp32:
-#  board: esp32s3box
+# ESP32-S3@Xtensa LX7 Dual-Core, 240MHz
+# PSRAM: 8MB Quad
   variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:
-    type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
+      execute_from_psram: true
     sdkconfig_options:
-      # need to set a s3 compatible board for the adf-sdk to compile
-      # board specific code is not used though
-#      CONFIG_ESP32_S3_BOX_BOARD: "y"
-      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
-      CONFIG_ESP32S3_DATA_CACHE_64KB:      "y"
-      CONFIG_ESP32S3_DATA_CACHE_LINE_64B:  "y"
+      # Cache optimizations for display graphics
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation rules for graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
 
-      CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM: "16"
-      CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: "512"
-      CONFIG_TCPIP_RECVMBOX_SIZE: "512"
-
-      CONFIG_TCP_SND_BUF_DEFAULT: "65535"
-      CONFIG_TCP_WND_DEFAULT: "512000"
-      CONFIG_TCP_RECVMBOX_SIZE: "512"
+psram:
+  mode: quad
+  speed: 80MHz
 
 wifi:
   enable_btm: true
   enable_rrm: true
 
-psram:
-  mode: quad
-  speed: 80MHz
 
 logger:
   deassert_rts_dtr: true

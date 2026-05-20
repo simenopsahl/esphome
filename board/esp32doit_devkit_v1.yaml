@@ -14,8 +14,15 @@ substitutions:
 
 esp32:
   board: esp32doit-devkit-v1
+  variant: esp32
+  flash_size: 4MB
+  cpu_frequency: 240MHz
   framework: 
     type: ${device.framework.type}
+    advanced:
+      compiler_optimization: PERF
+      sram1_as_iram: true
+      minimum_chip_revision: 3.1
 
 wifi:
   enable_btm: true

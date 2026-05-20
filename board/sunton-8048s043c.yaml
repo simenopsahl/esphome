@@ -14,40 +14,37 @@ substitutions:
 esphome:
   project:
     name: 'Sunton.4,3" 800x480'
-  platformio_options:
-    build_flags: "-DBOARD_HAS_PSRAM"
-    board_build.esp-idf.memory_type: qio_opi
-    board_build.flash_mode: dio
-    board_upload.maximum_ram_size: 524288
 
 esp32:
-  board: esp32-s3-devkitc-1
+# ESP32-S3R8 (Dual-core)
+# PSRAM: 8MB Octal
   variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:
-    type: ${device.framework.type}
-    # these versions prevent artifacting
-    version: 5.0.0
-    platform_version: 6.8.1
-    # Required to achieve sufficient PSRAM bandwidth
-    sdkconfig_options:
-#      COMPILER_OPTIMIZATION_SIZE: y
-      CONFIG_ESP32S3_DATA_CACHE_64KB: y
-      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
-      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
-      CONFIG_SPIRAM_RODATA: y
-      CONFIG_ESPTOOLPY_FLASHSIZE_16MB: y # fix warning about 2mb found
     advanced:
       compiler_optimization: PERF
-
-wifi:
-  enable_btm: true
-  enable_rrm: true
+      execute_from_psram: true
+    # These versions prevent RGB panel DMA artifacting
+    version: 5.0.0
+    platform_version: 6.8.1
+    sdkconfig_options:
+      # Cache optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation for large RGB graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
 
 psram:
   mode: octal
   speed: 80MHz
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 i2c:
   - id: i2c_internal

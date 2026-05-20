@@ -54,7 +54,7 @@ esphome:
         - script.execute: update_screen
 
 esp32:
-#  board: m5stack-stamps3
+# ESP32S3FN8@Dual-core Xtensa LX7, 240MHz
   variant: esp32s3
   flash_size: 8MB
   cpu_frequency: 240MHz
@@ -102,7 +102,7 @@ light:
     pin: ${pin.light.rgb}
     num_leds: 1
 #    rmt_channel: 0 # Not for ESP-IDF
-    rmt_symbols: 384
+    rmt_symbols: 48
     chipset: SK6812
     effects:
       - pulse:

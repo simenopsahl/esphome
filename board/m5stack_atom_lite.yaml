@@ -19,7 +19,7 @@ esphome:
     name: "M5Stack.Atom Lite"
 
 esp32:
-  board: m5stack-atom
+# ESP32-PICO-D4@Dual-core processor, 240MHz
   variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz
