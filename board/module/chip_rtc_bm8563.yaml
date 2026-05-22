@@ -1,0 +1,23 @@
+---
+# https://esphome.io/components/time/bm8563/
+# BM8563 / PCF8563 RTC
+
+substitutions:
+  rtc_i2c_bus: i2c_internal
+
+# i2c RTC only with one additional i2c bus
+time:
+  - platform: bm8563
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    update_interval: 15min
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - bm8563.write_time:
+
+esphome:
+  on_boot:
+    - priority: 800
+      then:
+        - bm8563.read_time

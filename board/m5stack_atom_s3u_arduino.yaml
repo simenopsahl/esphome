@@ -45,7 +45,7 @@ esp32:
 #remote_transmitter:
 #  pin: ${pin.light.ir}
 #  carrier_duty_percent: 50%
-#  rmt_symbols: 144
+#  rmt_symbols: 48
 
 light:
   # Enable status LED
@@ -61,7 +61,7 @@ light:
     num_leds: 1
     # RMT 0 channels will be occupied by IR
     rmt_channel: 1
-#    rmt_symbols: 384
+#    rmt_symbols: 48
     chipset: ws2812
     effects:
       - pulse:

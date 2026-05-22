@@ -60,7 +60,8 @@ sensor:
             window_size: 10
             send_every: 10
       on_value:
-        - component.update: iaq_classification_bme688
+        - then:
+            - component.update: iaq_classification_bme688
     iaq_static:
       id: static_iaq_bme688
       name: "Static IAQ BME688"
@@ -72,7 +73,8 @@ sensor:
             window_size: 10
             send_every: 10
       on_value:
-        - component.update: static_iaq_classification_bme688
+        - then:
+            - component.update: static_iaq_classification_bme688
     co2_equivalent:
       id: eco2_bme688
       name: "CO2 equivalent BME688"
@@ -111,7 +113,8 @@ sensor:
       - source: iaq_bme688
       - source: static_iaq_bme688
     on_value:
-      - component.update: combined_iaq_classification_bme688
+      - then:
+          - component.update: combined_iaq_classification_bme688
 
 text_sensor:
   - platform: template

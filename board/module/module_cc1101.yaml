@@ -34,20 +34,21 @@ cc1101:
   packet_mode: ${module.cc1101.packet_mode}
   num_preamble: ${module.cc1101.num_preamble}
   on_packet:
-    - lambda: |-
-        char hex[256];  // Size appropriately for your data
-        ESP_LOGD("cc1101",
-              "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u",
-              format_hex_to(hex, x),
-              freq_offset,
-              rssi,
-              lqi);
-    - sensor.template.publish:
-        id: cc1101_rssi
-        state: !lambda 'return rssi;'
-    - sensor.template.publish:
-        id: cc1101_lqi
-        state: !lambda 'return lqi;'
+    - then:
+        - lambda: |-
+            char hex[256];  // Size appropriately for your data
+            ESP_LOGD("cc1101",
+                  "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u",
+                  format_hex_to(hex, x),
+                  freq_offset,
+                  rssi,
+                  lqi);
+        - sensor.template.publish:
+            id: cc1101_rssi
+            state: !lambda 'return rssi;'
+        - sensor.template.publish:
+            id: cc1101_lqi
+            state: !lambda 'return lqi;'
 
 # Adjustments
 number:
@@ -66,8 +67,9 @@ number:
     mode: box
     disabled_by_default: true
     on_value:
-      - cc1101.set_frequency:
-          value: !lambda "return x * 1e6;"
+      - then:
+          - cc1101.set_frequency:
+              value: !lambda "return x * 1e6;"
   - platform: template
     id: cc1101_output_power
     name: "CC1101 Output Power"
@@ -83,8 +85,9 @@ number:
     mode: slider
     disabled_by_default: true
     on_value:
-      - cc1101.set_output_power:
-          value: !lambda "return x;"
+      - then:
+          - cc1101.set_output_power:
+              value: !lambda "return x;"
 select:
   - platform: template
     id: cc1101_modulation_type
@@ -103,8 +106,9 @@ select:
     mode: dropdown
     disabled_by_default: true
     on_option:
-      - cc1101.set_modulation_type:
-          value: !lambda "return x;"
+      - then:
+          - cc1101.set_modulation_type:
+              value: !lambda "return x;"
   - platform: template
     id: cc1101_symbol_rate
     name: "CC1101 Symbol Rate"
@@ -124,8 +128,9 @@ select:
     mode: dropdown
     disabled_by_default: true
     on_option:
-      - cc1101.set_symbol_rate:
-          value: !lambda "return x;"
+      - then:
+          - cc1101.set_symbol_rate:
+              value: !lambda "return x;"
   - platform: template
     id: cc1101_rx_attenuation
     name: "CC1101 RX Attenuation"
@@ -142,8 +147,9 @@ select:
     mode: dropdown
     disabled_by_default: true
     on_option:
-      - cc1101.set_rx_attenuation:
-          value: !lambda "return x;"
+      - then:
+          - cc1101.set_rx_attenuation:
+              value: !lambda "return x;"
 switch:
   - platform: template
     id: cc1101_rx
@@ -155,9 +161,11 @@ switch:
     initial_state: off
     disabled_by_default: true
     on_turn_on:
-      - cc1101.begin_rx:
+      - then:
+          - cc1101.begin_rx:
     on_turn_off:
-      - cc1101.set_idle:
+      - then:
+          - cc1101.set_idle:
 button:
   - platform: template
     id: cc1101_idle
@@ -165,7 +173,8 @@ button:
     icon: "mdi:email-lock"
     entity_category: config
     on_press:
-      - cc1101.set_idle:
+      - then:
+          - cc1101.set_idle:
 
 # Diagnostics
 sensor:

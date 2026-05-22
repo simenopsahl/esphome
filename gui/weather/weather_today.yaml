@@ -6,14 +6,14 @@ text_sensor:
     entity_id: weather.hjemme
     id: ha_weather_condition
     on_value:
-        then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: weather_condition_icon, input_id: ha_weather_condition  } }
+      - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: weather_condition_icon, input_id: ha_weather_condition  } }
 
   - platform: homeassistant
     entity_id: weather.hjemme
     attribute: temperature
     id: ha_weather_temperature
     on_value:
-        then:
+      - then:
           # Update weather_condition
           - lvgl.label.update:
               id: weather_temperature_today
@@ -26,7 +26,7 @@ text_sensor:
     attribute: weather_condition_now_string
     id: ha_condition_today
     on_value:
-        then:
+      - then:
           # Update weather_condition
           - lvgl.label.update:
               id: weather_condition_today

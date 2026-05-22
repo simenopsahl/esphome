@@ -13,12 +13,18 @@ esp32_ble:
 
 wifi:
   on_connect:
-    - delay: 15s
-    - if:
-        condition:
-          ble.enabled:
-        then:
-          - ble.disable
-          - delay: 5s
-    - delay: 10s
-    - ble.enable
+    - script.execute: ble_delayed_start
+
+script:
+  - id: ble_delayed_start
+    mode: single
+    then:
+      - delay: 15s
+      - if:
+          condition:
+            ble.enabled:
+          then:
+            - ble.disable
+            - delay: 5s
+      - delay: 10s
+      - ble.enable

@@ -19,6 +19,7 @@
 - "\U000F0141" # chevron-left
 - "\U000F0142" # chevron-right
 - "\U000F0140" # chevron-down
+- "\U000F0143" # chevron-up
 # pages
 - "\U000F0954" # clock
 - "\U000F081F" # finance
@@ -48,6 +49,7 @@
 - "\U000F0395" # newspaper
 - "\U000F010B" # car
 - "\U000F08CA" # bus-clock
+- "\U000F0F92" # water-boiler
 # weather
 - "\U000F0590" # weather-cloudy
 - "\U000F0F2F" # weather-cloudy-alert

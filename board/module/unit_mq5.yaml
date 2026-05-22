@@ -1,0 +1,65 @@
+---
+# https://docs.m5stack.com/en/unit/Unit_MQ
+# https://docs.m5stack.com/en/homeassistant/sensor/unit_mq_sensor
+# MQ-5 Combustible Gas Sensor
+
+substitutions:
+  module:
+    mq5_i2c_bus: i2c_grove
+
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: m5stack_unit_mq
+
+# UNIT MQ-5
+sensor:
+  - platform: m5stack_unit_mq
+    i2c_id: ${module.mq5_i2c_bus}
+    id: mq5_sensor
+    heat_mode: SWITCH
+    update_interval: 20s
+    temperature:
+      id: mq5_temperature
+      name: "MQ-5 Temperature"
+      device_class: "temperature"
+      state_class: "measurement"
+      entity_category: "diagnostic"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 2
+            send_every: 1
+    mq_adc:
+      id: mq5_mq_adc
+      name: "MQ-5 MQ ADC"
+      state_class: "measurement"
+    mq_voltage:
+      id: mq5_mq_voltage
+      name: "MQ-5 MQ Voltage"
+      device_class: "voltage"
+      state_class: "measurement"
+    led:
+      id: mq5_led
+      name: "MQ-5 LED State"
+      device_class: "light"
+    ntc_adc:
+      id: mq5_ntc_adc
+      name: "MQ-5 NTC ADC"
+      state_class: "measurement"
+      entity_category: "diagnostic"
+    ntc_voltage:
+      id: mq5_ntc_voltage
+      name: "MQ-5 NTC Voltage"
+      device_class: "voltage"
+      state_class: "measurement"
+      entity_category: "diagnostic"
+    ntc_resistance:
+      id: mq5_ntc_resistance
+      name: "MQ-5 NTC Resistance"
+      state_class: "measurement"
+      entity_category: "diagnostic"
+    reference_voltage:
+      id: mq5_reference_voltage
+      name: "MQ-5 Reference Voltage"
+      device_class: "voltage"
+      state_class: "measurement"
+      entity_category: "diagnostic"

@@ -1,6 +1,5 @@
 ---
 # https://docs.m5stack.com/en/base/m5go_bottom
-# https://esphome.io/components/sensor/sht3xd.html
 
 substitutions:
   m5go_port_b_in: ${pin.ext.mbus.p4}

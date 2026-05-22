@@ -8,7 +8,8 @@ button:
     icon: mdi:page-previous
     entity_category: config
     on_press:
-      - lvgl.page.previous:
+      - then:
+          - lvgl.page.previous:
   # Home page button
   - platform: template
     id: btn_home_page
@@ -16,7 +17,8 @@ button:
     icon: mdi:home-variant
     entity_category: config
     on_press:
-      - script.execute: go_home
+      - then:
+          - script.execute: go_home
   # Next page button
   - platform: template
     id: btn_next_page
@@ -24,7 +26,8 @@ button:
     icon: mdi:page-next
     entity_category: config
     on_press:
-      - lvgl.page.next:
+      - then:
+          - lvgl.page.next:
 
 text_sensor:
   # Current page text sensor

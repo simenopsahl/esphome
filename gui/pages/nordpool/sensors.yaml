@@ -14,14 +14,14 @@ globals:
 esphome:
   # On boot, run the script to calculate the initial graph layout.
   on_boot:
-    priority: -10.0 # Run before the display subsystem starts
-    then:
-      - script.execute:
-          id: nordpool_initialize_graph_layout
-          # Pass the variables to the script
-          graph_container_w: ${usable_screen_width}
-          graph_container_h: ${nordpool_row_2_height}
-          line_w: ${nordpool_line_width}
+    - priority: -10.0 # Run before the display subsystem starts
+      then:
+        - script.execute:
+            id: nordpool_initialize_graph_layout
+            # Pass the variables to the script
+            graph_container_w: ${usable_screen_width}
+            graph_container_h: ${nordpool_row_2_height}
+            line_w: ${nordpool_line_width}
 
 script:
   - id: nordpool_initialize_graph_layout
@@ -119,11 +119,12 @@ sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price0
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_price_0
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_price_0
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
   - platform: homeassistant
     id: nordpool_price_1
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -133,11 +134,12 @@ sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price2
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_price_2
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_price_2
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
   - platform: homeassistant
     id: nordpool_price_3
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -147,11 +149,12 @@ sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price4
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_price_4
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_price_4
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
   - platform: homeassistant
     id: nordpool_price_5
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -161,11 +164,12 @@ sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price6
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_price_6
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_price_6
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
   - platform: homeassistant
     id: nordpool_price_7
     entity_id: sensor.waveshare_nordpool_future_offset
@@ -175,11 +179,12 @@ sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: price8
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_price_8
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_price_8
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
 
   # Combination sensors to find the min and max price across all points
   - platform: combination
@@ -209,12 +214,13 @@ sensor:
       - source: nordpool_price_7
       - source: nordpool_price_8
     on_value:
-      # When the max price changes (meaning any price has changed), run the update script.
-      - script.execute:
-          id: nordpool_update_chart
-          # Pass the variables to the script
-          graph_container_h: ${nordpool_row_2_height}
-          line_w: ${nordpool_line_width}
+      - then:
+          # When the max price changes (meaning any price has changed), run the update script.
+          - script.execute:
+              id: nordpool_update_chart
+              # Pass the variables to the script
+              graph_container_h: ${nordpool_row_2_height}
+              line_w: ${nordpool_line_width}
 
 text_sensor:
   # All your homeassistant text_sensors for the time labels go here
@@ -223,38 +229,43 @@ text_sensor:
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time0
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_time_0
-          text: !lambda return id(nordpool_time_0).state;
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_time_0
+              text: !lambda return id(nordpool_time_0).state;
   - platform: homeassistant
     id: nordpool_time_2
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time2
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_time_2
-          text: !lambda return id(nordpool_time_2).state;
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_time_2
+              text: !lambda return id(nordpool_time_2).state;
   - platform: homeassistant
     id: nordpool_time_4
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time4
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_time_4
-          text: !lambda return id(nordpool_time_4).state;
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_time_4
+              text: !lambda return id(nordpool_time_4).state;
   - platform: homeassistant
     id: nordpool_time_6
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time6
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_time_6
-          text: !lambda return id(nordpool_time_6).state;
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_time_6
+              text: !lambda return id(nordpool_time_6).state;
   - platform: homeassistant
     id: nordpool_time_8
     entity_id: sensor.waveshare_nordpool_future_offset
     attribute: time8
     on_value:
-      - lvgl.label.update:
-          id: lbl_nordpool_time_8
-          text: !lambda return id(nordpool_time_8).state;
+      - then:
+          - lvgl.label.update:
+              id: lbl_nordpool_time_8
+              text: !lambda return id(nordpool_time_8).state;

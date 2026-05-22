@@ -137,7 +137,8 @@ lvgl:
     - id: page_splash
       skip: true
       on_load:
-        - script.execute: go_home
+        - then:
+            - script.execute: go_home
 
     # analog clock
     - <<: !include

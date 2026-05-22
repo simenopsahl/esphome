@@ -1,16 +1,16 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_stickc_plus2.yaml
   hat: !include board/extension/hat_i2c.yaml
-  internal: !include board/extension/internal_i2c.yaml
+#  internal: !include board/extension/internal_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
-#  grove: !include board/extension/grove_i2c.yaml
-#  co2: !include board/module/unit_co2.yaml
-#  multiplexer: !include board/extension/unit_pa_hub.yaml
+  grove: !include board/extension/grove_i2c.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
+  multiplexer: !include board/extension/unit_pa_hub.yaml
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
@@ -47,7 +47,7 @@ esphome:
 
 # --- LVGL CLOCKS ---
 time:
-  - id: !extend time_rtc
+  - id: !extend time_homeassistant
     on_time:
       - minutes: '*'
         seconds: 0
@@ -55,7 +55,123 @@ time:
           - script.execute: lvgl_time_update
 
 lvgl:
-  buffer_size: 75%
+  buffer_size: 40%
+  pages:
+    - id: page_water_boiler
+      <<: !include gui/styles/page_styles.yaml
+      # REMOVED: `<<: *page_styles`
+      # ADDED: Use the variables passed from the parent file
+      pad_top: 26
+      pad_bottom: 0
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: "\U000F0F92" # water-boiler
+      <<: !include
+        file: gui/functions/swipe_navigation.yaml
+      widgets:
+        - obj:
+            <<: !include gui/styles/container_styles.yaml
+            # Use the passed-in variables for size
+            pad_top: 1
+            pad_bottom: 8
+            pad_left: 3
+            pad_right: 3
+            scrollable: false
+            align: CENTER
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_cross: CENTER
+              flex_align_main: SPACE_EVENLY
+              flex_align_track: CENTER
+              pad_column: 0
+              pad_row: 0
+            widgets:
+              - obj:
+                  pad_all: 0
+                  width: 135
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_cross: CENTER
+                    flex_align_main: SPACE_AROUND
+                    pad_column: 0
+                    pad_row: 0
+                  widgets:
+                    - label: # thermometer icon
+                        id: lbl_boiler_top_temp_icon
+                        text: "\U000F0143" # chevron-up
+                        text_font: mdi_lg
+                        text_color: c_text_s
+                    - label: # temperature value
+                        id: lbl_boiler_top_temp_value
+                        text: "--°C"
+                        pad_all: 0
+                        text_font: font_xxl
+                        text_color: c_text_p
+                    - label: # temperature unit
+                        id: lbl_boiler_top_temp_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s
+              - obj:
+                  pad_all: 0
+                  width: 135
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_cross: CENTER
+                    flex_align_main: SPACE_AROUND
+                    pad_column: 0
+                    pad_row: 0
+                  widgets:
+                    - label: # thermometer icon
+                        id: lbl_boiler_mix_temp_icon
+                        text: "\U000F0F92" # water-boiler
+                        text_font: mdi_lg
+                        text_color: c_text_s
+                    - label: # temperature value
+                        id: lbl_boiler_mix_temp_value
+                        text: "--°C"
+                        pad_all: 0
+                        text_font: font_xxl
+                        text_color: c_text_p
+                    - label: # temperature unit
+                        id: lbl_boiler_mix_temp_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s
+              - obj:
+                  pad_all: 0
+                  width: 135
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_cross: CENTER
+                    flex_align_main: SPACE_AROUND
+                    pad_column: 0
+                    pad_row: 0
+                  widgets:
+                    - label: # thermometer icon
+                        id: lbl_boiler_bottom_temp_icon
+                        text: "\U000F0140" # chevron-down
+                        text_font: mdi_lg
+                        text_color: c_text_s
+                    - label: # temperature value
+                        id: lbl_boiler_bottom_temp_value
+                        text: "--°C"
+                        pad_all: 0
+                        text_font: font_xxl
+                        text_color: c_text_p
+                    - label: # temperature unit
+                        id: lbl_boiler_bottom_temp_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s
 
 binary_sensor:
   # Call sensors from HA.
@@ -89,69 +205,90 @@ binary_sensor:
 
 sensor:
   # UNIT KMeterISO
-#  - platform: kmeteriso
-#    i2c_id: i2c_pa_hub_c0
-#    id: kmeteriso_0_sensor
-#    temperature:
-#      id: temperature_kmeteriso_0
-#      name: "Temperature KMeterISO 0"
-#      device_class: "temperature"
-#      state_class: "measurement"
-#      filters:
-#        - sliding_window_moving_average:
-#            window_size: 10
-#            send_every: 5
-#    internal_temperature:
-#      id: temperature_kmeteriso_0_internal
-#      name: "Temperature KMeterISO 0 Internal"
-#      device_class: "temperature"
-#      state_class: "measurement"
-#      disabled_by_default: true
-#      filters:
-#        - sliding_window_moving_average:
-#            window_size: 20
-#            send_every: 10
-#    update_interval: 3s
+  - platform: kmeteriso
+    i2c_id: i2c_pa_hub_c0
+    id: kmeteriso_0_sensor
+    temperature:
+      id: temperature_kmeteriso_0
+      name: "Temperature KMeterISO 0"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 5
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: lbl_boiler_top_temp_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+    internal_temperature:
+      id: temperature_kmeteriso_0_internal
+      name: "Temperature KMeterISO 0 Internal"
+      device_class: "temperature"
+      state_class: "measurement"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
+    update_interval: 3s
 
-#  - platform: kmeteriso
-#    i2c_id: i2c_pa_hub_c1
-#    id: kmeteriso_1_sensor
-#    temperature:
-#      id: temperature_kmeteriso_1
-#      name: "Temperature KMeterISO 1"
-#      device_class: "temperature"
-#      state_class: "measurement"
-#      filters:
-#        - sliding_window_moving_average:
-#            window_size: 10
-#            send_every: 5
-#    internal_temperature:
-#      id: temperature_kmeteriso_1_internal
-#      name: "Temperature KMeterISO 1 Internal"
-#      device_class: "temperature"
-#      state_class: "measurement"
-#      disabled_by_default: true
-#      filters:
-#        - sliding_window_moving_average:
-#            window_size: 20
-#            send_every: 10
-#    update_interval: 3s
+  - platform: kmeteriso
+    i2c_id: i2c_pa_hub_c1
+    id: kmeteriso_1_sensor
+    temperature:
+      id: temperature_kmeteriso_1
+      name: "Temperature KMeterISO 1"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 10
+            send_every: 5
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: lbl_boiler_bottom_temp_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+    internal_temperature:
+      id: temperature_kmeteriso_1_internal
+      name: "Temperature KMeterISO 1 Internal"
+      device_class: "temperature"
+      state_class: "measurement"
+      disabled_by_default: true
+      filters:
+        - sliding_window_moving_average:
+            window_size: 20
+            send_every: 10
+    update_interval: 3s
 
   # Combine sensors
-#  - platform: combination
-#    type: median
-#    id: temperature_kmeteriso_mix
-#    name: "Temperature KMeterISO Mix"
-#    device_class: "temperature"
-#    state_class: "measurement"
-#    sources:
+  - platform: combination
+    type: median
+    id: temperature_kmeteriso_mix
+    name: "Temperature KMeterISO Mix"
+    device_class: "temperature"
+    state_class: "measurement"
+    sources:
       # KMeterISO
-#      - source: temperature_kmeteriso_0
-#      - source: temperature_kmeteriso_1
-#    filters:
-#      - or:
-#        - heartbeat: 900s
-#        - delta: 0.15
+      - source: temperature_kmeteriso_0
+      - source: temperature_kmeteriso_1
+    filters:
+      - or:
+        - heartbeat: 900s
+        - delta: 0.15
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_boiler_mix_temp_value
+            text:
+              format: "%.1f"
+              args: [ 'x' ]
 
   - id: !extend temperature_local
     sources:
@@ -164,8 +301,8 @@ sensor:
 #      - source: temperature_sht30_unit_env
 #      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
-#      - source: temperature_bmp280_unit_env
-#      - source: temperature_sht40_unit_env
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
       # Unit ENV Pro
 #      - source: temperature_bme688
       # Unit CO2
@@ -180,7 +317,7 @@ sensor:
       # Unit ENV III
 #      - source: humidity_sht30_unit_env
       # Unit ENV IV
-#      - source: humidity_sht40_unit_env
+      - source: humidity_sht40_unit_env
       # Unit ENV Pro
 #      - source: humidity_bme688
       # Unit CO2
@@ -193,6 +330,6 @@ sensor:
       # Unit ENV III
 #      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
-#      - source: pressure_bmp280_unit_env
+      - source: pressure_bmp280_unit_env
       # Unit ENV Pro
 #      - source: pressure_bme688

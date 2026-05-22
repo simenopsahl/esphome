@@ -89,8 +89,8 @@ time:
     update_interval: 15min
   - id: !extend time_homeassistant
     on_time_sync:
-      then:
-        bm8563.write_time:
+      - then:
+          - bm8563.write_time:
 
 external_components:
   - source: github://m5stack/esphome-yaml/components
@@ -177,20 +177,21 @@ touchscreen:
       aw9523b_id: aw9523b_hub
       number: 0
     on_touch:
-      - lambda: |-
-            ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
-                touch.x,
-                touch.y,
-                touch.x_raw,
-                touch.y_raw
-                );  
-      - if:
-          condition:
-            - light.is_off: backlight_light
-          then:
-            - light.turn_on:
-                id: backlight_light
-                brightness: 40%
+      - then:
+          - lambda: |-
+                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                    touch.x,
+                    touch.y,
+                    touch.x_raw,
+                    touch.y_raw
+                    );  
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
 #    on_update:
 #      - logger.log:
 #          format: Touch %d at (%d, %d)

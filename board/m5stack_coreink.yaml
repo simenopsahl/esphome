@@ -255,8 +255,8 @@ sensor:
     device_class: voltage
     unit_of_measurement: V
     on_value:
-      then:
-        - component.update: bat_percent
+      - then:
+          - component.update: bat_percent
   # Battery Percent
   - platform: template
     name: "Battery"

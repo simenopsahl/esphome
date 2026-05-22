@@ -17,53 +17,53 @@ sensor:
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 5
-            send_every: 5
+            window_size: 2
+            send_every: 1
     accel_y:
       id: mpu6886_accel_y
       name: "Accel Y"
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 5
-            send_every: 5
+            window_size: 2
+            send_every: 1
     accel_z:
       id: mpu6886_accel_z
       name: "Accel Z"
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 5
-            send_every: 5
+            window_size: 2
+            send_every: 1
     gyro_x:
       id: mpu6886_gyro_x
       name: "Gyro X"
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 5
-            send_every: 5
+            window_size: 2
+            send_every: 1
     gyro_y:
       id: mpu6886_gyro_y
       name: "Gyro Y"
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 5
-            send_every: 5
+            window_size: 2
+            send_every: 1
     gyro_z:
       id: mpu6886_gyro_z
       name: "Gyro Z"
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 5
-            send_every: 5
+            window_size: 2
+            send_every: 1
     temperature:
       id: temperature_mpu6886
       name: "Temperature MPU6886"
       disabled_by_default: true
       filters:
         - sliding_window_moving_average:
-            window_size: 60
-            send_every: 30
+            window_size: 30
+            send_every: 10

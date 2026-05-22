@@ -15,30 +15,26 @@ globals:
 ##### CATCH SYSTEM EVENTS #####
 esphome:
   on_boot:
-    priority: -10
-    then:
-      - lambda: 'id(boot_done) = true;'
-      - script.execute: led_system_status
+    - priority: -10
+      then:
+        - lambda: 'id(boot_done) = true;'
+        - script.execute: led_system_status
 
 wifi:
   on_connect:
-    then:
-      - lambda: 'id(wifi_ok) = true;'
-      - script.execute: led_system_status
+    - lambda: 'id(wifi_ok) = true;'
+    - script.execute: led_system_status
   on_disconnect:
-    then:
-      - lambda: 'id(wifi_ok) = false;'
-      - script.execute: led_system_status
+    - lambda: 'id(wifi_ok) = false;'
+    - script.execute: led_system_status
 
 api:
   on_client_connected:
-    then:
-      - lambda: 'id(api_ok) = true;'
-      - script.execute: led_system_status
+    - lambda: 'id(api_ok) = true;'
+    - script.execute: led_system_status
   on_client_disconnected:
-    then:
-      - lambda: 'id(api_ok) = false;'
-      - script.execute: led_system_status
+    - lambda: 'id(api_ok) = false;'
+    - script.execute: led_system_status
 
 ##### ASSIGN COLORS TO LED #####
 script:

@@ -7,8 +7,9 @@ sensor:
     platform: homeassistant
     entity_id: ${entity_id}
     on_value:
-      - lvgl.label.update:
-          id: ${uid}_widget_text
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - then:
+          - lvgl.label.update:
+              id: ${uid}_widget_text
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
