@@ -11,8 +11,8 @@ packages:
   # --- FEATURE PACKAGES ---
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
     light_id: rgb_led,
-    light_brightness: 80%,
-    light_flash_brightness: 90%
+    light_brightness: 50%,
+    light_flash_brightness: 70%
   }}
 
 substitutions:

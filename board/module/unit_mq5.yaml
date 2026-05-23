@@ -13,53 +13,125 @@ external_components:
 
 # UNIT MQ-5
 sensor:
+  # The device needs to be heated for a period of time before it can output normally
+  # (ADC readings generally appear only after heating to around 29 degrees Celsius)
   - platform: m5stack_unit_mq
     i2c_id: ${module.mq5_i2c_bus}
     id: mq5_sensor
-    heat_mode: SWITCH
-    update_interval: 20s
+    # heat_mode: SWITCH CONTINUOUS, OFF
+    heat_mode: CONTINUOUS
+#    high_level_time: 45  # Minimum is 30
+#    low_level_time: 5   # Minimum is 5
+    update_interval: 5s
+    # Temperature data derived from the thermistor reading
     temperature:
       id: mq5_temperature
       name: "MQ-5 Temperature"
       device_class: "temperature"
       state_class: "measurement"
       entity_category: "diagnostic"
+      disabled_by_default: true
       filters:
         - sliding_window_moving_average:
             window_size: 2
             send_every: 1
-    mq_adc:
-      id: mq5_mq_adc
-      name: "MQ-5 MQ ADC"
-      state_class: "measurement"
+    # 12-bit MQ ADC reading
+#    mq_adc:
+#      id: mq5_mq_adc
+#      name: "MQ-5 MQ ADC"
+#      state_class: "measurement"
+#      entity_category: "diagnostic"
+#      disabled_by_default: true
+    # MQ voltage reading
     mq_voltage:
       id: mq5_mq_voltage
       name: "MQ-5 MQ Voltage"
       device_class: "voltage"
       state_class: "measurement"
+      entity_category: "diagnostic"
+      disabled_by_default: true
+      on_value:
+        - lambda: |-
+            float current = x;
+            float baseline = id(mq5_dynamic_baseline);
+            float diff = current - baseline;
+            
+            // If the spike is massive (> 150mV over baseline), it's gas.
+            // Do NOT update the baseline.
+            if (diff > 150.0) {
+              return; 
+            }
+            // If voltage drifts slightly higher, adapt slowly (1% adjustment)
+            else if (diff > 0) {
+              id(mq5_dynamic_baseline) = baseline + (diff * 0.01);
+            }
+            // If voltage drops (cleaner air), adapt much faster (10% adjustment)
+            else {
+              id(mq5_dynamic_baseline) = baseline + (diff * 0.10);
+            }
+    # LED status reading. The LED lights up when the reading is valid
     led:
       id: mq5_led
-      name: "MQ-5 LED State"
-      device_class: "light"
-    ntc_adc:
-      id: mq5_ntc_adc
-      name: "MQ-5 NTC ADC"
-      state_class: "measurement"
+      name: "MQ-5 Valid Reading"
+      device_class: "problem"
       entity_category: "diagnostic"
+      filters:
+        - invert:
+    # 12-bit NTC ADC reading
+#    ntc_adc:
+#      id: mq5_ntc_adc
+#      name: "MQ-5 NTC ADC"
+#      state_class: "measurement"
+#      entity_category: "diagnostic"
+#      disable_by_default: true
     ntc_voltage:
       id: mq5_ntc_voltage
       name: "MQ-5 NTC Voltage"
       device_class: "voltage"
       state_class: "measurement"
       entity_category: "diagnostic"
+      disabled_by_default: true
+    # NTC resistance value.
     ntc_resistance:
       id: mq5_ntc_resistance
       name: "MQ-5 NTC Resistance"
       state_class: "measurement"
       entity_category: "diagnostic"
+      disabled_by_default: true
+    # Internal reference voltage
     reference_voltage:
       id: mq5_reference_voltage
       name: "MQ-5 Reference Voltage"
       device_class: "voltage"
       state_class: "measurement"
       entity_category: "diagnostic"
+      disabled_by_default: true
+
+# A template sensor so you can actually see the baseline on a graph in Home Assistant
+  - platform: template
+    id: mq5_baseline_tracker
+    name: "MQ-5 Dynamic Baseline"
+    device_class: "voltage"
+    state_class: "measurement"
+    unit_of_measurement: "mV"
+    entity_category: "diagnostic"
+    disabled_by_default: true
+    update_interval: 5s
+    lambda: |-
+      return id(mq5_dynamic_baseline);
+
+globals:
+  # Stores the dynamic baseline in memory. 
+  # We initialize it at 250.0mV as a starting guess.
+  - id: mq5_dynamic_baseline
+    type: float
+    initial_value: '250.0'
+
+# Binary GAS DETECTED sensor
+binary_sensor:
+  - platform: template
+    name: "MQ-5 Combustible Gas"
+    device_class: gas
+    # Triggers if the current reading jumps more than 200mV above our dynamic baseline
+    lambda: |-
+      return id(mq5_mq_voltage).state > (id(mq5_dynamic_baseline) + 200.0);
