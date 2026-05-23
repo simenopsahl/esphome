@@ -4,6 +4,7 @@
 # https://gist.github.com/wizioo/c89847c7894ede628071
 
 /.esphome/
+/.cache/
 /archive/
 /secrets.yaml
 sdl_*.yaml

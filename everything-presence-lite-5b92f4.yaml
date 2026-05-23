@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-5b92f4
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "2etg, Stue"
+  location: "Stue"
 
 packages:
   # --- COMMON PACKAGES ---

@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-5a3d38
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "1etg, Bad"
+  location: "Bad"
 
 packages:
   # --- COMMON PACKAGES ---

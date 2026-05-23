@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-aa3b78
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "2etg, Simen"
+  location: "Simen"
 
 packages:
   # --- COMMON PACKAGES ---

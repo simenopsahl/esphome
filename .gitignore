@@ -2,6 +2,7 @@
 # This is an example and may include too much for your use-case.
 # You can modify this file to suit your needs.
 /.esphome/
+/.cache/
 /archive/
 /components/
 /fonts/
@@ -10,6 +11,9 @@
 /trash/
 /secrets.yaml
 *.bak
+*.bin
 *.html
+*.json
+*.lock
 !common/
 !docs/

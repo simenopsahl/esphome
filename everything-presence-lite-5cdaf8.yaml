@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-5cdaf8
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "2etg, Gang"
+  location: "Gang"
 
 packages:
   # --- COMMON PACKAGES ---

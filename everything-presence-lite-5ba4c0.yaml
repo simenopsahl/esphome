@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-5ba4c0
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "1etg, Inngang"
+  location: "Inngang"
 
 packages:
   # --- COMMON PACKAGES ---

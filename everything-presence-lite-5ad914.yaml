@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-5ad914
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "2etg, Toalett"
+  location: "Toalett"
 
 packages:
   # --- COMMON PACKAGES ---

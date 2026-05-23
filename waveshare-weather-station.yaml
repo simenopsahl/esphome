@@ -11,7 +11,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: waveshare-weather-station
-    location: "2etg, Ellen & Svein"
+    location: "Ellen & Svein"
     framework:
       type: esp-idf
   display:

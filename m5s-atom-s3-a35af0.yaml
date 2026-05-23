@@ -1,0 +1,76 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_atom_s3.yaml
+  pir: !include board/module/unit_pir.yaml
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/128x128.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors:
+    !include {
+      file: gui/widgets/labels/number_sensor.yaml,
+      vars: { uid: room_temp_value, entity_id: sensor.etg2_simen_tc_heatindex },
+    }
+
+substitutions:
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-as3-a35af0
+    location: "Test"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_temperature
+
+esphome:
+  comment: "M5Stack Atom S3 @ Test"
+  name: ${device.name}
+  friendly_name: ${device.name}
+#  area: ${device.location}
+  project:
+    version: "1.0.0"
+
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
+binary_sensor:
+  - id: !extend btn_display
+    on_press:
+      - lvgl.page.next
+
+  # Turn on display while room is occupied
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: motion_detected
+    on_state: 
+      then:
+        - script.execute: display_on_off
+
+lvgl:
+  buffer_size: 15%
+  rotation: 180
+
+display:
+  - id: !extend display_lcd
+    dimensions:
+      offset_height: 1
+      offset_width: 2
+#    transform:
+#      mirror_x: true
+#      mirror_y: true

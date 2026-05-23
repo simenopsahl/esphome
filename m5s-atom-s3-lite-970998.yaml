@@ -25,7 +25,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-lite-970998
-    location: "1etg, Kjøkken"
+    location: "Kjøkken"
     framework:
       type: esp-idf
 

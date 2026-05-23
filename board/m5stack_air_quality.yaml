@@ -25,7 +25,6 @@ esphome:
   on_boot:
     - priority: 800
       then:
-        - output.turn_on: sen55_enable
         - bm8563.read_time
     - priority: 800
       then:

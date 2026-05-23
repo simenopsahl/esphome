@@ -284,7 +284,7 @@ time:
           - ds1307.write_time:
   - platform: ds1307
     update_interval: never
-    id: time_ehmtx
+    id: time_rtc
     on_time: 
       # Every day at 08:00
       - seconds: 0
@@ -329,7 +329,7 @@ ehmtxv2:
   icons2html: false
   iconscache: true
   icon_indicator: false
-  time_component: time_ehmtx
+  time_component: time_rtc
   time_format: "%H:%M" # defaults "%H:%M" (use "%I:%M%p" for the US)
   date_format: "%d.%m" # defaults "%d.%m." (use "%m.%d." for the US)
   show_seconds: false

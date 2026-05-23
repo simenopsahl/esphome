@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-aa2a1c
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "1etg, TV Stue"
+  location: "TV Stue"
 
 packages:
   # --- COMMON PACKAGES ---

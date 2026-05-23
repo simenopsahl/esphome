@@ -3,7 +3,7 @@ substitutions:
   friendly_name: EPL-aa3b40
   illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "2etg, Ellen & Svein"
+  location: "Ellen & Svein"
 
 packages:
   # --- COMMON PACKAGES ---
