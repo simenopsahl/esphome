@@ -17,8 +17,8 @@ logger:
   level: DEBUG
   initial_level: ${common.log_level}
   baud_rate: ${common.log_baud_rate}
-#  logs:
-#    light: INFO
+  logs:
+    light: INFO
 
 select:
   - platform: logger

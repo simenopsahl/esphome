@@ -20,8 +20,8 @@ sensor:
     id: mq5_sensor
     # heat_mode: SWITCH CONTINUOUS, OFF
     heat_mode: CONTINUOUS
-#    high_level_time: 45  # Minimum is 30
-#    low_level_time: 5   # Minimum is 5
+#    high_level_time: 45  # Minimum/default is 30
+#    low_level_time: 5   # Minimum/default is 5
     update_interval: 5s
     # Temperature data derived from the thermistor reading
     temperature:
@@ -53,12 +53,19 @@ sensor:
       on_value:
         - lambda: |-
             float current = x;
+            
+            // If the sensor is warming up/invalid (true), force the baseline 
+            // to instantly track the warm-up voltage. 
+            if (id(mq5_led).state) {
+              id(mq5_dynamic_baseline) = current;
+              return;
+            }
+
             float baseline = id(mq5_dynamic_baseline);
             float diff = current - baseline;
             
-            // If the spike is massive (> 150mV over baseline), it's gas.
-            // Do NOT update the baseline.
-            if (diff > 150.0) {
+            // If the spike is massive (> 400mV over baseline), it's gas.
+            if (diff > 400.0) {
               return; 
             }
             // If voltage drifts slightly higher, adapt slowly (1% adjustment)
@@ -134,4 +141,10 @@ binary_sensor:
     device_class: gas
     # Triggers if the current reading jumps more than 200mV above our dynamic baseline
     lambda: |-
+      // If the reading is invalid (true), completely suppress the alarm
+      if (id(mq5_led).state) {
+        return false;
+      }
+      
+      // If the reading is valid, evaluate the gas threshold
       return id(mq5_mq_voltage).state > (id(mq5_dynamic_baseline) + 200.0);

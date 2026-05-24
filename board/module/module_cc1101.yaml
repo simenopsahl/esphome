@@ -1,7 +1,6 @@
 ---
 # https://docs.m5stack.com/en/module/Module_CC1101
 # https://esphome.io/components/cc1101/
-# WIP
 
 substitutions:
   module:
@@ -16,6 +15,10 @@ substitutions:
       # Packet Mode settings
       packet_mode: "true"
       num_preamble: 0
+
+logger:
+  logs:
+    cc1101: DEBUG
 
 # Module CC1101
 cc1101:
@@ -36,22 +39,35 @@ cc1101:
   on_packet:
     - then:
         - lambda: |-
-            char hex[256];  // Size appropriately for your data
+            // format_hex_pretty safely returns a std::string, .c_str() formats it for the logger
             ESP_LOGD("cc1101",
                   "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u",
-                  format_hex_to(hex, x),
+                  format_hex_pretty(x).c_str(),
                   freq_offset,
                   rssi,
                   lqi);
+        # Set Last packet RSSI
         - sensor.template.publish:
             id: cc1101_rssi
             state: !lambda 'return rssi;'
+        # Set Last packet LQI
         - sensor.template.publish:
             id: cc1101_lqi
             state: !lambda 'return lqi;'
 
+esphome:
+  on_boot:
+    # Sync CC1101 settings on boot (in case we changed them from Home Assistant)
+    - priority: -10
+      then:
+        - cc1101.set_frequency:
+            value: !lambda "return id(cc1101_frequency).state * 1e6;"
+        - cc1101.set_output_power:
+            value: !lambda "return id(cc1101_output_power).state;"
+
 # Adjustments
 number:
+  # Change frequency from Home Assistant
   - platform: template
     id: cc1101_frequency
     name: "CC1101 Frequency"
@@ -70,6 +86,7 @@ number:
       - then:
           - cc1101.set_frequency:
               value: !lambda "return x * 1e6;"
+  # Change output power from Home Assistant
   - platform: template
     id: cc1101_output_power
     name: "CC1101 Output Power"
@@ -89,6 +106,7 @@ number:
           - cc1101.set_output_power:
               value: !lambda "return x;"
 select:
+  # Change modulation type from Home Assistant
   - platform: template
     id: cc1101_modulation_type
     name: "CC1101 Modulation Type"
@@ -107,8 +125,37 @@ select:
     disabled_by_default: true
     on_option:
       - then:
-          - cc1101.set_modulation_type:
-              value: !lambda "return x;"
+          - if:
+              condition:
+                lambda: 'return x == "ASK/OOK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: ASK/OOK
+          - if:
+              condition:
+                lambda: 'return x == "2-FSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: 2-FSK
+          - if:
+              condition:
+                lambda: 'return x == "4-FSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: 4-FSK
+          - if:
+              condition:
+                lambda: 'return x == "GFSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: GFSK
+          - if:
+              condition:
+                lambda: 'return x == "MSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: MSK
+  # Change symbol rate from Home Assistant
   - platform: template
     id: cc1101_symbol_rate
     name: "CC1101 Symbol Rate"
@@ -130,7 +177,9 @@ select:
     on_option:
       - then:
           - cc1101.set_symbol_rate:
-              value: !lambda "return x;"
+              # std::stoi converts the string 'x' to an integer
+              value: !lambda "return std::stoi(x);"
+  # Change RX attenuation from Home Assistant
   - platform: template
     id: cc1101_rx_attenuation
     name: "CC1101 RX Attenuation"
@@ -148,9 +197,32 @@ select:
     disabled_by_default: true
     on_option:
       - then:
-          - cc1101.set_rx_attenuation:
-              value: !lambda "return x;"
+          - if:
+              condition:
+                lambda: 'return x == "0dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 0dB
+          - if:
+              condition:
+                lambda: 'return x == "6dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 6dB
+          - if:
+              condition:
+                lambda: 'return x == "12dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 12dB
+          - if:
+              condition:
+                lambda: 'return x == "18dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 18dB
 switch:
+  # Enable/disable RX mode from Home Assistant
   - platform: template
     id: cc1101_rx
     name: "CC1101 Receive"
@@ -167,6 +239,7 @@ switch:
       - then:
           - cc1101.set_idle:
 button:
+  # Put CC1101 into idle mode from Home Assistant
   - platform: template
     id: cc1101_idle
     name: "CC1101 Idle"
@@ -178,6 +251,7 @@ button:
 
 # Diagnostics
 sensor:
+  # Last Packet RSSI
   - platform: template
     id: cc1101_rssi
     name: "CC1101 Last RSSI"
@@ -188,6 +262,9 @@ sensor:
     state_class: measurement
     accuracy_decimals: 1
     disabled_by_default: true
+    filters:
+      - throttle: 1s
+  # Last Packet LQI
   - platform: template
     id: cc1101_lqi
     name: "CC1101 Last LQI"
@@ -198,3 +275,5 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     disabled_by_default: true
+    filters:
+      - throttle: 1s
