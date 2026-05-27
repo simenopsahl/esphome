@@ -29,6 +29,100 @@ api:
   reboot_timeout: 90min
   encryption:
     key: !secret homeassistant_api
+  on_client_connected:
+    # Wait until client has subscribed
+    - wait_until:
+        condition:
+          api.connected:
+            state_subscription_only: true
+        timeout: 3s
+    - if:
+        condition:
+          lambda: 'return id(status_led_select).current_option() == "Enabled" && id(led_mode_select).current_option() != "Manual Control";'
+        then:
+          # Stop any effects first
+          - light.turn_on:
+              id: led_rgb
+              effect: none
+          # Smooth celebration sequence with flowing colors
+          - light.turn_on:
+              id: led_rgb
+              brightness: 60%
+              red: 0%
+              green: 100%
+              blue: 100%
+              white: 0%
+              transition_length: 400ms
+          - delay: 400ms
+          - light.turn_on:
+              id: led_rgb
+              brightness: 65%
+              red: 0%
+              green: 70%
+              blue: 100%
+              white: 0%
+              transition_length: 350ms
+          - delay: 350ms
+          - light.turn_on:
+              id: led_rgb
+              brightness: 70%
+              red: 50%
+              green: 0%
+              blue: 100%
+              white: 0%
+              transition_length: 350ms
+          - delay: 350ms
+          - light.turn_on:
+              id: led_rgb
+              brightness: 65%
+              red: 100%
+              green: 100%
+              blue: 100%
+              white: 0%
+              transition_length: 400ms
+          - delay: 500ms
+    # Always restore to current mode, even if Manual Control
+    - script.execute: control_leds
+  on_client_disconnected:
+    - script.execute: control_leds
+
+esphome:
+  on_boot: 
+    - priority: -100
+      then:
+        - button.press: get_mmwave_firmware
+        - binary_sensor.template.publish:
+            id: ld2450_zone1_occupancy
+            state: false 
+        - binary_sensor.template.publish:
+            id: ld2450_zone2_occupancy
+            state: false 
+        - binary_sensor.template.publish:
+            id: ld2450_zone3_occupancy
+            state: false 
+        - binary_sensor.template.publish:
+            id: ld2450_zone4_occupancy
+            state: false
+    - priority: -100
+      then:
+        - lambda: |-
+            if (std::string("${ device_config.bluetooth_enabled | lower }") == "true") {
+              id(firmware_ble).publish_state("Enabled");
+            } else {
+              id(firmware_ble).publish_state("Disabled");
+            }
+
+            if (std::string("${ device_config.co2_enabled | lower }") == "true") {
+              id(firmware_co2).publish_state("Enabled");
+            } else {
+              id(firmware_co2).publish_state("Disabled");
+            }
+
+            if (std::string("${ device_config.ethernet_enabled | lower }") == "true") {
+              id(firmware_network).publish_state("Ethernet");
+            } else {
+              id(firmware_network).publish_state("WiFi");
+            }
 
 wifi:
   ssid: !secret wifi_ssid
@@ -38,6 +132,10 @@ wifi:
   passive_scan: true
   enable_btm: true
   enable_rrm: true
+  on_connect:
+    - script.execute: control_leds
+  on_disconnect:
+    - script.execute: control_leds
 
 binary_sensor:
   - id: !extend ld2450_zone2_occupancy
@@ -48,13 +146,13 @@ binary_sensor:
     disabled_by_default: false
 
 number:
-  - id: !extend ld2450_zone_2_off_delay
+  - id: !extend ld2450_zone2_off_delay
     disabled_by_default: false
 
-  - id: !extend ld2450_zone_3_off_delay
+  - id: !extend ld2450_zone3_off_delay
     disabled_by_default: false
 
-  - id: !extend ld2450_zone_4_off_delay
+  - id: !extend ld2450_zone4_off_delay
     disabled_by_default: false
 
 sensor:

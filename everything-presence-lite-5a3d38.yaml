@@ -2,6 +2,8 @@ substitutions:
   name: everything-presence-lite-5a3d38
   friendly_name: EPL-5a3d38
   log_level: ERROR
+  device_config:
+    bluetooth_enabled: true
   device:
     name: everything-presence-lite-5a3d38
     friendly_name: EPL-5a3d38

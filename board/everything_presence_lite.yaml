@@ -39,6 +39,23 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - lambda: |-
+            if (std::string("${ device_config.bluetooth_enabled | lower }") == "true") {
+              id(firmware_ble).publish_state("Enabled");
+            } else {
+              id(firmware_ble).publish_state("Disabled");
+            }
+
+            if (std::string("${ device_config.co2_enabled | lower }") == "true") {
+              id(firmware_co2).publish_state("Enabled");
+            } else {
+              id(firmware_co2).publish_state("Disabled");
+            }
+
 binary_sensor:
   - id: !extend zone2_occupancy
     disabled_by_default: false

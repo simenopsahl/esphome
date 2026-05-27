@@ -1,13 +1,13 @@
 substitutions:
-  name: everything-presence-lite-aa2aa0
-  friendly_name: EPL-aa2aa0
-  log_level: ERROR
+  name: everything-presence-pro-e65644
+  friendly_name: EPP-e65644
+  log_level: "ERROR"
   device_config:
     bluetooth_enabled: true
   device:
-    name: everything-presence-lite-aa2aa0
-    friendly_name: EPL-aa2aa0
-    location: "Kjøkken"
+    name: everything-presence-pro-e65644
+    friendly_name: EPP-e65644
+    location: "TV Stue"
 
 packages:
   # --- COMMON PACKAGES ---
@@ -16,8 +16,8 @@ packages:
   status: !include common/status.yaml
 
   # --- BOARD AND MODULES ---
-  EverythingSmartTechnology.Everything_Presence_Lite: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
-  tweaks: !include board/everything_presence_lite.yaml
+  EverythingSmartTechnology.Everything Presence Pro: github://everythingsmarthome/everything-presence-pro/everything-presence-pro-wifi-co2.yaml@main
+  tweaks: !include board/everything_presence_pro.yaml
 
 esphome:
   comment: ${device.model} @ ${device.location}
