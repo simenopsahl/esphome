@@ -11,6 +11,7 @@ packages:
 substitutions:
   home_page: page_content
   device:
+    model: "Waveshare E-Paper"
     framework:
       type: arduino
 

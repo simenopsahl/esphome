@@ -1,9 +1,11 @@
 substitutions:
   name: everything-presence-lite-5a3d38
   friendly_name: EPL-5a3d38
-  illuminance_update_interval: "5s"
   log_level: ERROR
-  location: "Bad"
+  device:
+    name: everything-presence-lite-5a3d38
+    friendly_name: EPL-5a3d38
+    location: "Bad"
 
 packages:
   # --- COMMON PACKAGES ---
@@ -16,7 +18,18 @@ packages:
   tweaks: !include board/everything_presence_lite.yaml
 
 esphome:
-  name: ${name}
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
   name_add_mac_suffix: false
-  friendly_name: ${friendly_name}
-  area: ${location}
+  friendly_name: ${device.friendly_name}
+  area: ${device.location}
+
+esp32_ble:
+  max_connections: 2
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 500ms
+    window: 10ms
+bluetooth_proxy:
+  active: false
+  connection_slots: 1

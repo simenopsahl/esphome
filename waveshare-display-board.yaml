@@ -20,7 +20,7 @@ substitutions:
     home_page: page_content
 
 esphome:
-  comment: "E-Ink Kjøkken Display"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

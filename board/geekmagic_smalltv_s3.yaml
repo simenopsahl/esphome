@@ -10,6 +10,7 @@ packages:
 
 substitutions:
   device:
+    model: "GeekMagic SmallTV S3"
     framework:
       type: esp-idf
 

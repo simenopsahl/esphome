@@ -9,7 +9,7 @@
 # then enabled once WiFi is connected.
 esp32_ble:
   enable_on_boot: false
-  max_connections: 4
+  max_connections: 3
 
 wifi:
   on_connect:

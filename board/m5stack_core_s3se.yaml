@@ -13,6 +13,7 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
   device:
+    model: "M5Stack Core S3 SE"
     framework:
       type: esp-idf
 

@@ -4,6 +4,12 @@
 # M5Stack NanoC6
 #
 
+substitutions:
+  device:
+    model: "M5Stack Nano C6"
+    framework:
+      type: arduino
+
 # Pins for this model
 packages:
   pins: !include pins/m5stack_nano_c6.yaml

@@ -9,6 +9,12 @@ packages:
   pins: !include pins/m5stack_atom_s3u.yaml
   status_led: !include ../features/system_status_led.yaml
 
+substitutions:
+  device:
+    model: "M5Stack Atom S3U"
+  framework:
+    type: arduino
+
 esphome:
   project:
     name: "M5Stack.Atom S3U"

@@ -16,6 +16,7 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
   device:
+    model: "M5Stack Atom S3R"
     framework:
       type: esp-idf
 

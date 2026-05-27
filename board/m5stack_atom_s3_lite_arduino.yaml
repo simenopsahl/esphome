@@ -4,6 +4,12 @@
 # M5Stack AtomS3 Lite
 #
 
+substitutions:
+  device:
+    model: "M5Stack Atom S3 Lite"
+    framework:
+      type: arduino
+
 # Pins for this model
 packages:
   pins: !include pins/m5stack_atom_s3_lite.yaml

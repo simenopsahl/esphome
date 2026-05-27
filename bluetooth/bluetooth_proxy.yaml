@@ -4,5 +4,5 @@
 # https://esphome.io/components/bluetooth_proxy.html
 #
 bluetooth_proxy:
-  active: false
+#  active: false
   connection_slots: 2

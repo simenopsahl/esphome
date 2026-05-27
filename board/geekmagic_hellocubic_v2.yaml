@@ -10,6 +10,7 @@ packages:
 
 substitutions:
   device:
+    model: "GeekMagic HelloCubic V2"
     framework:
       type: esp-idf
 

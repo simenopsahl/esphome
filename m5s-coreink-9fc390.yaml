@@ -28,7 +28,7 @@ substitutions:
     home_page: page_out
 
 esphome:
-  comment: "M5Stack CoreInk @ Inngang"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

@@ -39,7 +39,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-b5c828
-    location: "2etg, Bod"
+    location: "Bod"
     framework:
       type: esp-idf
   module:
@@ -50,7 +50,7 @@ substitutions:
     home_page: page_temperature
 
 esphome:
-  comment: "M5Stack Atom S3 @ Bod"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

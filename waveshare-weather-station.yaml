@@ -22,7 +22,7 @@ substitutions:
 #    components: [ waveshare_epaper ]
 
 esphome:
-  comment: "E-Ink E&S Display"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

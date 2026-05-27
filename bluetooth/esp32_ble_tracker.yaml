@@ -5,8 +5,10 @@
 # https://esphome.io/components/esp32_ble_tracker
 #
 esp32_ble_tracker:
+  software_coexistence: false
   scan_parameters:
-    window: 50ms
+    interval: 420ms
+    window: 20ms
     active: false
 
 # Only enable bluetooth proxy on HA connecttion

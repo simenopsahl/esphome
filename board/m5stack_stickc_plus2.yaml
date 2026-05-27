@@ -10,6 +10,7 @@ substitutions:
   hat_shared: "false"
   grove_shared: "false"
   device:
+    model: "M5Stack StickC Plus2"
     framework:
       type: esp-idf
 

@@ -22,15 +22,17 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: s8048s043c-89f954
+    location: "Simen"
     framework:
       type: esp-idf
   display:
     home_page: page_analog_clock
 
 esphome:
-  comment: 'Sunton 4.3"'
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0.0"
 

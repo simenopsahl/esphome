@@ -2,6 +2,22 @@
 # https://github.com/EverythingSmartHome/everything-presence-lite
 # https://docs.everythingsmart.io/s/products/doc/everything-presence-lite-epl-ZVnBzYzuX2
 
+# Specific bluetooth settings, paste in root device yaml
+esp32_ble:
+  max_connections: 2
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 500ms
+    window: 10ms
+bluetooth_proxy:
+  active: false
+  connection_slots: 1
+
+substitutions:
+  illuminance_update_interval: "5s"
+  device:
+    model: "Everything Presence Lite"
+
 esp32:
   framework:
     advanced:
@@ -22,12 +38,6 @@ wifi:
   passive_scan: true
   enable_btm: true
   enable_rrm: true
-
-bluetooth_proxy:
-  active: false
-  connection_slots: 2
-esp32_ble:
-  max_connections: 4
 
 binary_sensor:
   - id: !extend zone2_occupancy
@@ -103,3 +113,5 @@ sensor:
 select:
   - id: !extend tracking_behaviour
     initial_option: Above + Distance and Angle
+  - id: !extend update_speed_select
+    initial_option: Slow (0.4s)

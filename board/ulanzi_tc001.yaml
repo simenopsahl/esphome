@@ -14,6 +14,7 @@ packages:
 
 substitutions:
   device:
+    model: "Ulanzi TC001"
     framework:
       type: esp-idf
 

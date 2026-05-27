@@ -16,6 +16,6 @@ time:
     timezone: "${time_timezone}"
 
   # https://esphome.io/components/time.html#sntp-time-source
-  - platform: sntp
-    id: time_sntp
-    timezone: "${time_timezone}"
+#  - platform: sntp
+#    id: time_sntp
+#    timezone: "${time_timezone}"

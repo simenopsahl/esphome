@@ -6,6 +6,7 @@
 
 substitutions:
   device:
+    model: "M5Stack Atom S3U"
     framework:
       type: esp-idf
 

@@ -26,7 +26,7 @@ substitutions:
     home_page: page_analog_clock
 
 esphome:
-  comment: "M5Stack Atom Lite @ Loft"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

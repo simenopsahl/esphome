@@ -6,6 +6,7 @@
 
 substitutions:
   device:
+    model: "M5Stack Fire"
     framework:
       type: esp-idf
   module:

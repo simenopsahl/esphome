@@ -30,7 +30,7 @@ substitutions:
     tmos_i2c_bus: i2c_port_abc
 
 esphome:
-  comment: "M5Stack Atom S3 Lite @ Ute, Bod"
+  comment: ${device.model} @ ${device.location_1}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location_1}

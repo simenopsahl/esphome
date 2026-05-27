@@ -20,7 +20,7 @@ substitutions:
       type: esp-idf
 
 esphome:
-  comment: "Ulanzi TC001 Pixel Clock @ Stue"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

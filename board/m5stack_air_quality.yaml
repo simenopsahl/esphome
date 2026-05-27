@@ -10,6 +10,7 @@ substitutions:
   display:
     home_page: page_content
   device:
+    model: "M5Stack Air Quality"
     framework:
       type: esp-idf
 

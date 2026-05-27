@@ -32,7 +32,7 @@ substitutions:
     home_page: page_room
 
 esphome:
-  comment: "M5Stack CoreInk @ Simen"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

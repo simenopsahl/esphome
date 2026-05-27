@@ -28,15 +28,17 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3r-0387f4
+    location: "Simen"
     framework:
       type: esp-idf
   display:
     home_page: page_temperature
 
 esphome:
-  comment: "M5Stack Atom S3R 0387f4"
+  comment: "M5Stack Atom S3R @ Test"
   name: ${device.name}
   friendly_name: ${device.name}
+  area: ${device.location}
   project:
     version: "1.0.0"
 

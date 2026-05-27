@@ -8,6 +8,7 @@ packages:
 
 substitutions:
   device:
+    model: 'Sunton 4.3"'
     framework:
       type: esp-idf
 

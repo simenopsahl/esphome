@@ -32,7 +32,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-3e3740
-    location: "TV Stue"
+    location: "Simen"
     framework:
       type: esp-idf
   module:
@@ -42,7 +42,7 @@ substitutions:
     home_page: page_analog_clock
 
 esphome:
-  comment: 'M5Stack Core3 SE @ TV Stue'
+  comment: 'M5Stack Core3 SE @ Test'
   name: ${device.name}
   friendly_name: ${device.name}
   project:

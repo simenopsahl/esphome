@@ -6,6 +6,7 @@
 
 substitutions:
   device:
+    model: "M5Stack NanoC6"
     framework:
       type: esp-idf
 

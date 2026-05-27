@@ -10,6 +10,7 @@ packages:
 
 substitutions:
   device:
+    model: "GeekMagic SmallTV Pro"
     framework:
       type: esp-idf
 
