@@ -37,6 +37,14 @@ esphome:
   project:
     version: "1.0.0"
 
+wifi:
+#  use_address: 192.168.69.80
+  use_address: m5s-as3-lite-970998.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.57
+
 sensor:
   # Combine sensors
   - id: !extend temperature_local

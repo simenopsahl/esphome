@@ -46,6 +46,14 @@ esphome:
       name: ${device.name}_sub
       area_id: area_ute_foran
 
+wifi:
+#  use_address: 192.168.69.61
+  use_address: m5s-as3-lite-b63eb8.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.61
+
 sensor:
   # Combine sensors
   - id: !extend temperature_local

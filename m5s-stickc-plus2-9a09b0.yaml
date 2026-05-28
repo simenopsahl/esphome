@@ -45,6 +45,14 @@ esphome:
   project: 
     version: "1.0.0"
 
+wifi:
+#  use_address: 192.168.69.71
+  use_address: m5s-stickc-plus2-9a09b0.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.44
+
 # --- LVGL CLOCKS ---
 time:
   - id: !extend time_homeassistant

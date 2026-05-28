@@ -32,6 +32,14 @@ esphome:
   project:
     version: "1.0.0"
 
+wifi:
+#  use_address: 192.168.69.56
+  use_address: m5s-air-quality-b62db0.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.50
+
 display:
   # 200 x 200 resolution
   - id: !extend display_eink

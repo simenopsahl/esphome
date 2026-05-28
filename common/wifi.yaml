@@ -12,6 +12,7 @@ wifi:
   fast_connect: true
   reboot_timeout: 30min
   passive_scan: true
+  power_save_mode: none
 
 sensor:
   # https://esphome.io/components/sensor/wifi_signal.html

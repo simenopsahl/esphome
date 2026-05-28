@@ -16,7 +16,7 @@ packages:
   status: !include common/status.yaml
 
   # --- BOARD AND MODULES ---
-  EverythingSmartTechnology.Everything Presence Pro: github://everythingsmarthome/everything-presence-pro/everything-presence-pro-wifi-co2.yaml@main
+  EverythingSmartTechnology.Everything Presence Pro: github://everythingsmarthome/everything-presence-pro/everything-presence-pro-wifi.yaml@main
   tweaks: !include board/everything_presence_pro.yaml
 
 esphome:
@@ -25,6 +25,13 @@ esphome:
   name_add_mac_suffix: false
   friendly_name: ${device.friendly_name}
   area: ${device.location}
+
+wifi:
+#  use_address: 192.168.69.92
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.13
 
 esp32_ble:
   max_connections: 2

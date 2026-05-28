@@ -26,6 +26,14 @@ esphome:
   friendly_name: ${device.friendly_name}
   area: ${device.location}
 
+wifi:
+#  use_address: 192.168.69.88
+  use_address: everything-presence-lite-aa3b40.local
+  manual_ip:
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.27
+
 esp32_ble:
   max_connections: 2
 esp32_ble_tracker:
