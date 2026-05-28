@@ -22,8 +22,10 @@ esphome:
 
 esp32:
   # ESP32 N8XX
-  board: esp32dev
+#  board: esp32dev
+  variant: ESP32
   flash_size: 8MB
+  cpu_frequency: 240MHz
   framework:
     advanced:
       compiler_optimization: PERF

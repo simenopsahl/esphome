@@ -1,0 +1,47 @@
+---
+# https://docs.m5stack.com/en/module/extport_for_core2
+# M5Stack Module ExtPort for Core2
+
+substitutions:
+  pin:
+		extport:
+			b:
+				i2c:
+					sda: ${pin.ext.mbus.p10}
+					scl: ${pin.ext.mbus.p4}
+				gpio:
+					in: ${pin.ext.mbus.p4}
+					out: ${pin.ext.mbus.p10}
+				uart:
+					tx: ${pin.ext.mbus.p4}
+					rx: ${pin.ext.mbus.p10}
+			c:
+				i2c:
+					sda: ${pin.ext.mbus.p16}
+					scl: ${pin.ext.mbus.p15}
+				gpio:
+					in: ${pin.ext.mbus.p15}
+					out: ${pin.ext.mbus.p16}
+				uart:
+					tx: ${pin.ext.mbus.p15}
+					rx: ${pin.ext.mbus.p16}
+			d:
+				i2c:
+					sda: ${pin.ext.mbus.p2}
+					scl: ${pin.ext.mbus.p26}
+				gpio:
+					in: ${pin.ext.mbus.p26}
+					out: ${pin.ext.mbus.p2}
+				uart:
+					tx: ${pin.ext.mbus.p26}
+					rx: ${pin.ext.mbus.p2}
+			e:
+				i2c:
+					sda: ${pin.ext.mbus.p22}
+					scl: ${pin.ext.mbus.p21}
+				gpio:
+					in: ${pin.ext.mbus.p21}
+					out: ${pin.ext.mbus.p22}
+				uart:
+					tx: ${pin.ext.mbus.p21}
+					rx: ${pin.ext.mbus.p22}

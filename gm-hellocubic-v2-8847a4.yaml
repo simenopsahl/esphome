@@ -36,6 +36,13 @@ esphome:
   project:
     version: "1.0.0"
 
+wifi:
+  use_address: gm-hellocubic-v2-8847a4.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.31
+
 # --- LVGL CLOCKS ---
 time:
   - id: !extend time_homeassistant

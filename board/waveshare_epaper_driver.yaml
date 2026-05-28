@@ -33,6 +33,7 @@ esphome:
           - script.execute: update_screen
 
 esp32:
+# ESP32-WROOM-32
 #  board: esp32dev
   variant: ESP32
   flash_size: 4MB

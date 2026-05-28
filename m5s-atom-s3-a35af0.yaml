@@ -31,7 +31,7 @@ substitutions:
     home_page: page_temperature
 
 esphome:
-  comment: "M5Stack Atom S3 @ Test"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
@@ -40,7 +40,7 @@ esphome:
 
 wifi:
 #  use_address: 192.168.69.99
-  use_address: m5s-a-s3-a35af0.local
+  use_address: m5s-as3-a35af0.local
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0

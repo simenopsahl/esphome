@@ -42,9 +42,9 @@ spi:
   mosi_pin: ${pin.int.spi.mosi}
 
 # IR
-remote_transmitter:
-  pin: ${pin.light.ir}
-  carrier_duty_percent: 50%
+#remote_transmitter:
+#  pin: ${pin.light.ir}
+#  carrier_duty_percent: 50%
 
 output:
   - platform: ledc

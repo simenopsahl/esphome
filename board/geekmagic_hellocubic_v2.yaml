@@ -19,8 +19,11 @@ esphome:
     name: "GeekMagic.HelloCubic V2"
 
 esp32:
-  board: esp32dev
+# ESP32-N16XX
+#  board: esp32dev
+  variant: esp32
   flash_size: 16MB
+  cpu_frequency: 240MHz
   framework:
     advanced:
       compiler_optimization: PERF

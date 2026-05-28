@@ -29,6 +29,14 @@ esphome:
   project:
     version: "1.0"
 
+wifi:
+#  use_address: 192.168.69.52
+  use_address: waveshare-weather-station.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.111
+
 # Now render everything on the ePaper screen.
 display:
   - id: !extend display_eink

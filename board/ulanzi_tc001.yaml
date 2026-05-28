@@ -40,7 +40,7 @@ esphome:
             id(rgb8x32)->date_screen(1440,15,false,160,240,160);
 
 esp32:
-  board: esp32dev
+#  board: esp32dev
   variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz

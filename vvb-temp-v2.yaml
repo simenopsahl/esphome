@@ -22,6 +22,14 @@ esphome:
   friendly_name: ${device.name}
   area: ${device.location}
 
+wifi:
+#  use_address: 192.168.69.77
+  use_address: vvb-temp-v2.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.91
+
 #i2c:
 #  scl: GPIO22
 #  sda: GPIO21

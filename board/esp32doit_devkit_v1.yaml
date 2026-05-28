@@ -9,11 +9,13 @@ packages:
 
 substitutions:
   device:
+    model: "DOIT DevKit V1"
     framework:
       type: esp-idf
 
 esp32:
-  board: esp32doit-devkit-v1
+# ESP32-WROOM-32
+#  board: esp32doit-devkit-v1
   variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz

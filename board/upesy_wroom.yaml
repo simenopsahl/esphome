@@ -1,6 +1,5 @@
 ---
-# https://www.waveshare.com/wiki/E-Paper_ESP32_Driver_Board
-# Base functions for Waveshare e-paper ESP32 driver board
+# Base functions for uPesy Wroom
 #
 
 # Pins for this model
@@ -9,11 +8,16 @@ packages:
 
 substitutions:
   device:
+    model: "uPesy Wroom"
     framework:
       type: esp-idf
 
 esp32:
-  board: upesy_wroom
+# uPesy ESP-WROOM-32
+#  board: upesy_wroom
+  variant: ESP32
+  flash_size: 4MB
+  cpu_frequency: 240MHz
   framework:
     type: ${device.framework.type}
 

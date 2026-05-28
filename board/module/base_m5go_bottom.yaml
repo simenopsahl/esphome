@@ -2,26 +2,32 @@
 # https://docs.m5stack.com/en/base/m5go_bottom
 
 substitutions:
-  m5go_port_b_in: ${pin.ext.mbus.p4}
-  m5go_port_b_out: ${pin.ext.mbus.p10}
-  m5go_port_c_rx: ${pin.ext.mbus.p15}
-  m5go_port_c_tx: ${pin.ext.mbus.p16}
-  m5go_pogo_sda: ${pin.ext.mbus.p17}
-  m5go_pogo_scl: ${pin.ext.mbus.p18}
-  m5go_ir_tx: ${pin.ext.mbus.p22}
-  m5go_rgb_led: ${pin.ext.mbus.p23}
-  m5go_mic: ${pin.ext.mbus.p26}
+  pin:
+    m5go:
+      port_b:
+        in: ${pin.ext.mbus.p4}
+        out: ${pin.ext.mbus.p10}
+      port_c:
+        rx: ${pin.ext.mbus.p15}
+        tx: ${pin.ext.mbus.p16}
+      pogo:
+        sda: ${pin.ext.mbus.p17}
+        scl: ${pin.ext.mbus.p18}
+      light:
+        ir: ${pin.ext.mbus.p22}
+        rgb_led: ${pin.ext.mbus.p23}
+      mic: ${pin.ext.mbus.p26}
 
 # RGB SK6812-2020
 light:
   - platform: esp32_rmt_led_strip
     id: rgb_led_m5go
     rgb_order: GRB
-    pin: ${m5go_rgb_led}
+    pin: ${pin.m5go.light.rgb_led}
     num_leds: 10
     # RMT 0 channels will be occupied by IR
 #    rmt_channel: 1
-    rmt_symbols: 384
+    rmt_symbols: 48
     chipset: sk6812
     effects:
       - pulse:

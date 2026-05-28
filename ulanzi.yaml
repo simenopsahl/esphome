@@ -27,6 +27,14 @@ esphome:
   project:
     version: "2.0.0"
 
+wifi:
+#  use_address: 192.168.69.76
+  use_address: ulanzi.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.30
+
 ehmtxv2:
   id: rgb8x32
   icons: 
