@@ -3,12 +3,18 @@ packages:
   <<: !include_dir_named common
 
 substitutions:
-  devicename: rf-link
+  common:
+    log_level: INFO
+    log_baud_rate: "0"
+  device:
+    model: "Tuya 433Mhz Hub"
+    name: rf-link
+    location: "TV Stue"
 
 esphome:
-  comment: "Tuya 433Mhz Hub"
-  name: $devicename
-  friendly_name: $devicename
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
   project:
     name: "Tuya.RfLink"
     version: "1.0.0"
@@ -23,11 +29,6 @@ wifi:
 
 esp8266:
   board: esp01_1m
-
-logger:
-  id: component_logger
-  baud_rate: 0
-
 
 remote_receiver:
   pin: 4

@@ -1,0 +1,39 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_atom_s3u.yaml
+
+  # --- FEATURE PACKAGES ---
+  nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
+    light_id: rgb_led,
+    light_brightness: 80%,
+    light_flash_brightness: 90%
+  }}
+
+substitutions:
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-as3u-a5b3e4
+    location: "Simen"
+    framework:
+      type: esp-idf
+
+esphome:
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
+  project:
+    version: "1.0.0"
+
+wifi:
+  use_address: m5s-as3u-a5b3e4.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.66

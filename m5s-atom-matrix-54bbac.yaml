@@ -1,0 +1,37 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_atom_matrix.yaml
+
+substitutions:
+  common:
+    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-a-m-54bbac
+    location: "Simen"
+    framework:
+      type: esp-idf
+
+esphome:
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
+  project:
+    version: "1.0.0"
+
+wifi:
+  use_address: m5s-a-m-54bbac.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.45
+
+binary_sensor:
+  - id: !extend btn_matrix
+    on_press:
+      - display.page.show_next

@@ -27,8 +27,8 @@ esp32:
       compiler_optimization: PERF
       execute_from_psram: true
     # These versions prevent RGB panel DMA artifacting
-    version: 5.0.0
-    platform_version: 6.8.1
+#    version: 5.0.0
+#    platform_version: 6.8.1
     sdkconfig_options:
       # Cache optimizations
       CONFIG_ESP32S3_DATA_CACHE_64KB: y

@@ -42,10 +42,6 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.65
 
-esp32:
-  framework:
-    type: esp-idf
-
 sensor:
   # Combine sensors
   - id: !extend temperature_local
