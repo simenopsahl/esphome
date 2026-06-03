@@ -65,35 +65,9 @@ binary_sensor:
     disabled_by_default: false
 
 number:
-  - id: !extend zone2_begin_x
-    disabled_by_default: false
-  - id: !extend zone2_end_x
-    disabled_by_default: false
-  - id: !extend zone2_begin_y
-    disabled_by_default: false
-  - id: !extend zone2_end_y
-    disabled_by_default: false
   - id: !extend zone_2_off_delay
     disabled_by_default: false
-
-  - id: !extend zone3_begin_x
-    disabled_by_default: false
-  - id: !extend zone3_end_x
-    disabled_by_default: false
-  - id: !extend zone3_begin_y
-    disabled_by_default: false
-  - id: !extend zone3_end_y
-    disabled_by_default: false
   - id: !extend zone_3_off_delay
-    disabled_by_default: false
-
-  - id: !extend zone4_begin_x
-    disabled_by_default: false
-  - id: !extend zone4_end_x
-    disabled_by_default: false
-  - id: !extend zone4_begin_y
-    disabled_by_default: false
-  - id: !extend zone4_end_y
     disabled_by_default: false
   - id: !extend zone_4_off_delay
     disabled_by_default: false

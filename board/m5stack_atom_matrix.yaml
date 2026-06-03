@@ -47,7 +47,7 @@ light:
     num_leds: 25
     rmt_symbols: 128
     chipset: ws2812
-    color_correct: [75%, 75%, 75%]
+    color_correct: [65%, 65%, 65%]
     effects:
       - pulse:
       - strobe:
@@ -81,33 +81,26 @@ display:
     width: 5
     height: 5
     pages:
-      - id: page_bulls_eye_r
+      - id: page_blank
         lambda: |-
-          // Draw a bulls-eye pattern
-          Color red = Color(0xFF0000);
-          Color green = Color(0x00FF00);
-          Color blue = Color(0x0000FF);
-          it.rectangle(0, 0, 5, 5, red);
-          it.rectangle(1, 1, 3, 3, green);
-          it.draw_pixel_at(2, 2, blue);
-      - id: page_bulls_eye_b
-        lambda: |-
-          // Draw a bulls-eye pattern
-          Color red = Color(0xFF0000);
-          Color green = Color(0x00FF00);
-          Color blue = Color(0x0000FF);
-          it.rectangle(0, 0, 5, 5, blue);
-          it.rectangle(1, 1, 3, 3, red);
-          it.draw_pixel_at(2, 2, green);
-      - id: page_bulls_eye_g
-        lambda: |-
-          // Draw a bulls-eye pattern
-          Color red = Color(0xFF0000);
-          Color green = Color(0x00FF00);
-          Color blue = Color(0x0000FF);
-          it.rectangle(0, 0, 5, 5, green);
-          it.rectangle(1, 1, 3, 3, blue);
-          it.draw_pixel_at(2, 2, red);
+          it.draw_pixel_at(0, 0, c_red);
+          it.draw_pixel_at(0, 1, c_green);
+          it.draw_pixel_at(0, 2, c_blue);
+          it.draw_pixel_at(0, 4, c_white);
+          it.draw_pixel_at(1, 4, c_cyan);
+          it.draw_pixel_at(1, 3, c_magenta);
+          it.draw_pixel_at(1, 2, c_yellow);
+          it.draw_pixel_at(1, 0, c_white);
+          it.draw_pixel_at(3, 0, c_gold);
+          it.draw_pixel_at(3, 1, c_orange);
+          it.draw_pixel_at(3, 2, c_darkorange);
+          it.draw_pixel_at(3, 3, c_orangered);
+          it.draw_pixel_at(3, 4, c_hotpink);
+          it.draw_pixel_at(4, 4, c_slateblue);
+          it.draw_pixel_at(4, 3, c_deepskyblue);
+          it.draw_pixel_at(4, 2, c_aquamarine);
+          it.draw_pixel_at(4, 1, c_springgreen);
+          it.draw_pixel_at(4, 0, c_chartreuse);
 
 # Button
 binary_sensor:
@@ -122,11 +115,86 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button Pressed
+      - display.page.show_next: display_matrix
     on_click:
       min_length: 1000ms
       max_length: 5000ms
       then:
         - logger.log: Button Held
-        - light.turn_off:
-            id: rgb_led
+        - light.toggle: rgb_led
 
+font:
+  - file: "gui/fonts/5x5-monospaced.ttf"
+    id: font_5x5
+    size: 5
+
+color:
+  - id: c_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: c_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: c_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: c_cyan
+    red: 0%
+    green: 100%
+    blue: 100%
+  - id: c_magenta
+    red: 100%
+    green: 0%
+    blue: 100%
+  - id: c_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+  - id: c_white
+    red: 100%
+    green: 100%
+    blue: 100%
+
+  - id: c_gold
+    red: 100%
+    green: 84%
+    blue: 0%
+  - id: c_orange
+    red: 100%
+    green: 55%
+    blue: 0%
+  - id: c_orangered
+    red: 100%
+    green: 27%
+    blue: 0%
+  - id: c_darkorange
+    red: 100%
+    green: 55%
+    blue: 0%
+  - id: c_hotpink
+    red: 100%
+    green: 41%
+    blue: 71%
+  - id: c_slateblue
+    red: 48%
+    green: 41%
+    blue: 93%
+  - id: c_deepskyblue
+    red: 0%
+    green: 75%
+    blue: 100%
+  - id: c_aquamarine
+    red: 50%
+    green: 100%
+    blue: 83%
+  - id: c_springgreen
+    red: 0%
+    green: 100%
+    blue: 50%
+  - id: c_chartreuse
+    red: 50%
+    green: 100%
+    blue: 0%

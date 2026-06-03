@@ -1,37 +1,37 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_core_s3se.yaml
-  internal_i2c: !include board/extension/internal_i2c.yaml
-  m5go: !include board/module/base_m5go_bottom.yaml
+  mbus_i2c: !include board/extension/mbus_i2c.yaml
+  mbus_uart: !include board/extension/mbus_uart.yaml
+  module_air_quality: !include board/module/module_air_quality.yaml
+  module_cc1101: !include board/module/module_cc1101.yaml
+  base_btc: !include board/module/base_btc.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/240x320.yaml
 
-  # --- LVGL WIDGET PACKAGES ---
-  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
-    uid: room_temp_value,
-    entity_id: sensor.etg2_simen_temperature
-  }}
-
 substitutions:
   common:
-    log_level: WARN
+#    log_level: WARN
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-3e3740
     location: "Simen"
     framework:
       type: esp-idf
+  module:
+    internal:
+      i2c_bus: i2c_mbus
   display:
-    home_page: page_analog_clock
+    home_page: page_temperature
 
 esphome:
-  comment: 'M5Stack Core3 SE @ Test'
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   project:

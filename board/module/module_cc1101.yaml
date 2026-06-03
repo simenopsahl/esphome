@@ -6,15 +6,16 @@ substitutions:
   module:
     cc1101:
       # General settings
-      frequency: 868.95MHz
-      output_power: 10
-      symbol_rate: 2400
+      frequency: "868.95MHz"
+      output_power: "-20"
+      modulation_type: "GFSK"
+      symbol_rate: "2400"
       # Tuner settings
-      filter_bandwidth: 58.0kHz
-      fsk_deviation: 25.4kHz
+      filter_bandwidth: "58.0kHz"
+      fsk_deviation: "25.4kHz"
       # Packet Mode settings
       packet_mode: "true"
-      num_preamble: 0
+      num_preamble: "0"
 
 logger:
   logs:
@@ -22,19 +23,24 @@ logger:
 
 # Module CC1101
 cc1101:
+  id: radio_cc1101
   # Hardware settings
   cs_pin: ${pin.ext.mbus.p8}
-  gdo0_pin: ${pin.ext.mbus.p22}
-  gdo2_pin: ${pin.ext.mbus.p2}
+  gdo0_pin:
+    number: ${pin.ext.mbus.p2}
+#    allow_other_uses: true
+#  gdo2_pin: ${pin.ext.mbus.p22}
   # General settings
   frequency: ${module.cc1101.frequency}
   output_power: ${module.cc1101.output_power}
+  modulation_type: ${module.cc1101.modulation_type}
   symbol_rate: ${module.cc1101.symbol_rate}
   # Tuner settings
   filter_bandwidth: ${module.cc1101.filter_bandwidth}
   fsk_deviation: ${module.cc1101.fsk_deviation}
   # Packet Mode settings
   packet_mode: ${module.cc1101.packet_mode}
+  packet_length: 0
   num_preamble: ${module.cc1101.num_preamble}
   on_packet:
     - then:
@@ -55,6 +61,21 @@ cc1101:
             id: cc1101_lqi
             state: !lambda 'return lqi;'
 
+#remote_transmitter:
+#  pin:
+#    number: ${pin.ext.mbus.p2}  # Must match GDO0
+#    allow_other_uses: true
+#  carrier_duty_percent: 100%
+#  on_transmit:
+#    then:
+#      - cc1101.begin_tx:
+#  on_complete:
+#    then:
+#      - cc1101.begin_rx:
+
+#remote_receiver:
+#  pin: ${pin.ext.mbus.p22}  # Must match GDO2
+
 esphome:
   on_boot:
     # Sync CC1101 settings on boot (in case we changed them from Home Assistant)
@@ -64,6 +85,46 @@ esphome:
             value: !lambda "return id(cc1101_frequency).state * 1e6;"
         - cc1101.set_output_power:
             value: !lambda "return id(cc1101_output_power).state;"
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "ASK/OOK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: ASK/OOK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "2-FSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: 2-FSK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "4-FSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: 4-FSK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "GFSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: GFSK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "MSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: MSK
 
 # Adjustments
 number:
@@ -98,8 +159,8 @@ number:
     step: 1
     restore_value: true
     optimistic: true
-    initial_value: 10
-    mode: slider
+    initial_value: -20
+    mode: box
     disabled_by_default: true
     on_value:
       - then:
@@ -120,10 +181,9 @@ select:
       - "MSK"
     restore_value: true
     optimistic: true
-    initial_option: "ASK/OOK"
-    mode: dropdown
+    initial_option: "GFSK"
     disabled_by_default: true
-    on_option:
+    on_value:
       - then:
           - if:
               condition:
@@ -162,19 +222,18 @@ select:
     icon: "mdi:speedometer"
     entity_category: config
     options:
-      - 1200
-      - 2400
-      - 4800
-      - 9600
-      - 19200
-      - 38400
-      - 48000
+      - "1200"
+      - "2400"
+      - "4800"
+      - "9600"
+      - "19200"
+      - "38400"
+      - "48000"
     restore_value: true
     optimistic: true
-    initial_option: 2400
-    mode: dropdown
+    initial_option: "2400"
     disabled_by_default: true
-    on_option:
+    on_value:
       - then:
           - cc1101.set_symbol_rate:
               # std::stoi converts the string 'x' to an integer
@@ -193,9 +252,8 @@ select:
     restore_value: true
     optimistic: true
     initial_option: "0dB"
-    mode: dropdown
     disabled_by_default: true
-    on_option:
+    on_value:
       - then:
           - if:
               condition:
@@ -228,9 +286,8 @@ switch:
     name: "CC1101 Receive"
     icon: "mdi:email-arrow-left"
     entity_category: config
-    restore_value: true
+    restore_mode: restore_default_on
     optimistic: true
-    initial_state: off
     disabled_by_default: true
     on_turn_on:
       - then:
@@ -248,6 +305,7 @@ button:
     on_press:
       - then:
           - cc1101.set_idle:
+          - switch.turn_off: cc1101_rx
 
 # Diagnostics
 sensor:
@@ -263,7 +321,7 @@ sensor:
     accuracy_decimals: 1
     disabled_by_default: true
     filters:
-      - throttle: 1s
+      - throttle: 2s
   # Last Packet LQI
   - platform: template
     id: cc1101_lqi
@@ -276,4 +334,4 @@ sensor:
     accuracy_decimals: 0
     disabled_by_default: true
     filters:
-      - throttle: 1s
+      - throttle: 2s

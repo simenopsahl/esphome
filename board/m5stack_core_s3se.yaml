@@ -232,13 +232,13 @@ output:
     channel: BLDO2
     voltage: 1500
 
-  - platform: axp2101
-    channel: DCDC1
-    voltage: 3300
+#  - platform: axp2101
+#    channel: DCDC1
+#    voltage: 3300
 
-  - platform: axp2101
-    channel: DCDC3
-    voltage: 3300
+#  - platform: axp2101
+#    channel: DCDC3
+#    voltage: 3300
 
 # https://devices.esphome.io/devices/M5Stack-Fire#wifi-issues-due-to-gpio15
 #  - platform: gpio
