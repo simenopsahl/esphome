@@ -11,6 +11,7 @@ substitutions:
     home_page: page_content
   device:
     model: "M5Stack Air Quality"
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
 
@@ -102,7 +103,7 @@ light:
     pin: ${pin.light.rgb}
     num_leds: 1
 #    rmt_channel: 0 # Not for ESP-IDF
-    rmt_symbols: 48
+    rmt_symbols: ${device.rmt_symbols_block}
     chipset: SK6812
     effects:
       - pulse:

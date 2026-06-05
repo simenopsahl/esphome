@@ -7,6 +7,7 @@
 substitutions:
   device:
     model: "M5Stack Fire"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
   module:
@@ -68,7 +69,7 @@ spi:
 #remote_transmitter:
 #  pin: ${ir_pin}
 #  carrier_duty_percent: 50%
-#  rmt_symbols: 144
+#  rmt_symbols: ${device.rmt_symbols_block}
 
 # 320x240 ILI9342C LCD
 display:

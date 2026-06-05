@@ -5,6 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_matrix.yaml
+  ir_remote: !include board/module/unit_ir_remote.yaml
 
 substitutions:
   common:

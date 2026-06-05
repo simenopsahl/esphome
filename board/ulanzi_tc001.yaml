@@ -15,6 +15,7 @@ packages:
 substitutions:
   device:
     model: "Ulanzi TC001"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 
@@ -267,6 +268,7 @@ light:
     max_refresh_rate: 30ms
     pin: ${pin.light.led_matrix}
     num_leds: 256
+    rmt_symbols: ${device.rmt_symbols_block * 4}
     color_correct: [30%, 30%, 30%]
     gamma_correct: 2.0
     restore_mode: ALWAYS_OFF

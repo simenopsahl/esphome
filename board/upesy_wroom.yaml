@@ -9,13 +9,14 @@ packages:
 substitutions:
   device:
     model: "uPesy Wroom"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 
 esp32:
 # uPesy ESP-WROOM-32
 #  board: upesy_wroom
-  variant: ESP32
+  variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz
   framework:

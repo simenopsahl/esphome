@@ -9,6 +9,7 @@ packages:
 substitutions:
   device:
     model: 'Sunton 4.3"'
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
 

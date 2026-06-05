@@ -9,6 +9,7 @@ packages:
 substitutions:
   device:
     model: 'Sunton 3,5"'
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
 
@@ -19,7 +20,7 @@ esphome:
 esp32:
 # ESP32-S3R8 (Dual-core, 240MHz)
 # PSRAM: 8MB Octal
-  variant: ESP32S3
+  variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
   framework:

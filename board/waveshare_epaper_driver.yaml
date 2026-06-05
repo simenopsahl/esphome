@@ -12,6 +12,7 @@ substitutions:
   home_page: page_content
   device:
     model: "Waveshare E-Paper"
+    rmt_symbols_block: 64
     framework:
       type: arduino
 
@@ -35,7 +36,7 @@ esphome:
 esp32:
 # ESP32-WROOM-32
 #  board: esp32dev
-  variant: ESP32
+  variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz
   framework:

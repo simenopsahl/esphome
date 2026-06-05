@@ -17,6 +17,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack Atom S3R"
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
 
@@ -60,7 +61,7 @@ spi:
 #remote_transmitter:
 #  pin: ${pin.light.ir}
 #  carrier_duty_percent: 50%
-#  rmt_symbols: 48
+#  rmt_symbols: ${device.rmt_symbols_block}
 
 external_components:
   - source: github://m5stack/esphome-yaml/components

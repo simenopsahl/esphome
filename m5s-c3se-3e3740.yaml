@@ -30,7 +30,7 @@ packages:
 
 substitutions:
   common:
-#    log_level: WARN
+    log_level: WARN
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-3e3740

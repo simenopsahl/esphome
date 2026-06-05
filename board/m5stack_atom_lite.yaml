@@ -7,6 +7,7 @@
 substitutions:
   device:
     model: "M5Stack Atom Lite"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 
@@ -38,7 +39,7 @@ wifi:
 #remote_transmitter:
 #  pin: $ir_pin
 #  carrier_duty_percent: 50%
-#  rmt_symbols: 144
+#  rmt_symbols: ${device.rmt_symbols_block}
 
 light:
   - platform: esp32_rmt_led_strip
@@ -46,7 +47,7 @@ light:
     rgb_order: GRB
     pin: ${pin.light.rgb}
     num_leds: 1
-    rmt_symbols: 384
+    rmt_symbols: ${device.rmt_symbols_block}
     chipset: sk6812
     effects:
       - pulse:

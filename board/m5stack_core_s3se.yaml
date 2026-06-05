@@ -14,6 +14,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack Core S3 SE"
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
 

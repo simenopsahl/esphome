@@ -7,6 +7,7 @@
 substitutions:
   device:
     model: "M5Stack Atom Matrix"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 
@@ -33,21 +34,15 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-# IR
-#remote_transmitter:
-#  pin: $ir_pin
-#  carrier_duty_percent: 50%
-#  rmt_symbols: 64
-
 light:
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
     pin: ${pin.light.rgb}
     num_leds: 25
-    rmt_symbols: 128
+    rmt_symbols: ${device.rmt_symbols_block * 2}
     chipset: ws2812
-    color_correct: [65%, 65%, 65%]
+    color_correct: [40%, 40%, 40%]
     effects:
       - pulse:
       - strobe:

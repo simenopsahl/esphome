@@ -1,0 +1,36 @@
+---
+# https://docs.m5stack.com/en/unit/ir
+# WIP
+
+substitutions:
+  module:
+    ir_in_pin: ${pin.ext.gpio.grove.in}
+    ir_out_pin: ${pin.ext.gpio.grove.out}
+
+logger:
+  logs:
+    remote_receiver: DEBUG
+    remote_transmitter: DEBUG
+    infrared: DEBUG
+
+# UNIT IR Remote
+remote_receiver:
+  id: ir_rx
+  pin: ${module.ir_in_pin}
+  rmt_symbols: ${device.rmt_symbols_block}
+  dump: all
+remote_transmitter:
+  id: ir_tx
+  pin: ${module.ir_out_pin}
+  carrier_duty_percent: 50%
+  rmt_symbols: ${device.rmt_symbols_block}
+
+# Infrared platform — creates infrared entities
+infrared:
+  - platform: ir_rf_proxy
+    name: IR Transmitter
+    remote_transmitter_id: ir_tx
+  - platform: ir_rf_proxy
+    name: IR Receiver
+    receiver_frequency: 38kHz
+    remote_receiver_id: ir_rx

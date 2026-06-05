@@ -10,6 +10,7 @@ packages:
 substitutions:
   device:
     model: "DOIT DevKit V1"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 

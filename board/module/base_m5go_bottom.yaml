@@ -27,7 +27,7 @@ light:
     num_leds: 10
     # RMT 0 channels will be occupied by IR
 #    rmt_channel: 1
-    rmt_symbols: 48
+    rmt_symbols: ${device.rmt_symbols_block * 2}
     chipset: sk6812
     effects:
       - pulse:

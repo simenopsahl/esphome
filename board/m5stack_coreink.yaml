@@ -13,6 +13,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack CoreInk"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 

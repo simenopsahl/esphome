@@ -7,6 +7,7 @@
 substitutions:
   device:
     model: "M5Stack NanoC6"
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
 
@@ -55,6 +56,7 @@ light:
     rgb_order: GRB
     pin: ${pin.light.rgb}
     num_leds: 1
+    rmt_symbols: ${device.rmt_symbols_block}
     chipset: WS2812
     is_rgbw: true
     effects:

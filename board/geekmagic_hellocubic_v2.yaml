@@ -11,6 +11,7 @@ packages:
 substitutions:
   device:
     model: "GeekMagic HelloCubic V2"
+    rmt_symbols_block: 64
     framework:
       type: esp-idf
 
