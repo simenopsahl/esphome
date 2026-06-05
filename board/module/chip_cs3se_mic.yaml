@@ -1,0 +1,50 @@
+---
+# PDM spm1423 microphone
+
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+  i2s_mclk_pin:
+    number: ${pin.audio.i2s_mclk}
+    ignore_strapping_warning: true
+
+audio_adc:
+  - platform: es7210
+    i2c_id: ${module.internal.i2c_bus}
+    id: adc_es7210
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    mic_gain: 36
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    adc_type: external
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 1250ms
+    rms:
+      name: "Average Loudness"
+      id: average_loudness
+      filters:
+        - multiply: -1
+
+switch:
+  - platform: template
+    name: Microphone Mute
+    id: mic_mute
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+    on_turn_on:
+        - microphone.mute:

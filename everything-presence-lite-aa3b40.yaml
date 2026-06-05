@@ -7,7 +7,7 @@ substitutions:
   device:
     name: everything-presence-lite-aa3b40
     friendly_name: EPL-aa3b40
-    location: "Simen"
+    location: "Storage"
 
 packages:
   # --- COMMON PACKAGES ---

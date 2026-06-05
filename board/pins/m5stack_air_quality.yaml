@@ -1,6 +1,6 @@
 ---
-# https://docs.m5stack.com/en/core/AirQ
-# PINs for m5stack PM2.5 Air Qualityy
+# https://docs.m5stack.com/en/core/Air_Quality
+# PINs for m5stack Air Qualityy
 
 substitutions:
   pin:
@@ -24,8 +24,6 @@ substitutions:
       rgb: GPIO21
     
     audio:
-#      i2s_lrclk: GPIO13
-#      mic: GPIO34
       spk_1: GPIO26
       buzzer: GPIO9
     

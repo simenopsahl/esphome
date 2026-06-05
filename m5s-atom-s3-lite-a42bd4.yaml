@@ -22,12 +22,12 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-lite-a42bd4
-    location: "Simen"
+    location: "Storage"
     framework:
       type: esp-idf
 
 esphome:
-  comment: "M5Stack Atom S3 Lite @ Test"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

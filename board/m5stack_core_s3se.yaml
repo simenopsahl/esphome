@@ -110,16 +110,16 @@ aw9523b:
   interrupt_pin: ${pin.int.i2c.int}
 
 #i2s_audio:
-#  id: i2s_shared
+#  id: i2s_audio_bus
 #  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
 #  i2s_bclk_pin: ${pin.audio.i2s_bclk}
 #  i2s_mclk_pin:
 #    number: ${pin.audio.i2s_mclk}
+#    ignore_strapping_warning: true
 #audio_adc:
 #  - platform: es7210
 #    i2c_id: ${module.internal.i2c_bus}
 #    id: adc_es7210
-#    address: 0x40
 #    bits_per_sample: 16bit
 #    sample_rate: 16000
 #    mic_gain: 36
@@ -130,12 +130,12 @@ aw9523b:
 #    sample_rate: 48000
 #microphone:
 #  - platform: i2s_audio
-#    i2s_audio_id: i2s_shared
-#    id: microphone_i2s
-#    i2s_din_pin: ${pin.audio.i2s_din}
-#    adc_type: external
-#    sample_rate: 16000
+#    i2s_audio_id: i2s_audio_bus
+#    id: i2s_mic
+#    i2s_din_pin: ${pin.audio.mic}
 #    bits_per_sample: 16bit
+#    sample_rate: 16000
+#    adc_type: external
 #speaker:
 #  - platform: i2s_audio
 #    i2s_audio_id: i2s_shared
@@ -170,7 +170,7 @@ touchscreen:
   - platform: ft63x6
     i2c_id: ${module.internal.i2c_bus}
     id: touchscreen_ft63x6
-    update_interval: 20ms
+#    update_interval: 20ms
 #    interrupt_pin:
 #      aw9523b_id: aw9523b_hub
 #      number: 10
@@ -207,6 +207,43 @@ binary_sensor:
     x_max: 320
     y_min: 0
     y_max: 240
+  # some aw9523b inputs (handle interrupts)
+  - platform: gpio
+    name: "ES_INT P0_3"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 3
+    on_press:
+      then:
+        - logger.log: "ES7210 interrupt triggered"
+    internal: true
+  - platform: gpio
+    name: "TF_SW P0_4"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 4 
+    on_press:
+      then:
+        - logger.log: "TF_SW interrupt triggered"
+    internal: true
+  - platform: gpio
+    name: "TOUCH_INT P1_2"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 10
+    on_press:
+      then:
+        - logger.log: "TOUCH interrupt triggered"
+    internal: true
+  - platform: gpio
+    name: "AW_INT P1_3"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 11
+    on_press:
+      then:
+        - logger.log: "AW88298 interrupt triggered"
+    internal: true
 
 output:
   - platform: axp2101
@@ -283,6 +320,7 @@ switch:
     # USB_OTG_EN = 0
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
+    disabled_by_default: true
 
   - platform: gpio
     id: sw_boost_en

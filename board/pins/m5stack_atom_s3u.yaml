@@ -10,7 +10,7 @@ substitutions:
     
     audio:
       i2s_bclk: GPIO38
-      i2s_lrck: GPIO39
+      i2s_lrclk: GPIO39
       mic: GPIO38
     
     ext:

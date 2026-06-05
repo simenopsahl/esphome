@@ -31,14 +31,14 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-stickc-plus2-9a09b0
-    location: "Simen"
+    location: "Storage"
     framework:
       type: esp-idf
   display:
     home_page: page_temperature
 
 esphome:
-  comment: "M5Stack StickC Plus2 @ Test"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

@@ -62,7 +62,7 @@ wifi:
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
-#  miso_pin: ${pin.int.spi.miso}
+  miso_pin: ${pin.int.spi.miso}
 
 # IR
 #remote_transmitter:

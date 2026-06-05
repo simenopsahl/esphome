@@ -31,7 +31,7 @@ sensor:
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_1_sensor
     channel: KMETER_1
-    update_interval: 30s
+    update_interval: 45s
     name: "Temperature DualKMeter 1"
     device_class: "temperature"
     state_class: "measurement"
@@ -43,7 +43,7 @@ sensor:
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_2_sensor
     channel: KMETER_2
-    update_interval: 30s
+    update_interval: 45s
     name: "Temperature DualKMeter 2"
     device_class: "temperature"
     state_class: "measurement"

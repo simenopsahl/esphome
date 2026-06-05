@@ -6,7 +6,7 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
   grove: !include board/extension/grove_i2c.yaml
-  env_iv: !include board/module/unit_env_iv.yaml
+  env_iii: !include board/module/unit_env_iii.yaml
   env_pro: !include board/module/unit_env_pro.yaml
 
   # --- FEATURE PACKAGES ---
@@ -48,11 +48,11 @@ sensor:
 #      - source: temperature_sht30_hat_env
 #      - source: temperature_qmp6988_hat_env
       # Unit ENV III
-#      - source: temperature_sht30_unit_env
-#      - source: temperature_qmp6988_unit_env
+      - source: temperature_sht30_unit_env
+      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
-      - source: temperature_bmp280_unit_env
-      - source: temperature_sht40_unit_env
+#      - source: temperature_bmp280_unit_env
+#      - source: temperature_sht40_unit_env
       # Unit ENV Pro
       - source: temperature_bme688
       # Unit CO2
@@ -65,9 +65,9 @@ sensor:
       # HAT ENV III
 #      - source: humidity_sht30_hat_env
       # Unit ENV III
-#      - source: humidity_sht30_unit_env
+      - source: humidity_sht30_unit_env
       # Unit ENV IV
-      - source: humidity_sht40_unit_env
+#      - source: humidity_sht40_unit_env
       # Unit ENV Pro
       - source: humidity_bme688
       # Unit CO2
@@ -78,8 +78,8 @@ sensor:
       # HAT ENV III
 #      - source: pressure_qmp6988_hat_env
       # Unit ENV III
-#      - source: pressure_qmp6988_unit_env
+      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
-      - source: pressure_bmp280_unit_env
+#      - source: pressure_bmp280_unit_env
       # Unit ENV Pro
       - source: pressure_bme688

@@ -3,18 +3,21 @@
 
 # Shared pins
 substitutions:
-  mbus_i2c_shared: "false"
-  i2c_mbus_frequency: 400kHz
+  extension:
+    i2c:
+      mbus:
+        shared: "false"
+        frequency: 400kHz
 
 i2c:
 # mBus Extension
   - id: i2c_mbus
     sda:
       number: ${pin.ext.mbus.p17}
-      allow_other_uses: ${mbus_i2c_shared}
+      allow_other_uses: ${extension.i2c.mbus.shared}
     scl:
       number: ${pin.ext.mbus.p18}
-      allow_other_uses: ${mbus_i2c_shared}
-    frequency: ${i2c_mbus_frequency}
+      allow_other_uses: ${extension.i2c.mbus.shared}
+    frequency: ${extension.i2c.mbus.frequency}
 #    timeout: 10ms
     scan: true

@@ -9,7 +9,7 @@ substitutions:
 
 # UNIT ToF4M
 sensor:
-  - platform: vl53l0x
+  - platform: vl53l1x # variant not currently supported
     i2c_id: ${module.tof_i2c_bus}
     id: tof_distance
     signal_rate_limit: 0.25

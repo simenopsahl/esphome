@@ -6,7 +6,7 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/upesy_wroom.yaml
   i2c_internal: !include board/extension/internal_i2c.yaml
-  bme280: !include board/module/bme280_i2c.yaml
+  bme280: !include board/module/chip_temp_bme280.yaml
 
 substitutions:
   common:
@@ -14,7 +14,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: ble-relay1
-    location: "1etg, Kjøkken"
+    location: "Storage"
     framework:
       type: esp-idf
   extension:

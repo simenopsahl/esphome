@@ -1,0 +1,49 @@
+---
+# https://docs.m5stack.com/en/unit/pdm
+# PDM spm1423 microphone
+
+substitutions:
+  pin:
+    audio:
+      i2s_lrclk: ${pin.ext.i2c.grove.scl}
+      mic: ${pin.ext.i2c.grove.sda}
+
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+
+# UNIT Mini PDM
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic_pdm
+    bits_per_sample: 8bit
+    sample_rate: 8000
+    adc_type: external
+    i2s_din_pin: ${pin.audio.mic}
+    pdm: true
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 1250ms
+    rms:
+      name: "PDM Average Loudness"
+      id: pdm_average_loudness
+      filters:
+        - multiply: -1
+
+switch:
+  - platform: template
+    name: Microphone Mute
+    id: mic_mute
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+        
+    on_turn_on:
+        - microphone.mute:

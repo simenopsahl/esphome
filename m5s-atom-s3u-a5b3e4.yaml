@@ -5,6 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3u.yaml
+  i2s: !include board/module/unit_pdm.yaml
 
   # --- FEATURE PACKAGES ---
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
@@ -15,11 +16,11 @@ packages:
 
 substitutions:
   common:
-    log_level: WARN
+#    log_level: WARN
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3u-a5b3e4
-    location: "Simen"
+    location: "Storage"
     framework:
       type: esp-idf
 

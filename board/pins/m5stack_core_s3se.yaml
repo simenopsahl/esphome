@@ -32,7 +32,8 @@ substitutions:
       i2s_bclk: GPIO34
       i2s_mclk: GPIO0
       i2s_din: GPIO14
-      i2s_dat1: GPIO14
+      i2s_dati: GPIO14
+      mic: GPIO14
       i2s_dout: GPIO13
       i2s_dato: GPIO13
     

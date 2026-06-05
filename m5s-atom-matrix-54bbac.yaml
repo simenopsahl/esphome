@@ -12,7 +12,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-a-m-54bbac
-    location: "Simen"
+    location: "Storage"
     framework:
       type: esp-idf
 
@@ -31,7 +31,33 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.45
 
-binary_sensor:
-  - id: !extend btn_matrix
-    on_press:
-      - display.page.show_next
+display:
+  - id: !extend display_matrix
+    pages:
+      - id: page_bulls_eye_b
+        lambda: |-
+          // Draw a bulls-eye pattern
+          it.rectangle(0, 0, 5, 5, id(c_red));
+          it.rectangle(1, 1, 3, 3, id(c_green));
+          it.draw_pixel_at(2, 2, id(c_blue));
+      - id: page_bulls_eye_g
+        lambda: |-
+          // Draw a bulls-eye pattern
+          it.rectangle(0, 0, 5, 5, id(c_blue));
+          it.rectangle(1, 1, 3, 3, id(c_red));
+          it.draw_pixel_at(2, 2, id(c_green));
+      - id: page_bulls_eye_r
+        lambda: |-
+          // Draw a bulls-eye pattern
+          it.rectangle(0, 0, 5, 5, id(c_green));
+          it.rectangle(1, 1, 3, 3, id(c_blue));
+          it.draw_pixel_at(2, 2, id(c_red));
+      - id: page_a
+        lambda: |-
+          it.print(0, 0, id(font_5x5), id(c_cyan), "A");
+      - id: page_b
+        lambda: |-
+          it.print(0, 0, id(font_5x5), id(c_magenta), "B");
+      - id: page_c
+        lambda: |-
+          it.print(0, 0, id(font_5x5), id(c_yellow), "C");

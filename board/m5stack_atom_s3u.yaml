@@ -31,7 +31,14 @@ esp32:
 
 #i2s_audio:
 #  id: i2s_audio_bus
-#  i2s_lrck_pin: ${pin.audio.i2s_lrck}
+#  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+#microphone:
+#  - platform: i2s_audio
+#    i2s_audio_id: i2s_audio_bus
+#    id: mic_pdm
+#    i2s_din_pin: ${pin.audio.mic}
+#    adc_type: external
+#    pdm: true
 
 # IR
 #remote_transmitter:
@@ -39,14 +46,6 @@ esp32:
 #  carrier_duty_percent: 50%
 #  non_blocking: true
 #  rmt_symbols: 48
-
-#microphone:
-#  - platform: i2s_audio
-#    i2s_id: i2s_audio_bus
-#    id: mic_pdm
-#    i2s_din_pin: ${pin.audio.mic}
-#    adc_type: external
-#    pdm: true
 
 light:
   #G35=RGB WS2812C-2020

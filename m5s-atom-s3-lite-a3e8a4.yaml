@@ -23,7 +23,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-lite-a3e8a4
-    location: "Simen"
+    location: "Storage"
     framework:
       type: esp-idf
   module:
@@ -31,7 +31,7 @@ substitutions:
     env_i2c_bus: i2c_port_abc
 
 esphome:
-  comment: "M5Stack Atom S3 Lite @ Test"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}

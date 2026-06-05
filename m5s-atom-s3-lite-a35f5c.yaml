@@ -21,7 +21,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-lite-a35f5c
-    location: "Simen"
+    location: "Storage"
     framework:
       type: esp-idf
 

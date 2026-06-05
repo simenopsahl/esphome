@@ -5,7 +5,7 @@ substitutions:
   extension:
     i2c:
       internal:
-        frequency: 100kHz
+        frequency: 50kHz
 
 i2c:
 # Internal

@@ -1,15 +1,18 @@
 ---
 # https://docs.m5stack.com/en/module/Module_CC1101
 # https://esphome.io/components/cc1101/
+# Does NOT work with CoreS3-SE as SPI MISO pin is shared with Display DC pin
+# Does work with Fire 2.7
 
 substitutions:
   module:
     cc1101:
       # General settings
       frequency: "868.95MHz"
-      output_power: "-20"
-      modulation_type: "GFSK"
+      output_power: "-10"
+      modulation_type: "2-FSK"
       symbol_rate: "2400"
+      rx_attenuation: "0dB"
       # Tuner settings
       filter_bandwidth: "58.0kHz"
       fsk_deviation: "25.4kHz"
@@ -25,7 +28,7 @@ logger:
 cc1101:
   id: radio_cc1101
   # Hardware settings
-  cs_pin: ${pin.ext.mbus.p8}
+  cs_pin: ${pin.ext.mbus.p21}
   gdo0_pin:
     number: ${pin.ext.mbus.p2}
 #    allow_other_uses: true
@@ -35,12 +38,16 @@ cc1101:
   output_power: ${module.cc1101.output_power}
   modulation_type: ${module.cc1101.modulation_type}
   symbol_rate: ${module.cc1101.symbol_rate}
+  rx_attenuation: ${module.cc1101.rx_attenuation}
+  dc_blocking_filter: false
   # Tuner settings
   filter_bandwidth: ${module.cc1101.filter_bandwidth}
   fsk_deviation: ${module.cc1101.fsk_deviation}
   # Packet Mode settings
   packet_mode: ${module.cc1101.packet_mode}
   packet_length: 0
+  sync0: 0xad
+  sync1: 0x12
   num_preamble: ${module.cc1101.num_preamble}
   on_packet:
     - then:
@@ -81,10 +88,15 @@ esphome:
     # Sync CC1101 settings on boot (in case we changed them from Home Assistant)
     - priority: -10
       then:
+        # 1. Safely park the radio (in case the restored switch already turned it on)
+        - cc1101.set_idle:
+
+        # 2. Sync all UI values to the hardware registers
         - cc1101.set_frequency:
             value: !lambda "return id(cc1101_frequency).state * 1e6;"
         - cc1101.set_output_power:
-            value: !lambda "return id(cc1101_output_power).state;"
+            # Safely converts the restored select string into a float
+            value: !lambda "return std::stof(id(cc1101_output_power).state);"
         - if:
             condition:
               select.is:
@@ -126,6 +138,13 @@ esphome:
               - cc1101.set_modulation_type:
                   value: MSK
 
+        # 3. Safely bring the radio back online if the switch is ON
+        - if:
+            condition:
+              switch.is_on: cc1101_rx
+            then:
+              - cc1101.begin_rx:
+
 # Adjustments
 number:
   # Change frequency from Home Assistant
@@ -135,8 +154,8 @@ number:
     entity_category: config
     device_class: frequency
     unit_of_measurement: MHz
-    min_value: 300
-    max_value: 928
+    min_value: 855
+    max_value: 925
     step: 0.01
     restore_value: true
     optimistic: true
@@ -145,28 +164,57 @@ number:
     disabled_by_default: true
     on_value:
       - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
           - cc1101.set_frequency:
               value: !lambda "return x * 1e6;"
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
+select:
   # Change output power from Home Assistant
   - platform: template
     id: cc1101_output_power
     name: "CC1101 Output Power"
+    icon: "mdi:transmission-tower"
     entity_category: config
-    device_class: signal_strength
-    unit_of_measurement: dBm
-    min_value: -30
-    max_value: 10
-    step: 1
+    options:
+      - "-30"
+      - "-20"
+      - "-15"
+      - "-10"
+      - "0"
+      - "5"
+      - "7"
+      - "10"
     restore_value: true
     optimistic: true
-    initial_value: -20
-    mode: box
+    initial_option: "-10"
     disabled_by_default: true
     on_value:
       - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
+          # std::stof converts the string 'x' (e.g., "-15") into a float
           - cc1101.set_output_power:
-              value: !lambda "return x;"
-select:
+              value: !lambda "return std::stof(x);"
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
   # Change modulation type from Home Assistant
   - platform: template
     id: cc1101_modulation_type
@@ -181,10 +229,14 @@ select:
       - "MSK"
     restore_value: true
     optimistic: true
-    initial_option: "GFSK"
+    initial_option: "2-FSK"
     disabled_by_default: true
     on_value:
       - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
           - if:
               condition:
                 lambda: 'return x == "ASK/OOK";'
@@ -215,6 +267,14 @@ select:
               then:
                 - cc1101.set_modulation_type:
                     value: MSK
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
   # Change symbol rate from Home Assistant
   - platform: template
     id: cc1101_symbol_rate
@@ -235,9 +295,21 @@ select:
     disabled_by_default: true
     on_value:
       - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
           - cc1101.set_symbol_rate:
               # std::stoi converts the string 'x' to an integer
               value: !lambda "return std::stoi(x);"
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
   # Change RX attenuation from Home Assistant
   - platform: template
     id: cc1101_rx_attenuation
@@ -255,6 +327,10 @@ select:
     disabled_by_default: true
     on_value:
       - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
           - if:
               condition:
                 lambda: 'return x == "0dB";'
@@ -279,6 +355,14 @@ select:
               then:
                 - cc1101.set_rx_attenuation:
                     value: 18dB
+
+            # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
 switch:
   # Enable/disable RX mode from Home Assistant
   - platform: template
@@ -295,6 +379,7 @@ switch:
     on_turn_off:
       - then:
           - cc1101.set_idle:
+
 button:
   # Put CC1101 into idle mode from Home Assistant
   - platform: template
@@ -305,6 +390,7 @@ button:
     on_press:
       - then:
           - cc1101.set_idle:
+          - delay: 1s
           - switch.turn_off: cc1101_rx
 
 # Diagnostics
