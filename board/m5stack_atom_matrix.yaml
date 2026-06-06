@@ -42,7 +42,7 @@ light:
     num_leds: 25
     rmt_symbols: ${device.rmt_symbols_block * 2}
     chipset: ws2812
-    color_correct: [40%, 40%, 40%]
+    color_correct: [35%, 35%, 35%]
     effects:
       - pulse:
       - strobe:
@@ -77,6 +77,19 @@ display:
     height: 5
     pages:
       - id: page_blank
+        lambda: |-
+          it.fill(COLOR_OFF);
+          it.draw_pixel_at(1, 2, c_red);
+          it.draw_pixel_at(3, 2, c_darkorange);
+          // Show wifi icon.
+          if ( id(component_wifi).is_connected() ) {
+            it.draw_pixel_at(1, 2, c_green);
+          }
+          // Show HA icon.
+          if ( id(component_api).is_connected() ) {
+            it.draw_pixel_at(3, 2, c_aquamarine);
+          }
+      - id: page_colors
         lambda: |-
           it.draw_pixel_at(0, 0, c_red);
           it.draw_pixel_at(0, 1, c_green);

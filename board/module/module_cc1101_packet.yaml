@@ -1,0 +1,762 @@
+---
+# https://docs.m5stack.com/en/module/Module_CC1101
+# https://esphome.io/components/cc1101/
+# Does NOT work with CoreS3-SE as SPI MISO pin is shared with Display DC pin
+# Does work with Fire 2.7
+
+substitutions:
+  module:
+    cc1101:
+      # General settings
+      frequency: "868.95MHz"
+      output_power: "5"
+      modulation_type: "2-FSK"
+      symbol_rate: "100000"
+      rx_attenuation: "6dB"
+      # Tuner settings
+      filter_bandwidth: "58.0kHz"
+      fsk_deviation: "50.0kHz"
+      # Packet Mode settings
+      packet_mode: "true"
+      num_preamble: "2"
+
+logger:
+  logs:
+    cc1101: DEBUG
+
+# Module CC1101
+cc1101:
+  id: radio_cc1101_packet
+  # Hardware settings
+  cs_pin: ${pin.ext.mbus.p21}
+  gdo0_pin:
+    number: ${pin.ext.mbus.p22}
+#    allow_other_uses: true
+#  gdo2_pin: ${pin.ext.mbus.p2}
+  # General settings
+  frequency: ${module.cc1101.frequency}
+  output_power: ${module.cc1101.output_power}
+  modulation_type: ${module.cc1101.modulation_type}
+  symbol_rate: ${module.cc1101.symbol_rate}
+  rx_attenuation: ${module.cc1101.rx_attenuation}
+  dc_blocking_filter: false
+  # Tuner settings
+  filter_bandwidth: ${module.cc1101.filter_bandwidth}
+  fsk_deviation: ${module.cc1101.fsk_deviation}
+  # Packet Mode settings
+  packet_mode: ${module.cc1101.packet_mode}
+  packet_length: 0
+  sync0: 0x54
+  sync1: 0x3d
+  num_preamble: ${module.cc1101.num_preamble}
+  on_packet:
+    - then:
+        - lambda: |-
+            // format_hex_pretty safely returns a std::string, .c_str() formats it for the logger
+            ESP_LOGD("cc1101",
+                  "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u",
+                  format_hex_pretty(x).c_str(),
+                  freq_offset,
+                  rssi,
+                  lqi);
+        # Set Last packet RSSI
+        - sensor.template.publish:
+            id: cc1101_rssi
+            state: !lambda 'return rssi;'
+        # Set Last packet LQI
+        - sensor.template.publish:
+            id: cc1101_lqi
+            state: !lambda 'return lqi;'
+        # Send the packet to the Home Assistant text file
+        - homeassistant.action:
+            action: notify.send_message
+            data:
+              entity_id: notify.cc1101_packet_log
+            data_template:
+              message: "{{ log_entry }}"
+            variables:
+              log_entry: |-
+                // 1. Safely format the numbers into a locked 128-byte character buffer
+                char buf[128];
+                snprintf(buf, sizeof(buf), "RSSI: %.1f dBm | LQI: %u | Data: ", rssi, lqi);
+                
+                // 2. Safely concatenate the buffer with the dynamically sized hex string
+                return std::string(buf) + format_hex_pretty(x);
+            on_success:
+              - logger.log: "Sent packet to Home Assistant"
+            on_error:
+              - logger.log: "Failed to send packet to Home Assistant"
+
+esphome:
+  on_boot:
+    # Sync CC1101 settings on boot (in case we changed them from Home Assistant)
+    - priority: -10
+      then:
+        # 1. Safely park the radio (in case the restored switch already turned it on)
+        - cc1101.set_idle:
+
+        # 2. Sync all UI values to the hardware registers
+        - cc1101.set_frequency:
+            value: !lambda "return id(cc1101_frequency).state * 1e6;"
+        # Sync the symbol rate (safely grabs the float state from the number component)
+        - cc1101.set_symbol_rate:
+            value: !lambda "return id(cc1101_symbol_rate).state;"
+        - cc1101.set_output_power:
+            # Safely converts the restored select string into a float
+            value: !lambda "return std::stof(id(cc1101_output_power).state);"
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "ASK/OOK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: ASK/OOK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "2-FSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: 2-FSK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "4-FSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: 4-FSK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "GFSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: GFSK
+        - if:
+            condition:
+              select.is:
+                id: cc1101_modulation_type
+                options: "MSK"
+            then:
+              - cc1101.set_modulation_type:
+                  value: MSK
+
+        # 3. Safely bring the radio back online if the switch is ON
+        - if:
+            condition:
+              switch.is_on: cc1101_rx
+            then:
+              - cc1101.begin_rx:
+
+# Adjustments
+number:
+  # Change frequency from Home Assistant
+  - platform: template
+    id: cc1101_frequency
+    name: "CC1101 Frequency"
+    entity_category: config
+    device_class: frequency
+    unit_of_measurement: MHz
+    min_value: 855
+    max_value: 925
+    step: 0.01
+    restore_value: true
+    optimistic: true
+    initial_value: 868.95
+    mode: box
+    disabled_by_default: true
+    on_value:
+      - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
+          - cc1101.set_frequency:
+              value: !lambda "return x * 1e6;"
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+      - then:
+          - lvgl.label.update:
+              id: lbl_frequency_value
+              text:
+                format: "%.2f"
+                args: [ 'x' ]
+  # Change symbol rate from Home Assistant
+  - platform: template
+    id: cc1101_symbol_rate
+    name: "CC1101 Symbol Rate"
+    icon: "mdi:speedometer"
+    entity_category: config
+    min_value: 600
+    max_value: 500000
+    step: 100
+    restore_value: true
+    optimistic: true
+    initial_value: 100000
+    disabled_by_default: true
+    on_value:
+      - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
+          - cc1101.set_symbol_rate:
+              value: !lambda "return x;"
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
+select:
+  # Change output power from Home Assistant
+  - platform: template
+    id: cc1101_output_power
+    name: "CC1101 Output Power"
+    icon: "mdi:transmission-tower"
+    entity_category: config
+    options:
+      - "-30"
+      - "-20"
+      - "-15"
+      - "-10"
+      - "0"
+      - "5"
+      - "7"
+      - "10"
+    restore_value: true
+    optimistic: true
+    initial_option: "5"
+    disabled_by_default: true
+    on_value:
+      - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
+          # std::stof converts the string 'x' (e.g., "-15") into a float
+          - cc1101.set_output_power:
+              value: !lambda "return std::stof(x);"
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+      - then:
+          - lvgl.label.update:
+              id: lbl_tx_power_value
+              text:
+                format: "%s"
+                args: [ 'x' ]
+
+  # Change modulation type from Home Assistant
+  - platform: template
+    id: cc1101_modulation_type
+    name: "CC1101 Modulation Type"
+    icon: "mdi:signal-variant"
+    entity_category: config
+    options:
+      - "ASK/OOK"
+      - "2-FSK"
+      - "4-FSK"
+      - "GFSK"
+      - "MSK"
+    restore_value: true
+    optimistic: true
+    initial_option: "2-FSK"
+    disabled_by_default: true
+    on_value:
+      - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
+          - if:
+              condition:
+                lambda: 'return x == "ASK/OOK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: ASK/OOK
+          - if:
+              condition:
+                lambda: 'return x == "2-FSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: 2-FSK
+          - if:
+              condition:
+                lambda: 'return x == "4-FSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: 4-FSK
+          - if:
+              condition:
+                lambda: 'return x == "GFSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: GFSK
+          - if:
+              condition:
+                lambda: 'return x == "MSK";'
+              then:
+                - cc1101.set_modulation_type:
+                    value: MSK
+
+          # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+      - then:
+          - lvgl.label.update:
+              id: lbl_modulation_value
+              text:
+                format: "%s"
+                args: [ 'x' ]
+
+  # Change RX attenuation from Home Assistant
+  - platform: template
+    id: cc1101_rx_attenuation
+    name: "CC1101 RX Attenuation"
+    icon: "mdi:broadcast"
+    entity_category: config
+    options:
+      - "0dB"
+      - "6dB"
+      - "12dB"
+      - "18dB"
+    restore_value: true
+    optimistic: true
+    initial_option: "6dB"
+    disabled_by_default: true
+    on_value:
+      - then:
+          # 1. Safely park the radio state machine
+          - cc1101.set_idle:
+
+          # 2. Update the hardware registers
+          - if:
+              condition:
+                lambda: 'return x == "0dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 0dB
+          - if:
+              condition:
+                lambda: 'return x == "6dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 6dB
+          - if:
+              condition:
+                lambda: 'return x == "12dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 12dB
+          - if:
+              condition:
+                lambda: 'return x == "18dB";'
+              then:
+                - cc1101.set_rx_attenuation:
+                    value: 18dB
+
+            # 3. Safely bring the radio back online if the switch is ON
+          - if:
+              condition:
+                switch.is_on: cc1101_rx
+              then:
+                - cc1101.begin_rx:
+
+switch:
+  # Enable/disable RX mode from Home Assistant
+  - platform: template
+    id: cc1101_rx
+    name: "CC1101 Receive"
+    icon: "mdi:email-arrow-left"
+    entity_category: config
+    restore_mode: restore_default_on
+    optimistic: true
+    disabled_by_default: true
+    on_turn_on:
+      - then:
+          - cc1101.begin_rx:
+      - then:
+          - lvgl.label.update:
+              id: lbl_cc1101_state
+              text: "Mottar..."
+          - lvgl.led.update:
+              id: led_cc1101_state
+              color: c_green
+    on_turn_off:
+      - then:
+          - cc1101.set_idle:
+      - then:
+          - lvgl.label.update:
+              id: lbl_cc1101_state
+              text: "Av"
+          - lvgl.led.update:
+              id: led_cc1101_state
+              color: c_red
+
+button:
+  # Put CC1101 into idle mode from Home Assistant
+  - platform: template
+    id: cc1101_idle
+    name: "CC1101 Idle"
+    icon: "mdi:email-lock"
+    entity_category: config
+    on_press:
+      - then:
+          - cc1101.set_idle:
+          - delay: 1s
+          - switch.turn_off: cc1101_rx
+      - then:
+          - lvgl.label.update:
+              id: lbl_cc1101_state
+              text: "Stopper"
+          - lvgl.led.update:
+              id: led_cc1101_state
+              color: c_yellow
+
+# Diagnostics
+sensor:
+  # Last Packet RSSI
+  - platform: template
+    id: cc1101_rssi
+    name: "CC1101 Last RSSI"
+    update_interval: never
+    device_class: signal_strength
+    entity_category: diagnostic
+    unit_of_measurement: dBm
+    state_class: measurement
+    accuracy_decimals: 1
+    disabled_by_default: true
+    filters:
+      - throttle: 2s
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_rssi_value
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
+  # Last Packet LQI
+  - platform: template
+    id: cc1101_lqi
+    name: "CC1101 Last LQI"
+    icon: "mdi:link-variant"
+    update_interval: never
+    unit_of_measurement: "LQI"
+    entity_category: diagnostic
+    state_class: measurement
+    accuracy_decimals: 0
+    disabled_by_default: true
+    filters:
+      - throttle: 2s
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_lqi_value
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
+          - lvgl.label.update:
+              id: lbl_cc1101_state
+              text: "Mottar"
+          - lvgl.label.update:
+              id: lbl_cc1101_packet
+              text: "Pakke"
+          - lvgl.led.update:
+              id: led_cc1101_state
+              color: c_blue
+          - delay: 2s
+          - lvgl.label.update:
+              id: lbl_cc1101_state
+              text: "Mottar..."
+          - lvgl.label.update:
+              id: lbl_cc1101_packet
+              text: " "
+          - lvgl.led.update:
+              id: led_cc1101_state
+              color: c_green
+
+lvgl:
+  pages:
+    - id: page_cc1101
+      pad_top: 32
+      pad_bottom: 32
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: Radio
+      <<: !include
+        file: ../../gui/functions/swipe_navigation.yaml
+      widgets:
+        - obj:
+            pad_top: 1
+            pad_bottom: 1
+            pad_left: 4
+            pad_right: 4
+            scrollable: false
+            align: CENTER
+            height: 100%
+            width: 100%
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: SPACE_EVENLY
+              flex_align_cross: CENTER
+              flex_align_track: CENTER
+              pad_row: 0
+              pad_column: 0
+            widgets:
+              # --- Row 1: Frequency ---
+              - obj:
+                  # This is a container for a single row
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    # Descriptor Label
+                    - label:
+                        id: lbl_frequency_l
+                        text: "Frekvens: "
+                        pad_left: 4
+                        pad_right: 4
+                        text_font: font_sm
+                        text_color: c_text_s
+                    # Value Label
+                    - label:
+                        id: lbl_frequency_value
+                        text: "?"
+                        pad_right: 4
+                        text_font: font_md
+                        text_color: c_text_p
+                    # Unit Label
+                    - label:
+                        id: lbl_frequency_unit
+                        text: "Mhz"
+                        text_font: font_sm
+                        text_color: c_text_s
+
+              # --- Row 2: Modulation & Tx Power ---
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    - obj:
+                        width: 65%
+                        height: SIZE_CONTENT
+                        pad_all: 0
+                        pad_left: 0
+                        pad_right: 10
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: START
+                          flex_align_cross: CENTER
+                          pad_row: 0
+                          pad_column: 0
+                        widgets:
+                          # Descriptor Label
+                          - label:
+                              id: lbl_modulation_l
+                              text: "Protokoll: "
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_sm
+                              text_color: c_text_s
+                          # Value Label
+                          - label:
+                              id: lbl_modulation_value
+                              text: "?"
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_md
+                              text_color: c_text_p
+                    - obj:
+                        width: 35%
+                        height: SIZE_CONTENT
+                        pad_all: 0
+                        pad_left: 10
+                        pad_right: 0
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: END
+                          flex_align_cross: CENTER
+                          pad_row: 0
+                          pad_column: 0
+                        widgets:
+                          # Value Label
+                          - label:
+                              id: lbl_tx_power_value
+                              text: "?"
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_sm
+                              text_color: c_text_p
+                          # Unit Label
+                          - label:
+                              id: lbl_tx_power_unit
+                              text: "dBm"
+                              pad_left: 4
+                              text_font: font_sm
+                              text_color: c_text_s
+
+              # --- Row 3: Transmit/Receive ---
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_top: 10
+                  pad_bottom: 10
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    # Descriptor Label
+                    - label:
+                        id: lbl_cc1101_state
+                        text: "Mottar..."
+                        pad_left: 4
+                        pad_right: 4
+                        text_font: font_sm
+                        text_color: c_text_s
+                    # Value Label
+                    - led:
+                        id: led_cc1101_state
+                        color: c_green
+                        pad_right: 4
+                        height: 6
+                        width: 26
+                        radius: 3
+                        shadow_width: 6
+                        shadow_spread: 2
+                    # Unit Label
+                    - label:
+                        id: lbl_cc1101_packet
+                        text: "     "
+                        text_font: font_sm
+                        text_color: c_text_s
+
+              # --- Row 4: RSSI & LQI ---
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    - obj:
+                        width: 50%
+                        height: SIZE_CONTENT
+                        pad_all: 0
+                        pad_left: 0
+                        pad_right: 10
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: START
+                          flex_align_cross: CENTER
+                          pad_row: 0
+                          pad_column: 0
+                        widgets:
+                          # Descriptor Label
+                          - label:
+                              id: lbl_rssi_l
+                              text: "RSSI: "
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_sm
+                              text_color: c_text_s
+                          # Value Label
+                          - label:
+                              id: lbl_rssi_value
+                              text: "?"
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_md
+                              text_color: c_text_p
+                          # Unit Label
+                          - label:
+                              id: lbl_rssi_unit
+                              text: "dBm"
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_sm
+                              text_color: c_text_s
+                    - obj:
+                        width: 50%
+                        height: SIZE_CONTENT
+                        pad_all: 0
+                        pad_left: 10
+                        pad_right: 0
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: END
+                          flex_align_cross: CENTER
+                          pad_row: 0
+                          pad_column: 0
+                        widgets:
+                          # Descriptor Label
+                          - label:
+                              id: lbl_lqi_l
+                              text: "LQI: "
+                              pad_left: 4
+                              pad_right: 4
+                              text_font: font_sm
+                              text_color: c_text_s
+                          # Value Label
+                          - label:
+                              id: lbl_lqi_value
+                              text: "?"
+                              pad_left: 4
+                              text_font: font_md
+                              text_color: c_text_p

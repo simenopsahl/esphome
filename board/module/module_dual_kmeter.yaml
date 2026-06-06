@@ -27,6 +27,13 @@ sensor:
       - sliding_window_moving_average:
           window_size: 6
           send_every: 6
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_temp_kmeteri_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
   - platform: dual_kmeter
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_1_sensor
@@ -39,6 +46,13 @@ sensor:
       - sliding_window_moving_average:
           window_size: 3
           send_every: 2
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_temp_kmeter1_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
   - platform: dual_kmeter
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_2_sensor
@@ -51,3 +65,189 @@ sensor:
       - sliding_window_moving_average:
           window_size: 3
           send_every: 2
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_temp_kmeter2_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+
+lvgl:
+  pages:
+    - id: page_kmeter
+      pad_top: 32
+      pad_bottom: 32
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: Temp Probe
+      <<: !include
+        file: ../../gui/functions/swipe_navigation.yaml
+      widgets:
+        - obj:
+            pad_top: 1
+            pad_bottom: 1
+            pad_left: 4
+            pad_right: 4
+            scrollable: false
+            align: CENTER
+            height: 100%
+            width: 100%
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: SPACE_EVENLY
+              flex_align_cross: CENTER
+              flex_align_track: CENTER
+              pad_row: 0
+              pad_column: 0
+            widgets:
+              # --- Row 1: Probe 1 ---
+              - obj:
+                  # This is a container for a single row
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    # Descriptor Label
+                    - label:
+                        id: lbl_temp_kmeter1_l
+                        text: "Probe 1: "
+                        pad_left: 4
+                        pad_right: 4
+                        text_font: font_md
+                        text_color: c_text_s
+                    # Value Label
+                    - label:
+                        id: lbl_temp_kmeter1_value
+                        text: "?"
+                        pad_right: 4
+                        text_font: font_xl
+                        text_color: c_text_p
+                    # Unit Label
+                    - label:
+                        id: lbl_temp_kmeter1_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s
+
+              # --- Row 2: Probe 2 ---
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    # Descriptor Label
+                    - label:
+                        id: lbl_temp_kmeter2_l
+                        text: "Probe 2: "
+                        pad_left: 4
+                        pad_right: 4
+                        text_font: font_md
+                        text_color: c_text_s
+                    # Value Label
+                    - label:
+                        id: lbl_temp_kmeter2_value
+                        text: "?"
+                        pad_right: 4
+                        text_font: font_xl
+                        text_color: c_text_p
+                    # Unit Label
+                    - label:
+                        id: lbl_temp_kmeter2_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s
+
+              # --- Row 3: KMeter Int ---
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    # Descriptor Label
+                    - label:
+                        id: lbl_temp_kmeteri_l
+                        text: "Intern: "
+                        pad_left: 4
+                        pad_right: 4
+                        text_font: font_md
+                        text_color: c_text_s
+                    # Value Label
+                    - label:
+                        id: lbl_temp_kmeteri_value
+                        text: "?"
+                        pad_right: 4
+                        text_font: font_xl
+                        text_color: c_text_p
+                    # Unit Label
+                    - label:
+                        id: lbl_temp_kmeteri_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s
+
+              # --- Row 4: Temperature ---
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  pad_all: 0
+                  pad_left: 4
+                  pad_right: 4
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: SPACE_BETWEEN
+                    flex_align_cross: CENTER
+                    pad_row: 0
+                    pad_column: 0
+                  widgets:
+                    # Descriptor Label
+                    - label:
+                        id: lbl_temp_local2_l
+                        text: "Luft: "
+                        pad_left: 4
+                        pad_right: 4
+                        text_font: font_md
+                        text_color: c_text_s
+                    # Value Label
+                    - label:
+                        id: lbl_temp_local2_value
+                        text: "?"
+                        pad_right: 4
+                        text_font: font_xl
+                        text_color: c_text_p
+                    # Unit Label
+                    - label:
+                        id: lbl_temp_local2_unit
+                        text: "°C"
+                        text_font: font_lg
+                        text_color: c_text_s

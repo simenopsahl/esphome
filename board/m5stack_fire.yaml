@@ -65,6 +65,7 @@ spi:
   mosi_pin: ${pin.int.spi.mosi}
   miso_pin: ${pin.int.spi.miso}
 
+
 # IR
 #remote_transmitter:
 #  pin: ${ir_pin}

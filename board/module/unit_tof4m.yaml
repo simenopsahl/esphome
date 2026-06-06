@@ -18,4 +18,3 @@ sensor:
     timing_budget: 33000us
     name: "ToF4M Distance"
     update_interval: 1s
-
