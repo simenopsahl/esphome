@@ -1,0 +1,226 @@
+# LVGL Particulate matter and CO2 page
+
+# required vars:
+# - *page_styles
+# - *container_styles
+# - page_title
+
+# Air Quality page
+#lvgl:
+#  pages:
+    id: page_airq
+    <<: !include ../../styles/page_styles.yaml
+    # REMOVED: `<<: *page_styles`
+    # ADDED: Use the variables passed from the parent file
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
+    on_load:
+      - lvgl.label.update:
+          id: lbl_page_title
+          text: ${page_title}
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      - obj:
+          <<: !include ../../styles/container_styles.yaml
+          # Use the passed-in variables for size
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
+          align: CENTER
+          layout:
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_main: SPACE_EVENLY
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+            pad_row: 0
+            pad_column: 0
+          widgets:
+            # --- Row 1: Temperature ---
+            - obj:
+                # This is a container for a single row
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_temp_local_l
+                      text: "Temperatur: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_temp_local_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_temp_local_unit
+                      text: "°C"
+                      pad_right: ${container_pad_right}
+                      text_font: font_md
+                      text_color: c_text_s
+
+            # --- Row 2: Carbonmonoxide ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_co2_l
+                      text: "Karbondioksid: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_co2_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_co2_unit
+                      text: "ppm"
+                      pad_right: ${container_pad_right}
+                      text_font: font_md
+                      text_color: c_text_s
+
+            # --- Row 3: PM1.0 ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_pm1_l
+                      text: "Svevestøv 1.0: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_pm1_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_pm1_unit
+                      text: "µg/m³"
+                      pad_right: ${container_pad_right}
+                      text_font: font_md
+                      text_color: c_text_s
+
+            # --- Row 4: PM2.5 ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_pm25_l
+                      text: "Svevestøv 2.5: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_pm25_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_pm25_unit
+                      text: "µg/m³"
+                      pad_right: ${container_pad_right}
+                      text_font: font_md
+                      text_color: c_text_s
+
+            # --- Row 5: PM10.0 ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_pm10_l
+                      text: "Svevestøv 10.0: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_pm10_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_pm10_unit
+                      text: "µg/m³"
+                      pad_right: ${container_pad_right}
+                      text_font: font_md
+                      text_color: c_text_s

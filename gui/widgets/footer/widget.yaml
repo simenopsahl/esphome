@@ -27,7 +27,7 @@ obj: # navigation bar
         on_press:
           - lvgl.page.previous:
               animation: OUT_RIGHT
-              time: 300ms
+              time: 200ms
         widgets:
           - label:
               align: CENTER
@@ -56,7 +56,7 @@ obj: # navigation bar
         on_press:
           - lvgl.page.next:
               animation: OUT_LEFT
-              time: 300ms
+              time: 200ms
         widgets:
           - label:
               align: CENTER

@@ -51,14 +51,11 @@ cc1101:
   num_preamble: ${module.cc1101.num_preamble}
   on_packet:
     - then:
-        - lambda: |-
-            // format_hex_pretty safely returns a std::string, .c_str() formats it for the logger
-            ESP_LOGD("cc1101",
-                  "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u",
-                  format_hex_pretty(x).c_str(),
-                  freq_offset,
-                  rssi,
-                  lqi);
+        - logger.log:
+            level: DEBUG
+            tag: "cc1101"
+            format: "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u"
+            args: ['format_hex_pretty(x).c_str()', 'freq_offset', 'rssi', 'lqi']
         # Set Last packet RSSI
         - sensor.template.publish:
             id: cc1101_rssi
@@ -494,269 +491,34 @@ sensor:
               id: led_cc1101_state
               color: c_green
 
+.sizing:
+  - &page_styles
+    <<: !include ../../gui/styles/page_styles.yaml
+    page_pad_top: 32
+    page_pad_bottom: 32
+    screen_height: 240
+    screen_width: 320
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 240 - (2 * 32) - (2 * 1) = 170
+    usable_screen_height: 170
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 320  (2 * 4) = 312
+    usable_screen_width: 312
+
+  - &container_styles
+    <<: !include ../../gui/styles/container_styles.yaml
+    container_pad_top: 1
+    container_pad_bottom: 1
+    container_pad_left: 4
+    container_pad_right: 4
+    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
+
 lvgl:
   pages:
-    - id: page_cc1101
-      pad_top: 32
-      pad_bottom: 32
-      on_load:
-        - lvgl.label.update:
-            id: lbl_page_title
-            text: Radio
-      <<: !include
-        file: ../../gui/functions/swipe_navigation.yaml
-      widgets:
-        - obj:
-            pad_top: 1
-            pad_bottom: 1
-            pad_left: 4
-            pad_right: 4
-            scrollable: false
-            align: CENTER
-            height: 100%
-            width: 100%
-            layout:
-              type: FLEX
-              flex_flow: COLUMN
-              flex_align_main: SPACE_EVENLY
-              flex_align_cross: CENTER
-              flex_align_track: CENTER
-              pad_row: 0
-              pad_column: 0
-            widgets:
-              # --- Row 1: Frequency ---
-              - obj:
-                  # This is a container for a single row
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_all: 0
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    # Descriptor Label
-                    - label:
-                        id: lbl_frequency_l
-                        text: "Frekvens: "
-                        pad_left: 4
-                        pad_right: 4
-                        text_font: font_sm
-                        text_color: c_text_s
-                    # Value Label
-                    - label:
-                        id: lbl_frequency_value
-                        text: "?"
-                        pad_right: 4
-                        text_font: font_md
-                        text_color: c_text_p
-                    # Unit Label
-                    - label:
-                        id: lbl_frequency_unit
-                        text: "Mhz"
-                        text_font: font_sm
-                        text_color: c_text_s
-
-              # --- Row 2: Modulation & Tx Power ---
-              - obj:
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_all: 0
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    - obj:
-                        width: 65%
-                        height: SIZE_CONTENT
-                        pad_all: 0
-                        pad_left: 0
-                        pad_right: 10
-                        layout:
-                          type: FLEX
-                          flex_flow: ROW
-                          flex_align_main: START
-                          flex_align_cross: CENTER
-                          pad_row: 0
-                          pad_column: 0
-                        widgets:
-                          # Descriptor Label
-                          - label:
-                              id: lbl_modulation_l
-                              text: "Protokoll: "
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-                          # Value Label
-                          - label:
-                              id: lbl_modulation_value
-                              text: "?"
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_md
-                              text_color: c_text_p
-                    - obj:
-                        width: 35%
-                        height: SIZE_CONTENT
-                        pad_all: 0
-                        pad_left: 10
-                        pad_right: 0
-                        layout:
-                          type: FLEX
-                          flex_flow: ROW
-                          flex_align_main: END
-                          flex_align_cross: CENTER
-                          pad_row: 0
-                          pad_column: 0
-                        widgets:
-                          # Value Label
-                          - label:
-                              id: lbl_tx_power_value
-                              text: "?"
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_p
-                          # Unit Label
-                          - label:
-                              id: lbl_tx_power_unit
-                              text: "dBm"
-                              pad_left: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-
-              # --- Row 3: Transmit/Receive ---
-              - obj:
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_top: 10
-                  pad_bottom: 10
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    # Descriptor Label
-                    - label:
-                        id: lbl_cc1101_state
-                        text: "Mottar..."
-                        pad_left: 4
-                        pad_right: 4
-                        text_font: font_sm
-                        text_color: c_text_s
-                    # Value Label
-                    - led:
-                        id: led_cc1101_state
-                        color: c_green
-                        pad_right: 4
-                        height: 6
-                        width: 26
-                        radius: 3
-                        shadow_width: 6
-                        shadow_spread: 2
-                    # Unit Label
-                    - label:
-                        id: lbl_cc1101_packet
-                        text: "     "
-                        text_font: font_sm
-                        text_color: c_text_s
-
-              # --- Row 4: RSSI & LQI ---
-              - obj:
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_all: 0
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    - obj:
-                        width: 50%
-                        height: SIZE_CONTENT
-                        pad_all: 0
-                        pad_left: 0
-                        pad_right: 10
-                        layout:
-                          type: FLEX
-                          flex_flow: ROW
-                          flex_align_main: START
-                          flex_align_cross: CENTER
-                          pad_row: 0
-                          pad_column: 0
-                        widgets:
-                          # Descriptor Label
-                          - label:
-                              id: lbl_rssi_l
-                              text: "RSSI: "
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-                          # Value Label
-                          - label:
-                              id: lbl_rssi_value
-                              text: "?"
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_md
-                              text_color: c_text_p
-                          # Unit Label
-                          - label:
-                              id: lbl_rssi_unit
-                              text: "dBm"
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-                    - obj:
-                        width: 50%
-                        height: SIZE_CONTENT
-                        pad_all: 0
-                        pad_left: 10
-                        pad_right: 0
-                        layout:
-                          type: FLEX
-                          flex_flow: ROW
-                          flex_align_main: END
-                          flex_align_cross: CENTER
-                          pad_row: 0
-                          pad_column: 0
-                        widgets:
-                          # Descriptor Label
-                          - label:
-                              id: lbl_lqi_l
-                              text: "LQI: "
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-                          # Value Label
-                          - label:
-                              id: lbl_lqi_value
-                              text: "?"
-                              pad_left: 4
-                              text_font: font_md
-                              text_color: c_text_p
+    - <<: !include 
+        file: ../../gui/pages/cc1101/packet.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: Radio

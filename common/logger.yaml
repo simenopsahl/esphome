@@ -9,7 +9,7 @@
 
 substitutions:
   common:
-    log_level: DEBUG
+    log_level: INFO
     log_baud_rate: "115200"
 
 logger:

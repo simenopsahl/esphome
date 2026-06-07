@@ -1,0 +1,236 @@
+# LVGL CC1101 Radio wMBus mode page
+
+# required vars:
+# - *page_styles
+# - *container_styles
+# - page_title
+
+# CC1101 wMBus mode page
+#lvgl:
+#  pages:
+    id: page_cc1101
+    <<: !include ../../styles/page_styles.yaml
+    # REMOVED: `<<: *page_styles`
+    # ADDED: Use the variables passed from the parent file
+    pad_top: ${page_pad_top}
+    pad_bottom: ${page_pad_bottom}
+    on_load:
+      - lvgl.label.update:
+          id: lbl_page_title
+          text: ${page_title}
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      - obj:
+          <<: !include ../../styles/container_styles.yaml
+          # Use the passed-in variables for size
+          pad_top: ${container_pad_top}
+          pad_bottom: ${container_pad_bottom}
+          pad_left: ${container_pad_left}
+          pad_right: ${container_pad_right}
+          scrollable: ${container_scrollable}
+          align: CENTER
+          layout:
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_main: SPACE_EVENLY
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+            pad_row: 0
+            pad_column: 0
+          widgets:
+            # --- Row 1: Water Meter ---
+            - obj:
+                # This is a container for a single row
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_water_meter_manufacturer
+                      text: "Kamstrup"
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_water_meter_model
+                      text: "FlowIQ2200"
+                      pad_right: 4
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Unit Label
+                  - label:
+                      id: lbl_water_meter_serial
+                      text: ${module.cc1101.water_meter_serial}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_p
+
+            # --- Row 2: Water Consumption ---
+            - obj:
+                # This is a container for a single row
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_water_consumption_l
+                      text: "Totalt forbruk: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_water_consumption_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_water_consumption_unit
+                      text: "m³"
+                      pad_right: ${container_pad_right}
+                      text_font: font_md
+                      text_color: c_text_s
+
+            # --- Row 3: Water Meter Alarms ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  # Descriptor Label
+                  - label:
+                      id: lbl_water_meter_alarms_l
+                      text: "Varsler: "
+                      pad_left: ${container_pad_left}
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+                  # Value Label
+                  - label:
+                      id: lbl_water_meter_alarms_value
+                      text: "?"
+                      long_mode: scroll_circular
+                      text_font: font_md
+                      text_color: c_text_p
+                  # Unit Label
+                  - label:
+                      id: lbl_water_meter_alarms_spacer
+                      text: " "
+                      pad_right: ${container_pad_right}
+                      text_font: font_sm
+                      text_color: c_text_s
+
+            # --- Row 4: RSSI & Status ---
+            - obj:
+                width: 100%
+                height: SIZE_CONTENT
+                pad_all: 0
+                pad_left: ${container_pad_left}
+                pad_right: ${container_pad_right}
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: SPACE_BETWEEN
+                  flex_align_cross: CENTER
+                  pad_row: 0
+                  pad_column: 0
+                widgets:
+                  - obj:
+                      width: 60%
+                      height: SIZE_CONTENT
+                      pad_all: 0
+                      pad_left: 10
+                      pad_right: 0
+                      layout:
+                        type: FLEX
+                        flex_flow: ROW
+                        flex_align_main: START
+                        flex_align_cross: CENTER
+                        pad_row: 0
+                        pad_column: 0
+                      widgets:
+                        # Descriptor Label
+                        - label:
+                            id: lbl_water_meter_status_l
+                            text: "Status: "
+                            long_mode: scroll_circular
+                            pad_left: ${container_pad_left}
+                            pad_right: ${container_pad_right}
+                            text_font: font_sm
+                            text_color: c_text_s
+                        # Value Label
+                        - label:
+                            id: lbl_water_meter_status_value
+                            text: "?"
+                            pad_right: ${container_pad_right}
+                            text_font: font_md
+                            text_color: c_text_p
+                  - obj:
+                      width: 40%
+                      height: SIZE_CONTENT
+                      pad_all: 0
+                      pad_left: 0
+                      pad_right: 10
+                      layout:
+                        type: FLEX
+                        flex_flow: ROW
+                        flex_align_main: END
+                        flex_align_cross: CENTER
+                        pad_row: 0
+                        pad_column: 0
+                      widgets:
+                        # Descriptor Label
+                        - label:
+                            id: lbl_water_meter_rssi_l
+                            text: "Signal: "
+                            pad_left: ${container_pad_left}
+                            pad_right: ${container_pad_right}
+                            text_font: font_sm
+                            text_color: c_text_s
+                        # Value Label
+                        - label:
+                            id: lbl_water_meter_rssi_value
+                            text: "?"
+                            text_font: font_md
+                            text_color: c_text_p
+                        # Unit Label
+                        - label:
+                            id: lbl_water_meter_rssi_unit
+                            text: "dBm"
+                            pad_right: ${container_pad_right}
+                            text_font: font_sm
+                            text_color: c_text_s

@@ -4,23 +4,37 @@
 # https://github.com/SzczepanLeon/esphome-components/tree/version_4
 # Does NOT work with CoreS3-SE as SPI MISO pin is shared with Display DC pin
 # Does work with Fire 2.7
-#
-# WIP
-#
 
 substitutions:
   module:
     cc1101:
       frequency: "868.95MHz" # 855 ~ 925MHz supported by this chip
+      water_meter_serial: !secret water_meter_serial
 
 # Pull the custom wM-Bus component directly from GitHub
 external_components:
   - source: github://SzczepanLeon/esphome-components@main
     components: [ wmbus_radio, wmbus_common, wmbus_meter ]
 
+# Make water meter always appear as a separate device in the kitchen area
+esphome:
+  areas:
+    - id: area_kitchen
+      name: Kjøkken
+  # Define devices
+  devices:
+    - id: sub_device_water_meter
+      name: kamstrup_flowiq2200
+      area_id: area_kitchen
+
 logger:
   logs:
+    wmbus: DEBUG
     wmbus_radio: DEBUG
+    wmbus_common: DEBUG
+    wmbus_meter: DEBUG
+    sensor.wmbus_meter: DEBUG
+    text_sensor.wmbus_meter: DEBUG
 
 # https://github.com/SzczepanLeon/esphome-components/tree/main#radio-configuration
 wmbus_radio:
@@ -36,6 +50,8 @@ wmbus_radio:
   on_frame:
     - then:
         - logger.log:
+            level: DEBUG
+            tag: "wmbus_radio"
             format: "Frame received: RSSI=%ddBm, Mode=%s, Data=%s"
             args: [ 'frame->rssi()', 'toString(frame->link_mode())', 'frame->as_hex().c_str()' ]
 
@@ -49,308 +65,155 @@ wmbus_common:
 # Define your water meter
 wmbus_meter:
   - id: water_meter
-    meter_id: !secret water_meter_serial 53908435
+    meter_id: 0x${module.cc1101.water_meter_serial}
     type: flowiq2200
     key: !secret water_meter_encryption_key
     mode:
       - C1
     on_telegram:
       - logger.log:
+          level: DEBUG
+          tag: "wmbus_meter"
           format: "Telegram received from water meter"
 
-# sensor:
+sensor:
   # Water meter total consumption
-  # - platform: wmbus_meter
-  #   parent_id: water_meter
-  #   field: total_m3
-  #   id: wmbus_water_total_consumption
-  #   name: "Water Total Consumption"
-  #   unit_of_measurement: "m³"
-  #   device_class: water
-  #   state_class: total_increasing
-  #   accuracy_decimals: 3
-  #   icon: "mdi:water"
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: total_m3
+    id: wmbus_water_total_consumption
+    device_id: sub_device_water_meter
+    name: "Water Total Consumption"
+    unit_of_measurement: "m³"
+    device_class: water
+    state_class: total_increasing
+    accuracy_decimals: 3
+    icon: "mdi:water"
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_water_consumption_value
+              text:
+                format: "%.3f"
+                args: [ 'x' ]
 
   # Target/Last month reading
-  # - platform: wmbus_meter
-  #   parent_id: water_meter
-  #   field: target_m3
-  #   id: wmbus_water_target
-  #   name: "Water Target"
-  #   unit_of_measurement: "m³"
-  #   accuracy_decimals: 3
-  #   icon: "mdi:counter"
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: target_m3
+    id: wmbus_water_target
+    device_id: sub_device_water_meter
+    name: "Water Target"
+    unit_of_measurement: "m³"
+    accuracy_decimals: 3
+    icon: "mdi:counter"
 
   # Flow temperature
-  # - platform: wmbus_meter
-  #   parent_id: water_meter
-  #   field: flow_temperature_c
-  #   id: wmbus_water_flow_temperature
-  #   name: "Water Temperature"
-  #   unit_of_measurement: "°C"
-  #   device_class: temperature
-  #   accuracy_decimals: 1
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: flow_temperature_c
+    id: wmbus_water_flow_temperature
+    device_id: sub_device_water_meter
+    name: "Water Temperature"
+    unit_of_measurement: "°C"
+    device_class: temperature
+    accuracy_decimals: 1
 
   # External/Ambient temperature
-  # - platform: wmbus_meter
-  #   parent_id: water_meter
-  #   field: external_temperature_c
-  #   id: wmbus_water_external_temperature
-  #   name: "Meter Ambient Temperature"
-  #   unit_of_measurement: "°C"
-  #   device_class: temperature
-  #   entity_category: diagnostic
-  #   accuracy_decimals: 1
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: external_temperature_c
+    id: wmbus_water_external_temperature
+    device_id: sub_device_water_meter
+    name: "Meter Ambient Temperature"
+    unit_of_measurement: "°C"
+    device_class: temperature
+    entity_category: diagnostic
+    disabled_by_default: true
+    accuracy_decimals: 1
 
   # RSSI
-  # - platform: wmbus_meter
-  #   parent_id: water_meter
-  #   field: rssi_dbm
-  #   id: wmbus_water_rssi
-  #   name: "Water Meter RSSI"
-  #   unit_of_measurement: "dBm"
-  #   device_class: signal_strength
-  #   state_class: measurement
-  #   entity_category: diagnostic
-  #   accuracy_decimals: 0
-  #   icon: "mdi:signal"
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: rssi_dbm
+    id: wmbus_water_rssi
+    device_id: sub_device_water_meter
+    name: "Water Meter RSSI"
+    unit_of_measurement: "dBm"
+    device_class: signal_strength
+    state_class: measurement
+    entity_category: diagnostic
+    disabled_by_default: true
+    accuracy_decimals: 0
+    icon: "mdi:signal"
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_water_meter_rssi_value
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
 
-# text_sensor:
-#   - platform: wmbus_meter
-#     parent_id: water_meter
-#     field: current_alarms
-#     id: wmbus_water_alarms
-#     name: "Water Meter Alarms"
+text_sensor:
+  # Alarms
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: current_alarms
+    id: wmbus_water_alarms
+    device_id: sub_device_water_meter
+    name: "Water Meter Alarms"
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_water_meter_alarms_value
+              text:
+                format: "%s"
+                args: [ 'x' ]
 
-#   - platform: wmbus_meter
-#     parent_id: water_meter
-#     field: status
-#     id: wmbus_water_status
-#     name: "Water Meter Status"
+  # Status
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: status
+    id: wmbus_water_status
+    device_id: sub_device_water_meter
+    name: "Water Meter Status"
+    entity_category: diagnostic
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_water_meter_status_value
+              text:
+                format: "%s"
+                args: [ 'x' ]
+
+.sizing:
+  - &page_styles
+    <<: !include ../../gui/styles/page_styles.yaml
+    page_pad_top: 32
+    page_pad_bottom: 32
+    screen_height: 240
+    screen_width: 320
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 240 - (2 * 32) - (2 * 1) = 170
+    usable_screen_height: 170
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 320  (2 * 4) = 312
+    usable_screen_width: 312
+
+  - &container_styles
+    <<: !include ../../gui/styles/container_styles.yaml
+    container_pad_top: 1
+    container_pad_bottom: 1
+    container_pad_left: 4
+    container_pad_right: 4
+    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
 
 lvgl:
   pages:
-    - id: page_cc1101
-      pad_top: 32
-      pad_bottom: 32
-      on_load:
-        - lvgl.label.update:
-            id: lbl_page_title
-            text: wM-Bus
-      <<: !include
-        file: ../../gui/functions/swipe_navigation.yaml
-      widgets:
-        - obj:
-            pad_top: 1
-            pad_bottom: 1
-            pad_left: 4
-            pad_right: 4
-            scrollable: false
-            align: CENTER
-            height: 100%
-            width: 100%
-            layout:
-              type: FLEX
-              flex_flow: COLUMN
-              flex_align_main: SPACE_EVENLY
-              flex_align_cross: CENTER
-              flex_align_track: CENTER
-              pad_row: 0
-              pad_column: 0
-            widgets:
-              # --- Row 1: Water Meter ---
-              - obj:
-                  # This is a container for a single row
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_all: 0
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    # Descriptor Label
-                    - label:
-                        id: lbl_water_meter_manufacturer
-                        text: "Kamstrup"
-                        pad_left: 4
-                        pad_right: 4
-                        text_font: font_sm
-                        text_color: c_text_s
-                    # Value Label
-                    - label:
-                        id: lbl_water_meter_model
-                        text: "FlowIQ2200: "
-                        pad_right: 4
-                        text_font: font_sm
-                        text_color: c_text_s
-                    # Unit Label
-                    - label:
-                        id: lbl_water_meter_serial
-                        text: !secret water_meter_serial
-                        text_font: font_sm
-                        text_color: c_text_p
-
-              # --- Row 2: Water Consumption ---
-              - obj:
-                  # This is a container for a single row
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_all: 0
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    # Descriptor Label
-                    - label:
-                        id: lbl_water_consumption_l
-                        text: "Totalt forbruk: "
-                        pad_left: 4
-                        pad_right: 4
-                        text_font: font_sm
-                        text_color: c_text_s
-                    # Value Label
-                    - label:
-                        id: lbl_water_consumption_value
-                        text: "?"
-                        pad_right: 4
-                        text_font: font_lg
-                        text_color: c_text_p
-                    # Unit Label
-                    - label:
-                        id: lbl_water_consumption_unit
-                        text: "m³"
-                        text_font: font_md
-                        text_color: c_text_s
-
-              # --- Row 3: Water Meter Alarms ---
-              - obj:
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_top: 10
-                  pad_bottom: 10
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    # Descriptor Label
-                    - label:
-                        id: lbl_water_meter_alarms_l
-                        text: "Varsler: "
-                        pad_left: 4
-                        pad_right: 4
-                        text_font: font_sm
-                        text_color: c_text_s
-                    # Value Label
-                    - label:
-                        id: lbl_water_meter_alarms_value
-                        text: "?"
-                        pad_right: 4
-                        text_font: font_md
-                        text_color: c_text_p
-                    # Unit Label
-                    - label:
-                        id: lbl_water_meter_alarms_spacer
-                        text: " "
-                        text_font: font_sm
-                        text_color: c_text_s
-
-              # --- Row 4: RSSI & Status ---
-              - obj:
-                  width: 100%
-                  height: SIZE_CONTENT
-                  pad_all: 0
-                  pad_left: 4
-                  pad_right: 4
-                  layout:
-                    type: FLEX
-                    flex_flow: ROW
-                    flex_align_main: SPACE_BETWEEN
-                    flex_align_cross: CENTER
-                    pad_row: 0
-                    pad_column: 0
-                  widgets:
-                    - obj:
-                        width: 60%
-                        height: SIZE_CONTENT
-                        pad_all: 0
-                        pad_left: 10
-                        pad_right: 0
-                        layout:
-                          type: FLEX
-                          flex_flow: ROW
-                          flex_align_main: END
-                          flex_align_cross: CENTER
-                          pad_row: 0
-                          pad_column: 0
-                        widgets:
-                          # Descriptor Label
-                          - label:
-                              id: lbl_water_meter_status_l
-                              text: "Status: "
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-                          # Value Label
-                          - label:
-                              id: lbl_water_meter_status_value
-                              text: "?"
-                              pad_left: 4
-                              text_font: font_md
-                              text_color: c_text_p
-                    - obj:
-                        width: 40%
-                        height: SIZE_CONTENT
-                        pad_all: 0
-                        pad_left: 0
-                        pad_right: 10
-                        layout:
-                          type: FLEX
-                          flex_flow: ROW
-                          flex_align_main: START
-                          flex_align_cross: CENTER
-                          pad_row: 0
-                          pad_column: 0
-                        widgets:
-                          # Descriptor Label
-                          - label:
-                              id: lbl_water_meter_rssi_l
-                              text: "RSSI: "
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
-                          # Value Label
-                          - label:
-                              id: lbl_water_meter_rssi_value
-                              text: "?"
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_md
-                              text_color: c_text_p
-                          # Unit Label
-                          - label:
-                              id: lbl_water_meter_rssi_unit
-                              text: "dBm"
-                              pad_left: 4
-                              pad_right: 4
-                              text_font: font_sm
-                              text_color: c_text_s
+    - <<: !include 
+        file: ../../gui/pages/cc1101/wmbus.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: Radio
