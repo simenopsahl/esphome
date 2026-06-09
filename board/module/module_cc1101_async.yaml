@@ -6,6 +6,8 @@
 # https://esphome.io/components/ir_rf_proxy/
 # Does NOT work with CoreS3-SE as SPI MISO pin is shared with Display DC pin
 # Does work with Fire 2.7
+#
+# CC1101 raw radio signals package
 
 substitutions:
   module:

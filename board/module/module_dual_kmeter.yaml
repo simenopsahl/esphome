@@ -29,8 +29,8 @@ sensor:
     entity_category: diagnostic
     filters:
       - sliding_window_moving_average:
-          window_size: 6
-          send_every: 6
+          window_size: 2
+          send_every: 1
     on_value:
       - then:
           - lvgl.label.update:
@@ -48,8 +48,8 @@ sensor:
     state_class: "measurement"
     filters:
       - sliding_window_moving_average:
-          window_size: 3
-          send_every: 2
+          window_size: 2
+          send_every: 1
     on_value:
       - then:
           - lvgl.label.update:
@@ -67,8 +67,8 @@ sensor:
     state_class: "measurement"
     filters:
       - sliding_window_moving_average:
-          window_size: 3
-          send_every: 2
+          window_size: 2
+          send_every: 1
     on_value:
       - then:
           - lvgl.label.update:

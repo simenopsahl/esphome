@@ -3,6 +3,8 @@
 # https://esphome.io/components/cc1101/
 # Does NOT work with CoreS3-SE as SPI MISO pin is shared with Display DC pin
 # Does work with Fire 2.7
+#
+# CC1101 Packet mode package
 
 substitutions:
   module:

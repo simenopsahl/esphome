@@ -5,16 +5,14 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
+  hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
-  env_iv: !include board/module/unit_env_iii.yaml
+  env_iii: !include board/module/hat_env_iii.yaml
+  env_iv: !include board/module/unit_env_iv.yaml
+  mq5: !include board/module/unit_mq5.yaml
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
-  nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
-    light_id: rgb_led,
-    light_brightness: 80%,
-    light_flash_brightness: 90%
-  }}
 
 substitutions:
   common:
@@ -22,7 +20,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-lite-a42bd4
-    location: "Storage"
+    location: "Ute, Bak"
     framework:
       type: esp-idf
 
@@ -49,14 +47,14 @@ sensor:
       # Base BTC
 #      - source: temperature_sht30_base_btc
       # HAT ENV III
-#      - source: temperature_sht30_hat_env
-#      - source: temperature_qmp6988_hat_env
+      - source: temperature_sht30_hat_env
+      - source: temperature_qmp6988_hat_env
       # Unit ENV III
-      - source: temperature_sht30_unit_env
-      - source: temperature_qmp6988_unit_env
+#      - source: temperature_sht30_unit_env
+#      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
-#      - source: temperature_bmp280_unit_env
-#      - source: temperature_sht40_unit_env
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
       # Unit ENV Pro
 #      - source: temperature_bme688
       # Unit CO2
@@ -67,11 +65,11 @@ sensor:
       # Base BTC
 #      - source: humidity_sht30_base_btc
       # HAT ENV III
-#      - source: humidity_sht30_hat_env
+      - source: humidity_sht30_hat_env
       # Unit ENV III
-      - source: humidity_sht30_unit_env
+#      - source: humidity_sht30_unit_env
       # Unit ENV IV
-#      - source: humidity_sht40_unit_env
+      - source: humidity_sht40_unit_env
       # Unit ENV Pro
 #      - source: humidity_bme688
       # Unit CO2
@@ -80,10 +78,10 @@ sensor:
   - id: !extend pressure_local
     sources:
       # HAT ENV III
-#      - source: pressure_qmp6988_hat_env
+      - source: pressure_qmp6988_hat_env
       # Unit ENV III
-      - source: pressure_qmp6988_unit_env
+#      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
-#      - source: pressure_bmp280_unit_env
+      - source: pressure_bmp280_unit_env
       # Unit ENV Pro
 #      - source: pressure_bme688

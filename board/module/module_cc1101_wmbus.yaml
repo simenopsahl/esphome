@@ -1,9 +1,11 @@
 ---
 # https://docs.m5stack.com/en/module/Module_CC1101
 # https://esphome.io/components/cc1101/
-# https://github.com/SzczepanLeon/esphome-components/tree/version_4
+# https://github.com/SzczepanLeon/esphome-components/
 # Does NOT work with CoreS3-SE as SPI MISO pin is shared with Display DC pin
 # Does work with Fire 2.7
+#
+# CC1101 Wireless M-Bus package
 
 substitutions:
   module:
@@ -37,6 +39,7 @@ logger:
     text_sensor.wmbus_meter: DEBUG
 
 # https://github.com/SzczepanLeon/esphome-components/tree/main#radio-configuration
+# https://github.com/SzczepanLeon/esphome-components/blob/main/ESP32-C3_SuperMini_CC1101.yaml
 wmbus_radio:
   id: radio_cc1101_wmbus
 # radio_type: Must be CC1101
@@ -61,6 +64,14 @@ wmbus_common:
 #    - auto
     - flowiq2200
 #    - multical21
+
+# https://github.com/SzczepanLeon/esphome-components/blob/version_4/docs/wmbus.md
+## If You want to send telegram to nother machine and decode it via wmbusmeters.
+# socket_transmitter:
+#   id: socket_to_wmbusmeters
+#   ip_address: 192.168.68.100 # Home Assistant IP
+#   port: 7011
+#   protocol: TCP # or UDP
 
 # Define your water meter
 wmbus_meter:
