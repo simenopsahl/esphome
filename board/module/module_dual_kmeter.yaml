@@ -1,16 +1,27 @@
 ---
 # https://docs.m5stack.com/en/module/DualKmeter%20Module13.2
 # https://github.com/m5stack/esphome-yaml/tree/main/components/dual_kmeter
-# https://github.com/Chill-Division/M5Stack-ESPHome/
 
 substitutions:
   module:
     kmeteriso_i2c_bus: i2c_mbus
+    
+    # --- WATER TANK BAR GRAPHIC LIMITS ---
+    # Values are multiplied by 10 to allow 0.1°C animation resolution (e.g., 26.5°C = 265).
+    # The bar uses inverted logic: hot water (red) is anchored to the top of the tank.
+    # As the bottom probe cools, the red indicator shrinks upwards to reveal cold water (blue).
+    
+    # tank_temp_min: The coldest the bottom probe gets (red indicator shrinks to the top).
+    tank_temp_min: "260" # Represents 26.0°C (Shower dip)
+    
+    # tank_temp_max: The hottest the bottom probe gets (red indicator fills down to the bottom).
+    tank_temp_max: "590" # Represents 59.0°C (Normal resting temp)
 
 external_components:
   - source: github://m5stack/esphome-yaml/components
     components: [dual_kmeter]
 
+# Enable logging for this component
 logger:
   logs:
     sensor.dual_kmeter: DEBUG
@@ -31,13 +42,6 @@ sensor:
       - sliding_window_moving_average:
           window_size: 2
           send_every: 1
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_temp_kmeteri_value
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
   - platform: dual_kmeter
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_1_sensor
@@ -52,11 +56,35 @@ sensor:
           send_every: 1
     on_value:
       - then:
+          # Update the shadow label
+          - lvgl.label.update:
+              id: lbl_temp_kmeter1_shadow
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+          # Update the main foreground label
           - lvgl.label.update:
               id: lbl_temp_kmeter1_value
               text:
                 format: "%.1f"
                 args: [ 'x' ]
+          ## Update the bar graphic with the inverted thermocline math
+          - lvgl.bar.update:
+              id: tank_graphic
+              mode: RANGE
+              # Keep the top of the red indicator locked to the top of the tank
+              value: ${module.tank_temp_max}
+              # Calculate the bottom edge of the red indicator
+              start_value: !lambda |-
+                int current = (int)round(x * 10.0);
+                int min_val = ${module.tank_temp_min};
+                int max_val = ${module.tank_temp_max};
+                
+                // Invert the reading: As temp drops, the start_value goes UP the screen
+                int mapped_start = max_val - (current - min_val);
+                
+                // Safely constrain the result so a sudden temp spike doesn't crash LVGL
+                return std::max(min_val, std::min(max_val, mapped_start));
   - platform: dual_kmeter
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_2_sensor
@@ -71,12 +99,37 @@ sensor:
           send_every: 1
     on_value:
       - then:
+          # Update the shadow label
+          - lvgl.label.update:
+              id: lbl_temp_kmeter2_shadow
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+          # Update the main foreground label
           - lvgl.label.update:
               id: lbl_temp_kmeter2_value
               text:
                 format: "%.1f"
                 args: [ 'x' ]
 
+  - platform: combination
+    type: median
+    id: dual_kmeter_mix_sensor
+    name: "Temperature DualKMeter Mix"
+    device_class: "temperature"
+    state_class: "measurement"
+    sources:
+      - source: dual_kmeter_1_sensor
+      - source: dual_kmeter_2_sensor
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_temp_kmeter_mix_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+
+# Same as in ../../gui/240x320.yaml
 .sizing:
   - &page_styles
     <<: !include ../../gui/styles/page_styles.yaml
@@ -100,11 +153,21 @@ sensor:
     container_pad_left: 4
     container_pad_right: 4
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last
+  
+  - &dual_kmeter_styles
+    # Tank Graphic Dimensions
+    tank_width: 100
+    tank_height: 170
+    tank_radius: 34
+    # Bar widget limits (must be whole numbers)
+    tank_temp_min: ${module.tank_temp_min}
+    tank_temp_max: ${module.tank_temp_max}
 
+# include lvgl page for dual kmeter
 lvgl:
   pages:
     - <<: !include 
         file: ../../gui/pages/dual_kmeter/page.yaml
         vars:
-          <<: [*page_styles, *container_styles]
+          <<: [*page_styles, *container_styles, *dual_kmeter_styles]
           page_title: Temp Probe

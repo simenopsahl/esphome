@@ -114,7 +114,6 @@ sensor:
         - lvgl.label.update:
             id:
               - lbl_temp_local_value
-              - lbl_temp_local2_value
             text:
               format: "%.1f"
               args: [ 'x' ]

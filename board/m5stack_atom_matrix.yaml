@@ -75,19 +75,19 @@ display:
     id: display_matrix
     width: 5
     height: 5
+    update_interval: 5s
     pages:
       - id: page_blank
         lambda: |-
           it.fill(COLOR_OFF);
-          it.draw_pixel_at(1, 2, c_red);
-          it.draw_pixel_at(3, 2, c_darkorange);
-          // Show wifi icon.
+          it.draw_pixel_at(3, 3, c_darkorange);
+          // Show wifi indicator.
           if ( id(component_wifi).is_connected() ) {
-            it.draw_pixel_at(1, 2, c_green);
+            it.draw_pixel_at(3, 3, c_green);
           }
-          // Show HA icon.
+          // Show HA indicator.
           if ( id(component_api).is_connected() ) {
-            it.draw_pixel_at(3, 2, c_aquamarine);
+            it.draw_pixel_at(3, 3, c_aquamarine);
           }
       - id: page_colors
         lambda: |-
@@ -95,10 +95,12 @@ display:
           it.draw_pixel_at(0, 1, c_green);
           it.draw_pixel_at(0, 2, c_blue);
           it.draw_pixel_at(0, 4, c_white);
+
           it.draw_pixel_at(1, 4, c_cyan);
           it.draw_pixel_at(1, 3, c_magenta);
           it.draw_pixel_at(1, 2, c_yellow);
           it.draw_pixel_at(1, 0, c_white);
+
           it.draw_pixel_at(3, 0, c_gold);
           it.draw_pixel_at(3, 1, c_orange);
           it.draw_pixel_at(3, 2, c_darkorange);

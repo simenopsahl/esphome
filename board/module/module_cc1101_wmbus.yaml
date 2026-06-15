@@ -29,6 +29,7 @@ esphome:
       name: kamstrup_flowiq2200
       area_id: area_kitchen
 
+# Enable logging for this component
 logger:
   logs:
     wmbus: DEBUG
@@ -38,6 +39,7 @@ logger:
     sensor.wmbus_meter: DEBUG
     text_sensor.wmbus_meter: DEBUG
 
+# CC1101 module hardware settings
 # https://github.com/SzczepanLeon/esphome-components/tree/main#radio-configuration
 # https://github.com/SzczepanLeon/esphome-components/blob/main/ESP32-C3_SuperMini_CC1101.yaml
 wmbus_radio:
@@ -58,6 +60,7 @@ wmbus_radio:
             format: "Frame received: RSSI=%ddBm, Mode=%s, Data=%s"
             args: [ 'frame->rssi()', 'toString(frame->link_mode())', 'frame->as_hex().c_str()' ]
 
+# Define drivers/meters to enable
 # Uncomment and list only the drivers you need to save flash space
 wmbus_common:
   drivers:
@@ -66,7 +69,7 @@ wmbus_common:
 #    - multical21
 
 # https://github.com/SzczepanLeon/esphome-components/blob/version_4/docs/wmbus.md
-## If You want to send telegram to nother machine and decode it via wmbusmeters.
+## If You want to send telegram to another machine and decode it via wmbusmeters addon.
 # socket_transmitter:
 #   id: socket_to_wmbusmeters
 #   ip_address: 192.168.68.100 # Home Assistant IP
@@ -87,6 +90,7 @@ wmbus_meter:
           tag: "wmbus_meter"
           format: "Telegram received from water meter"
 
+# Water meter sensors
 sensor:
   # Water meter total consumption
   - platform: wmbus_meter
@@ -197,6 +201,7 @@ text_sensor:
                 format: "%s"
                 args: [ 'x' ]
 
+# Same as in ../../gui/240x320.yaml
 .sizing:
   - &page_styles
     <<: !include ../../gui/styles/page_styles.yaml
@@ -221,6 +226,7 @@ text_sensor:
     container_pad_right: 4
     container_scrollable: false # prevents scrollbars on pages where space is used up to the last
 
+# include lvgl page for water meter
 lvgl:
   pages:
     - <<: !include 

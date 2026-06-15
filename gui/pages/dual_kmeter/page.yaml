@@ -10,8 +10,6 @@
 #  pages:
     id: page_kmeter
     <<: !include ../../styles/page_styles.yaml
-    # REMOVED: `<<: *page_styles`
-    # ADDED: Use the variables passed from the parent file
     pad_top: ${page_pad_top}
     pad_bottom: ${page_pad_bottom}
     on_load:
@@ -23,7 +21,6 @@
     widgets:
       - obj:
           <<: !include ../../styles/container_styles.yaml
-          # Use the passed-in variables for size
           pad_top: ${container_pad_top}
           pad_bottom: ${container_pad_bottom}
           pad_left: ${container_pad_left}
@@ -32,158 +29,119 @@
           align: CENTER
           layout:
             type: FLEX
-            flex_flow: COLUMN
+            flex_flow: ROW
             flex_align_main: SPACE_EVENLY
             flex_align_cross: CENTER
-            flex_align_track: CENTER
-            pad_row: 0
-            pad_column: 0
           widgets:
-            # --- Row 1: Probe 1 ---
+            # --- The Water Tank Graphic ---
+            # Wrapped in a transparent obj to isolate the layout engine
             - obj:
-                # This is a container for a single row
-                width: 100%
-                height: SIZE_CONTENT
-                pad_all: 0
+                width: ${tank_width}
+                height: ${tank_height}
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
-                layout:
-                  type: FLEX
-                  flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
-                  flex_align_cross: CENTER
-                  pad_row: 0
-                  pad_column: 0
+                # By being a standard rigid obj, the parent's FLEX ROW will center this perfectly.
                 widgets:
-                  # Descriptor Label
+                  # 1. The Bar Widget (Base Layer)
+                  - bar:
+                      id: tank_graphic
+                      width: 100%
+                      height: 100%
+                      pad_all: 0
+                      radius: ${tank_radius}
+                      border_width: 2
+                      border_color: c_blue
+                      # Cold water background
+                      bg_color: c_blue 
+                      bg_opa: 90%
+                      # Define the scale
+                      min_value: ${tank_temp_min}
+                      max_value: ${tank_temp_max}
+                      # Draw from the top (hot) down to the current value
+                      mode: RANGE
+                      start_value: ${tank_temp_min}
+                      value: ${tank_temp_max} # Default starting state
+                      # Hot water indicator
+                      indicator:
+                        border_width: 2
+                        border_color: c_red
+                        bg_color: c_red
+                        bg_opa: 90%
+                        radius: 0
+                
+                  # 2a. Top Temp Drop Shadow (Rendered first so it sits behind)
                   - label:
-                      id: lbl_temp_kmeter1_l
-                      text: "Probe 1: "
-                      pad_left: ${container_pad_left}
-                      pad_right: ${container_pad_right}
-                      text_font: font_md
-                      text_color: c_text_s
-                  # Value Label
-                  - label:
-                      id: lbl_temp_kmeter1_value
+                      id: lbl_temp_kmeter2_shadow
                       text: "?"
-                      text_font: font_xl
-                      text_color: c_text_p
-                  # Unit Label
-                  - label:
-                      id: lbl_temp_kmeter1_unit
-                      text: "°C"
-                      pad_right: ${container_pad_right}
                       text_font: font_lg
-                      text_color: c_text_s
-
-            # --- Row 2: Probe 2 ---
-            - obj:
-                width: 100%
-                height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
-                layout:
-                  type: FLEX
-                  flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
-                  flex_align_cross: CENTER
-                  pad_row: 0
-                  pad_column: 0
-                widgets:
-                  # Descriptor Label
-                  - label:
-                      id: lbl_temp_kmeter2_l
-                      text: "Probe 2: "
-                      pad_left: ${container_pad_left}
-                      pad_right: ${container_pad_right}
-                      text_font: font_md
-                      text_color: c_text_s
-                  # Value Label
+                      text_color: c_black
+                      align: TOP_MID
+                      # Offset by 2 pixels
+                      x: 2
+                      y: 17
+                  # 2b. Top Temp (Probe 2) Main Text (Rendered second so it sits on top)
                   - label:
                       id: lbl_temp_kmeter2_value
                       text: "?"
-                      text_font: font_xl
-                      text_color: c_text_p
-                  # Unit Label
-                  - label:
-                      id: lbl_temp_kmeter2_unit
-                      text: "°C"
-                      pad_right: ${container_pad_right}
                       text_font: font_lg
-                      text_color: c_text_s
-
-            # --- Row 3: KMeter Int ---
-            - obj:
-                width: 100%
-                height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
-                layout:
-                  type: FLEX
-                  flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
-                  flex_align_cross: CENTER
-                  pad_row: 0
-                  pad_column: 0
-                widgets:
-                  # Descriptor Label
-                  - label:
-                      id: lbl_temp_kmeteri_l
-                      text: "Intern: "
-                      pad_left: ${container_pad_left}
-                      pad_right: ${container_pad_right}
-                      text_font: font_sm
-                      text_color: c_text_s
-                  # Value Label
-                  - label:
-                      id: lbl_temp_kmeteri_value
-                      text: "?"
-                      text_font: font_sm
                       text_color: c_text_p
-                  # Unit Label
-                  - label:
-                      id: lbl_temp_kmeteri_unit
-                      text: "°C"
-                      pad_right: ${container_pad_right}
-                      text_font: font_sm
-                      text_color: c_text_s
+                      align: TOP_MID
+                      y: 15
 
-            # --- Row 4: Temperature ---
+                  # 3a. Bottom Temp Drop Shadow (Rendered first so it sits behind)
+                  - label:
+                      id: lbl_temp_kmeter1_shadow
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_black
+                      align: BOTTOM_MID
+                      # Offset by 2 pixels
+                      x: 2
+                      y: -13
+                  # 3b. Bottom Temp (Probe 1) Main Text (Rendered second so it sits on top)
+                  - label:
+                      id: lbl_temp_kmeter1_value
+                      text: "?"
+                      text_font: font_lg
+                      text_color: c_text_p
+                      align: BOTTOM_MID
+                      y: -15
+
+            # --- The Info Panel (Flanked) ---
             - obj:
-                width: 100%
+                width: SIZE_CONTENT
                 height: SIZE_CONTENT
                 pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
                   type: FLEX
-                  flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
+                  flex_flow: COLUMN
+                  flex_align_main: CENTER
                   flex_align_cross: CENTER
-                  pad_row: 0
-                  pad_column: 0
+                  pad_row: 10
                 widgets:
-                  # Descriptor Label
                   - label:
-                      id: lbl_temp_local2_l
-                      text: "Luft: "
-                      pad_left: ${container_pad_left}
-                      pad_right: ${container_pad_right}
-                      text_font: font_sm
-                      text_color: c_text_s
-                  # Value Label
-                  - label:
-                      id: lbl_temp_local2_value
-                      text: "?"
+                      text: "VVB:"
                       text_font: font_md
-                      text_color: c_text_p
-                  # Unit Label
-                  - label:
-                      id: lbl_temp_local2_unit
-                      text: "°C"
-                      pad_right: ${container_pad_right}
-                      text_font: font_sm
                       text_color: c_text_s
+                  - obj:
+                      width: SIZE_CONTENT
+                      height: SIZE_CONTENT
+                      bg_opa: TRANSP
+                      border_width: 0
+                      layout:
+                        type: FLEX
+                        flex_flow: ROW
+                        flex_align_cross: CENTER
+                        pad_column: 4
+                      widgets:
+                        - label:
+                            id: lbl_temp_kmeter_mix_value
+                            text: "?"
+                            text_font: font_xl
+                            text_color: c_text_p
+                        - label:
+                            text: "°C"
+                            text_font: font_lg
+                            text_color: c_text_s
