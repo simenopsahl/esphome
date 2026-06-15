@@ -51,31 +51,22 @@ sensor:
       entity_category: "diagnostic"
       disabled_by_default: true
       on_value:
-        - lambda: |-
-            float current = x;
-            
-            // If the sensor is warming up/invalid (true), force the baseline 
-            // to instantly track the warm-up voltage. 
-            if (id(mq5_led).state) {
-              id(mq5_dynamic_baseline) = current;
-              return;
-            }
+        - globals.set:
+            id: mq5_dynamic_baseline
+            value: !lambda |-
+              float current = x;
+              float baseline = id(mq5_dynamic_baseline);
+              float diff = current - baseline;
 
-            float baseline = id(mq5_dynamic_baseline);
-            float diff = current - baseline;
-            
-            // If the spike is massive (> 400mV over baseline), it's gas.
-            if (diff > 400.0) {
-              return; 
-            }
-            // If voltage drifts slightly higher, adapt slowly (1% adjustment)
-            else if (diff > 0) {
-              id(mq5_dynamic_baseline) = baseline + (diff * 0.01);
-            }
-            // If voltage drops (cleaner air), adapt much faster (10% adjustment)
-            else {
-              id(mq5_dynamic_baseline) = baseline + (diff * 0.10);
-            }
+              // 1. Warm-up override
+              if (id(mq5_led).state) return current;
+              
+              // 2. Massive spike (gas leak detected) -> lock the baseline
+              if (diff > 400.0) return baseline;
+              
+              // 3. Normal tracking using ternary operator:
+              // If diff > 0 (drift up), adapt by 1%. Else (cleaner air), adapt by 10%.
+              return (diff > 0) ? (baseline + (diff * 0.01)) : (baseline + (diff * 0.10));
     # LED status reading. The LED lights up when the reading is valid
     led:
       id: mq5_led
