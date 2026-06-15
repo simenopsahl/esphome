@@ -30,11 +30,11 @@ globals:
   # Stores the dynamic minimum (Coldest recorded temperature)
   - id: tank_dynamic_min
     type: int
-    initial_value: ${module.tank_temp_min}
+    initial_value: ${module.tank_temp_min | pprint} # pprint to bypass parser issues
   # Stores the dynamic maximum (Hottest recorded temperature)
   - id: tank_dynamic_max
     type: int
-    initial_value: ${module.tank_temp_max}
+    initial_value: ${module.tank_temp_max | pprint}
 
 # Module13.2 Dual Kmeter
 sensor:
@@ -86,6 +86,7 @@ sensor:
           # Update the bar graphic using the new dynamic globals
           - lvgl.bar.update:
               id: tank_graphic
+              mode: RANGE
               # 1. Update the physical scale of the widget
               min_value: !lambda return id(tank_dynamic_min);
               max_value: !lambda return id(tank_dynamic_max);

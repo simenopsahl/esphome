@@ -99,8 +99,8 @@ sensor:
 #     initial_value: 0
 #     icon: "mdi:thermometer"
 #     on_value:
-#       - lambda: 'id(unit_env_bmp280_sensor).update();'
-#       - lambda: 'id(temperature_sht40_unit_env).update();'
+#       - component.update: unit_env_bmp280_sensor
+#       - component.update: temperature_sht40_unit_env
 
 #   - platform: template
 #     id: humidity_offset_env_iv
@@ -118,4 +118,4 @@ sensor:
 #     initial_value: 0
 #     icon: "mdi:water-percent"
 #     on_value:
-#       - lambda: 'id(temperature_sht40_unit_env).update();'
+#       - component.update: temperature_sht40_unit_env

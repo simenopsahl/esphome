@@ -17,23 +17,33 @@ esphome:
   on_boot:
     - priority: -10
       then:
-        - lambda: 'id(boot_done) = true;'
+        - globals.set:
+            id: boot_done
+            value: 'true'
         - script.execute: led_system_status
 
 wifi:
   on_connect:
-    - lambda: 'id(wifi_ok) = true;'
+    - globals.set:
+        id: wifi_ok
+        value: 'true'
     - script.execute: led_system_status
   on_disconnect:
-    - lambda: 'id(wifi_ok) = false;'
+    - globals.set:
+        id: wifi_ok
+        value: 'false'
     - script.execute: led_system_status
 
 api:
   on_client_connected:
-    - lambda: 'id(api_ok) = true;'
+    - globals.set:
+        id: api_ok
+        value: 'true'
     - script.execute: led_system_status
   on_client_disconnected:
-    - lambda: 'id(api_ok) = false;'
+    - globals.set:
+        id: api_ok
+        value: 'false'
     - script.execute: led_system_status
 
 ##### ASSIGN COLORS TO LED #####
