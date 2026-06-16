@@ -47,7 +47,7 @@ esphome:
 
 wifi:
 #  use_address: 192.168.69.71
-  use_address: m5s-stickc-plus2-9a09b0.local
+  use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0
