@@ -21,7 +21,7 @@ substitutions:
     log_level: INFO
 #    log_baud_rate: "115200"
   device:
-    name: s8048s043c-89f954
+    name: sunton8048s043c-89f954
     location: "Storage"
     framework:
       type: esp-idf
@@ -67,6 +67,7 @@ light:
             args: [ '(int(id(backlight_light).remote_values.get_brightness() * 100))' ]
 
 lvgl:
+  rotation: 90
   pages:
     - id: page_screen
       pad_top: 44
