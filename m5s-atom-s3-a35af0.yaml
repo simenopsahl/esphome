@@ -40,7 +40,7 @@ esphome:
 
 wifi:
 #  use_address: 192.168.69.99
-  use_address: m5s-as3-a35af0.local
+  use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0
