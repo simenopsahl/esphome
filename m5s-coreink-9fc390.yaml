@@ -37,7 +37,7 @@ esphome:
 
 wifi:
 #  use_address: 192.168.69.68
-  use_address: m5s-coreink-9fc390.local
+  use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0
