@@ -80,7 +80,6 @@ display:
       height: 480
       width: 800
     color_order: RGB
-    rotation: 90
     de_pin: ${pin.int.disp.de}
     hsync_pin: ${pin.int.disp.hsync}
     vsync_pin: ${pin.int.disp.vsync}
