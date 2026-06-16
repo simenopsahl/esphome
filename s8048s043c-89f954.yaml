@@ -37,7 +37,7 @@ esphome:
     version: "1.0.0"
 
 wifi:
-  use_address: s8048s043c-89f954.local
+  use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0
