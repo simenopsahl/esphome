@@ -73,15 +73,15 @@ binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
     entity_id: binary_sensor.etg2_stue_occupancy
-    id: motion_stue
+    id: motion1
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
-    id: motion_gang
+    id: motion2
   # Turn on display while room is occupied
   - platform: template
     id: motion_detected
     lambda: !lambda |-
-      if ( (id(motion_stue).state) or (id(motion_gang).state) ) {
+      if ( (id(motion1).state) or (id(motion2).state) ) {
         return true;
       } else {
         return false;
