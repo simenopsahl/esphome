@@ -28,7 +28,7 @@ esphome:
 
 wifi:
 #  use_address: 192.168.69.82
-  use_address: everything-presence-lite-5ad914.local
+  use_address: ${name}.local
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0
