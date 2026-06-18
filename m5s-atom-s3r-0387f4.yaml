@@ -198,7 +198,7 @@ script:
             id: indicator
             bg_color: red
             x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 200);
-            y: !lambda return (int)(clamp(id(pitch).state, -20.0f, 20.0f) / 20.0f * 200);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 200);
 
 #sensor:
   # Combine sensors
