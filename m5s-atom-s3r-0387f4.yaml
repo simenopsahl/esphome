@@ -90,37 +90,153 @@ binary_sensor:
 lvgl:
   buffer_size: 40%
   rotation: 180
-#  top_layer:
-#    - obj:
-#        id: titlebar
-#        layout:
-#          type: GRID
-#          grid_columns: [ fr(1), fr(4), fr(1)]
-#        widgets:
-#          - label:
-#              id: page_title
-#              hidden: true
-#          - label:
-#              id: nav_clock
-#              align: CENTER
-#              text_align: CENTER
-#              grid_cell_column_pos: 1
-#              grid_cell_x_align: CENTER
-#          - label:
-#              id: lbl_ha_status
-#              grid_cell_column_pos: 2
-
-display:
-  - id: !extend display_lcd
-    dimensions:
-      offset_height: 1
-      offset_width: 2
-    # Rotate 180deg
-#    transform:
-#      mirror_x: true
-#      mirror_y: true
-    auto_clear_enabled: false
-    update_interval: never
+  style_definitions:
+    - id: circle
+      radius: circle
+      outline_width: 2
+      outline_color: c_gray
+      align: center
+    - id: dashline
+      width: 100%
+      height: 100%
+      line_dash_width: 5
+      line_dash_gap: 5
+      line_color: c_gray
+  pages:
+    - id: page_imu
+      pad_top: 24
+      pad_bottom: 0
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: "\U000F0D49" # axis-arrow
+      <<: !include
+        file: gui/functions/swipe_navigation.yaml
+      widgets:
+        - container:
+            max_height: 400
+            max_width: 400
+            styles: [circle]
+            bg_color: c_green
+            bg_opa: cover
+            widgets:
+            - container:
+                styles: circle
+                width: 75%
+                height: 75%
+            - container:
+                styles: circle
+                width: 50%
+                height: 50%
+            - container:
+                styles: circle
+                width: 25%
+                height: 25%
+            - line:
+                styles: dashline
+                points:
+                  - 50%,0
+                  - 50%,100%
+            - line:
+                styles: dashline
+                points:
+                  - {x: 0, y: 50%}
+                  - [100%, 50%]
+            - container:
+                styles: circle
+                width: 8%
+                height: 8%
+                bg_color: c_gray
+                bg_opa: 50%
+            - label:
+                text: R
+                align: bottom_mid
+            - label:
+                text: F
+                align: top_mid
+            - label:
+                text: L
+                align: left_mid
+            - label:
+                text: R
+                align: right_mid
+    
+            - container:
+                id: indicator_container
+                width: 100%
+                height: 100%
+                transform_pivot_x: 50%
+                transform_pivot_y: 50%
+                widgets:
+                  - container:
+                      id: indicator
+                      styles: circle
+                      width: 10%
+                      height: 10%
+                      bg_color: tomato
+                      bg_opa: 100%
+                      x: 100
+                      y: 100
+        - container:
+            event_bubble: true
+            layout:
+              type: flex
+              flex_flow: column
+              flex_align_main: space_evenly
+              flex_align_track: center
+              flex_align_cross: center
+            flex_grow: 1
+            pad_all: 20px
+            widgets:
+              - button:
+                  id: calibrate_level_button
+                  text_font: montserrat_24
+                  widgets:
+                    - label:
+                        align: center
+                        text: Calibrate Level
+                  pad_all: 10px
+                  on_click:
+                    - motion.calibrate_level:
+                        id: motion_id
+                        save: true
+                        on_success:
+                          lvgl.label.update:
+                            id: feedback
+                            text: Level calibrated.
+              - button:
+                  text_font: montserrat_24
+                  widgets:
+                    - label:
+                        align: center
+                        text: Calibrate X-axis
+                  pad_all: 10px
+                  on_click:
+                    if:
+                      condition:
+                        any:
+                          - sensor.in_range:
+                              id: roll_id
+                              above: 15.0
+                              below: 75.0
+                          - sensor.in_range:
+                              id: pitch_id
+                              above: 15.0
+                              below: 75.0
+                      then:
+                        motion.calibrate_heading:
+                          id: motion_id
+                          save: true
+                          on_success:
+                            lvgl.label.update:
+                              id: feedback
+                              text: Heading calibrated.
+                      else:
+                        lvgl.label.update:
+                          id: feedback
+                          text: Insufficient angle
+              - label:
+                  id: feedback
 
 #sensor:
   # Combine sensors
