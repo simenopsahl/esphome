@@ -114,7 +114,7 @@ lvgl:
       height: 100%
       line_dash_width: 4
       line_dash_gap: 4
-      line_color: c_dark_gray
+      line_color: c_gray
   pages:
     - id: page_imu
       pad_top: 24
@@ -142,7 +142,7 @@ lvgl:
                   max_height: 80
                   max_width: 80
                   styles: circle
-                  bg_color: c_yellow
+                  bg_color: c_dark_gray
                   bg_opa: cover
                   widgets:
                   - container:
