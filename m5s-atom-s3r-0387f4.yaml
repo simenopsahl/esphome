@@ -192,12 +192,12 @@ script:
             id: indicator
             bg_color: green
             x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 200);
-            y: !lambda return (int)(clamp(id(pitch).state, -20.0f, 20.0f) / 20.0f * 200);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 200);
         else:
           lvgl.widget.update:
             id: indicator
             bg_color: red
-            x: !lambda return (int)(clamp(id(roll_id).state, -20.0f, 20.0f) / 20.0f * 200);
+            x: !lambda return (int)(clamp(id(roll).state, -20.0f, 20.0f) / 20.0f * 200);
             y: !lambda return (int)(clamp(id(pitch_id).state, -20.0f, 20.0f) / 20.0f * 200);
 
 #sensor:
