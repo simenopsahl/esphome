@@ -32,9 +32,6 @@ substitutions:
     location: "Storage"
     framework:
       type: esp-idf
-  module:
-    internal:
-      i2c_bus: i2c_hat
   display:
     home_page: page_temperature
 
