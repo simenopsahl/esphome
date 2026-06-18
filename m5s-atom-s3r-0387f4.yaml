@@ -6,6 +6,7 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
   hat: !include board/extension/hat_i2c.yaml
+  imu: !include board/module/chip_imu_bmi270.yaml
 #  env: !include board/module/hat_env_iii.yaml
   dlight: !include board/module/hat_dlight.yaml
 
