@@ -182,7 +182,7 @@ lvgl:
                       text_color: c_text_p
 
 script:
-  - id: update_id
+  - id: update_motion
     then:
     - if:
         condition:
