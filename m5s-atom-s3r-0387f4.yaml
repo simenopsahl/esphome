@@ -93,6 +93,13 @@ display:
       offset_height: 191
       offset_width: 110
 
+motion:
+  - id: !extend motion_bmi270
+    axis_map:
+      x: x
+      y: "-y"
+      z: z
+
 lvgl:
   buffer_size: 40%
   rotation: 180
