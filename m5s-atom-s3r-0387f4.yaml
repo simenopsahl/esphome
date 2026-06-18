@@ -1,7 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
@@ -86,6 +86,12 @@ binary_sensor:
     on_state: 
       then:
         - script.execute: display_on_off
+
+display:
+  - id: !extend display_lcd
+    dimensions:
+      offset_height: 1
+      offset_width: 2
 
 lvgl:
   buffer_size: 40%
@@ -194,8 +200,8 @@ lvgl:
                             height: 10%
                             bg_color: c_red
                             bg_opa: 100%
-                            x: 100
-                            y: 100
+                            x: 10
+                            y: 10
 
 script:
   - id: update_motion
@@ -207,14 +213,14 @@ script:
           lvgl.widget.update:
             id: indicator
             bg_color: green
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 200);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 200);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 20);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 20);
         else:
           lvgl.widget.update:
             id: indicator
             bg_color: red
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 200);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 200);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 20);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 20);
 
 sensor:
   - id: !extend motion_roll
