@@ -191,7 +191,7 @@ script:
           lvgl.widget.update:
             id: indicator
             bg_color: green
-            x: !lambda return (int)(clamp(id(roll_id).state, -20.0f, 20.0f) / 20.0f * 200);
+            x: !lambda return (int)(clamp(id(roll).state, -20.0f, 20.0f) / 20.0f * 200);
             y: !lambda return (int)(clamp(id(pitch_id).state, -20.0f, 20.0f) / 20.0f * 200);
         else:
           lvgl.widget.update:
