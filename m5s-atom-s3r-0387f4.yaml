@@ -202,7 +202,8 @@ script:
 
 sensor:
   - id: !extend motion_roll
-    
+    on_value:
+      script.execute: update_id
   # Combine sensors
 #  - id: !extend temperature_local
 #    sources:
