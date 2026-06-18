@@ -163,12 +163,18 @@ lvgl:
                   - label:
                       text: R
                       align: bottom_mid
+                      text_font_: font_md
+                      text_color: c_text_p
                   - label:
                       text: F
                       align: top_mid
+                      text_font_: font_md
+                      text_color: c_text_p
                   - label:
                       text: L
                       align: left_mid
+                      text_font_: font_md
+                      text_color: c_text_p
                   - label:
                       text: R
                       align: right_mid
