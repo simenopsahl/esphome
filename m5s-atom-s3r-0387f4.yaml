@@ -139,8 +139,8 @@ lvgl:
             align: CENTER
             widgets:
               - container:
-                  max_height: 72
-                  max_width: 72
+                  max_height: 69
+                  max_width: 69
                   styles: circle
                   bg_color: c_dark_gray
                   bg_opa: cover
@@ -216,14 +216,14 @@ script:
           lvgl.widget.update:
             id: indicator
             bg_color: c_green
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 40);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 40);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 35);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 35);
         else:
           lvgl.widget.update:
             id: indicator
             bg_color: c_red
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 40);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 40);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 35);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 35);
 
 sensor:
   - id: !extend motion_roll
