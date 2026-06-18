@@ -79,9 +79,9 @@ binary_sensor:
     id: presence2
   # Turn on display while room is occupied
   - platform: template
-    id: motion_detected
+    id: presence_detected
     lambda: !lambda |-
-      if ( (id(motion1).state) or (id(motion2).state) ) {
+      if ( (id(presence1).state) or (id(motion2).state) ) {
         return true;
       } else {
         return false;
