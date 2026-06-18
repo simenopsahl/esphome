@@ -107,7 +107,7 @@ lvgl:
       height: 100%
       line_dash_width: 5
       line_dash_gap: 5
-      line_color: c_gray
+      line_color: c_dark_gray
   pages:
     - id: page_imu
       pad_top: 24
@@ -140,16 +140,12 @@ lvgl:
                   widgets:
                   - container:
                       styles: circle
-                      width: 75%
-                      height: 75%
+                      width: 66%
+                      height: 66%
                   - container:
                       styles: circle
-                      width: 50%
-                      height: 50%
-                  - container:
-                      styles: circle
-                      width: 25%
-                      height: 25%
+                      width: 33%
+                      height: 33%
                   - line:
                       styles: dashline
                       points:
@@ -166,26 +162,6 @@ lvgl:
                       height: 8%
                       bg_color: c_gray
                       bg_opa: 50%
-                  - label:
-                      text: R
-                      align: bottom_mid
-                      text_font: font_md
-                      text_color: c_text_p
-                  - label:
-                      text: F
-                      align: top_mid
-                      text_font: font_md
-                      text_color: c_text_p
-                  - label:
-                      text: L
-                      align: left_mid
-                      text_font: font_md
-                      text_color: c_text_p
-                  - label:
-                      text: R
-                      align: right_mid
-                      text_font: font_md
-                      text_color: c_text_p
                   - container:
                       id: indicator_container
                       width: 100%
@@ -202,6 +178,26 @@ lvgl:
                             bg_opa: 100%
                             x: 10
                             y: 10
+              - label:
+                  text: R
+                  align: bottom_mid
+                  text_font: font_md
+                  text_color: c_text_p
+              - label:
+                  text: F
+                  align: top_mid
+                  text_font: font_md
+                  text_color: c_text_p
+              - label:
+                  text: L
+                  align: left_mid
+                  text_font: font_md
+                  text_color: c_text_p
+              - label:
+                  text: R
+                  align: right_mid
+                  text_font: font_md
+                  text_color: c_text_p
 
 script:
   - id: update_motion
