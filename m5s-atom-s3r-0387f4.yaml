@@ -186,7 +186,7 @@ script:
     then:
     - if:
         condition:
-          lambda: return abs(id(motion_roll).state) < 1.0f && abs(id(pitch_id).state) < 1.0f;
+          lambda: return abs(id(motion_roll).state) < 1.0f && abs(id(pitch).state) < 1.0f;
         then:
           lvgl.widget.update:
             id: indicator
