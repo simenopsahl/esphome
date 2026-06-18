@@ -113,7 +113,7 @@ lvgl:
       <<: !include
         file: gui/functions/swipe_navigation.yaml
       widgets:
-        - container:
+        - obj:
             pad_top: 0
             pad_bottom: 6
             pad_left: 3
