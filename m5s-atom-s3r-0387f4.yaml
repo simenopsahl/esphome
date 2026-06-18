@@ -3,7 +3,7 @@ packages:
   <<: !include_dir_named common
   <<: !include_dir_named bluetooth
 
-  # --- BOARD AND MODULES ---
+  # --- BOARD AND MODULES --
   board: !include board/m5stack_atom_s3r.yaml
   hat: !include board/extension/hat_i2c.yaml
   imu: !include board/module/chip_imu_bmi270.yaml
