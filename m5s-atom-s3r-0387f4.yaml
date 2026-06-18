@@ -161,8 +161,8 @@ lvgl:
                         - [100%, 50%]
                   - container:
                       styles: circle
-                      width: 8%
-                      height: 8%
+                      width: 10%
+                      height: 10%
                       bg_color: c_gray
                       bg_opa: 50%
                   - container:
@@ -175,8 +175,8 @@ lvgl:
                         - container:
                             id: indicator
                             styles: circle
-                            width: 10%
-                            height: 10%
+                            width: 12%
+                            height: 12%
                             bg_color: c_red
                             bg_opa: 100%
                             x: 10
