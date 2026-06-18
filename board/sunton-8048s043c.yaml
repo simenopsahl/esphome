@@ -1,3 +1,4 @@
+labels: [esp32s3, psram, display, i2c]
 ---
 # PINs for Sunton module ESP32-S3 with 4.3" display
 #
@@ -112,7 +113,7 @@ display:
         - ${pin.int.disp.blue.b3}
         - ${pin.int.disp.blue.b4}
         - ${pin.int.disp.blue.b5}
-    update_interval: never
+    update_interval: 10s
     auto_clear_enabled: false
 
 touchscreen:

@@ -1,3 +1,4 @@
+labels: [BME280, temperature, humidity, pressure, i2c]
 ---
 # https://esphome.io/components/sensor/bme280.html
 # BME280

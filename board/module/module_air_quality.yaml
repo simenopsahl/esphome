@@ -1,3 +1,4 @@
+labels: [PMSA003, particulates, uart]
 ---
 # https://docs.m5stack.com/en/module/PM2.5%20AIR%20QUALITY%20KIT%20(Excluding%20Core)
 # https://esphome.io/components/sensor/pmsx003.html

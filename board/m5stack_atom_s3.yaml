@@ -1,3 +1,4 @@
+labels: [esp32s3, psram, ST7789V, display, MPU6886]
 ---
 # https://docs.m5stack.com/en/core/AtomS3
 # Base functions for:
@@ -96,7 +97,8 @@ display:
     reset_pin: ${pin.int.spi.disp.reset}
     data_rate: 40Mhz
     invert_colors: true
-    update_interval: 1s
+    update_interval: 10s
+    auto_clear_enabled: false
     dimensions:
       height: 128
       width: 128

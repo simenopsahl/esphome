@@ -1,3 +1,4 @@
+labels: [esp32, psram, ST7789V, MPU6050, motion, display, i2c]
 ---
 # https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/
 # Base functions for:
@@ -161,4 +162,4 @@ display:
       offset_width: 0
     invert_colors: true
     auto_clear_enabled: false
-    update_interval: never
+    update_interval: 10s

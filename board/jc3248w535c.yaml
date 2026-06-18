@@ -1,3 +1,4 @@
+labels: [esp32s3, psram, JC4832W535, display, i2c]
 ---
 # PINs for Sunton module ESP32-S3 with Guition 3.5" display
 #
@@ -90,7 +91,7 @@ display:
       number: ${pin.int.spi.disp.cs}
       ignore_strapping_warning: true
     draw_from_origin: true
-    update_interval: 5s
+    update_interval: 10s
     auto_clear_enabled: false
 
 touchscreen:

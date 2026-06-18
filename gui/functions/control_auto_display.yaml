@@ -9,6 +9,17 @@ switch:
     name: "Display auto off"
     entity_category: config
 
+binary_sensor:
+  # Turn on display while room is occupied
+  # Default to true
+  - platform: template
+    id: presence_detected
+    lambda: !lambda |-
+      return true;
+    on_state: 
+      then:
+        - script.execute: display_on_off
+
 # Script to control the display backlight based on motion detection
 script:
   - id: display_on_off
@@ -16,7 +27,7 @@ script:
     then:
       - if:
           condition:
-            - binary_sensor.is_on: motion_detected
+            - binary_sensor.is_on: presence_detected
           then:
             - light.turn_on:
                 id: backlight_light
@@ -26,7 +37,7 @@ script:
           else:
             - if:
                 condition:
-                  - binary_sensor.is_off: motion_detected
+                  - binary_sensor.is_off: presence_detected
                 then:
                   - delay: 15s
                   - light.turn_on:
@@ -36,7 +47,7 @@ script:
                   - logger.log: "Motion NOT detected. Display 50%"
                   - if:
                       condition:
-                        - binary_sensor.is_off: motion_detected
+                        - binary_sensor.is_off: presence_detected
                       then:
                         - delay: 30s
                         - light.turn_on:
@@ -47,7 +58,7 @@ script:
                         - if:
                             condition:
                               and:
-                                - binary_sensor.is_off: motion_detected
+                                - binary_sensor.is_off: presence_detected
                                 - switch.is_on: display_auto
                             then:
                               - delay: 45s
@@ -59,7 +70,7 @@ script:
                               - if:
                                   condition:
                                     and:
-                                      - binary_sensor.is_off: motion_detected
+                                      - binary_sensor.is_off: presence_detected
                                       - switch.is_on: display_auto
                                   then:
                                     - delay: 1min

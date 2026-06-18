@@ -1,3 +1,4 @@
+labels: [MQ5, combusible_gas, i2c]
 ---
 # https://docs.m5stack.com/en/unit/Unit_MQ
 # https://docs.m5stack.com/en/homeassistant/sensor/unit_mq_sensor

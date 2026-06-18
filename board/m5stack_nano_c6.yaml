@@ -1,3 +1,4 @@
+labels: [esp32c6, WS2812, RGB]
 ---
 # https://docs.m5stack.com/en/core/M5NanoC6
 # Base functions for:

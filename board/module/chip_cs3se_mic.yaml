@@ -1,3 +1,4 @@
+labels: [microphone, ES7210, sound_level, i2s_audio]
 ---
 # PDM spm1423 microphone
 

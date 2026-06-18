@@ -1,3 +1,4 @@
+labels: [extension, uart]
 ---
 # https://docs.m5stack.com/en/atom/AtomPortABC
 # m5stack uart Port ABC

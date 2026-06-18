@@ -1,3 +1,4 @@
+labels: [esp32s3, BM8563, RTC, SCD40, CO2, temperature, humidity, SEN55, particulates, VOC, ePaper, display, i2c]
 ---
 # https://docs.m5stack.com/en/core/Air_Quality
 # https://devices.esphome.io/devices/M5Stack-AirQ

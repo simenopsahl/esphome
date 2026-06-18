@@ -1,14 +1,16 @@
+labels: [MPU6886, IMU, motion, i2c]
 ---
 # https://esphome.io/components/sensor/mpu6886.html
 
 substitutions:
-  gyro_i2c_bus: i2c_internal
-
+  module:
+    internal:
+      i2c_bus: i2c_internal
 
   # Built-in 6-axis (IMU) that also includes a temperature sensor
 sensor:
   - platform: mpu6886
-    i2c_id: ${gyro_i2c_bus}
+    i2c_id: ${module.internal.i2c_bus}
     address: 0x68
     update_interval: 1s
     accel_x:

@@ -20,7 +20,7 @@ time:
               then:
                 - if:
                     condition:
-                      binary_sensor.is_on: motion_detected
+                      binary_sensor.is_on: presence_detected
                     then:
                       - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
                       - script.execute: update_screen

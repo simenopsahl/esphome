@@ -1,3 +1,4 @@
+labels: [extension, i2c]
 ---
 # https://docs.m5stack.com/en/accessory/StampS3%20GroveBreakOut
 # m5stack Stamp-S3 GroveBreakOut

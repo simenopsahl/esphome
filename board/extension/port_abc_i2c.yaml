@@ -1,3 +1,4 @@
+labels: [extension, i2c]
 ---
 # https://docs.m5stack.com/en/atom/AtomPortABC
 # m5stack i2c Port ABC

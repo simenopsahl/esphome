@@ -1,3 +1,4 @@
+labels: [BH1750, illuminance, i2c]
 ---
 # https://docs.m5stack.com/en/unit/DLight%20Unit
 # https://esphome.io/components/sensor/bh1750.html

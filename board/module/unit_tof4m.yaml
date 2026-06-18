@@ -1,3 +1,4 @@
+labels: [VL53L0X, distance, i2c]
 ---
 # https://docs.m5stack.com/en/unit/Unit-ToF4M
 # https://esphome.io/components/sensor/vl53l0x/

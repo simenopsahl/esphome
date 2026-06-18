@@ -1,3 +1,4 @@
+labels: [CC1101, wmbus, radio, SPI]
 ---
 # https://docs.m5stack.com/en/module/Module_CC1101
 # https://esphome.io/components/cc1101/

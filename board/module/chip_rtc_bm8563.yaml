@@ -1,9 +1,12 @@
+lables: [BM8563, RTC, i2c]
 ---
 # https://esphome.io/components/time/bm8563/
 # BM8563 / PCF8563 RTC
 
 substitutions:
-  rtc_i2c_bus: i2c_internal
+  module:
+    internal:
+      i2c_bus: i2c_internal
 
 # i2c RTC only with one additional i2c bus
 time:

@@ -1,3 +1,4 @@
+labels: [esp32, SK6812, RGB]
 ---
 # https://docs.m5stack.com/en/core/ATOM%20Lite
 # Base functions for:

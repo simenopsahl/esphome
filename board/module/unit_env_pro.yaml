@@ -1,3 +1,4 @@
+labels: [BME688, temperature, humidity, pressure, CO2, VOC, i2c]
 ---
 # https://docs.m5stack.com/en/unit/ENV%20Pro%20Unit
 # https://esphome.io/components/sensor/bme68x_bsec2.html

@@ -1,0 +1,94 @@
+labels: [BMI270, IMU, motion, i2c]
+---
+# https://esphome.io/components/motion/bmi270/
+# The BMI270 is an ultra-low-power IMU optimized for wearable applications.
+# It includes a 16-bit 3-axis accelerometer and a 16-bit 3-axis gyroscope
+
+substitutions:
+  module:
+    internal:
+      i2c_bus: i2c_internal
+
+# Six-axis BMI270 IMU
+motion:
+  - platform: bmi270
+    i2c_id: ${module.internal.i2c_bus}
+    id: motion_bmi270
+    accelerometer_range: 4g
+    gyroscope_range: 2000dps
+    gyroscope_odr: 200Hz
+    update_interval: 100ms
+
+sensor:
+  - platform: motion
+    type: acceleration_x
+    id: motion_accel_x
+    name: "Motion Accel X"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: motion
+    type: acceleration_y
+    id: motion_accel_y
+    name: "Motion Accel Y"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: motion
+    type: acceleration_z
+    id: motion_accel_z
+    name: "Motion Accel Z"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: motion
+    type: gyroscope_x
+    id: motion_gyro_x
+    name: "Motion Gyro X"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    disabled_by_default: True
+  - platform: motion
+    type: gyroscope_y
+    id: motion_gyro_y
+    name: "Motion Gyro Y"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    disabled_by_default: True
+  - platform: motion
+    type: gyroscope_z
+    id: motion_gyro_z
+    name: "Motion Gyro Z"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    disabled_by_default: True
+  - platform: motion
+    type: pitch
+    id: motion_pitch
+    name: "Motion Pitch"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+    disabled_by_default: True
+  - platform: motion
+    type: roll
+    id: motion_roll
+    name: "Motion Roll"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+    disabled_by_default: True
