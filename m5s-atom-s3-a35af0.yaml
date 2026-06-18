@@ -65,10 +65,7 @@ binary_sensor:
   # Turn on display while room is occupied
   - platform: homeassistant
     entity_id: binary_sensor.etg2_simen_occupancy
-    id: presence_detected
-    on_state: 
-      then:
-        - script.execute: display_on_off
+    id: presence1
   - id: !extend presence_detected
     lambda: !lambda |-
       if ( (id(presence1).state) or (id(presence2).state) ) {
