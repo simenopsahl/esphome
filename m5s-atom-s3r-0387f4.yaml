@@ -106,7 +106,7 @@ lvgl:
   style_definitions:
     - id: circle
       radius: circle
-      outline_width: 2
+      outline_width: 1
       outline_color: c_gray
       align: center
     - id: dashline
@@ -147,8 +147,12 @@ lvgl:
                   widgets:
                   - container:
                       styles: circle
-                      width: 50%
-                      height: 50%
+                      width: 66%
+                      height: 66%
+                  - container:
+                      styles: circle
+                      width: 33%
+                      height: 33%
                   - line:
                       styles: dashline
                       points:
