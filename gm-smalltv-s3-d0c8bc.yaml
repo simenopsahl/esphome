@@ -61,7 +61,7 @@ binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
     entity_id: binary_sensor.etg2_simen_occupancy
-    id: motion_simen
+    id: presence1
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
     id: motion_gang
