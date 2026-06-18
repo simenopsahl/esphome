@@ -225,7 +225,7 @@ image:
 binary_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.etg2_occupancy
-    id: motion_detected
+    id: presence_detected
 
 graph:
   - id: graph_temperature_room
