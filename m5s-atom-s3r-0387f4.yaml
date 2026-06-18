@@ -13,7 +13,7 @@ packages:
   # --- FEATURE PACKAGES ---
 #  combined_env_sensors: !include features/combined_env_sensors.yaml
 
-  # --- GUI PACKAGES ---
+  # --- GUI PACKAGES --
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/128x128.yaml
 
