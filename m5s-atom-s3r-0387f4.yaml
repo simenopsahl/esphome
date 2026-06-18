@@ -200,7 +200,8 @@ script:
             x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 200);
             y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 200);
 
-#sensor:
+sensor:
+
   # Combine sensors
 #  - id: !extend temperature_local
 #    sources:
