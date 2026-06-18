@@ -142,7 +142,7 @@ lvgl:
                   max_height: 80
                   max_width: 80
                   styles: circle
-                  bg_color: c_green
+                  bg_color: c_yellow
                   bg_opa: cover
                   widgets:
                   - container:
@@ -211,13 +211,13 @@ script:
         then:
           lvgl.widget.update:
             id: indicator
-            bg_color: green
+            bg_color: c_green
             x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 40);
             y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 40);
         else:
           lvgl.widget.update:
             id: indicator
-            bg_color: red
+            bg_color: c_red
             x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 40);
             y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 40);
 
