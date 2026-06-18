@@ -107,14 +107,14 @@ lvgl:
     - id: circle
       radius: circle
       outline_width: 1
-      outline_color: c_gray
+      outline_color: c_yellow
       align: center
     - id: dashline
       width: 100%
       height: 100%
       line_dash_width: 4
       line_dash_gap: 4
-      line_color: c_gray
+      line_color: c_yellow
   pages:
     - id: page_imu
       pad_top: 24
