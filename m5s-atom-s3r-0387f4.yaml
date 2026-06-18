@@ -33,7 +33,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_temperature
+    home_page: page_imu
 
 esphome:
   comment: ${device.model} @ ${device.location}
