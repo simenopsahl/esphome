@@ -181,6 +181,27 @@ lvgl:
                       text_font_: font_md
                       text_color: c_text_p
 
+script:
+
+    
+  - id: update_id
+    then:
+    - if:
+        condition:
+          lambda: return abs(id(roll_id).state) < 1.0f && abs(id(pitch_id).state) < 1.0f;
+        then:
+          lvgl.widget.update:
+            id: indicator
+            bg_color: green
+            x: !lambda return (int)(clamp(id(roll_id).state, -20.0f, 20.0f) / 20.0f * 200);
+            y: !lambda return (int)(clamp(id(pitch_id).state, -20.0f, 20.0f) / 20.0f * 200);
+        else:
+          lvgl.widget.update:
+            id: indicator
+            bg_color: red
+            x: !lambda return (int)(clamp(id(roll_id).state, -20.0f, 20.0f) / 20.0f * 200);
+            y: !lambda return (int)(clamp(id(pitch_id).state, -20.0f, 20.0f) / 20.0f * 200);
+
 #sensor:
   # Combine sensors
 #  - id: !extend temperature_local
