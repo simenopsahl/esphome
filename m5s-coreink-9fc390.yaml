@@ -326,7 +326,7 @@ image:
 binary_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.etg1_occupancy
-    id: motion_detected
+    id: presence_detected
 
   # Stick Up
   - id: !extend stick_up
