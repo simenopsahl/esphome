@@ -70,22 +70,18 @@ binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
     entity_id: binary_sensor.etg2_simen_occupancy
-    id: motion1
+    id: presence1
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
-    id: motion2
+    id: presence2
   # Turn on display while room is occupied
-  - platform: template
-    id: motion_detected
+  - id: !extend presence_detected
     lambda: !lambda |-
-      if ( (id(motion1).state) or (id(motion2).state) ) {
+      if ( (id(presence1).state) or (id(presence2).state) ) {
         return true;
       } else {
         return false;
       }
-    on_state: 
-      then:
-        - script.execute: display_on_off
 
 display:
   - id: !extend display_lcd
