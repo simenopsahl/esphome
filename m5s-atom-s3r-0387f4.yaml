@@ -139,8 +139,8 @@ lvgl:
             align: CENTER
             widgets:
               - container:
-                  max_height: 69
-                  max_width: 69
+                  max_height: 66
+                  max_width: 66
                   styles: circle
                   bg_color: c_dark_gray
                   bg_opa: cover
