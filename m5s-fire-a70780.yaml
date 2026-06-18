@@ -76,10 +76,10 @@ binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
     entity_id: binary_sensor.etg2_simen_occupancy
-    id: motion1
+    id: presence1
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
-    id: motion2
+    id: presence2
   # Turn on display while room is occupied
   - platform: template
     id: motion_detected
