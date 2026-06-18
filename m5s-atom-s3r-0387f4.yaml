@@ -120,8 +120,8 @@ lvgl:
         file: gui/functions/swipe_navigation.yaml
       widgets:
         - obj:
-            pad_top: 0
-            pad_bottom: 6
+            pad_top: 4
+            pad_bottom: 4
             pad_left: 3
             pad_right: 3
             scrollable: false
@@ -132,8 +132,8 @@ lvgl:
             align: CENTER
             widgets:
               - container:
-                  max_height: 90
-                  max_width: 90
+                  max_height: 84
+                  max_width: 84
                   styles: circle
                   bg_color: c_green
                   bg_opa: cover
