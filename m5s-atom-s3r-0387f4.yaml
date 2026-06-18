@@ -182,8 +182,6 @@ lvgl:
                       text_color: c_text_p
 
 script:
-
-    
   - id: update_id
     then:
     - if:
