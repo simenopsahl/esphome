@@ -112,8 +112,8 @@ lvgl:
     - id: dashline
       width: 100%
       height: 100%
-      line_dash_width: 5
-      line_dash_gap: 5
+      line_dash_width: 4
+      line_dash_gap: 4
       line_color: c_dark_gray
   pages:
     - id: page_imu
@@ -216,14 +216,14 @@ script:
           lvgl.widget.update:
             id: indicator
             bg_color: green
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 20);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 20);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 84);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 84);
         else:
           lvgl.widget.update:
             id: indicator
             bg_color: red
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 20);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 20);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 84);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 84);
 
 sensor:
   - id: !extend motion_roll
