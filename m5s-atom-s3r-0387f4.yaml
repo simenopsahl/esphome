@@ -173,7 +173,7 @@ lvgl:
                       text: R
                       align: right_mid
                       text_font_: font_md
-                      
+                      text_color:
 
 #sensor:
   # Combine sensors
