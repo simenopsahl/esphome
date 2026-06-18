@@ -78,7 +78,7 @@ binary_sensor:
   - platform: template
     id: motion_detected
     lambda: !lambda |-
-      if ( (id(motion1).state) or (id(motion_gang).state) ) {
+      if ( (id(motion1).state) or (id(motion2).state) ) {
         return true;
       } else {
         return false;
