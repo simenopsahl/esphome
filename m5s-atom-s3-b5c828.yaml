@@ -81,6 +81,13 @@ binary_sensor:
     on_press:
       - lvgl.page.next
 
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_bod_occupancy
+    id: presence1
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: presence2
   # Turn on display while room is occupied
   - id: !extend presence_detected
     lambda: !lambda |-
