@@ -150,7 +150,7 @@ font: !include
 binary_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.etg2_occupancy
-    id: motion_detected
+    id: presence_detected
 
 sensor:
   # Call sensors from HA.
