@@ -19,6 +19,8 @@ substitutions:
     location: "Storage"
     framework:
       type: esp-idf
+  display:
+    home_page: page_status
 
 esphome:
   comment: ${device.model} @ ${device.location}
