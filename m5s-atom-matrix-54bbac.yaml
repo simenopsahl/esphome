@@ -36,3 +36,9 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.45
+
+# Button
+binary_sensor:
+  - id: !extend btn_matrix
+    on_press:
+      - lvgl.page.next
