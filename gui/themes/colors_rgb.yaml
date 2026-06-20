@@ -1,0 +1,118 @@
+---
+# https://esphome.io/components/display/#color
+# Global colors
+
+color:
+  - id: c_bg_p
+    red: 0%
+    green: 0%
+    blue: 0%
+  - id: c_bg_s
+    red: 20%
+    green: 20%
+    blue: 20%
+  - id: c_text_p
+    red: 100%
+    green: 100%
+    blue: 100%
+  - id: c_text_s
+    red: 70%
+    green: 70%
+    blue: 70%
+
+  - id: c_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: c_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: c_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: c_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+  - id: c_pink
+    red: 100%
+    green: 41%
+    blue: 71%
+  - id: c_pink2
+    red: 100%
+    green: 41%
+    blue: 71%
+  - id: c_purple
+    red: 100%
+    green: 0%
+    blue: 100%
+
+  - id: c_gray
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: c_dark_gray
+    red: 33%
+    green: 33%
+    blue: 33%
+  - id: c_white
+    red: 100%
+    green: 100%
+    blue: 100%
+  - id: c_black
+    red: 0%
+    green: 0%
+    blue: 0%
+
+  - id: c_ha_icon
+    red: 50%
+    green: 100%
+    blue: 83%
+
+  - id: c_cyan
+    red: 0%
+    green: 100%
+    blue: 100%
+  - id: c_magenta
+    red: 100%
+    green: 0%
+    blue: 100%
+
+  - id: c_gold
+    red: 100%
+    green: 84%
+    blue: 0%
+  - id: c_orange
+    red: 100%
+    green: 65%
+    blue: 0%
+  - id: c_orangered
+    red: 100%
+    green: 27%
+    blue: 0%
+  - id: c_darkorange
+    red: 100%
+    green: 55%
+    blue: 0%
+  - id: c_slateblue
+    red: 48%
+    green: 41%
+    blue: 93%
+  - id: c_deepskyblue
+    red: 0%
+    green: 75%
+    blue: 100%
+  - id: c_aquamarine
+    red: 50%
+    green: 100%
+    blue: 83%
+  - id: c_springgreen
+    red: 0%
+    green: 100%
+    blue: 50%
+  - id: c_chartreuse
+    red: 50%
+    green: 100%
+    blue: 0%

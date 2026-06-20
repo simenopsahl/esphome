@@ -1,0 +1,188 @@
+# for square 5x5 displays
+
+font:
+  - file: gui/fonts/5x5-monospaced.ttf
+    id: font_5x5
+    size: 5
+
+.sizing:
+  - &matrix_page_styles
+    pad_all: 0
+
+  - &matrix_styles
+    radius: 0
+    border_width: 0
+    pad_all: 0
+
+script:
+  - id: go_home
+    then:
+      - lvgl.page.show: ${display.home_page}
+
+lvgl:
+  id: display_lvgl
+  buffer_size: 30%
+  draw_rounding: 1
+  default_font: font_5x5
+  theme: !include themes/main_5x5.yaml
+#  bottom_layer: COLOR_OFF
+  bg_color: c_black
+  top_layer:
+    widgets:
+      - obj:
+          id: boot_screen
+          <<: *matrix_styles
+          align: CENTER
+          width: 100%
+          height: 100%
+          bg_color: c_bg_p
+          bg_opa: COVER
+          widgets:
+            - spinner:
+                <<: *matrix_styles
+                align: CENTER
+                height: 4
+                width: 4
+                spin_time: 1s
+                arc_width: 1
+                arc_color: c_dark_gray
+                indicator:
+                  <<: *matrix_styles
+                  arc_color: c_cyan
+                  arc_width: 1
+      - obj:
+          id: ota_screen
+          <<: *matrix_styles
+          align: CENTER
+          width: 100%
+          height: 100%
+          bg_color: c_bg_p
+          bg_opa: COVER
+          hidden: true
+          widgets:
+            - bar:
+                id: lvgl_ota_progress
+                <<: *matrix_styles
+                align: CENTER
+                width: 5
+                height: 2
+                bg_color: c_bg_s
+                indicator:
+                  <<: *matrix_styles
+                  bg_color: c_cyan
+
+  pages:
+    - id: page_splash
+      skip: true
+      on_load:
+        - then:
+            - script.execute: go_home
+
+    - id: page_status
+      <<: *matrix_page_styles
+      on_load:
+        - text_sensor.template.publish:
+            id: sensor_current_page
+            state: "Status"
+      widgets:
+        - container:
+            widgets:
+              - spinner:
+                  <<: *matrix_styles
+                  align: CENTER
+                  width: 3
+                  height: 3
+                  spin_time: 1s
+                  arc_width: 1
+                  arc_color: c_bg_s
+                  indicator:
+                    <<: *matrix_styles
+                    arc_color: c_cyan
+                    arc_width: 1
+              # wifi icon
+              - obj:
+                  id: lbl_wifi_status
+                  <<: *matrix_styles
+                  align: TOP_LEFT
+                  width: 1
+                  height: 1
+                  bg_color: c_red
+                  bg_opa: COVER
+              # HA status
+              - obj:
+                  id: lbl_ha_status
+                  <<: *matrix_styles
+                  align: TOP_RIGHT
+                  width: 1
+                  height: 1
+                  bg_color: c_orange
+                  bg_opa: COVER
+
+    - id: page_bar
+      <<: *matrix_page_styles
+      on_load:
+        - text_sensor.template.publish:
+            id: sensor_current_page
+            state: "Bar"
+      widgets:
+        - bar:
+            <<: *matrix_styles
+            align: CENTER
+            width: 3
+            height: 5
+            bg_color: c_blue
+            min_value: 0
+            max_value: 100
+            value: 60 # Will fill exactly 3 out of 5 rows of LEDs
+            indicator:
+              <<: *matrix_styles
+              bg_color: c_purple
+
+wifi:
+  on_connect:
+    - lvgl.widget.update:
+        id: lbl_wifi_status
+        bg_color: c_green
+  on_disconnect:
+    - lvgl.widget.update:
+        id: lbl_wifi_status
+        bg_color: c_red
+
+api:
+  on_client_connected:
+    - lvgl.widget.hide: boot_screen
+    - lvgl.widget.update:
+        id: lbl_ha_status
+        bg_color: c_ha_icon
+  on_client_disconnected:
+    - lvgl.widget.update:
+        id: lbl_ha_status
+        bg_color: c_orange
+
+ota:
+  id: !extend component_ota
+  on_begin:
+    - then:
+        - lvgl.widget.show: ota_screen
+  on_progress:
+    - then:
+        - lvgl.bar.update:
+            id: lvgl_ota_progress
+            value: !lambda "return (int)x;"
+        - lambda: "id(display_lvgl).loop();"
+
+packages:
+  # RGB LED Colors
+  colors: !include { file: themes/colors_rgb.yaml }
+  # automatic screen control
+#  control_auto_display: !include { file: functions/control_auto_display.yaml }
+  # remote page navigation
+  control_navigation: !include { file: functions/control_navigation.yaml }
+
+text_sensor:
+  - id: !remove sensor_current_page
+  - id: sensor_current_page
+    platform: template
+    name: "Current page"
+    icon: mdi:page-layout-header
+    entity_category: diagnostic

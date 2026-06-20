@@ -1,0 +1,77 @@
+bar:
+  radius: 0
+  pad_all: 0
+  bg_color: c_bg_s
+  indicator:
+    bg_color: c_pink
+button:
+  radius: 0
+  pad_all: 0
+  border_width: 0
+  bg_color: c_bg_s
+  border_color: c_bg_p
+  text_color: c_text_p
+  shadow_width: 0
+  pressed: # set some button colors to be different in pressed state
+    bg_color: c_dark_gray
+  checked: # set some button colors to be different in checked state
+    bg_color: c_dark_gray
+    text_color: c_purple
+dropdown:
+  bg_color: c_dark_gray
+  text_color: c_text_p
+  border_width: 0
+  shadow_width: 0
+  radius: 0
+  pad_all: 0
+image:
+  border_width: 0
+  scrollable: false
+  radius: 0
+  pad_all: 0
+label:
+  border_width: 0
+  scrollable: false
+  radius: 0
+  pad_all: 0
+obj:
+  border_width: 0
+  bg_color: c_bg_p
+  bg_opa: TRANSP
+  text_color: c_text_p
+  scrollable: false
+  radius: 0
+  pad_all: 0
+slider:
+  radius: 0
+  pad_all: 0
+  border_width: 0
+  bg_color: c_gray
+  bg_opa: COVER
+  indicator:
+    bg_color: c_pink
+    bg_opa: COVER
+  knob:
+    bg_color: c_pink
+    bg_opa: COVER
+    border_width: 0
+    text_color: c_text_p
+spinner:
+  radius: 0
+  pad_all: 0
+  arc_rounded: false
+  bg_opa: TRANSP
+switch:
+  radius: 0
+  pad_all: 0
+  border_width: 0
+  bg_color: c_gray
+  checked:
+    bg_color: c_pink
+    bg_opa: COVER
+  knob:
+    bg_color: c_text_s
+    bg_opa: COVER
+    checked:
+      bg_color: c_text_p
+      bg_opa: COVER
