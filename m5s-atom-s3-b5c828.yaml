@@ -81,7 +81,7 @@ binary_sensor:
     on_press:
       - lvgl.page.next:
           animation: OUT_TOP
-          time: 50ms
+          time: 100ms
 
   # Call sensors from HA.
   - platform: homeassistant
