@@ -140,7 +140,7 @@ lvgl:
                   max_height: 66
                   max_width: 66
                   styles: circle
-                  bg_color: c_dark_gray
+                  bg_color: c_bg_s
                   bg_opa: cover
                   widgets:
                   - container:
@@ -186,23 +186,23 @@ lvgl:
               - label:
                   text: R
                   align: bottom_mid
-                  text_font: font_md
-                  text_color: c_text_p
+                  text_font: font_sm
+                  text_color: c_dark_gray
               - label:
                   text: F
                   align: top_mid
-                  text_font: font_md
-                  text_color: c_text_p
+                  text_font: font_sm
+                  text_color: c_dark_gray
               - label:
                   text: L
                   align: left_mid
                   text_font: font_md
-                  text_color: c_text_p
+                  text_color: c_dark_gray
               - label:
                   text: R
                   align: right_mid
                   text_font: font_md
-                  text_color: c_text_p
+                  text_color: c_dark_gray
 
 script:
   - id: update_motion
