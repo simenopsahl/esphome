@@ -143,14 +143,14 @@ sensor:
       # Unit ENV Pro
 #      - source: pressure_bme688
 
-display:
-  - id: !extend display_lcd
-    dimensions:
-      offset_height: 191
-      offset_width: 110
+#display:
+#  - id: !extend display_lcd
+#    dimensions:
+#      offset_height: 191
+#      offset_width: 110
 
 lvgl:
-  buffer_size: 15%
+  buffer_size: 30%
   rotation: 180
   pages:
     - id: !remove page_temperature
