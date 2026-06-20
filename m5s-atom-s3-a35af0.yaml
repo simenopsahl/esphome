@@ -60,7 +60,8 @@ time:
 binary_sensor:
   - id: !extend btn_display
     on_press:
-      - lvgl.page.next
+      - lvgl.page.next:
+          animation: OUT_TOP
 
   - platform: homeassistant
     entity_id: binary_sensor.etg2_simen_occupancy
