@@ -20,9 +20,20 @@ M5Stack: ATOM Mate HAT, ATOM Port ABC, Unit pA Hub and more
 Sensors and peripherals  
 M5Stack: HAT ENV.III, Unit ENV.IV, Unit PIR  
 ePaper basic functions and scripts
- 
+
+### [bluetooth](bluetooth)
+Bluetooth proxy and BLE scanner/tracker packages
+
+### [common](common)
+Shared base configuration included in all ESPHome projects  
+WiFi, API, OTA, logging, time and restart defaults
+
+### [features](features)
+Reusable feature packages for cross-device functionality  
+Combined sensors, IR codes, NordPool alerts, status LEDs
+
 ### [gui](gui)
-Modular LVGL layout
+Modular LVGL layout with resolution-specific configs, themes, pages and widgets
 
 ---
 
