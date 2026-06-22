@@ -6,6 +6,7 @@ labels: [esp32]
 # Pins for this model
 packages:
   pins: !include pins/upesy_wroom.yaml
+  i2c: !include extension/internal_i2c.yaml
 
 substitutions:
   device:
@@ -13,6 +14,10 @@ substitutions:
     rmt_symbols_block: 64
     framework:
       type: esp-idf
+  extension:
+    i2c:
+      internal:
+        frequency: 100kHz
 
 esp32:
 # uPesy ESP-WROOM-32

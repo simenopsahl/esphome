@@ -1,0 +1,128 @@
+---
+# PINs for ESP32S3 USB_OTG
+
+substitutions:
+  pin:
+    light:
+      rgb: GPIO21
+      led: GPIO2
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO7
+      y3: GPIO5
+      y4: GPIO4
+      y5: GPIO6
+      y6: GPIO8
+      y7: GPIO42
+      y8: GPIO48
+      y9: GPIO47
+      vs: GPIO35
+      hs: GPIO34
+      p_clk: GPIO41
+      m_clk: GPIO33
+    cam_alt:
+      y0: nc
+      y1: nc
+      y2: GPIO11
+      y3: GPIO9
+      y4: GPIO8
+      y5: GPIO10
+      y6: GPIO12
+      y7: GPIO18
+      y8: GPIO17
+      y9: GPIO16
+      vs: GPIO6
+      hs: GPIO7
+      p_clk: GPIO13
+      m_clk: GPIO15
+    cam_alt2:
+      y0: nc
+      y1: nc
+      y2: GPIO5
+      y3: GPIO18
+      y4: GPIO19
+      y5: GPIO21
+      y6: GPIO36
+      y7: GPIO39
+      y8: GPIO34
+      y9: GPIO35
+      vs: GPIO25
+      hs: GPIO23
+      p_clk: GPIO22
+      m_clk: GPIO0
+    card:
+      d0: GPIO41
+      d1: nc
+      d2: nc
+      d3: GPIO38
+      cmd: GPIO39
+      clk: GPIO42
+    card_alt:
+      d: GPIO40
+      clk: GPIO39
+      cmd: GPIO38
+    i2c:
+      sda: GPIO37
+      scl: GPIO36
+    i2c_alt:
+      sda: GPIO4
+      scl: GPIO5
+    i2c_alt2:
+      sda: GPIO26
+      scl: GPIO27
+    uart:
+      tx0: GPIO43
+      rx0: GPIO44
+      rts0: GPIO15
+      cts0: GPIO16
+      tx1: GPIO17
+      rx1: GPIO18
+    spi:
+      clk: GPIO11
+      mosi: GPIO3
+      miso: GPIO12
+      cs: GPIO2
+      clk_p: GPIO11
+      clk_n: GPIO9
+      f:
+        clk1: GPIO12
+        clk2: GPIO14
+        cs0: GPIO10
+        io4: GPIO10
+        io5: GPIO11
+        io6: GPIO12
+        io7: GPIO13
+        dqs: GPIO14
+        wp: GPIO38
+        q: GPIO13
+        d: GPIO11
+        hd: GPIO9
+      sub:
+        clk1: GPIO12
+        clk2: GPIO14
+        cs0: GPIO10
+        cs1: GPIO39
+        wp: GPIO14
+        q: GPIO21
+        d: GPIO11
+        hd: GPIO9
+    spi_alt:
+      clk: GPIO39
+      mosi: GPIO42
+      miso: GPIO41
+      cs: GPIO38
+    mt:
+      clk: GPIO39
+      ms: GPIO8
+      d0: GPIO40
+      d1: GPIO7
+    clk_out1:
+      clk1: GPIO7
+      clk2: GPIO43
+    clk_out2:
+      clk1: GPIO40
+      clk2: GPIO44
+    clk_out3:
+      clk1: GPIO18
+      clk2: GPIO39

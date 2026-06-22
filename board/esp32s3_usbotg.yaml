@@ -1,0 +1,113 @@
+labels: [esp32]
+---
+# WIP
+# Camera not working
+
+# Pins for this model
+packages:
+  pins: !include pins/esp32s3-usbotg.yaml
+#  i2c: !include extension/internal_i2c.yaml
+  status_led: !include ../features/system_status_led.yaml
+
+substitutions:
+  device:
+    model: "S3 OTG CAM"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+  extension:
+    i2c:
+      internal:
+        frequency: 200kHz
+
+esp32:
+# ESP32-WROOM-32
+#  board: lolin_s3
+  variant: esp32s3
+  flash_size: 16MB
+  cpu_frequency: 240MHz
+  framework: 
+    type: ${device.framework.type}
+    advanced:
+      compiler_optimization: PERF
+      enable_idf_experimental_features: true
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+psram:
+  mode: quad
+  speed: 80MHz
+
+# spi:
+#   clk_pin: ${pin.spi.clk}
+#   mosi_pin: ${pin.spi.mosi}
+
+i2c:
+  - id: i2c_internal
+    sda: ${pin.i2c.sda}
+    scl: ${pin.i2c.scl}
+    frequency: ${extension.i2c.internal.frequency}
+
+esp32_camera:
+  i2c_id: i2c_internal
+  external_clock:
+    pin: ${pin.cam.m_clk}
+    frequency: 10MHz
+  data_pins:
+    - ${pin.cam.y2}
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin: ${pin.cam.vs}
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin: ${pin.cam.p_clk}
+  id: espcam
+  name: "Camera OV2640"
+  resolution: 640x480
+  jpeg_quality: 15
+  max_framerate: 5 fps
+  frame_buffer_count: 2
+
+status_led:
+  pin: ${pin.light.led}
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    rgb_order: GRB
+    pin: ${pin.light.rgb}
+    num_leds: 1
+    rmt_symbols: ${device.rmt_symbols_block}
+    chipset: sk6812
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 200ms on, 1500ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+    default_transition_length: 100ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "LED"
+    entity_category: config
