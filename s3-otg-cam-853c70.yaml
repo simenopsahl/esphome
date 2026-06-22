@@ -28,7 +28,3 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.93
-
-logger:
-  level: VERBOSE
-  initial_level: VERBOSE
