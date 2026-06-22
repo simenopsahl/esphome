@@ -7,7 +7,7 @@ packages:
 
 substitutions:
   common:
-#    log_level: WARN
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: s3-otg-cam-853c70
