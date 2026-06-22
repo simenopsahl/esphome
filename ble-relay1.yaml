@@ -16,10 +16,6 @@ substitutions:
     location: "Storage"
     framework:
       type: esp-idf
-  extension:
-    i2c:
-      internal:
-        frequency: 100kHz
 
 esphome:
   comment: "BLE Relay"
