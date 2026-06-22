@@ -5,7 +5,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/upesy_wroom.yaml
-  i2c_internal: !include board/extension/internal_i2c.yaml
   bme280: !include board/module/chip_temp_bme280.yaml
 
 substitutions:
