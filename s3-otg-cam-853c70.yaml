@@ -30,5 +30,5 @@ wifi:
     static_ip: 192.168.71.93
 
 logger:
-  level: VERBOSE
-  initial_level: VERBOSE
+  level: VERY_VERBOSE
+  initial_level: VERY_VERBOSE
