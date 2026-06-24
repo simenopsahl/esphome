@@ -6,7 +6,7 @@ labels: [esp32]
 # Pins for this model
 packages:
   pins: !include pins/esp32s3-usbotg.yaml
-#  i2c: !include extension/internal_i2c.yaml
+  i2c: !include extension/internal_i2c.yaml
   status_led: !include ../features/system_status_led.yaml
 
 substitutions:
@@ -40,21 +40,16 @@ psram:
   mode: quad
   speed: 80MHz
 
-# spi:
-#   clk_pin: ${pin.spi.clk}
-#   mosi_pin: ${pin.spi.mosi}
-
-i2c:
-  - id: i2c_internal
-    sda: ${pin.i2c.sda}
-    scl: ${pin.i2c.scl}
-    frequency: ${extension.i2c.internal.frequency}
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
 
 esp32_camera:
   i2c_id: i2c_internal
+  # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
-    frequency: 10MHz
+    frequency: 12MHz
   data_pins:
     - ${pin.cam.y2}
     - ${pin.cam.y3}
@@ -67,12 +62,21 @@ esp32_camera:
   vsync_pin: ${pin.cam.vs}
   href_pin: ${pin.cam.hs}
   pixel_clock_pin: ${pin.cam.p_clk}
+  # Metadata
   id: espcam
   name: "Camera OV2640"
+  # Image settings
   resolution: 640x480
-  jpeg_quality: 15
-  max_framerate: 5 fps
-  frame_buffer_count: 2
+  jpeg_quality: 12
+  max_framerate: 1 fps
+  frame_buffer_count: 2 # defaults to 1
+  vertical_flip: true
+  horizontal_mirror: true
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  # White balance
+  wb_mode: auto
 
 status_led:
   pin: ${pin.light.led}
@@ -85,6 +89,7 @@ light:
     num_leds: 1
     rmt_symbols: ${device.rmt_symbols_block}
     chipset: sk6812
+    color_correct: [75%, 75%, 75%]
     effects:
       - pulse:
       - strobe:

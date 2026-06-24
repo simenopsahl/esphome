@@ -1,0 +1,35 @@
+labels: [RCWL-9620, distance, i2c]
+---
+# https://docs.m5stack.com/en/unit/ULTRASONIC%20I2C
+# https://github.com/Chill-Division/M5Stack-ESPHome/blob/main/Ultrasonic%20Distance%20Unit%20I2C%20(RCWL-9620).md
+# WIP
+
+substitutions:
+  module:
+    sonic_i2c_bus: i2c_grove
+
+external_components:
+  - source: github://chill-Division/M5Stack-ESPHome/
+    components: sonic_i2c
+
+# UNIT Ultrasonic I2C
+sensor:
+  - platform: sonic_i2c
+    i2c_id: ${module.sonic_i2c_bus}
+    id: ultrasonic
+    name: "Ultrasonic Distance"
+    update_interval: 5s
+    device_class: distance
+    unit_of_measurement: mm
+    accuracy_decimals: 0
+    filters:
+      - filter_out: nan
+      - lambda: |-
+          if (x == 0) {
+          return {};  // This filters out the reading
+          } else {
+          return x;   // This passes the reading through
+          }
+      - sliding_window_moving_average:
+          window_size: 2
+          send_every: 3

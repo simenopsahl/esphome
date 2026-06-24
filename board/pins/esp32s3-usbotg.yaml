@@ -1,76 +1,51 @@
 ---
 # PINs for ESP32S3 USB_OTG
+# https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L448
 
 substitutions:
   pin:
     light:
-      rgb: GPIO21
-      led: GPIO2
+      rgb: GPIO33
+      led: GPIO34
+    int:
+      spi:
+        clk: GPIO42
+        mosi: GPIO39
+        miso: GPIO41
+        cs: GPIO38
+      i2c:
+        sda: GPIO21
+        scl: GPIO14
+      i2s:
+        lrclk: GPIO37
+        bclk: GPIO36
     cam:
       y0: nc
       y1: nc
-      y2: GPIO7
-      y3: GPIO5
-      y4: GPIO4
-      y5: GPIO6
-      y6: GPIO8
-      y7: GPIO42
-      y8: GPIO48
-      y9: GPIO47
-      vs: GPIO35
-      hs: GPIO34
-      p_clk: GPIO41
-      m_clk: GPIO33
-    cam_alt:
-      y0: nc
-      y1: nc
-      y2: GPIO11
-      y3: GPIO9
-      y4: GPIO8
-      y5: GPIO10
-      y6: GPIO12
-      y7: GPIO18
-      y8: GPIO17
-      y9: GPIO16
-      vs: GPIO6
-      hs: GPIO7
-      p_clk: GPIO13
-      m_clk: GPIO15
-    cam_alt2:
-      y0: nc
-      y1: nc
       y2: GPIO5
-      y3: GPIO18
-      y4: GPIO19
-      y5: GPIO21
-      y6: GPIO36
-      y7: GPIO39
-      y8: GPIO34
-      y9: GPIO35
-      vs: GPIO25
-      hs: GPIO23
-      p_clk: GPIO22
-      m_clk: GPIO0
+      y3: GPIO3
+      y4: GPIO2
+      y5: GPIO4
+      y6: GPIO6
+      y7: GPIO8
+      y8: GPIO9
+      y9: GPIO11
+      vs: GPIO13
+      hs: GPIO12
+      p_clk: GPIO7
+      m_clk: GPIO10
     card:
       d0: GPIO41
       d1: nc
       d2: nc
       d3: GPIO38
+      cs: GPIO38
       cmd: GPIO39
       clk: GPIO42
-    card_alt:
-      d: GPIO40
-      clk: GPIO39
-      cmd: GPIO38
-    i2c:
-      sda: GPIO37
-      scl: GPIO36
-    i2c_alt:
-      sda: GPIO4
-      scl: GPIO5
-    i2c_alt2:
-      sda: GPIO26
-      scl: GPIO27
+    mic:
+      din: GPIO35
+
+# Not tested
     uart:
       tx0: GPIO43
       rx0: GPIO44
