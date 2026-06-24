@@ -5,7 +5,9 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
+  grove: !include board/extension/grove_i2c.yaml
   hat_pir: !include board/module/hat_pir.yaml
+  sonic: !include board/module/unit_ultrasonic_i2c.yaml
 
   # --- FEATURE PACKAGES ---
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
