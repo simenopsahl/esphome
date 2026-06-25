@@ -2,7 +2,6 @@ labels: [RCWL-9620, distance, i2c]
 ---
 # https://docs.m5stack.com/en/unit/ULTRASONIC%20I2C
 # https://github.com/Chill-Division/M5Stack-ESPHome/blob/main/Ultrasonic%20Distance%20Unit%20I2C%20(RCWL-9620).md
-# WIP
 
 substitutions:
   module:
@@ -33,3 +32,23 @@ sensor:
       - sliding_window_moving_average:
           window_size: 2
           send_every: 3
+
+  # Water tank level percentage calculation based on distance readings
+  # https://www.jula.no/catalog/hage/vanning/vannslange-og-tilbehor/vanntonner/regnvannstonne-med-fot-033163/
+  - platform: template
+    name: "Reservoir Level"
+    unit_of_measurement: "%"
+    icon: "mdi:waves"
+    update_interval: 10s # Or whatever update interval you prefer
+    lambda: |-
+      auto x = id(ultrasonic).state;
+      const float min_distance = 200.0;
+      const float max_distance = 940.0;
+      if (isnan(x)) {
+      return NAN; // Don't publish a value if the sensor reading is invalid
+      }
+      // Clamp the sensor reading to be within your defined min/max range
+      x = clamp(x, min_distance, max_distance);
+      // Calculate the percentage
+      float percentage = 100.0 - ((x - min_distance) / (max_distance - min_distance) * 100.0);
+      return percentage;

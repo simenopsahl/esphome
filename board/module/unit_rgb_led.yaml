@@ -1,0 +1,43 @@
+labels: [SK6812, led, gpio]
+---
+# https://docs.m5stack.com/en/unit/rgb
+# https://esphome.io/components/light/esp32_rmt_led_strip/
+
+substitutions:
+  module:
+    rgb_in_pin: ${pin.ext.gpio.grove.in}
+
+# UNIT RGB
+light:
+  - platform: esp32_rmt_led_strip
+    id: unit_rgb_strip
+    rgb_order: GRB
+    pin: ${module.rgb_in_pin}
+    num_leds: 15
+    rmt_symbols: ${device.rmt_symbols_block}
+    chipset: sk6812
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 200ms on, 1500ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+    default_transition_length: 100ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: Unit RGB Strip

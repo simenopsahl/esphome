@@ -1,0 +1,216 @@
+labels: [esp32s3, BM8563, RTC, ILI9342, display, i2c]
+---
+# https://docs.m5stack.com/en/core/M5Dial%20V1.1
+# https://docs.m5stack.com/en/homeassistant/kit/dial
+# https://devices.esphome.io/devices/m5stack-dial/ For older revision
+# Base functions for:
+# M5Stack Dial v1.1
+#
+
+substitutions:
+  time_timezone: "Europe/Oslo"
+  display:
+    home_page: page_tempoerature
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  device:
+    model: "M5Stack Dial"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_dial.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+
+esphome:
+  project:
+    name: "M5Stack.Dial v1.1"
+  on_boot:
+    - priority: 800
+      then:
+        - bm8563.read_time
+  platformio_options:
+    board_build.flash_mode: dio
+
+esp32:
+# ESP32S3FN8@Dual-core Xtensa LX7, 240MHz
+  variant: esp32s3
+  flash_size: 8MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+    sdkconfig_options:
+      # Cache optimizations for display graphics
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation rules for graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: 
+    number: ${pin.int.spi.miso}
+    allow_other_uses: true
+
+time:
+  - platform: bm8563
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    address: 0x51
+    update_interval: 15min
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - bm8563.write_time:
+
+output:
+  # backlight output
+  - platform: ledc
+    id: backlight_output
+    pin: ${pin.light.disp_bl}
+    frequency: 1000Hz
+  # Buzzer
+  - platform: ledc
+    id: buzzer
+    pin: ${pin.audio.buzzer}
+    frequency: 4000Hz
+
+light:
+  - platform: monochromatic # backlight
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+binary_sensor:
+  - platform: gpio
+    id: button_front
+    name: "Front Button"
+    entity_category: diagnostic
+    pin:
+      number: ${pin.btn.c}
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Front Button Pressed
+      - script.execute: buzzer_beep
+    on_release:
+        - output.turn_off: buzzer
+
+  - platform: gpio
+    id: pwr_hold
+    name: Power Hold
+    entity_category: diagnostic
+    pin: ${pin.int.pwr_mos}
+    on_press:
+      - logger.log: Power Hold On
+    on_release:
+      - logger.log: Power Hold Off
+
+sensor:
+  - platform: rotary_encoder
+    id: encoder
+    name: "Rotary Encoder"
+    entity_category: diagnostic
+    pin_a:
+      number: ${pin.btn.a}
+      mode: INPUT_PULLUP
+    pin_b:
+      number: ${pin.btn.b}
+      mode: INPUT_PULLUP
+    resolution: 4
+    min_value: -32768
+    max_value: 32767
+    publish_initial_value: true
+
+display:
+  # 240 x 240 resolution
+  - platform: mipi_spi
+    id: display_lcd
+    model: GC9A01A
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin: ${pin.int.spi.disp.reset}
+    busy_pin:
+      number: ${pin.int.spi.disp.busy}
+      inverted: false
+    data_rate: 40MHz
+    invert_colors: true
+    update_interval: 10s
+    auto_clear_enabled: false
+
+touchscreen:
+  - platform: ft5x06
+    i2c_id: ${module.internal.i2c_bus}
+    id: touchscreen_ft5x06
+    on_touch:
+      - then:
+          - lambda: |-
+                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                    touch.x,
+                    touch.y,
+                    touch.x_raw,
+                    touch.y_raw
+                    );  
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
+
+rc522_i2c:
+  - id: nfc_reader
+    i2c_id: ${module.internal.i2c_bus}
+    update_interval: 500ms
+    on_tag:
+      - lambda: |-
+          ESP_LOGD("rfid", "Card detected: %s", x.c_str());
+    on_tag_removed:
+      - lambda: |-
+          ESP_LOGD("rfid", "Card removed: %s", x.c_str());
+
+script:
+  # Script for buzzer beep
+  - id: buzzer_on
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+  - id: buzzer_beep
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 50ms
+      - output.turn_off: buzzer

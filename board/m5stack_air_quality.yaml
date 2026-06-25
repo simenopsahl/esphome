@@ -1,6 +1,7 @@
 labels: [esp32s3, BM8563, RTC, SCD40, CO2, temperature, humidity, SEN55, particulates, VOC, ePaper, display, i2c]
 ---
 # https://docs.m5stack.com/en/core/Air_Quality
+# https://docs.m5stack.com/en/homeassistant/kit/air_quality_v1.1
 # https://devices.esphome.io/devices/M5Stack-AirQ
 # Base functions for:
 # M5Stack PM2.5 Air Quality
@@ -10,6 +11,9 @@ substitutions:
   time_timezone: "Europe/Oslo"
   display:
     home_page: page_content
+  module:
+    internal:
+      i2c_bus: i2c_internal
   device:
     model: "M5Stack Air Quality"
     rmt_symbols_block: 48
@@ -19,6 +23,7 @@ substitutions:
 # Pins for this model
 packages:
   pins: !include pins/m5stack_air_quality.yaml
+  i2c_int: !include extension/internal_i2c.yaml
   epaper: !include module/epaper.yaml
   status_led: !include ../features/system_status_led.yaml
 
@@ -75,7 +80,7 @@ spi:
 
 time:
   - platform: bm8563
-    i2c_id: i2c_internal
+    i2c_id: ${module.internal.i2c_bus}
     id: time_rtc
     address: 0x51
     update_interval: 15min
@@ -266,12 +271,14 @@ display:
     id: display_eink
     model: 1.54inv2
     cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin: ${pin.int.spi.disp.dc}
+    dc_pin:
+      number: ${pin.int.spi.disp.dc}
+      ignore_strapping_warning: true
     reset_pin: ${pin.int.spi.disp.reset}
     busy_pin:
       number: ${pin.int.spi.disp.busy}
       inverted: false
-    full_update_every: 1
+    full_update_every: 5
 #    reset_duration: 2ms
     update_interval: never
     pages:
@@ -287,7 +294,7 @@ display:
 sensor:
   - platform: scd4x
     id: aq_scd40_sensor
-    i2c_id: i2c_internal
+    i2c_id: ${module.internal.i2c_bus}
     co2:
       id: co2_scd40_aq
       name: "AirQuality SCD40 CO2"
@@ -321,7 +328,7 @@ sensor:
 
   - platform: sen5x
     id: sen55_sensor
-    i2c_id: i2c_internal
+    i2c_id: ${module.internal.i2c_bus}
     pm_1_0:
       id: pm1_0_sen55
       name: "PM 1"

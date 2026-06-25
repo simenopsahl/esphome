@@ -1,0 +1,105 @@
+labels: [esp32s3, psram, BMI270, OV3660, camera, i2c]
+---
+# https://docs.m5stack.com/en/core/AtomS3R-M12
+# https://docs.m5stack.com/en/homeassistant/camera/atoms3r_m12
+# Base functions for:
+# M5Stack AtomS3R-M12
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3r.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+  imu: !include module/chip_imu_bmi270.yaml
+
+substitutions:
+  time_timezone: "Europe/Oslo"
+  mbus_i2c_shared: "false"
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  device:
+    model: "M5Stack Atom S3R-M12"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+esphome:
+  project:
+    name: "M5Stack.Atom S3R-M12"
+  on_boot:
+    - priority: 800
+      then:
+        - lambda: |-
+            gpio_set_direction(GPIO_NUM_18, GPIO_MODE_OUTPUT);
+            gpio_set_level(GPIO_NUM_18, 0);
+            vTaskDelay(pdMS_TO_TICKS(1500));
+
+esp32:
+# ESP32-S3-PICO-1-N8R8@Dual-core Xtensa LX7, up to 240MHz
+# PSRAM: 8MB Octal
+  variant: esp32s3
+  flash_size: 8MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+    type: ${device.framework.type}
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+i2c:
+  - id: i2c_cam
+    sda: ${pin.int.i2c.sda}
+    scl: ${pin.int.i2c.scl}
+    frequency: 100kHz
+    timeout: 10ms
+    scan: true
+
+# IR
+#remote_transmitter:
+#  pin: ${pin.light.ir}
+#  carrier_duty_percent: 50%
+#  rmt_symbols: ${device.rmt_symbols_block}
+
+esp32_camera:
+  i2c_id: i2c_cam
+  # PINS
+  external_clock:
+    pin: ${pin.cam.m_clk}
+    frequency: 20MHz
+  data_pins:
+    - ${pin.cam.y2}
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin: ${pin.cam.vs}
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin: ${pin.cam.p_clk}
+  power_down_pin: ${pin.cam.pwr}
+  # Metadata
+  id: espcam
+  name: "Camera OV3660"
+  # Image settings
+  resolution: 640x480
+  jpeg_quality: 12
+  max_framerate: 1 fps
+  frame_buffer_count: 2 # defaults to 1
+  vertical_flip: true
+  horizontal_mirror: true
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  # White balance
+  wb_mode: auto

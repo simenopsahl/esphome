@@ -1,0 +1,20 @@
+labels: [radio, gpio]
+---
+# https://docs.m5stack.com/en/unit/rf433_t
+# https://esphome.io/components/remote_transmitter/
+
+substitutions:
+  module:
+    rf433t_out_pin: ${pin.ext.gpio.grove.out}
+
+# UNIT RF433T
+remote_transmitter:
+  id: rf_tx
+  pin: ${module.rf433t_out_pin}
+  carrier_duty_percent: 100%
+
+radio_frequency:
+  - platform: ir_rf_proxy
+    id: rf_proxy_tx
+    name: "RF433T Proxy Transmitter"
+    remote_transmitter_id: rf_tx

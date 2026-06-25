@@ -31,13 +31,13 @@ sensor:
 
 switch:
   - platform: template
-    name: Microphone Mute
     id: mic_mute
+    name: Microphone Mute
+    icon: "mdi:microphone-off"
     optimistic: true
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
     on_turn_off:
         - microphone.unmute:
-        
     on_turn_on:
         - microphone.mute:

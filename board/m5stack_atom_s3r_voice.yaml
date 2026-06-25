@@ -1,0 +1,126 @@
+labels: [esp32s3, psram, ES8311, I2S, microphone, speaker, i2c]
+---
+# https://docs.m5stack.com/en/core/Atom_EchoS3R
+# https://github.com/m5stack/esphome-yaml/blob/main/common/atom-echos3r-satellite-base.yaml
+# Base functions for:
+# M5Stack Atom Voice S3R
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3r.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+
+substitutions:
+  time_timezone: "Europe/Oslo"
+  mbus_i2c_shared: "false"
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  device:
+    model: "M5Stack Atom Voice S3R"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+esphome:
+  project:
+    name: "M5Stack Atom Voice S3R"
+
+esp32:
+# ESP32-S3-PICO-1-N8R8@Dual-core Xtensa LX7, up to 240MHz
+# PSRAM: 8MB Octal
+  variant: esp32s3
+  flash_size: 8MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+    type: ${device.framework.type}
+    ## Note: Disable these configurations if you face the boot loop issue.
+    sdkconfig_options:
+        CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+        CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+        CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+# Button
+binary_sensor:
+  - platform: gpio
+    id: btn_display
+    pin:
+      number: ${pin.btn}
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Button Pressed
+    name: Button
+    entity_category: diagnostic
+
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin:
+    number: ${pin.audio.i2s_lrclk}
+    ignore_strapping_warning: true
+  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+  i2s_mclk_pin: ${pin.audio.i2s_mclk}
+
+audio_dac:
+  - platform: es8311
+    i2c_id: ${module.internal.i2c_bus}
+    id: dac_es8311
+    bits_per_sample: 16bit
+    sample_rate: 48000
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_shared
+    id: speaker_i2s
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    dac_type: external
+    audio_dac: dac_es8311
+    sample_rate: 48000
+    bits_per_sample: 16bit
+    channel: left
+
+switch:
+  - platform: gpio
+    id: speaker_enable
+    name: Speaker Enable
+    pin: ${pin.audio.pwr}
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: template
+    id: mic_mute
+    name: Microphone Mute
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+    on_turn_on:
+        - microphone.mute:

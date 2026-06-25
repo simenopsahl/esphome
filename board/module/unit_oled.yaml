@@ -1,0 +1,26 @@
+labels: [SH1107, display, i2c]
+---
+# https://docs.m5stack.com/en/unit/oled
+# https://esphome.io/components/display/ssd1306/
+
+substitutions:
+  module:
+    oled_i2c_bus: i2c_grove
+
+# Unit OLED
+display:
+  - platform: ssd1306_i2c
+    i2c_id: ${module.oled_i2c_bus}
+    id: display_oled
+    model: SH1107 128x64
+    contrast: 100%
+    update_interval: 5s
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill(COLOR_OFF);
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill(COLOR_ON);

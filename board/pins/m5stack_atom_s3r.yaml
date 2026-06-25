@@ -50,8 +50,39 @@ substitutions:
         port_abc:
           in: GPIO8
           out: GPIO7
-    
+        
     btn: GPIO41
+
+    cam:
+      sda: GPIO12
+      scl: GPIO9
+      y0: nc
+      y1: nc
+      y2: GPIO3
+      y3: GPIO42
+      y4: GPIO46
+      y5: GPIO48
+      y6: GPIO4
+      y7: GPIO17
+      y8: GPIO11
+      y9: GPIO13
+      vs: GPIO10
+      hs: GPIO14
+      p_clk: GPIO40
+      m_clk: GPIO21
+      pwr: GPIO18
+
+    audio:
+      i2s_lrclk: GPIO3
+      #i2s_wck: GPIO33
+      i2s_bclk: GPIO17
+      i2s_mclk: GPIO11
+      i2s_din: GPIO4
+      i2s_dati: GPIO4
+      mic: GPIO4
+      i2s_dout: GPIO48
+      i2s_dato: GPIO48
+      pwr: GPIO18
 
   # Internal
   i2c_int_sda_pin: GPIO45

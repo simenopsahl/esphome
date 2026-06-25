@@ -1,0 +1,38 @@
+labels: [switch, gpio]
+---
+# https://docs.m5stack.com/en/unit/Unit%20Limit
+# https://esphome.io/components/binary_sensor/gpio/
+
+substitutions:
+  module:
+    limit_in_pin: ${pin.ext.gpio.grove.in}
+
+# UNIT Limit
+binary_sensor:
+  - platform: gpio
+    id: limit_sensor
+    pin:
+      number: ${module.limit_in_pin}
+      mode:
+        input: true
+    filters:
+      - delayed_on_off: 250ms
+      - delayed_off: !lambda 'return id(limit_off_latency).state * 1000;'
+    name: "Limit Sensor"
+    device_class: opening
+
+# Adjustable off delay
+number:
+  - platform: template
+    id: limit_off_latency
+    name: "Limit Off Latency"
+    icon: mdi:clock-end
+    entity_category: config
+    unit_of_measurement: s
+    min_value: 0
+    max_value: 30
+    step: 1
+    restore_value: true
+    optimistic: true
+    initial_value: 0
+    mode: slider

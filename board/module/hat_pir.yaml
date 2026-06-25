@@ -1,6 +1,7 @@
 labels: [PIR, presence, gpio]
 ---
 # https://docs.m5stack.com/en/hat/hat-pir
+# https://esphome.io/components/binary_sensor/gpio/
 
 substitutions:
   module:

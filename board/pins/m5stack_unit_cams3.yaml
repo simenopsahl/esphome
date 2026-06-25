@@ -1,0 +1,53 @@
+---
+# https://docs.m5stack.com/en/unit/Unit-CAMS3%205MP
+# PINs for m5stack Unit CamS3-5MP
+
+substitutions:
+  pin:
+    light:
+      led: GPIO14
+    
+    int:
+      i2c:
+        sda: GPIO17
+        scl: GPIO41
+      spi:
+        clk: GPIO39
+        mosi: GPIO38
+        miso: GPIO40
+        card:
+          cs: GPIO9
+    ext:
+      i2c:
+        grove:
+          sda: GPIO19
+          scl: GPIO20
+      uart:
+        grove:
+          tx: GPIO20
+          rx: GPIO19
+      gpio:
+        grove:
+          in: GPIO20
+          out: GPIO19
+    audio:
+      i2s_lrclk: GPIO47
+      i2s_din: GPIO48
+      i2s_dati: GPIO48
+      mic: GPIO48
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO6
+      y3: GPIO15
+      y4: GPIO16
+      y5: GPIO7
+      y6: GPIO5
+      y7: GPIO10
+      y8: GPIO4
+      y9: GPIO13
+      vs: GPIO42
+      hs: GPIO18
+      p_clk: GPIO12
+      m_clk: GPIO11
+      reset: GPIO21

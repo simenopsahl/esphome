@@ -1,0 +1,35 @@
+labels: [MLX90614, temperature, i2c]
+---
+# https://docs.m5stack.com/en/unit/ncir
+# https://esphome.io/components/sensor/mlx90614/
+
+substitutions:
+  module:
+    ncir_i2c_bus: i2c_grove
+
+# UNIT NCIR
+sensor:
+  - platform: mlx90614
+    i2c_id: ${module.ncir_i2c_bus}
+    id: sensor_mlx90614
+    update_interval: 5s
+    ambient:
+      id: ncir_ambient
+      name: "NCIR Ambient Temperature"
+      device_class: temperature
+      unit_of_measurement: "°C"
+      accuracy_decimals: 1
+      filters:
+        - sliding_window_moving_average:
+            window_size: 2
+            send_every: 3
+    object:
+      id: ncir_object
+      name: "NCIR Object Temperature"
+      device_class: temperature
+      unit_of_measurement: "°C"
+      accuracy_decimals: 1
+    filters:
+      - sliding_window_moving_average:
+          window_size: 2
+          send_every: 2

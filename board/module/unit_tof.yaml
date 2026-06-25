@@ -1,14 +1,14 @@
 labels: [VL53L0X, distance, i2c]
 ---
-# https://docs.m5stack.com/en/unit/Unit-ToF4M
+# https://docs.m5stack.com/en/unit/TOF
+# https://docs.m5stack.com/en/unit/Unit%20Mini%20ToF-90
 # https://esphome.io/components/sensor/vl53l0x/
-# WIP
 
 substitutions:
   module:
     tof_i2c_bus: i2c_grove
 
-# UNIT ToF4M
+# UNIT ToF/-90
 sensor:
   - platform: vl53l1x # variant not currently supported
     i2c_id: ${module.tof_i2c_bus}
@@ -17,7 +17,7 @@ sensor:
     long_range: false
     timeout: 10ms
     timing_budget: 33000us
-    name: "ToF4M Distance"
+    name: "ToF Distance"
     update_interval: 500ms
     filters:
       - filter_out: nan

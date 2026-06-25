@@ -1,0 +1,65 @@
+---
+# https://docs.m5stack.com/en/core/M5Dial%20V1.1
+# PINs for m5stack Dial v1.1
+
+substitutions:
+  pin:
+    int:
+      i2c:
+        sda: GPIO11
+        scl: GPIO12
+        int: GPIO14
+      spi:
+        clk: GPIO6
+        mosi: GPIO5
+        disp:
+          cs: GPIO7
+          dc: GPIO4
+          reset: GPIO8
+      rfid:
+        reset: GPIO8
+        irq: GPIO10
+      touch:
+        int: GPIO14
+      pwr_mos: GPIO46
+
+    light:
+      disp_bl: GPIO9
+    
+    audio:
+      buzzer: GPIO3
+    
+    ext:
+      i2c:
+        grove:
+          sda: GPIO13
+          scl: GPIO15
+      gpio:
+        grove:
+          in: GPIO1
+          out: GPIO2
+    
+    btn:
+      a: GPIO41
+      b: GPIO40
+      c: GPIO42
+
+
+  # Internal
+  i2c_int_sda_pin: GPIO11
+  i2c_int_scl_pin: GPIO12
+  spi_clk_pin: GPIO6
+  spi_mosi_pin: GPIO5
+  disp_cs_pin: GPIO7
+  disp_dc_pin: GPIO4
+  disp_rst_pin: GPIO8
+  # GROVE
+  i2c_grove_sda_pin: GPIO13
+  i2c_grove_scl_pin: GPIO15
+  in_grove_pin: GPIO1
+  out_grove_pin: GPIO2
+  # Button
+  button_a_pin: GPIO41
+  button_b_pin: GPIO40
+  # Mic & Speaker
+  buzzer_pin: GPIO3

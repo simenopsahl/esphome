@@ -1,0 +1,20 @@
+labels: [radio, gpio]
+---
+# https://docs.m5stack.com/en/unit/rf433_r
+# https://esphome.io/components/remote_receiver/
+
+substitutions:
+  module:
+    rf433r_in_pin: ${pin.ext.gpio.grove.in}
+
+# UNIT RF433R
+remote_receiver:
+  id: rf_rx
+  pin: ${module.rf433r_in_pin}
+  dump: raw
+
+radio_frequency:
+  - platform: ir_rf_proxy
+    id: rf_proxy_rx
+    name: "RF433R Proxy Receiver"
+    remote_receiver_id: rf_rx

@@ -1,0 +1,83 @@
+labels: [camera, i2c]
+---
+# https://docs.m5stack.com/en/unit/Unit-CAMS3%205MP
+# https://docs.m5stack.com/en/homeassistant/camera/unit_cams3_5mp
+
+# UNIT CamS3-5MP
+substitutions:
+  device:
+    model: "M5Stack Unit CamS3"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+  extension:
+    i2c:
+      internal:
+        frequency: 200kHz
+
+# Pins for this model
+packages:
+  pins: !include ../pins/m5stack_unit_cams3.yaml
+  i2c: !include ../extension/internal_i2c.yaml
+
+esphome:
+  project:
+    name: "M5Stack.Unit CamS3"
+
+esp32:
+# ESP32-S3-WROOM-1-N16R8
+  variant: esp32s3
+  flash_size: 16MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+    type: ${device.framework.type}
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+switch:
+  - platform: gpio
+    id: camera_led
+    name: "Camera LED"
+    pin:
+      number: ${pin.light.led}
+      inverted: true
+    restore_mode: ALWAYS_ON
+
+esp32_camera:
+  i2c_id: i2c_internal
+  # PINS
+  external_clock:
+    pin: ${pin.cam.m_clk}
+    frequency: 20MHz
+  data_pins:
+    - ${pin.cam.y2}
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin: ${pin.cam.vs}
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin: ${pin.cam.p_clk}
+  reset_pin: ${pin.cam.reset}
+  # Metadata
+  id: espcam
+  name: "Camera PY260"
+  # Image settings
+  resolution: 640x480
+  jpeg_quality: 12
+  max_framerate: 1 fps
+  frame_buffer_count: 2 # defaults to 1
+  vertical_flip: true
+  horizontal_mirror: true
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  # White balance
+  wb_mode: auto
