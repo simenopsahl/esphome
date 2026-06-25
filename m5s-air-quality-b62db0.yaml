@@ -5,7 +5,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_air_quality.yaml
-  internal_i2c: !include board/extension/internal_i2c.yaml
   grove_i2c: !include board/extension/grove_i2c.yaml
   env_iv: !include board/module/unit_env_iv.yaml
 
