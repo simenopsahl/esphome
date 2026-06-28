@@ -13,8 +13,8 @@ binary_sensor:
     id: hall_sensor
     pin:
       number: ${module.hall_in_pin}
-      mode:
-        input: true
+      mode: INPUT_PULLUP
+      inverted: true
     filters:
       - delayed_on_off: 250ms
       - delayed_off: !lambda 'return id(hall_off_latency).state * 1000;'

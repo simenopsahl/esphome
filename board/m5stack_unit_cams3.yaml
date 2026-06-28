@@ -17,8 +17,8 @@ substitutions:
 
 # Pins for this model
 packages:
-  pins: !include ../pins/m5stack_unit_cams3.yaml
-  i2c: !include ../extension/internal_i2c.yaml
+  pins: !include pins/m5stack_unit_cams3.yaml
+  i2c: !include extension/internal_i2c.yaml
 
 esphome:
   project:
