@@ -106,6 +106,18 @@ external_components:
   - source: github://m5stack/esphome-yaml/components
     components: [axp2101, aw88298, aw9523b]
 
+# IO Expander
+aw9523b:
+  i2c_id: ${module.internal.i2c_bus}
+  id: aw9523b_hub
+  p0_drive_mode: PUSH_PULL
+  interrupt_pin: ${pin.int.i2c.int}
+
+# PMU
+axp2101:
+  id: axp2101_pmu
+  i2c_id: ${module.internal.i2c_bus}
+
 output:
   - platform: axp2101
     type: range
@@ -182,8 +194,8 @@ display:
       mirror_x: false
       mirror_y: false
     invert_colors: true
-    update_interval: 10s
     auto_clear_enabled: false
+    update_interval: 10s
 
 touchscreen:
   - platform: ft63x6
@@ -326,15 +338,3 @@ switch:
 #    dac_type: external
 #    i2s_dout_pin: ${pin.audio.i2s_dout}
 #    audio_dac: dac_aw88298
-
-# IO Expander
-aw9523b:
-  i2c_id: ${module.internal.i2c_bus}
-  id: aw9523b_hub
-  p0_drive_mode: PUSH_PULL
-  interrupt_pin: ${pin.int.i2c.int}
-
-# PMU
-axp2101:
-  id: axp2101_pmu
-  i2c_id: ${module.internal.i2c_bus}

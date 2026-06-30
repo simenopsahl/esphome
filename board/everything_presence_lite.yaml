@@ -41,6 +41,23 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
+api:
+  reboot_timeout: 90min
+  encryption:
+    key: !secret homeassistant_api
+
+bluetooth_proxy:
+  active: false
+  connection_slots: 1
+
+esp32_ble:
+  max_connections: 2
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 500ms
+    window: 10ms
+
 binary_sensor:
   - id: !extend zone2_occupancy
     disabled_by_default: false
@@ -91,20 +108,3 @@ select:
     initial_option: Above + Distance and Angle
   - id: !extend update_speed_select
     initial_option: Slow (0.4s)
-
-api:
-  reboot_timeout: 90min
-  encryption:
-    key: !secret homeassistant_api
-
-bluetooth_proxy:
-  active: false
-  connection_slots: 1
-
-esp32_ble:
-  max_connections: 2
-
-esp32_ble_tracker:
-  scan_parameters:
-    interval: 500ms
-    window: 10ms

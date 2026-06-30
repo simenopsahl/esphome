@@ -8,24 +8,16 @@ substitutions:
   module:
     mq5_i2c_bus: i2c_grove
 
+globals:
+  # Stores the dynamic baseline in memory. 
+  # We initialize it at 250.0mV as a starting guess.
+  - id: mq5_dynamic_baseline
+    type: float
+    initial_value: '250.0'
+
 external_components:
   - source: github://m5stack/esphome-yaml/components
     components: m5stack_unit_mq
-
-# Binary GAS DETECTED sensor
-binary_sensor:
-  - platform: template
-    name: "MQ-5 Combustible Gas"
-    device_class: gas
-    # Triggers if the current reading jumps more than 200mV above our dynamic baseline
-    lambda: |-
-      // If the reading is invalid (true), completely suppress the alarm
-      if (id(mq5_led).state) {
-        return false;
-      }
-      
-      // If the reading is valid, evaluate the gas threshold
-      return id(mq5_mq_voltage).state > (id(mq5_dynamic_baseline) + 200.0);
 
 # UNIT MQ-5
 sensor:
@@ -134,9 +126,17 @@ sensor:
     lambda: |-
       return id(mq5_dynamic_baseline);
 
-globals:
-  # Stores the dynamic baseline in memory. 
-  # We initialize it at 250.0mV as a starting guess.
-  - id: mq5_dynamic_baseline
-    type: float
-    initial_value: '250.0'
+# Binary GAS DETECTED sensor
+binary_sensor:
+  - platform: template
+    name: "MQ-5 Combustible Gas"
+    device_class: gas
+    # Triggers if the current reading jumps more than 200mV above our dynamic baseline
+    lambda: |-
+      // If the reading is invalid (true), completely suppress the alarm
+      if (id(mq5_led).state) {
+        return false;
+      }
+      
+      // If the reading is valid, evaluate the gas threshold
+      return id(mq5_mq_voltage).state > (id(mq5_dynamic_baseline) + 200.0);

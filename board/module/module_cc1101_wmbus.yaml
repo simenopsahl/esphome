@@ -40,6 +40,57 @@ external_components:
   - source: github://SzczepanLeon/esphome-components@main
     components: [ wmbus_radio, wmbus_common, wmbus_meter ]
 
+# CC1101 module hardware settings
+# https://github.com/SzczepanLeon/esphome-components/tree/main#radio-configuration
+# https://github.com/SzczepanLeon/esphome-components/blob/main/ESP32-C3_SuperMini_CC1101.yaml
+wmbus_radio:
+  id: radio_cc1101_wmbus
+# radio_type: Must be CC1101
+  radio_type: CC1101
+# cs_pin: SPI chip select pin
+  cs_pin: ${pin.ext.mbus.p21}
+# irq_pin: Interrupt pin (GDO0)
+  irq_pin: ${pin.ext.mbus.p22}
+# frequency (Optional): Operating frequency, 300–928 MHz. Defaults to 868.950 MHz
+  frequency: ${module.cc1101.frequency}
+  on_frame:
+    - then:
+        - logger.log:
+            level: DEBUG
+            tag: "wmbus_radio"
+            format: "Frame received: RSSI=%ddBm, Mode=%s, Data=%s"
+            args: [ 'frame->rssi()', 'toString(frame->link_mode())', 'frame->as_hex().c_str()' ]
+
+# Define drivers/meters to enable
+# Uncomment and list only the drivers you need to save flash space
+wmbus_common:
+  drivers:
+#    - auto
+    - flowiq2200
+#    - multical21
+
+# https://github.com/SzczepanLeon/esphome-components/blob/version_4/docs/wmbus.md
+## If You want to send telegram to another machine and decode it via wmbusmeters addon.
+# socket_transmitter:
+#   id: socket_to_wmbusmeters
+#   ip_address: 192.168.68.100 # Home Assistant IP
+#   port: 7011
+#   protocol: TCP # or UDP
+
+# Define your water meter
+wmbus_meter:
+  - id: water_meter
+    meter_id: 0x${module.cc1101.water_meter_serial}
+    type: flowiq2200
+    key: !secret water_meter_encryption_key
+    mode:
+      - C1
+    on_telegram:
+      - logger.log:
+          level: DEBUG
+          tag: "wmbus_meter"
+          format: "Telegram received from water meter"
+
 # Water meter sensors
 sensor:
   # Water meter total consumption
@@ -184,54 +235,3 @@ lvgl:
         vars:
           <<: [*page_styles, *container_styles]
           page_title: Radio
-
-# CC1101 module hardware settings
-# https://github.com/SzczepanLeon/esphome-components/tree/main#radio-configuration
-# https://github.com/SzczepanLeon/esphome-components/blob/main/ESP32-C3_SuperMini_CC1101.yaml
-wmbus_radio:
-  id: radio_cc1101_wmbus
-# radio_type: Must be CC1101
-  radio_type: CC1101
-# cs_pin: SPI chip select pin
-  cs_pin: ${pin.ext.mbus.p21}
-# irq_pin: Interrupt pin (GDO0)
-  irq_pin: ${pin.ext.mbus.p22}
-# frequency (Optional): Operating frequency, 300–928 MHz. Defaults to 868.950 MHz
-  frequency: ${module.cc1101.frequency}
-  on_frame:
-    - then:
-        - logger.log:
-            level: DEBUG
-            tag: "wmbus_radio"
-            format: "Frame received: RSSI=%ddBm, Mode=%s, Data=%s"
-            args: [ 'frame->rssi()', 'toString(frame->link_mode())', 'frame->as_hex().c_str()' ]
-
-# Define drivers/meters to enable
-# Uncomment and list only the drivers you need to save flash space
-wmbus_common:
-  drivers:
-#    - auto
-    - flowiq2200
-#    - multical21
-
-# https://github.com/SzczepanLeon/esphome-components/blob/version_4/docs/wmbus.md
-## If You want to send telegram to another machine and decode it via wmbusmeters addon.
-# socket_transmitter:
-#   id: socket_to_wmbusmeters
-#   ip_address: 192.168.68.100 # Home Assistant IP
-#   port: 7011
-#   protocol: TCP # or UDP
-
-# Define your water meter
-wmbus_meter:
-  - id: water_meter
-    meter_id: 0x${module.cc1101.water_meter_serial}
-    type: flowiq2200
-    key: !secret water_meter_encryption_key
-    mode:
-      - C1
-    on_telegram:
-      - logger.log:
-          level: DEBUG
-          tag: "wmbus_meter"
-          format: "Telegram received from water meter"

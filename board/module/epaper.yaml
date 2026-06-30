@@ -29,6 +29,34 @@ time:
               else:
                 - logger.log: "No sensors updated - skipping display refresh."
 
+globals:
+  # Detecting if the display needs to be refreshed.
+  - id: data_updated
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  # Tracking if initial data has been received.
+  - id: initial_data_received
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  # Tracking display refresh count
+  - id: recorded_display_refresh
+    type: int
+    restore_value: yes
+    initial_value: '0'
+
+  - id: epaper_bg_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'COLOR_OFF' # Default to white background
+  - id: epaper_text_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'COLOR_ON' # Default to black text
+
 sensor:
   # Create sensors for monitoring remotely.
   - platform: template
@@ -110,31 +138,3 @@ script:
       - lambda: 'id(recorded_display_refresh) += 1;'
       - logger.log: "Black screen"
       - delay: 20s
-
-globals:
-  # Detecting if the display needs to be refreshed.
-  - id: data_updated
-    type: bool
-    restore_value: no
-    initial_value: 'false'
-  # Tracking if initial data has been received.
-  - id: initial_data_received
-    type: bool
-    restore_value: no
-    initial_value: 'false'
-  # Tracking display refresh count
-  - id: recorded_display_refresh
-    type: int
-    restore_value: yes
-    initial_value: '0'
-
-  - id: epaper_bg_color
-    type: Color
-    restore_value: yes
-    max_restore_data_length: 16
-    initial_value: 'COLOR_OFF' # Default to white background
-  - id: epaper_text_color
-    type: Color
-    restore_value: yes
-    max_restore_data_length: 16
-    initial_value: 'COLOR_ON' # Default to black text

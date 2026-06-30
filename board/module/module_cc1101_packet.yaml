@@ -92,6 +92,66 @@ logger:
   logs:
     cc1101: DEBUG
 
+# Module CC1101
+cc1101:
+  id: radio_cc1101_packet
+  # Hardware settings
+  cs_pin: ${pin.ext.mbus.p21}
+  gdo0_pin:
+    number: ${pin.ext.mbus.p22}
+#    allow_other_uses: true
+#  gdo2_pin: ${pin.ext.mbus.p2}
+  # General settings
+  frequency: ${module.cc1101.frequency}
+  output_power: ${module.cc1101.output_power}
+  modulation_type: ${module.cc1101.modulation_type}
+  symbol_rate: ${module.cc1101.symbol_rate}
+  rx_attenuation: ${module.cc1101.rx_attenuation}
+  dc_blocking_filter: false
+  # Tuner settings
+  filter_bandwidth: ${module.cc1101.filter_bandwidth}
+  fsk_deviation: ${module.cc1101.fsk_deviation}
+  # Packet Mode settings
+  packet_mode: ${module.cc1101.packet_mode}
+  packet_length: 0
+  sync0: 0x54
+  sync1: 0x3d
+  num_preamble: ${module.cc1101.num_preamble}
+  on_packet:
+    - then:
+        - logger.log:
+            level: DEBUG
+            tag: "cc1101"
+            format: "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u"
+            args: ['format_hex_pretty(x).c_str()', 'freq_offset', 'rssi', 'lqi']
+        # Set Last packet RSSI
+        - sensor.template.publish:
+            id: cc1101_rssi
+            state: !lambda 'return rssi;'
+        # Set Last packet LQI
+        - sensor.template.publish:
+            id: cc1101_lqi
+            state: !lambda 'return lqi;'
+        # Send the packet to the Home Assistant text file
+        - homeassistant.action:
+            action: notify.send_message
+            data:
+              entity_id: notify.cc1101_packet_log
+            data_template:
+              message: "{{ log_entry }}"
+            variables:
+              log_entry: |-
+                // 1. Safely format the numbers into a locked 128-byte character buffer
+                char buf[128];
+                snprintf(buf, sizeof(buf), "RSSI: %.1f dBm | LQI: %u | Data: ", rssi, lqi);
+                
+                // 2. Safely concatenate the buffer with the dynamically sized hex string
+                return std::string(buf) + format_hex_pretty(x);
+            on_success:
+              - logger.log: "Sent packet to Home Assistant"
+            on_error:
+              - logger.log: "Failed to send packet to Home Assistant"
+
 # Diagnostics
 sensor:
   # Last Packet RSSI
@@ -153,30 +213,6 @@ sensor:
           - lvgl.led.update:
               id: led_cc1101_state
               color: c_green
-
-.sizing:
-  - &page_styles
-    <<: !include ../../gui/styles/page_styles.yaml
-    page_pad_top: 32
-    page_pad_bottom: 32
-    screen_height: 240
-    screen_width: 320
-    # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 32) - (2 * 1) = 170
-    usable_screen_height: 170
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 320  (2 * 4) = 312
-    usable_screen_width: 312
-
-  - &container_styles
-    <<: !include ../../gui/styles/container_styles.yaml
-    container_pad_top: 1
-    container_pad_bottom: 1
-    container_pad_left: 4
-    container_pad_right: 4
-    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
 
 button:
   # Put CC1101 into idle mode from Home Assistant
@@ -458,6 +494,30 @@ switch:
               id: led_cc1101_state
               color: c_red
 
+.sizing:
+  - &page_styles
+    <<: !include ../../gui/styles/page_styles.yaml
+    page_pad_top: 32
+    page_pad_bottom: 32
+    screen_height: 240
+    screen_width: 320
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 240 - (2 * 32) - (2 * 1) = 170
+    usable_screen_height: 170
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 320  (2 * 4) = 312
+    usable_screen_width: 312
+
+  - &container_styles
+    <<: !include ../../gui/styles/container_styles.yaml
+    container_pad_top: 1
+    container_pad_bottom: 1
+    container_pad_left: 4
+    container_pad_right: 4
+    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
+
 lvgl:
   pages:
     - <<: !include 
@@ -465,63 +525,3 @@ lvgl:
         vars:
           <<: [*page_styles, *container_styles]
           page_title: Radio
-
-# Module CC1101
-cc1101:
-  id: radio_cc1101_packet
-  # Hardware settings
-  cs_pin: ${pin.ext.mbus.p21}
-  gdo0_pin:
-    number: ${pin.ext.mbus.p22}
-#    allow_other_uses: true
-#  gdo2_pin: ${pin.ext.mbus.p2}
-  # General settings
-  frequency: ${module.cc1101.frequency}
-  output_power: ${module.cc1101.output_power}
-  modulation_type: ${module.cc1101.modulation_type}
-  symbol_rate: ${module.cc1101.symbol_rate}
-  rx_attenuation: ${module.cc1101.rx_attenuation}
-  dc_blocking_filter: false
-  # Tuner settings
-  filter_bandwidth: ${module.cc1101.filter_bandwidth}
-  fsk_deviation: ${module.cc1101.fsk_deviation}
-  # Packet Mode settings
-  packet_mode: ${module.cc1101.packet_mode}
-  packet_length: 0
-  sync0: 0x54
-  sync1: 0x3d
-  num_preamble: ${module.cc1101.num_preamble}
-  on_packet:
-    - then:
-        - logger.log:
-            level: DEBUG
-            tag: "cc1101"
-            format: "packet %s freq_offset %.0f Hz rssi %.1f dBm lqi %u"
-            args: ['format_hex_pretty(x).c_str()', 'freq_offset', 'rssi', 'lqi']
-        # Set Last packet RSSI
-        - sensor.template.publish:
-            id: cc1101_rssi
-            state: !lambda 'return rssi;'
-        # Set Last packet LQI
-        - sensor.template.publish:
-            id: cc1101_lqi
-            state: !lambda 'return lqi;'
-        # Send the packet to the Home Assistant text file
-        - homeassistant.action:
-            action: notify.send_message
-            data:
-              entity_id: notify.cc1101_packet_log
-            data_template:
-              message: "{{ log_entry }}"
-            variables:
-              log_entry: |-
-                // 1. Safely format the numbers into a locked 128-byte character buffer
-                char buf[128];
-                snprintf(buf, sizeof(buf), "RSSI: %.1f dBm | LQI: %u | Data: ", rssi, lqi);
-                
-                // 2. Safely concatenate the buffer with the dynamically sized hex string
-                return std::string(buf) + format_hex_pretty(x);
-            on_success:
-              - logger.log: "Sent packet to Home Assistant"
-            on_error:
-              - logger.log: "Failed to send packet to Home Assistant"

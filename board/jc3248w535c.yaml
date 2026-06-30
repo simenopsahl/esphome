@@ -82,17 +82,17 @@ light:
 display:
   - platform: qspi_dbi
     id: display_lcd
-    dimensions:
-      height: 480
-      width: 320
     model: JC4832W535
-    data_rate: 40MHz
     cs_pin:
       number: ${pin.int.spi.disp.cs}
       ignore_strapping_warning: true
+    dimensions:
+      height: 480
+      width: 320
+    data_rate: 40MHz
     draw_from_origin: true
-    update_interval: 10s
     auto_clear_enabled: false
+    update_interval: 10s
 
 touchscreen:
   - platform: axs15231

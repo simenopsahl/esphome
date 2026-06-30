@@ -9,6 +9,16 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
 
+# Six-axis BMI270 IMU
+motion:
+  - platform: bmi270
+    i2c_id: ${module.internal.i2c_bus}
+    id: motion_bmi270
+    accelerometer_range: 4g
+    gyroscope_range: 2000dps
+    gyroscope_odr: 200Hz
+    update_interval: 100ms
+
 sensor:
   - platform: motion
     type: acceleration_x
@@ -82,13 +92,3 @@ sensor:
           window_size: 3
           send_every: 1
     disabled_by_default: True
-
-# Six-axis BMI270 IMU
-motion:
-  - platform: bmi270
-    i2c_id: ${module.internal.i2c_bus}
-    id: motion_bmi270
-    accelerometer_range: 4g
-    gyroscope_range: 2000dps
-    gyroscope_odr: 200Hz
-    update_interval: 100ms

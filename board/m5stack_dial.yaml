@@ -112,8 +112,8 @@ display:
       inverted: false
     data_rate: 40MHz
     invert_colors: true
-    update_interval: 10s
     auto_clear_enabled: false
+    update_interval: 10s
 
 touchscreen:
   - platform: ft5x06

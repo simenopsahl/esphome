@@ -91,7 +91,6 @@ display:
     cs_pin: ${pin.int.spi.disp.cs}
     dc_pin: ${pin.int.spi.disp.dc}
     reset_pin: ${pin.int.spi.disp.reset}
-    data_rate: 20Mhz
     dimensions:
       height: 240
       width: 320
@@ -99,9 +98,10 @@ display:
       swap_xy: false
       mirror_x: false
       mirror_y: false
+    data_rate: 20Mhz
     invert_colors: true
-    update_interval: 10s
     auto_clear_enabled: false
+    update_interval: 10s
 
 # Buttons
 binary_sensor:

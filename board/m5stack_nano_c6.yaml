@@ -105,7 +105,7 @@ switch:
     id: rgb_switch
     pin: ${pin.int.rgb_pwr}
     restore_mode: RESTORE_DEFAULT_ON
-    name: "RGB on/off"
+    name: "RGB power"
     entity_category: config
 
 # Enable status LED

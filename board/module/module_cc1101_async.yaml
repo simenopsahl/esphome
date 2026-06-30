@@ -98,6 +98,85 @@ logger:
     remote_receiver: DEBUG
     radio_frequency: DEBUG
 
+# Module CC1101
+cc1101:
+  id: radio_cc1101_async
+  # Hardware settings
+  cs_pin: ${pin.ext.mbus.p21}
+  gdo0_pin:
+    number: ${pin.ext.mbus.p22}
+    allow_other_uses: true
+#  gdo2_pin: ${pin.ext.mbus.p2}
+  # General settings
+  frequency: ${module.cc1101.frequency}
+  output_power: ${module.cc1101.output_power}
+  modulation_type: ${module.cc1101.modulation_type}
+  symbol_rate: ${module.cc1101.symbol_rate}
+  rx_attenuation: ${module.cc1101.rx_attenuation}
+  dc_blocking_filter: false
+  # Tuner settings
+  filter_bandwidth: ${module.cc1101.filter_bandwidth}
+  fsk_deviation: ${module.cc1101.fsk_deviation}
+  # Packet Mode settings
+  packet_mode: ${module.cc1101.packet_mode}
+
+# Can NOT toggle packet mode at runtime, use separate package file
+remote_transmitter:
+  id: rf_tx
+  pin:
+    number: ${pin.ext.mbus.p22}  # Must match GDO0
+    allow_other_uses: true
+  carrier_duty_percent: 100%
+  on_transmit:
+    then:
+      - cc1101.begin_tx:
+      - lvgl.label.update:
+          id: lbl_cc1101_state
+          text: "Sender..."
+      - lvgl.label.update:
+          id: lbl_cc1101_packet
+          text: "..."
+      - lvgl.led.update:
+          id: led_cc1101_state
+          color: c_purple
+  on_complete:
+    then:
+      - cc1101.begin_rx:
+      - lvgl.label.update:
+          id: lbl_cc1101_state
+          text: "Mottar..."
+      - lvgl.led.update:
+          id: led_cc1101_state
+          color: c_green
+
+remote_receiver:
+  id: rf_rx
+  pin: ${pin.ext.mbus.p2}  # Must match GDO2
+  dump: raw
+
+radio_frequency:
+  - platform: ir_rf_proxy
+    id: rf_proxy_tx
+    name: "CC1101 Proxy Transmitter"
+    remote_transmitter_id: rf_tx
+    frequency: ${module.cc1101.frequency}
+    # Optional: retune the CC1101 when an API request specifies a different
+    # carrier frequency.  `x` is the radio_frequency call object.
+    on_control:
+      then:
+        - if:
+            condition:
+              lambda: "return x.get_frequency().has_value() && *x.get_frequency() > 0;"
+            then:
+              - cc1101.set_frequency:
+                  value: !lambda "return *x.get_frequency();"
+
+  - platform: ir_rf_proxy
+    id: rf_proxy_rx
+    name: "CC1101 Proxy Receiver"
+    remote_receiver_id: rf_rx
+    frequency: ${module.cc1101.frequency}
+
 button:
   # Put CC1101 into idle mode from Home Assistant
   - platform: template
@@ -402,63 +481,6 @@ switch:
               id: led_cc1101_state
               color: c_red
 
-# Can NOT toggle packet mode at runtime, use separate package file
-remote_transmitter:
-  id: rf_tx
-  pin:
-    number: ${pin.ext.mbus.p22}  # Must match GDO0
-    allow_other_uses: true
-  carrier_duty_percent: 100%
-  on_transmit:
-    then:
-      - cc1101.begin_tx:
-      - lvgl.label.update:
-          id: lbl_cc1101_state
-          text: "Sender..."
-      - lvgl.label.update:
-          id: lbl_cc1101_packet
-          text: "..."
-      - lvgl.led.update:
-          id: led_cc1101_state
-          color: c_purple
-  on_complete:
-    then:
-      - cc1101.begin_rx:
-      - lvgl.label.update:
-          id: lbl_cc1101_state
-          text: "Mottar..."
-      - lvgl.led.update:
-          id: led_cc1101_state
-          color: c_green
-
-remote_receiver:
-  id: rf_rx
-  pin: ${pin.ext.mbus.p2}  # Must match GDO2
-  dump: raw
-
-radio_frequency:
-  - platform: ir_rf_proxy
-    id: rf_proxy_tx
-    name: "CC1101 Proxy Transmitter"
-    remote_transmitter_id: rf_tx
-    frequency: ${module.cc1101.frequency}
-    # Optional: retune the CC1101 when an API request specifies a different
-    # carrier frequency.  `x` is the radio_frequency call object.
-    on_control:
-      then:
-        - if:
-            condition:
-              lambda: "return x.get_frequency().has_value() && *x.get_frequency() > 0;"
-            then:
-              - cc1101.set_frequency:
-                  value: !lambda "return *x.get_frequency();"
-
-  - platform: ir_rf_proxy
-    id: rf_proxy_rx
-    name: "CC1101 Proxy Receiver"
-    remote_receiver_id: rf_rx
-    frequency: ${module.cc1101.frequency}
-
 lvgl:
   pages:
     - <<: !include 
@@ -466,25 +488,3 @@ lvgl:
         vars:
           <<: [*page_styles, *container_styles]
           page_title: Radio
-
-# Module CC1101
-cc1101:
-  id: radio_cc1101_async
-  # Hardware settings
-  cs_pin: ${pin.ext.mbus.p21}
-  gdo0_pin:
-    number: ${pin.ext.mbus.p22}
-    allow_other_uses: true
-#  gdo2_pin: ${pin.ext.mbus.p2}
-  # General settings
-  frequency: ${module.cc1101.frequency}
-  output_power: ${module.cc1101.output_power}
-  modulation_type: ${module.cc1101.modulation_type}
-  symbol_rate: ${module.cc1101.symbol_rate}
-  rx_attenuation: ${module.cc1101.rx_attenuation}
-  dc_blocking_filter: false
-  # Tuner settings
-  filter_bandwidth: ${module.cc1101.filter_bandwidth}
-  fsk_deviation: ${module.cc1101.fsk_deviation}
-  # Packet Mode settings
-  packet_mode: ${module.cc1101.packet_mode}

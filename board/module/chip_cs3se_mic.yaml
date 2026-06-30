@@ -10,6 +10,23 @@ i2s_audio:
     number: ${pin.audio.i2s_mclk}
     ignore_strapping_warning: true
 
+audio_adc:
+  - platform: es7210
+    i2c_id: ${module.internal.i2c_bus}
+    id: adc_es7210
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    mic_gain: 36
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    adc_type: external
+
 sensor:
   - platform: sound_level
     id: sound_level_sensor
@@ -33,20 +50,3 @@ switch:
         - microphone.unmute:
     on_turn_on:
         - microphone.mute:
-
-audio_adc:
-  - platform: es7210
-    i2c_id: ${module.internal.i2c_bus}
-    id: adc_es7210
-    bits_per_sample: 16bit
-    sample_rate: 16000
-    mic_gain: 36
-
-microphone:
-  - platform: i2s_audio
-    i2s_audio_id: i2s_audio_bus
-    id: i2s_mic
-    i2s_din_pin: ${pin.audio.mic}
-    bits_per_sample: 16bit
-    sample_rate: 16000
-    adc_type: external

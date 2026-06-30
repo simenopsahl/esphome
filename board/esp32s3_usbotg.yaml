@@ -80,9 +80,6 @@ light:
     name: "LED"
     entity_category: config
 
-status_led:
-  pin: ${pin.light.led}
-
 esp32_camera:
   i2c_id: i2c_internal
   # PINS
@@ -116,3 +113,6 @@ esp32_camera:
   aec2: true # defaults to false
   # White balance
   wb_mode: auto
+
+status_led:
+  pin: ${pin.light.led}

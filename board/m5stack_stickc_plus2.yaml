@@ -76,45 +76,9 @@ wifi:
 
 spi:
   clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
-
-# text_sensor:
-#   - platform: template
-#     id: wakeup_cause
-#     lambda: return esp_sleep_get_wakeup_cause();
-#     filters:
-#       - lambda: |-
-#           if (x == 0) {
-#             return "ESP_SLEEP_WAKEUP_UNDEFINED";
-#           } else if (x == 1) {
-#             return "ESP_SLEEP_WAKEUP_ALL";
-#           } else if (x == 2) {
-#             return "ESP_SLEEP_WAKEUP_EXT0";
-#           } else if (x == 3) {
-#             return "ESP_SLEEP_WAKEUP_EXT1";
-#           } else if (x == 4) {
-#             return "ESP_SLEEP_WAKEUP_TIMER";
-#           } else if (x == 5) {
-#             return "ESP_SLEEP_WAKEUP_TOUCHPAD";
-#           } else if (x == 6) {
-#             return "ESP_SLEEP_WAKEUP_ULP";
-#           } else if (x == 7) {
-#             return "ESP_SLEEP_WAKEUP_GPIO";
-#           } else if (x == 8) {
-#             return "ESP_SLEEP_WAKEUP_UART";
-#           } else if (x == 9) {
-#             return "ESP_SLEEP_WAKEUP_WIFI";
-#           } else if (x == 10) {
-#             return "ESP_SLEEP_WAKEUP_COCPU";
-#           } else if (x == 11) {
-#             return "ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
-#           } else if (x == 12) {
-#             return "ESP_SLEEP_WAKEUP_BT";
-#           } else {
-#             return "UNKNOWN";
-#           }
-#     name: "Wakeup Cause"
-#     entity_category: diagnostic
+  mosi_pin:
+    number: ${pin.int.spi.mosi}
+    ignore_strapping_warning: true
 
 # Audio not tested
 #i2s_audio:
@@ -167,8 +131,8 @@ light:
 # 1.14 inch, 135*240 Colorful TFT LCD, ST7789v2
 display:
   - platform: mipi_spi
-    model: st7789v
     id: display_lcd
+    model: st7789v
     cs_pin:
       number: ${pin.int.spi.disp.cs}
       ignore_strapping_warning: true
@@ -176,14 +140,22 @@ display:
     reset_pin:
       number: ${pin.int.spi.disp.reset}
       ignore_strapping_warning: true
-    invert_colors: true
-    update_interval: 10s
-    auto_clear_enabled: false
     dimensions:
       height: 240
       width: 135
       offset_height: 40
       offset_width: 52
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 10s
+
+#microphone:
+#  - platform: i2s_audio
+#    i2s_din_pin: ${pin.audio.mic}
+#    i2s_audio_id: i2s_bus
+#    adc_type: external
+#    pdm: true
+#    id: mic
 
 binary_sensor:
   # Side Button
@@ -268,6 +240,44 @@ sensor:
     entity_category: diagnostic
     device_class: battery
     unit_of_measurement: "%"
+
+# text_sensor:
+#   - platform: template
+#     id: wakeup_cause
+#     lambda: return esp_sleep_get_wakeup_cause();
+#     filters:
+#       - lambda: |-
+#           if (x == 0) {
+#             return "ESP_SLEEP_WAKEUP_UNDEFINED";
+#           } else if (x == 1) {
+#             return "ESP_SLEEP_WAKEUP_ALL";
+#           } else if (x == 2) {
+#             return "ESP_SLEEP_WAKEUP_EXT0";
+#           } else if (x == 3) {
+#             return "ESP_SLEEP_WAKEUP_EXT1";
+#           } else if (x == 4) {
+#             return "ESP_SLEEP_WAKEUP_TIMER";
+#           } else if (x == 5) {
+#             return "ESP_SLEEP_WAKEUP_TOUCHPAD";
+#           } else if (x == 6) {
+#             return "ESP_SLEEP_WAKEUP_ULP";
+#           } else if (x == 7) {
+#             return "ESP_SLEEP_WAKEUP_GPIO";
+#           } else if (x == 8) {
+#             return "ESP_SLEEP_WAKEUP_UART";
+#           } else if (x == 9) {
+#             return "ESP_SLEEP_WAKEUP_WIFI";
+#           } else if (x == 10) {
+#             return "ESP_SLEEP_WAKEUP_COCPU";
+#           } else if (x == 11) {
+#             return "ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
+#           } else if (x == 12) {
+#             return "ESP_SLEEP_WAKEUP_BT";
+#           } else {
+#             return "UNKNOWN";
+#           }
+#     name: "Wakeup Cause"
+#     entity_category: diagnostic
 
 switch:
   # Power Hold

@@ -8,7 +8,6 @@ substitutions:
       i2c_bus: i2c_internal
 
   # Built-in 6-axis (IMU) that also includes a temperature sensor
-
 sensor:
   - platform: mpu6886
     i2c_id: ${module.internal.i2c_bus}

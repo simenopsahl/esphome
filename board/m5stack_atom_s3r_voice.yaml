@@ -60,6 +60,33 @@ i2s_audio:
   i2s_bclk_pin: ${pin.audio.i2s_bclk}
   i2s_mclk_pin: ${pin.audio.i2s_mclk}
 
+audio_dac:
+  - platform: es8311
+    i2c_id: ${module.internal.i2c_bus}
+    id: dac_es8311
+    bits_per_sample: 16bit
+    sample_rate: 48000
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_shared
+    id: speaker_i2s
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    dac_type: external
+    audio_dac: dac_es8311
+    sample_rate: 48000
+    bits_per_sample: 16bit
+    channel: left
+
 # Button
 binary_sensor:
   - platform: gpio
@@ -97,30 +124,3 @@ switch:
         - microphone.unmute:
     on_turn_on:
         - microphone.mute:
-
-audio_dac:
-  - platform: es8311
-    i2c_id: ${module.internal.i2c_bus}
-    id: dac_es8311
-    bits_per_sample: 16bit
-    sample_rate: 48000
-
-microphone:
-  - platform: i2s_audio
-    i2s_audio_id: i2s_audio_bus
-    id: i2s_mic
-    i2s_din_pin: ${pin.audio.mic}
-    bits_per_sample: 16bit
-    sample_rate: 16000
-    adc_type: external
-
-speaker:
-  - platform: i2s_audio
-    i2s_audio_id: i2s_shared
-    id: speaker_i2s
-    i2s_dout_pin: ${pin.audio.i2s_dout}
-    dac_type: external
-    audio_dac: dac_es8311
-    sample_rate: 48000
-    bits_per_sample: 16bit
-    channel: left

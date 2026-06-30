@@ -62,6 +62,17 @@ external_components:
   - source: github://m5stack/esphome-yaml/components
     components: [ lp5562 ]
 
+lp5562:
+  i2c_id: ${module.internal.i2c_bus}
+  id: led_lp5562
+  use_internal_clk: true
+#  high_pwm_freq: true
+#  logarithmic_dimming: true
+#  red_current: 15.5
+#  green_current: 16.5
+#  blue_current: 22.5
+  white_current: 17.5
+
 output:
   - platform: lp5562
     lp5562_id: led_lp5562
@@ -112,10 +123,6 @@ display:
     cs_pin: ${pin.int.spi.disp.cs}
     dc_pin: ${pin.int.spi.disp.dc}
     reset_pin: ${pin.int.spi.disp.reset}
-    data_rate: 40Mhz
-    invert_colors: true
-    update_interval: 10s
-    auto_clear_enabled: false
     dimensions:
       height: 128
       width: 128
@@ -123,6 +130,10 @@ display:
       offset_height: 1
       pad_width: 2
       pad_height: 1
+    data_rate: 40Mhz
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 10s
 
 # Button
 binary_sensor:
@@ -146,14 +157,3 @@ binary_sensor:
 #  pin: ${pin.light.ir}
 #  carrier_duty_percent: 50%
 #  rmt_symbols: ${device.rmt_symbols_block}
-
-lp5562:
-  i2c_id: ${module.internal.i2c_bus}
-  id: led_lp5562
-  use_internal_clk: true
-#  high_pwm_freq: true
-#  logarithmic_dimming: true
-#  red_current: 15.5
-#  green_current: 16.5
-#  blue_current: 22.5
-  white_current: 17.5

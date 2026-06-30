@@ -62,25 +62,9 @@ light:
     entity_category: config
 
 display:
-#  - platform: ili9xxx
-#    id: display_lcd
-#    model: st7789v
-#    data_rate: 40MHz
-#    dc_pin: ${pin.spi.disp.dc}
-#    reset_pin: ${pin.spi.disp.reset}
-#    spi_mode: MODE3
-#    dimensions:
-#      width: 240
-#      height: 240
-#      offset_height: 0
-#      offset_width: 0
-#    invert_colors: true
-#    auto_clear_enabled: false
-#    update_interval: never
   - platform: mipi_spi
-    model: st7789v
     id: display_lcd
-    data_rate: 40MHz
+    model: st7789v
     dc_pin: ${pin.spi.disp.dc}
     reset_pin: ${pin.spi.disp.reset}
     spi_mode: MODE3
@@ -89,9 +73,13 @@ display:
       height: 240
       offset_height: 0
       offset_width: 0
+    data_rate: 40MHz
     invert_colors: true
     auto_clear_enabled: false
     update_interval: 10s
+
+# Button
+esp32_touch:
 
 binary_sensor:
   - platform: esp32_touch
@@ -115,6 +103,3 @@ binary_sensor:
 #        - logger.log: "Long Touch"
     name: "Touchpad"
     entity_category: diagnostic
-
-# Button
-esp32_touch:

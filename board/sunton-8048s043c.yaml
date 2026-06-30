@@ -77,22 +77,18 @@ light:
 display:
   - platform: rpi_dpi_rgb
     id: display_lcd
-    dimensions:
-      height: 480
-      width: 800
-    color_order: RGB
     de_pin: ${pin.int.disp.de}
     hsync_pin: ${pin.int.disp.hsync}
-    vsync_pin: ${pin.int.disp.vsync}
-    pclk_pin: ${pin.int.disp.pclk}
-    pclk_inverted: true
-    pclk_frequency: 14MHz
     hsync_front_porch: 8
     hsync_pulse_width: 4
     hsync_back_porch: 8
+    vsync_pin: ${pin.int.disp.vsync}
     vsync_front_porch: 8
     vsync_pulse_width: 4
     vsync_back_porch: 8
+    pclk_pin: ${pin.int.disp.pclk}
+    pclk_inverted: true
+    pclk_frequency: 14MHz
     data_pins:
       red:
         - ${pin.int.disp.red.r1}
@@ -113,8 +109,12 @@ display:
         - ${pin.int.disp.blue.b3}
         - ${pin.int.disp.blue.b4}
         - ${pin.int.disp.blue.b5}
-    update_interval: 10s
+    dimensions:
+      height: 480
+      width: 800
+    color_order: RGB
     auto_clear_enabled: false
+    update_interval: 10s
 
 touchscreen:
   - platform: gt911
