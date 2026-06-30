@@ -98,6 +98,7 @@ output:
     pin:
       number: ${pin.int.pwr_mos}
       allow_other_uses: true
+      ignore_strapping_warning: true
   - platform: ledc
     id: buzzer
     pin: ${pin.audio.buzzer}

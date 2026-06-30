@@ -98,7 +98,9 @@ light:
 output:
   - platform: ledc
     id: buzzer
-    pin: ${pin.audio.buzzer}
+    pin:
+      number: ${pin.audio.buzzer}
+      ignore_strapping_warning: true
 #  - platform: gpio
 #    id: power_hold
 #    pin:
@@ -129,6 +131,7 @@ binary_sensor:
     pin:
       number: ${pin.btn.top}
       inverted: true
+      ignore_strapping_warning: true
       mode:
         input: true
         pullup: true
@@ -347,8 +350,12 @@ display:
     id: display_eink
     model: 1.54inv2
     cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin: ${pin.int.spi.disp.dc}
-    reset_pin: ${pin.int.spi.disp.reset}
+    dc_pin:
+      number: ${pin.int.spi.disp.dc}
+      ignore_strapping_warning: true
+    reset_pin:
+      number: ${pin.int.spi.disp.reset}
+      ignore_strapping_warning: true
     busy_pin:
       number: ${pin.int.spi.disp.busy}
       inverted: false

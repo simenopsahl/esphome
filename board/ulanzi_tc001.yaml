@@ -239,7 +239,9 @@ sensor:
 
 output:
   - platform: ledc
-    pin: ${pin.audio.buzzer}
+    pin:
+      number: ${pin.audio.buzzer}
+      ignore_strapping_warning: true
     id: rtttl_out
 
 rtttl:

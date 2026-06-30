@@ -65,7 +65,9 @@ wifi:
 
 spi:
   clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
+  mosi_pin:
+    number: ${pin.int.spi.mosi}
+    ignore_strapping_warning: true
 
 # Limit of 2 I2C buses on this board
 #time:
@@ -99,7 +101,9 @@ output:
   # Buzzer
   - platform: ledc
     id: buzzer
-    pin: ${pin.audio.buzzer}
+    pin:
+      number: ${pin.audio.buzzer}
+      ignore_strapping_warning: true
   # TFT Backlight
   - platform: ledc
     id: backlight_output
@@ -119,9 +123,13 @@ display:
   - platform: mipi_spi
     model: st7789v
     id: display_lcd
-    cs_pin: ${pin.int.spi.disp.cs}
+    cs_pin:
+      number: ${pin.int.spi.disp.cs}
+      ignore_strapping_warning: true
     dc_pin: ${pin.int.spi.disp.dc}
-    reset_pin: ${pin.int.spi.disp.reset}
+    reset_pin:
+      number: ${pin.int.spi.disp.reset}
+      ignore_strapping_warning: true
     invert_colors: true
     update_interval: 10s
     auto_clear_enabled: false
