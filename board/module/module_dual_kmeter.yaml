@@ -18,24 +18,14 @@ substitutions:
     # tank_temp_max: The hottest the bottom probe gets (red indicator fills down to the bottom).
     tank_temp_max: "550" # Represents 55.0°C (Normal resting temp)
 
-external_components:
-  - source: github://m5stack/esphome-yaml/components
-    components: [dual_kmeter]
-
 # Enable logging for this component
 logger:
   logs:
     sensor.dual_kmeter: DEBUG
 
-globals:
-  # Stores the dynamic minimum (Coldest recorded temperature)
-  - id: tank_dynamic_min
-    type: int
-    initial_value: ${module.tank_temp_min | pprint} # pprint to bypass parser issues
-  # Stores the dynamic maximum (Hottest recorded temperature)
-  - id: tank_dynamic_max
-    type: int
-    initial_value: ${module.tank_temp_max | pprint}
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: [dual_kmeter]
 
 # Module13.2 Dual Kmeter
 sensor:
@@ -184,6 +174,16 @@ sensor:
     # Bar widget limits (must be whole numbers)
     tank_temp_min: ${module.tank_temp_min}
     tank_temp_max: ${module.tank_temp_max}
+
+globals:
+  # Stores the dynamic minimum (Coldest recorded temperature)
+  - id: tank_dynamic_min
+    type: int
+    initial_value: ${module.tank_temp_min | pprint} # pprint to bypass parser issues
+  # Stores the dynamic maximum (Hottest recorded temperature)
+  - id: tank_dynamic_max
+    type: int
+    initial_value: ${module.tank_temp_max | pprint}
 
 # include lvgl page for dual kmeter
 lvgl:

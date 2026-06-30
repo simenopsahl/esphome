@@ -5,17 +5,17 @@ labels: [esp32, SK6812, RGB]
 # M5Stack Atom Lite
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_lite.yaml
+  status_led: !include ../features/system_status_led.yaml
+
 substitutions:
   device:
     model: "M5Stack Atom Lite"
     rmt_symbols_block: 64
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_atom_lite.yaml
-  status_led: !include ../features/system_status_led.yaml
 
 esphome:
   project:
@@ -35,12 +35,6 @@ esp32:
 wifi:
   enable_btm: true
   enable_rrm: true
-
-# IR
-#remote_transmitter:
-#  pin: $ir_pin
-#  carrier_duty_percent: 50%
-#  rmt_symbols: ${device.rmt_symbols_block}
 
 light:
   - platform: esp32_rmt_led_strip
@@ -97,3 +91,8 @@ binary_sensor:
         - light.turn_off:
             id: rgb_led
 
+# IR
+#remote_transmitter:
+#  pin: $ir_pin
+#  carrier_duty_percent: 50%
+#  rmt_symbols: ${device.rmt_symbols_block}

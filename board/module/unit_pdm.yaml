@@ -14,17 +14,6 @@ i2s_audio:
   i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
   i2s_bclk_pin: ${pin.audio.i2s_bclk}
 
-# UNIT Mini PDM
-microphone:
-  - platform: i2s_audio
-    i2s_audio_id: i2s_audio_bus
-    id: i2s_mic_pdm
-    bits_per_sample: 8bit
-    sample_rate: 8000
-    adc_type: external
-    i2s_din_pin: ${pin.audio.mic}
-    pdm: true
-
 sensor:
   - platform: sound_level
     id: sound_level_sensor
@@ -48,3 +37,14 @@ switch:
         
     on_turn_on:
         - microphone.mute:
+
+# UNIT Mini PDM
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic_pdm
+    bits_per_sample: 8bit
+    sample_rate: 8000
+    adc_type: external
+    i2s_din_pin: ${pin.audio.mic}
+    pdm: true

@@ -7,6 +7,11 @@ labels: [esp32s3, BM8563, RTC, ILI9342, display, i2c]
 # M5Stack Dial v1.1
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_dial.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+
 substitutions:
   time_timezone: "Europe/Oslo"
   display:
@@ -19,11 +24,6 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_dial.yaml
-  i2c_int: !include extension/internal_i2c.yaml
 
 esphome:
   project:
@@ -57,13 +57,6 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-spi:
-  clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
-  miso_pin: 
-    number: ${pin.int.spi.miso}
-    allow_other_uses: true
-
 time:
   - platform: bm8563
     i2c_id: ${module.internal.i2c_bus}
@@ -74,6 +67,13 @@ time:
     on_time_sync:
       - then:
           - bm8563.write_time:
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: 
+    number: ${pin.int.spi.miso}
+    allow_other_uses: true
 
 output:
   # backlight output
@@ -98,6 +98,43 @@ light:
       brightness: 25%
     name: "Backlight"
     entity_category: config
+
+display:
+  # 240 x 240 resolution
+  - platform: mipi_spi
+    id: display_lcd
+    model: GC9A01A
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin: ${pin.int.spi.disp.reset}
+    busy_pin:
+      number: ${pin.int.spi.disp.busy}
+      inverted: false
+    data_rate: 40MHz
+    invert_colors: true
+    update_interval: 10s
+    auto_clear_enabled: false
+
+touchscreen:
+  - platform: ft5x06
+    i2c_id: ${module.internal.i2c_bus}
+    id: touchscreen_ft5x06
+    on_touch:
+      - then:
+          - lambda: |-
+                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                    touch.x,
+                    touch.y,
+                    touch.x_raw,
+                    touch.y_raw
+                    );  
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
 
 binary_sensor:
   - platform: gpio
@@ -144,54 +181,6 @@ sensor:
     max_value: 32767
     publish_initial_value: true
 
-display:
-  # 240 x 240 resolution
-  - platform: mipi_spi
-    id: display_lcd
-    model: GC9A01A
-    cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin: ${pin.int.spi.disp.dc}
-    reset_pin: ${pin.int.spi.disp.reset}
-    busy_pin:
-      number: ${pin.int.spi.disp.busy}
-      inverted: false
-    data_rate: 40MHz
-    invert_colors: true
-    update_interval: 10s
-    auto_clear_enabled: false
-
-touchscreen:
-  - platform: ft5x06
-    i2c_id: ${module.internal.i2c_bus}
-    id: touchscreen_ft5x06
-    on_touch:
-      - then:
-          - lambda: |-
-                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
-                    touch.x,
-                    touch.y,
-                    touch.x_raw,
-                    touch.y_raw
-                    );  
-          - if:
-              condition:
-                - light.is_off: backlight_light
-              then:
-                - light.turn_on:
-                    id: backlight_light
-                    brightness: 40%
-
-rc522_i2c:
-  - id: nfc_reader
-    i2c_id: ${module.internal.i2c_bus}
-    update_interval: 500ms
-    on_tag:
-      - lambda: |-
-          ESP_LOGD("rfid", "Card detected: %s", x.c_str());
-    on_tag_removed:
-      - lambda: |-
-          ESP_LOGD("rfid", "Card removed: %s", x.c_str());
-
 script:
   # Script for buzzer beep
   - id: buzzer_on
@@ -214,3 +203,14 @@ script:
           level: "1%"
       - delay: 50ms
       - output.turn_off: buzzer
+
+rc522_i2c:
+  - id: nfc_reader
+    i2c_id: ${module.internal.i2c_bus}
+    update_interval: 500ms
+    on_tag:
+      - lambda: |-
+          ESP_LOGD("rfid", "Card detected: %s", x.c_str());
+    on_tag_removed:
+      - lambda: |-
+          ESP_LOGD("rfid", "Card removed: %s", x.c_str());

@@ -58,26 +58,9 @@ spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
 
-# IR
-#remote_transmitter:
-#  pin: ${pin.light.ir}
-#  carrier_duty_percent: 50%
-#  rmt_symbols: ${device.rmt_symbols_block}
-
 external_components:
   - source: github://m5stack/esphome-yaml/components
     components: [ lp5562 ]
-
-lp5562:
-  i2c_id: ${module.internal.i2c_bus}
-  id: led_lp5562
-  use_internal_clk: true
-#  high_pwm_freq: true
-#  logarithmic_dimming: true
-#  red_current: 15.5
-#  green_current: 16.5
-#  blue_current: 22.5
-  white_current: 17.5
 
 output:
   - platform: lp5562
@@ -122,23 +105,6 @@ light:
 #    name: "Backlight RGBW"
 #    entity_category: config
 
-# Button
-binary_sensor:
-  - platform: gpio
-    id: btn_display
-    pin:
-      number: ${pin.btn}
-      inverted: true
-      mode:
-        input: true
-        pullup: true
-    filters:
-      - delayed_off: 10ms
-    on_press:
-      - logger.log: Button Pressed
-    name: Button
-    entity_category: diagnostic
-
 display:
   - platform: mipi_spi
     model: st7789v
@@ -157,3 +123,37 @@ display:
       offset_height: 1
       pad_width: 2
       pad_height: 1
+
+# Button
+binary_sensor:
+  - platform: gpio
+    id: btn_display
+    pin:
+      number: ${pin.btn}
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Button Pressed
+    name: Button
+    entity_category: diagnostic
+
+# IR
+#remote_transmitter:
+#  pin: ${pin.light.ir}
+#  carrier_duty_percent: 50%
+#  rmt_symbols: ${device.rmt_symbols_block}
+
+lp5562:
+  i2c_id: ${module.internal.i2c_bus}
+  id: led_lp5562
+  use_internal_clk: true
+#  high_pwm_freq: true
+#  logarithmic_dimming: true
+#  red_current: 15.5
+#  green_current: 16.5
+#  blue_current: 22.5
+  white_current: 17.5

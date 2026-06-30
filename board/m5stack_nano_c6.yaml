@@ -5,17 +5,17 @@ labels: [esp32c6, WS2812, RGB]
 # M5Stack NanoC6
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_nano_c6.yaml
+  status_led: !include ../features/system_status_led.yaml
+
 substitutions:
   device:
     model: "M5Stack NanoC6"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_nano_c6.yaml
-  status_led: !include ../features/system_status_led.yaml
 
 esphome:
   project:
@@ -36,19 +36,6 @@ esp32:
     type: ${device.framework.type}
 #    version: 5.4.0
 #    platform_version: espressif32 @ 6.10.0
-
-# Enable status LED
-status_led:
-  id: status_light
-  pin: ${pin.light.led}
-
-switch:
-  - platform: gpio
-    id: rgb_switch
-    pin: ${pin.int.rgb_pwr}
-    restore_mode: RESTORE_DEFAULT_ON
-    name: "RGB on/off"
-    entity_category: config
 
 # Configuration of onboard RGB LED
 light:
@@ -111,3 +98,16 @@ binary_sensor:
         - logger.log: Button Held
         - light.turn_off:
             id: rgb_led
+
+switch:
+  - platform: gpio
+    id: rgb_switch
+    pin: ${pin.int.rgb_pwr}
+    restore_mode: RESTORE_DEFAULT_ON
+    name: "RGB on/off"
+    entity_category: config
+
+# Enable status LED
+status_led:
+  id: status_light
+  pin: ${pin.light.led}

@@ -61,32 +61,6 @@ light:
     name: "Backlight"
     entity_category: config
 
-# Button
-esp32_touch:
-
-binary_sensor:
-  - platform: esp32_touch
-    id: touch_pad
-    pin: ${pin.btn.touch1}
-    threshold: 1250
-    filters:
-      # Small filter, to debounce the spurious events.
-      - delayed_on: 20ms
-      - delayed_off: 50ms
-    on_press:
-      - logger.log: "Touch"
-#    on_click:
-#    - min_length: 50ms
-#      max_length: 500ms
-#      then:
-#        - logger.log: "Short Touch"
-#    - min_length: 500ms
-#      max_length: 2000ms
-#      then:
-#        - logger.log: "Long Touch"
-    name: "Touchpad"
-    entity_category: diagnostic
-
 display:
 #  - platform: ili9xxx
 #    id: display_lcd
@@ -118,3 +92,29 @@ display:
     invert_colors: true
     auto_clear_enabled: false
     update_interval: 10s
+
+binary_sensor:
+  - platform: esp32_touch
+    id: touch_pad
+    pin: ${pin.btn.touch1}
+    threshold: 1250
+    filters:
+      # Small filter, to debounce the spurious events.
+      - delayed_on: 20ms
+      - delayed_off: 50ms
+    on_press:
+      - logger.log: "Touch"
+#    on_click:
+#    - min_length: 50ms
+#      max_length: 500ms
+#      then:
+#        - logger.log: "Short Touch"
+#    - min_length: 500ms
+#      max_length: 2000ms
+#      then:
+#        - logger.log: "Long Touch"
+    name: "Touchpad"
+    entity_category: diagnostic
+
+# Button
+esp32_touch:

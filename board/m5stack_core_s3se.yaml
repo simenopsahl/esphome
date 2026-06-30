@@ -7,6 +7,10 @@ labels: [esp32s3, psram, ILI9342, display, BM8563, microphone, speaker]
 # https://community.home-assistant.io/t/m5stack-m5cores3-se-with-microwakeword/761965/5
 # https://github.com/luka6000/wake-word-voice-assistants/blob/main/m5stack-coreS3-se/m5stack-coreS3-se-spk.yaml
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_core_s3se.yaml
+
 substitutions:
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
@@ -18,10 +22,6 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_core_s3se.yaml
 
 esphome:
   project:
@@ -58,6 +58,24 @@ wifi:
 logger:
   deassert_rts_dtr: true
 
+time:
+  - platform: bm8563
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    address: 0x51
+    update_interval: 15min
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - bm8563.write_time:
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: 
+    number: ${pin.int.spi.miso}
+    allow_other_uses: true
+
 #i2c:
 # Int
 #  - id: i2c_internal
@@ -76,40 +94,6 @@ logger:
 #    frequency: 200kHz
 #    scan: true
 
-spi:
-  clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
-  miso_pin: 
-    number: ${pin.int.spi.miso}
-    allow_other_uses: true
-
-time:
-  - platform: bm8563
-    i2c_id: ${module.internal.i2c_bus}
-    id: time_rtc
-    address: 0x51
-    update_interval: 15min
-  - id: !extend time_homeassistant
-    on_time_sync:
-      - then:
-          - bm8563.write_time:
-
-external_components:
-  - source: github://m5stack/esphome-yaml/components
-    components: [axp2101, aw88298, aw9523b]
-
-# PMU
-axp2101:
-  id: axp2101_pmu
-  i2c_id: ${module.internal.i2c_bus}
-
-# IO Expander
-aw9523b:
-  i2c_id: ${module.internal.i2c_bus}
-  id: aw9523b_hub
-  p0_drive_mode: PUSH_PULL
-  interrupt_pin: ${pin.int.i2c.int}
-
 #i2s_audio:
 #  id: i2s_audio_bus
 #  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
@@ -117,33 +101,65 @@ aw9523b:
 #  i2s_mclk_pin:
 #    number: ${pin.audio.i2s_mclk}
 #    ignore_strapping_warning: true
-#audio_adc:
-#  - platform: es7210
-#    i2c_id: ${module.internal.i2c_bus}
-#    id: adc_es7210
-#    bits_per_sample: 16bit
-#    sample_rate: 16000
-#    mic_gain: 36
-#audio_dac:
-#  - platform: aw88298
-#    i2c_id: ${module.internal.i2c_bus}
-#    id: dac_aw88298
-#    sample_rate: 48000
-#microphone:
-#  - platform: i2s_audio
-#    i2s_audio_id: i2s_audio_bus
-#    id: i2s_mic
-#    i2s_din_pin: ${pin.audio.mic}
-#    bits_per_sample: 16bit
-#    sample_rate: 16000
-#    adc_type: external
-#speaker:
-#  - platform: i2s_audio
-#    i2s_audio_id: i2s_shared
-#    id: speaker_i2s
-#    dac_type: external
-#    i2s_dout_pin: ${pin.audio.i2s_dout}
-#    audio_dac: dac_aw88298
+
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: [axp2101, aw88298, aw9523b]
+
+output:
+  - platform: axp2101
+    type: range
+    channel: DLDO1
+    id: backlight_output
+    min_voltage: 2600
+    max_voltage: 3300
+
+  - platform: axp2101
+    channel: ALDO1
+    voltage: 1800
+
+  - platform: axp2101
+    channel: ALDO2
+    voltage: 3300
+  
+  - platform: axp2101
+    channel: BLDO1
+    voltage: 2800
+  
+  - platform: axp2101
+    channel: BLDO2
+    voltage: 1500
+
+#  - platform: axp2101
+#    channel: DCDC1
+#    voltage: 3300
+
+#  - platform: axp2101
+#    channel: DCDC3
+#    voltage: 3300
+
+# https://devices.esphome.io/devices/M5Stack-Fire#wifi-issues-due-to-gpio15
+#  - platform: gpio
+#    id: wifi_fix_output
+#    pin: ${mbus23}
+
+light:
+  # White
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 250ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+    # on_state:
+    #   - lambda: |-
+    #       uint8_t light;
+    #       if (id(axp2101).read_byte(0x99, &light))
+    #         id(backlight).turn_on().set_brightness( (( light << 5 ) - 641 ) /255 );
 
 display:
   - platform: mipi_spi
@@ -246,61 +262,6 @@ binary_sensor:
         - logger.log: "AW88298 interrupt triggered"
     internal: true
 
-output:
-  - platform: axp2101
-    type: range
-    channel: DLDO1
-    id: backlight_output
-    min_voltage: 2600
-    max_voltage: 3300
-
-  - platform: axp2101
-    channel: ALDO1
-    voltage: 1800
-
-  - platform: axp2101
-    channel: ALDO2
-    voltage: 3300
-  
-  - platform: axp2101
-    channel: BLDO1
-    voltage: 2800
-  
-  - platform: axp2101
-    channel: BLDO2
-    voltage: 1500
-
-#  - platform: axp2101
-#    channel: DCDC1
-#    voltage: 3300
-
-#  - platform: axp2101
-#    channel: DCDC3
-#    voltage: 3300
-
-# https://devices.esphome.io/devices/M5Stack-Fire#wifi-issues-due-to-gpio15
-#  - platform: gpio
-#    id: wifi_fix_output
-#    pin: ${mbus23}
-
-light:
-  # White
-  - platform: monochromatic
-    id: backlight_light
-    output: backlight_output
-    default_transition_length: 250ms
-    restore_mode: RESTORE_AND_ON
-    initial_state:
-      state: on
-      brightness: 25%
-    name: "Backlight"
-    entity_category: config
-    # on_state:
-    #   - lambda: |-
-    #       uint8_t light;
-    #       if (id(axp2101).read_byte(0x99, &light))
-    #         id(backlight).turn_on().set_brightness( (( light << 5 ) - 641 ) /255 );
-
 switch:
   - platform: gpio
     id: sw_bus_out_en
@@ -332,3 +293,46 @@ switch:
     # BOOST_EN
     restore_mode: RESTORE_DEFAULT_ON
     entity_category: config
+
+#audio_dac:
+#  - platform: aw88298
+#    i2c_id: ${module.internal.i2c_bus}
+#    id: dac_aw88298
+#    sample_rate: 48000
+
+#audio_adc:
+#  - platform: es7210
+#    i2c_id: ${module.internal.i2c_bus}
+#    id: adc_es7210
+#    bits_per_sample: 16bit
+#    sample_rate: 16000
+#    mic_gain: 36
+
+#microphone:
+#  - platform: i2s_audio
+#    i2s_audio_id: i2s_audio_bus
+#    id: i2s_mic
+#    i2s_din_pin: ${pin.audio.mic}
+#    bits_per_sample: 16bit
+#    sample_rate: 16000
+#    adc_type: external
+
+#speaker:
+#  - platform: i2s_audio
+#    i2s_audio_id: i2s_shared
+#    id: speaker_i2s
+#    dac_type: external
+#    i2s_dout_pin: ${pin.audio.i2s_dout}
+#    audio_dac: dac_aw88298
+
+# IO Expander
+aw9523b:
+  i2c_id: ${module.internal.i2c_bus}
+  id: aw9523b_hub
+  p0_drive_mode: PUSH_PULL
+  interrupt_pin: ${pin.int.i2c.int}
+
+# PMU
+axp2101:
+  id: axp2101_pmu
+  i2c_id: ${module.internal.i2c_bus}

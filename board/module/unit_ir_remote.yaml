@@ -14,17 +14,18 @@ logger:
     remote_transmitter: DEBUG
     infrared: DEBUG
 
+remote_transmitter:
+  id: ir_tx
+  pin: ${module.ir_out_pin}
+  carrier_duty_percent: 50%
+  rmt_symbols: ${device.rmt_symbols_block}
+
 # UNIT IR Remote
 remote_receiver:
   id: ir_rx
   pin: ${module.ir_in_pin}
   rmt_symbols: ${device.rmt_symbols_block}
   dump: raw
-remote_transmitter:
-  id: ir_tx
-  pin: ${module.ir_out_pin}
-  carrier_duty_percent: 50%
-  rmt_symbols: ${device.rmt_symbols_block}
 
 # Infrared platform — creates infrared entities
 infrared:

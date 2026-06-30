@@ -3,41 +3,10 @@
 # https://docs.everythingsmart.io/s/products/doc/everything-presence-lite-epl-ZVnBzYzuX2
 
 # Specific bluetooth settings, paste in root device yaml
-esp32_ble:
-  max_connections: 2
-esp32_ble_tracker:
-  scan_parameters:
-    interval: 500ms
-    window: 10ms
-bluetooth_proxy:
-  active: false
-  connection_slots: 1
-
 substitutions:
   illuminance_update_interval: "5s"
   device:
     model: "Everything Presence Lite"
-
-esp32:
-  framework:
-    advanced:
-      assertion_level: DISABLE
-      compiler_optimization : PERF
-      minimum_chip_revision: 3.1
-
-api:
-  reboot_timeout: 90min
-  encryption:
-    key: !secret homeassistant_api
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  reboot_timeout: 30min
-  fast_connect: true
-  passive_scan: true
-  enable_btm: true
-  enable_rrm: true
 
 esphome:
   on_boot:
@@ -56,20 +25,28 @@ esphome:
               id(firmware_co2).publish_state("Disabled");
             }
 
+esp32:
+  framework:
+    advanced:
+      assertion_level: DISABLE
+      compiler_optimization : PERF
+      minimum_chip_revision: 3.1
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  reboot_timeout: 30min
+  fast_connect: true
+  passive_scan: true
+  enable_btm: true
+  enable_rrm: true
+
 binary_sensor:
   - id: !extend zone2_occupancy
     disabled_by_default: false
   - id: !extend zone3_occupancy
     disabled_by_default: false
   - id: !extend zone4_occupancy
-    disabled_by_default: false
-
-number:
-  - id: !extend zone_2_off_delay
-    disabled_by_default: false
-  - id: !extend zone_3_off_delay
-    disabled_by_default: false
-  - id: !extend zone_4_off_delay
     disabled_by_default: false
 
 sensor:
@@ -101,8 +78,33 @@ sensor:
   - id: !extend zone4_target_count
     disabled_by_default: false
 
+number:
+  - id: !extend zone_2_off_delay
+    disabled_by_default: false
+  - id: !extend zone_3_off_delay
+    disabled_by_default: false
+  - id: !extend zone_4_off_delay
+    disabled_by_default: false
+
 select:
   - id: !extend tracking_behaviour
     initial_option: Above + Distance and Angle
   - id: !extend update_speed_select
     initial_option: Slow (0.4s)
+
+api:
+  reboot_timeout: 90min
+  encryption:
+    key: !secret homeassistant_api
+
+bluetooth_proxy:
+  active: false
+  connection_slots: 1
+
+esp32_ble:
+  max_connections: 2
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 500ms
+    window: 10ms

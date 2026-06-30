@@ -7,6 +7,10 @@ labels: [esp32, psram, ST7789V, microphone]
 #
 
 # HAT and Mic shared pins
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_stickc_plus2.yaml
+
 substitutions:
   hat_shared: "false"
   grove_shared: "false"
@@ -15,10 +19,6 @@ substitutions:
     rmt_symbols_block: 64
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_stickc_plus2.yaml
 
 esphome:
   project:
@@ -63,10 +63,6 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-spi:
-  clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
-
 # Limit of 2 I2C buses on this board
 #time:
 #  - platform: bm8563
@@ -78,22 +74,57 @@ spi:
 #      then:
 #        bm8563.write_time:
 
-light:
-  # Enable status LED
-  - platform: status_led
-    id: status_light
-    pin: ${pin.light.led}
-  # TFT Backlight
-  - platform: monochromatic
-    output:  backlight_output
-    id: backlight_light
-    default_transition_length: 100ms
-    restore_mode: RESTORE_AND_ON
-    initial_state:
-      state: on
-      brightness: 25%
-    name: "Backlight"
-    entity_category: config
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+
+# text_sensor:
+#   - platform: template
+#     id: wakeup_cause
+#     lambda: return esp_sleep_get_wakeup_cause();
+#     filters:
+#       - lambda: |-
+#           if (x == 0) {
+#             return "ESP_SLEEP_WAKEUP_UNDEFINED";
+#           } else if (x == 1) {
+#             return "ESP_SLEEP_WAKEUP_ALL";
+#           } else if (x == 2) {
+#             return "ESP_SLEEP_WAKEUP_EXT0";
+#           } else if (x == 3) {
+#             return "ESP_SLEEP_WAKEUP_EXT1";
+#           } else if (x == 4) {
+#             return "ESP_SLEEP_WAKEUP_TIMER";
+#           } else if (x == 5) {
+#             return "ESP_SLEEP_WAKEUP_TOUCHPAD";
+#           } else if (x == 6) {
+#             return "ESP_SLEEP_WAKEUP_ULP";
+#           } else if (x == 7) {
+#             return "ESP_SLEEP_WAKEUP_GPIO";
+#           } else if (x == 8) {
+#             return "ESP_SLEEP_WAKEUP_UART";
+#           } else if (x == 9) {
+#             return "ESP_SLEEP_WAKEUP_WIFI";
+#           } else if (x == 10) {
+#             return "ESP_SLEEP_WAKEUP_COCPU";
+#           } else if (x == 11) {
+#             return "ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
+#           } else if (x == 12) {
+#             return "ESP_SLEEP_WAKEUP_BT";
+#           } else {
+#             return "UNKNOWN";
+#           }
+#     name: "Wakeup Cause"
+#     entity_category: diagnostic
+
+# Audio not tested
+#i2s_audio:
+#  id: i2s_bus
+#  i2s_lrclk_pin:
+#    number: ${pin.audio.i2s_lrclk}
+#    allow_other_uses: ${hat_shared}
+#  i2s_bclk_pin:
+#    number: ${pin.audio.i2s_bclk}
+#    allow_other_uses: ${hat_shared}
 
 output:
   # Buzzer
@@ -113,6 +144,23 @@ output:
 #    pin:
 #      number: ${pwr_mos_pin}
 #      allow_other_uses: true
+
+light:
+  # Enable status LED
+  - platform: status_led
+    id: status_light
+    pin: ${pin.light.led}
+  # TFT Backlight
+  - platform: monochromatic
+    output:  backlight_output
+    id: backlight_light
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
 
 # 1.14 inch, 135*240 Colorful TFT LCD, ST7789v2
 display:
@@ -162,44 +210,6 @@ binary_sensor:
       - output.turn_off: buzzer
     name: Front Button
     entity_category: diagnostic
-
-#  - platform: gpio
-#    id: pwr_hold
-#    name: Power Hold
-#    entity_category: diagnostic
-#    pin:
-#      number: ${pin.int.pwr_mos}
-#      allow_other_uses: true
-#      inverted: true
-#    on_press:
-#      then:
-#        - logger.log: Power Hold
-#    on_release:
-#      then:
-#        - logger.log: Power Hold Off
-
-# Script for buzzer beep
-script:
-  - id: buzzer_on
-    then:
-      - output.turn_on: buzzer
-      - output.ledc.set_frequency:
-          id: buzzer
-          frequency: "500Hz"
-      - output.set_level:
-          id: buzzer
-          level: "1%"
-  - id: buzzer_beep
-    then:
-      - output.turn_on: buzzer
-      - output.ledc.set_frequency:
-          id: buzzer
-          frequency: "500Hz"
-      - output.set_level:
-          id: buzzer
-          level: "1%"
-      - delay: 30ms
-      - output.turn_off: buzzer
 
 sensor:
   # Battery voltage
@@ -253,25 +263,6 @@ sensor:
     device_class: battery
     unit_of_measurement: "%"
 
-#deep_sleep:
-#  id: deep_sleep_battery
-#  run_duration: 120s
-#  sleep_duration: 180s
-#  wakeup_pin_mode: KEEP_AWAKE
-#  wakeup_pin:
-#    number: $power_mos_pin
-#    allow_other_uses: true
-#  esp32_ext1_wakeup: 
-#    mode: ANY_HIGH
-#    pins:
-#      - number: $rtc_wakeup_pin
-#      - number: ${pin.int.pwr_mos}
-#        allow_other_uses: true
-#      - number: ${pin.btn.side}
-#        allow_other_uses: true
-#      - number: ${pin.btn.front}
-#        allow_other_uses: true
-
 switch:
   # Power Hold
   - platform: template
@@ -295,53 +286,43 @@ switch:
     entity_category: config
     optimistic: true
 
-# text_sensor:
-#   - platform: template
-#     id: wakeup_cause
-#     lambda: return esp_sleep_get_wakeup_cause();
-#     filters:
-#       - lambda: |-
-#           if (x == 0) {
-#             return "ESP_SLEEP_WAKEUP_UNDEFINED";
-#           } else if (x == 1) {
-#             return "ESP_SLEEP_WAKEUP_ALL";
-#           } else if (x == 2) {
-#             return "ESP_SLEEP_WAKEUP_EXT0";
-#           } else if (x == 3) {
-#             return "ESP_SLEEP_WAKEUP_EXT1";
-#           } else if (x == 4) {
-#             return "ESP_SLEEP_WAKEUP_TIMER";
-#           } else if (x == 5) {
-#             return "ESP_SLEEP_WAKEUP_TOUCHPAD";
-#           } else if (x == 6) {
-#             return "ESP_SLEEP_WAKEUP_ULP";
-#           } else if (x == 7) {
-#             return "ESP_SLEEP_WAKEUP_GPIO";
-#           } else if (x == 8) {
-#             return "ESP_SLEEP_WAKEUP_UART";
-#           } else if (x == 9) {
-#             return "ESP_SLEEP_WAKEUP_WIFI";
-#           } else if (x == 10) {
-#             return "ESP_SLEEP_WAKEUP_COCPU";
-#           } else if (x == 11) {
-#             return "ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
-#           } else if (x == 12) {
-#             return "ESP_SLEEP_WAKEUP_BT";
-#           } else {
-#             return "UNKNOWN";
-#           }
-#     name: "Wakeup Cause"
-#     entity_category: diagnostic
+#  - platform: gpio
+#    id: pwr_hold
+#    name: Power Hold
+#    entity_category: diagnostic
+#    pin:
+#      number: ${pin.int.pwr_mos}
+#      allow_other_uses: true
+#      inverted: true
+#    on_press:
+#      then:
+#        - logger.log: Power Hold
+#    on_release:
+#      then:
+#        - logger.log: Power Hold Off
 
-# Audio not tested
-#i2s_audio:
-#  id: i2s_bus
-#  i2s_lrclk_pin:
-#    number: ${pin.audio.i2s_lrclk}
-#    allow_other_uses: ${hat_shared}
-#  i2s_bclk_pin:
-#    number: ${pin.audio.i2s_bclk}
-#    allow_other_uses: ${hat_shared}
+# Script for buzzer beep
+script:
+  - id: buzzer_on
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+  - id: buzzer_beep
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 30ms
+      - output.turn_off: buzzer
 
 #microphone:
 #  - platform: i2s_audio
@@ -350,3 +331,22 @@ switch:
 #    adc_type: external
 #    pdm: true
 #    id: mic
+
+#deep_sleep:
+#  id: deep_sleep_battery
+#  run_duration: 120s
+#  sleep_duration: 180s
+#  wakeup_pin_mode: KEEP_AWAKE
+#  wakeup_pin:
+#    number: $power_mos_pin
+#    allow_other_uses: true
+#  esp32_ext1_wakeup: 
+#    mode: ANY_HIGH
+#    pins:
+#      - number: $rtc_wakeup_pin
+#      - number: ${pin.int.pwr_mos}
+#        allow_other_uses: true
+#      - number: ${pin.btn.side}
+#        allow_other_uses: true
+#      - number: ${pin.btn.front}
+#        allow_other_uses: true

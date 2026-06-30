@@ -8,15 +8,6 @@ substitutions:
   module:
     env_i2c_bus: i2c_grove
 
-# UNIT ENV Pro
-bme68x_bsec2_i2c:
-  id: bme68x_bsec_component
-  i2c_id: ${module.env_i2c_bus}
-  address: 0x77
-  model: BME688
-  sample_rate: LP
-  operating_age: 4d
-  state_save_interval: 6h
 sensor:
   - platform: bme68x_bsec2
     bme68x_bsec2_id: bme68x_bsec_component
@@ -239,3 +230,13 @@ text_sensor:
         return {"Ukjent"}; // "unknown" in Norwegian
       }
     update_interval: never
+
+# UNIT ENV Pro
+bme68x_bsec2_i2c:
+  id: bme68x_bsec_component
+  i2c_id: ${module.env_i2c_bus}
+  address: 0x77
+  model: BME688
+  sample_rate: LP
+  operating_age: 4d
+  state_save_interval: 6h

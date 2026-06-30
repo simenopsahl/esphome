@@ -5,17 +5,17 @@ labels: [esp32s3, WS2812, RGB, microphone]
 # M5Stack AtomS3U
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3u.yaml
+  status_led: !include ../features/system_status_led.yaml
+
 substitutions:
   device:
     model: "M5Stack Atom S3U"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_atom_s3u.yaml
-  status_led: !include ../features/system_status_led.yaml
 
 esphome:
   project:
@@ -34,20 +34,6 @@ esp32:
 #i2s_audio:
 #  id: i2s_audio_bus
 #  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
-#microphone:
-#  - platform: i2s_audio
-#    i2s_audio_id: i2s_audio_bus
-#    id: mic_pdm
-#    i2s_din_pin: ${pin.audio.mic}
-#    adc_type: external
-#    pdm: true
-
-# IR
-#remote_transmitter:
-#  pin: ${pin.light.ir}
-#  carrier_duty_percent: 50%
-#  non_blocking: true
-#  rmt_symbols: ${device.rmt_symbols_block}
 
 light:
   #G35=RGB WS2812C-2020
@@ -114,3 +100,18 @@ binary_sensor:
         - logger.log: Button Held
         - light.turn_off:
             id: rgb_led
+
+# IR
+#remote_transmitter:
+#  pin: ${pin.light.ir}
+#  carrier_duty_percent: 50%
+#  non_blocking: true
+#  rmt_symbols: ${device.rmt_symbols_block}
+
+#microphone:
+#  - platform: i2s_audio
+#    i2s_audio_id: i2s_audio_bus
+#    id: mic_pdm
+#    i2s_din_pin: ${pin.audio.mic}
+#    adc_type: external
+#    pdm: true
