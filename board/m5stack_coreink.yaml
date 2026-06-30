@@ -6,6 +6,11 @@ labels: [esp32, ePaper, display]
 # M5Stack CoreInk
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_coreink.yaml
+  epaper: !include module/epaper.yaml
+
 substitutions:
   time_timezone: "Europe/Oslo"
   home_page: page_content
@@ -17,11 +22,6 @@ substitutions:
     rmt_symbols_block: 64
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_coreink.yaml
-  epaper: !include module/epaper.yaml
 
 esphome:
   project:
@@ -73,10 +73,6 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-spi:
-  clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
-
 # i2c RTC only with one additional i2c bus
 #time:
 #  - platform: bm8563
@@ -88,11 +84,9 @@ spi:
 #      then:
 #        bm8563.write_time:
 
-light:
-  # Enable status LED
-  - platform: status_led
-    id: status_light
-    pin: ${pin.light.led}
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
 
 # Buzzer
 output:
@@ -106,6 +100,75 @@ output:
 #    pin:
 #      number: ${pin.int.pwr_mos}
 #      allow_other_uses: true
+
+light:
+  # Enable status LED
+  - platform: status_led
+    id: status_light
+    pin: ${pin.light.led}
+
+display:
+  # 200 x 200 resolution
+  - platform: waveshare_epaper
+    id: display_eink
+    model: 1.54inv2
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin: ${pin.int.spi.disp.reset}
+    busy_pin:
+      number: ${pin.int.spi.disp.busy}
+      inverted: false
+    full_update_every: 1
+#    reset_duration: 2ms
+    update_interval: never
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill(id(epaper_text_color));
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill(id(epaper_bg_color));
+
+# text_sensor:
+#   - platform: template
+#     id: wakeup_cause
+#     lambda: return to_string( esp_sleep_get_wakeup_cause() );
+#     filters:
+#       - lambda: |-
+#           if (x == "0") {
+#             return x + "_ESP_SLEEP_WAKEUP_UNDEFINED";
+#           } else if (x == "1") {
+#             return x + "_ESP_SLEEP_WAKEUP_ALL";
+#           } else if (x == "2") {
+#             return x + "_ESP_SLEEP_WAKEUP_EXT0";
+#           } else if (x == "3") {
+#             return x + "_ESP_SLEEP_WAKEUP_EXT1";
+#           } else if (x == "4") {
+#             return x + "_ESP_SLEEP_WAKEUP_TIMER";
+#           } else if (x == "5") {
+#             return x + "_ESP_SLEEP_WAKEUP_TOUCHPAD";
+#           } else if (x == "6") {
+#             return x + "_ESP_SLEEP_WAKEUP_ULP";
+#           } else if (x == "7") {
+#             return x + "_ESP_SLEEP_WAKEUP_GPIO";
+#           } else if (x == "8") {
+#             return x + "_ESP_SLEEP_WAKEUP_UART";
+#           } else if (x == "9") {
+#             return x + "_ESP_SLEEP_WAKEUP_WIFI";
+#           } else if (x == "10") {
+#             return x + "_ESP_SLEEP_WAKEUP_COCPU";
+#           } else if (x == "11") {
+#             return x + "_ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
+#           } else if (x == "12") {
+#             return x + "_ESP_SLEEP_WAKEUP_BT";
+#           } else {
+#             return x + "_UNKNOWN";
+#           }
+#     name: "Wakeup Cause"
+#     entity_category: diagnostic
+#     disabled_by_default: true
 
 binary_sensor:
   # Power Button
@@ -212,29 +275,6 @@ binary_sensor:
     name: Power Hold
     entity_category: diagnostic
 
-# Script for buzzer beep
-script:
-  - id: buzzer_on
-    then:
-      - output.turn_on: buzzer
-      - output.ledc.set_frequency:
-          id: buzzer
-          frequency: "500Hz"
-      - output.set_level:
-          id: buzzer
-          level: "1%"
-  - id: buzzer_beep
-    then:
-      - output.turn_on: buzzer
-      - output.ledc.set_frequency:
-          id: buzzer
-          frequency: "500Hz"
-      - output.set_level:
-          id: buzzer
-          level: "1%"
-      - delay: 30ms
-      - output.turn_off: buzzer
-
 sensor:
   # Deep Sleep wakeup cause
 #  - platform: template
@@ -292,25 +332,6 @@ sensor:
     device_class: battery
     unit_of_measurement: "%"
 
-#deep_sleep:
-#  id: deep_sleep_battery
-#  run_duration: 120s
-#  sleep_duration: 180s
-#  wakeup_pin_mode: KEEP_AWAKE
-#  esp32_ext1_wakeup:
-#    mode: ANY_HIGH
-#    pins:
-#      - number: ${pin.int.rtc_wakeup}
-#      - number: ${pin.int.pwr_mos}
-#        allow_other_uses: true
-#        inverted: true
-#      - number: ${pin.btn.stick.up}
-#        allow_other_uses: true
-#      - number: ${pin.btn.stick.press}
-#        allow_other_uses: true
-#      - number: ${pin.btn.stick.down}
-#        allow_other_uses: true
-
 #switch:
   # Power Hold
 #  - platform: template
@@ -344,69 +365,44 @@ sensor:
 #    entity_category: config
 #    optimistic: true
 
-display:
-  # 200 x 200 resolution
-  - platform: waveshare_epaper
-    id: display_eink
-    model: 1.54inv2
-    cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin:
-      number: ${pin.int.spi.disp.dc}
-      ignore_strapping_warning: true
-    reset_pin:
-      number: ${pin.int.spi.disp.reset}
-      ignore_strapping_warning: true
-    busy_pin:
-      number: ${pin.int.spi.disp.busy}
-      inverted: false
-    full_update_every: 1
-#    reset_duration: 2ms
-    update_interval: never
-    pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_text_color));
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_bg_color));
+# Script for buzzer beep
+script:
+  - id: buzzer_on
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+  - id: buzzer_beep
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 30ms
+      - output.turn_off: buzzer
 
-# text_sensor:
-#   - platform: template
-#     id: wakeup_cause
-#     lambda: return to_string( esp_sleep_get_wakeup_cause() );
-#     filters:
-#       - lambda: |-
-#           if (x == "0") {
-#             return x + "_ESP_SLEEP_WAKEUP_UNDEFINED";
-#           } else if (x == "1") {
-#             return x + "_ESP_SLEEP_WAKEUP_ALL";
-#           } else if (x == "2") {
-#             return x + "_ESP_SLEEP_WAKEUP_EXT0";
-#           } else if (x == "3") {
-#             return x + "_ESP_SLEEP_WAKEUP_EXT1";
-#           } else if (x == "4") {
-#             return x + "_ESP_SLEEP_WAKEUP_TIMER";
-#           } else if (x == "5") {
-#             return x + "_ESP_SLEEP_WAKEUP_TOUCHPAD";
-#           } else if (x == "6") {
-#             return x + "_ESP_SLEEP_WAKEUP_ULP";
-#           } else if (x == "7") {
-#             return x + "_ESP_SLEEP_WAKEUP_GPIO";
-#           } else if (x == "8") {
-#             return x + "_ESP_SLEEP_WAKEUP_UART";
-#           } else if (x == "9") {
-#             return x + "_ESP_SLEEP_WAKEUP_WIFI";
-#           } else if (x == "10") {
-#             return x + "_ESP_SLEEP_WAKEUP_COCPU";
-#           } else if (x == "11") {
-#             return x + "_ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
-#           } else if (x == "12") {
-#             return x + "_ESP_SLEEP_WAKEUP_BT";
-#           } else {
-#             return x + "_UNKNOWN";
-#           }
-#     name: "Wakeup Cause"
-#     entity_category: diagnostic
-#     disabled_by_default: true
+#deep_sleep:
+#  id: deep_sleep_battery
+#  run_duration: 120s
+#  sleep_duration: 180s
+#  wakeup_pin_mode: KEEP_AWAKE
+#  esp32_ext1_wakeup:
+#    mode: ANY_HIGH
+#    pins:
+#      - number: ${pin.int.rtc_wakeup}
+#      - number: ${pin.int.pwr_mos}
+#        allow_other_uses: true
+#        inverted: true
+#      - number: ${pin.btn.stick.up}
+#        allow_other_uses: true
+#      - number: ${pin.btn.stick.press}
+#        allow_other_uses: true
+#      - number: ${pin.btn.stick.down}
+#        allow_other_uses: true

@@ -4,6 +4,11 @@ labels: [camera, i2c]
 # https://docs.m5stack.com/en/homeassistant/camera/unit_cams3_5mp
 
 # UNIT CamS3-5MP
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_unit_cams3.yaml
+  i2c: !include extension/internal_i2c.yaml
+
 substitutions:
   device:
     model: "M5Stack Unit CamS3"
@@ -14,11 +19,6 @@ substitutions:
     i2c:
       internal:
         frequency: 200kHz
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_unit_cams3.yaml
-  i2c: !include extension/internal_i2c.yaml
 
 esphome:
   project:

@@ -20,14 +20,6 @@ substitutions:
     framework:
       type: esp-idf
 
-external_components:
-  - source:
-      type: git
-      url: https://github.com/lubeda/EsphoMaTrixv2
-      ref: 2026.4.1
-    refresh: 60s
-    components: [ ehmtxv2 ]
-
 esphome:
   project:
     name: "Ulanzi.EHMTXv2"
@@ -53,6 +45,27 @@ esp32:
       ignore_efuse_custom_mac: true
       sram1_as_iram: true
 
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - ds1307.write_time:
+  - platform: ds1307
+    update_interval: never
+    id: time_rtc
+    on_time: 
+      # Every day at 08:00
+      - seconds: 0
+        minutes: 0
+        hours: 8
+        then:
+          # Initialize CLOCK screen
+          - lambda: |-
+              id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
+          # Initialize DATE screen
+          - lambda: |-
+              id(rgb8x32)->date_screen(1440,15,false,160,240,160);
+
 i2c:
   id: i2c_bus
   sda: ${pin.int.i2c.sda}
@@ -60,32 +73,72 @@ i2c:
   frequency: 200kHz
   scan: true
 
-globals:
-  # aab = auto-adjustable brightness
-  - id: aab_enable
-    type: "bool"
-    restore_value: true
-    initial_value: "true"
-  - id: aab_add
-    type: int
-    initial_value: '10'
-  - id: aab_max
-    type: int
-    initial_value: '220'
-  - id: aab_min
-    type: int
-    initial_value: '40'
+external_components:
+  - source:
+      type: git
+      url: https://github.com/lubeda/EsphoMaTrixv2
+      ref: 2026.4.1
+    refresh: 60s
+    components: [ ehmtxv2 ]
 
-api:
-  # Enable custom Home Assistant services for EHMTXv2
-  custom_services: true
-  actions:
-    - action: tune
-      variables:
-        tune: string
-      then:
-        - rtttl.play:
-            rtttl: !lambda 'return tune;'
+output:
+  - platform: ledc
+    pin: ${pin.audio.buzzer}
+    id: rtttl_out
+
+light:
+#  - platform: neopixelbus
+#    id: light_ehmtx
+#    variant: ws2812
+#    type: GRB
+#    pin: ${pin.light.led_matrix}
+#    num_leds: 256
+#    color_correct: [30%, 30%, 30%]
+#    gamma_correct: 2.0
+#    restore_mode: ALWAYS_OFF
+#    name: "Light"
+#    on_turn_on:
+#      lambda: |-
+#        id(display_ehmtx)->set_enabled(false);
+#    on_turn_off:
+#      lambda: |-
+#        id(display_ehmtx)->set_enabled(true);
+  - platform: esp32_rmt_led_strip
+    id: light_ehmtx
+    chipset: ws2812
+    rgb_order: GRB
+    max_refresh_rate: 30ms
+    pin: ${pin.light.led_matrix}
+    num_leds: 256
+    rmt_symbols: ${device.rmt_symbols_block * 4}
+    color_correct: [30%, 30%, 30%]
+    gamma_correct: 2.0
+    restore_mode: ALWAYS_OFF
+    name: "Light"
+    on_turn_on:
+      lambda: |-
+        id(display_ehmtx)->set_enabled(false);
+    on_turn_off:
+      lambda: |-
+        id(display_ehmtx)->set_enabled(true);
+
+display:
+  - platform: addressable_light
+    id: display_ehmtx
+    addressable_light_id: light_ehmtx
+    width: 32
+    height: 8
+    pixel_mapper: |-
+      if (y % 2 == 0) {
+        return (y * 32) + x;
+      }
+      return (y * 32) + (31 - x);
+    rotation: 0°
+    update_interval: 16ms
+    auto_clear_enabled: true
+    lambda: |-
+      id(rgb8x32)->tick();
+      id(rgb8x32)->draw();
 
 binary_sensor:
   - platform: gpio
@@ -116,55 +169,6 @@ binary_sensor:
 # example to switch to next screen
 #        lambda: |-
 #          id(rgb8x32)->skip_screen();
-
-number:
-  - platform: template
-    id: screen_brightness
-    name: "Brightness"
-    entity_category: config
-    min_value: 0
-    max_value: 255
-    update_interval: 1s
-    step: 25
-    lambda: |-
-      return id(rgb8x32)->get_brightness();
-    set_action:
-      lambda: |-
-        id(rgb8x32)->set_brightness(x);
-
-switch:
-  - platform: template
-    id: displaycontrol
-    name: "Display"
-    icon: "mdi:power"
-    entity_category: config
-    restore_mode: ALWAYS_ON
-    lambda: |-
-      return id(rgb8x32)->show_display;
-    turn_on_action:
-      lambda: |-
-        id(rgb8x32)->set_display_on();
-    turn_off_action:
-      lambda: |-
-        id(rgb8x32)->set_display_off();
-  - platform: template
-    id: switch_autobrightness
-    name: "Auto-Adjust Brightness"
-    icon: mdi:brightness-auto
-    entity_category: config
-    restore_mode: RESTORE_DEFAULT_ON
-    lambda: |-
-      if (id(aab_enable)) {
-        return true;
-      } else {
-        return false;
-      }
-    turn_on_action:
-      lambda: |-
-        id(aab_enable) = true;
-    turn_off_action:
-      lambda: |-
-        id(aab_enable) = false;
 
 sensor:
   - platform: sht3xd
@@ -237,98 +241,105 @@ sensor:
                 if ( abs(d) > 2 ) id(rgb8x32)->set_brightness(n);
               }
 
-output:
-  - platform: ledc
-    pin:
-      number: ${pin.audio.buzzer}
-      ignore_strapping_warning: true
-    id: rtttl_out
+number:
+  - platform: template
+    id: screen_brightness
+    name: "Brightness"
+    entity_category: config
+    min_value: 0
+    max_value: 255
+    update_interval: 1s
+    step: 25
+    lambda: |-
+      return id(rgb8x32)->get_brightness();
+    set_action:
+      lambda: |-
+        id(rgb8x32)->set_brightness(x);
+
+switch:
+  - platform: template
+    id: displaycontrol
+    name: "Display"
+    icon: "mdi:power"
+    entity_category: config
+    restore_mode: ALWAYS_ON
+    lambda: |-
+      return id(rgb8x32)->show_display;
+    turn_on_action:
+      lambda: |-
+        id(rgb8x32)->set_display_on();
+    turn_off_action:
+      lambda: |-
+        id(rgb8x32)->set_display_off();
+  - platform: template
+    id: switch_autobrightness
+    name: "Auto-Adjust Brightness"
+    icon: mdi:brightness-auto
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      if (id(aab_enable)) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        id(aab_enable) = true;
+    turn_off_action:
+      lambda: |-
+        id(aab_enable) = false;
+
+globals:
+  # aab = auto-adjustable brightness
+  - id: aab_enable
+    type: "bool"
+    restore_value: true
+    initial_value: "true"
+  - id: aab_add
+    type: int
+    initial_value: '10'
+  - id: aab_max
+    type: int
+    initial_value: '220'
+  - id: aab_min
+    type: int
+    initial_value: '40'
+
+api:
+  # Enable custom Home Assistant services for EHMTXv2
+  custom_services: true
+  actions:
+    - action: tune
+      variables:
+        tune: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return tune;'
 
 rtttl:
   output: rtttl_out
-
-light:
-#  - platform: neopixelbus
-#    id: light_ehmtx
-#    variant: ws2812
-#    type: GRB
-#    pin: ${pin.light.led_matrix}
-#    num_leds: 256
-#    color_correct: [30%, 30%, 30%]
-#    gamma_correct: 2.0
-#    restore_mode: ALWAYS_OFF
-#    name: "Light"
-#    on_turn_on:
-#      lambda: |-
-#        id(display_ehmtx)->set_enabled(false);
-#    on_turn_off:
-#      lambda: |-
-#        id(display_ehmtx)->set_enabled(true);
-  - platform: esp32_rmt_led_strip
-    id: light_ehmtx
-    chipset: ws2812
-    rgb_order: GRB
-    max_refresh_rate: 30ms
-    pin: ${pin.light.led_matrix}
-    num_leds: 256
-    rmt_symbols: ${device.rmt_symbols_block * 4}
-    color_correct: [30%, 30%, 30%]
-    gamma_correct: 2.0
-    restore_mode: ALWAYS_OFF
-    name: "Light"
-    on_turn_on:
-      lambda: |-
-        id(display_ehmtx)->set_enabled(false);
-    on_turn_off:
-      lambda: |-
-        id(display_ehmtx)->set_enabled(true);
-
-time:
-  - id: !extend time_homeassistant
-    on_time_sync:
-      - then:
-          - ds1307.write_time:
-  - platform: ds1307
-    update_interval: never
-    id: time_rtc
-    on_time: 
-      # Every day at 08:00
-      - seconds: 0
-        minutes: 0
-        hours: 8
-        then:
-          # Initialize CLOCK screen
-          - lambda: |-
-              id(rgb8x32)->clock_screen(1440,30,false,160,240,160);
-          # Initialize DATE screen
-          - lambda: |-
-              id(rgb8x32)->date_screen(1440,15,false,160,240,160);
-
-display:
-  - platform: addressable_light
-    id: display_ehmtx
-    addressable_light_id: light_ehmtx
-    width: 32
-    height: 8
-    pixel_mapper: |-
-      if (y % 2 == 0) {
-        return (y * 32) + x;
-      }
-      return (y * 32) + (31 - x);
-    rotation: 0°
-    update_interval: 16ms
-    auto_clear_enabled: true
-    lambda: |-
-      id(rgb8x32)->tick();
-      id(rgb8x32)->draw();
 
 #image:
 #  - file: img/1pixel.gif
 #    id: breaking20237
 
-#animation:
-#  - file: img/1pixel.gif
-#    id: breaking202371
+font: 
+  # adapt the filename to your local settings
+  - file: gui/fonts/MatrixClock-Light8.bdf
+    id: default_font
+    size: 8
+    glyphs: &norwegian_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', ',', '.', '/', '[', '\', ']', '^', '`',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', ':', ';', '<', '=', '>', '?', '@', '_', '°',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å' ]
+  - file: gui/fonts/MatrixClock-Chunky6.bdf
+    id: special_font
+    size: 6
+    glyphs: &clock_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', 'A', 'P', 'M', 'T', 'a', 'p', 'm', 't' ]
 
 ehmtxv2:
   id: rgb8x32
@@ -360,19 +371,6 @@ ehmtxv2:
         id(rgb8x32)->set_weekday_color(155,155,155);
         id(rgb8x32)->set_today_color(240,160,160);
 
-font: 
-  # adapt the filename to your local settings
-  - file: gui/fonts/MatrixClock-Light8.bdf
-    id: default_font
-    size: 8
-    glyphs: &norwegian_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', ',', '.', '/', '[', '\', ']', '^', '`',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', ':', ';', '<', '=', '>', '?', '@', '_', '°',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å' ]
-  - file: gui/fonts/MatrixClock-Chunky6.bdf
-    id: special_font
-    size: 6
-    glyphs: &clock_glyphs [ '!', ' ', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', 'A', 'P', 'M', 'T', 'a', 'p', 'm', 't' ]
+#animation:
+#  - file: img/1pixel.gif
+#    id: breaking202371

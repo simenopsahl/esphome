@@ -38,13 +38,13 @@ esp32:
       CONFIG_SPIRAM_USE_MALLOC: y
     type: ${device.framework.type}
 
-wifi:
-  enable_btm: true
-  enable_rrm: true
-
 psram:
   mode: octal
   speed: 80MHz
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
 
 # https://community.home-assistant.io/t/jc3248w535-guition-3-5-config/791363
 spi:

@@ -8,6 +8,12 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
 
+esphome:
+  on_boot:
+    - priority: 800
+      then:
+        - bm8563.read_time
+
 # i2c RTC only with one additional i2c bus
 time:
   - platform: bm8563
@@ -18,9 +24,3 @@ time:
     on_time_sync:
       - then:
           - bm8563.write_time:
-
-esphome:
-  on_boot:
-    - priority: 800
-      then:
-        - bm8563.read_time

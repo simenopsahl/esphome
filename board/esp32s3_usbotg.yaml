@@ -32,54 +32,17 @@ esp32:
       compiler_optimization: PERF
       enable_idf_experimental_features: true
 
-wifi:
-  enable_btm: true
-  enable_rrm: true
-
 psram:
   mode: quad
   speed: 80MHz
 
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
-
-esp32_camera:
-  i2c_id: i2c_internal
-  # PINS
-  external_clock:
-    pin: ${pin.cam.m_clk}
-    frequency: 12MHz
-  data_pins:
-    - ${pin.cam.y2}
-    - ${pin.cam.y3}
-    - ${pin.cam.y4}
-    - ${pin.cam.y5}
-    - ${pin.cam.y6}
-    - ${pin.cam.y7}
-    - ${pin.cam.y8}
-    - ${pin.cam.y9}
-  vsync_pin: ${pin.cam.vs}
-  href_pin: ${pin.cam.hs}
-  pixel_clock_pin: ${pin.cam.p_clk}
-  # Metadata
-  id: espcam
-  name: "Camera OV2640"
-  # Image settings
-  resolution: 640x480
-  jpeg_quality: 12
-  max_framerate: 1 fps
-  frame_buffer_count: 2 # defaults to 1
-  vertical_flip: true
-  horizontal_mirror: true
-  # Exposure
-  aec_mode: auto
-  aec2: true # defaults to false
-  # White balance
-  wb_mode: auto
-
-status_led:
-  pin: ${pin.light.led}
 
 light:
   - platform: esp32_rmt_led_strip
@@ -116,3 +79,40 @@ light:
       blue: 0%
     name: "LED"
     entity_category: config
+
+status_led:
+  pin: ${pin.light.led}
+
+esp32_camera:
+  i2c_id: i2c_internal
+  # PINS
+  external_clock:
+    pin: ${pin.cam.m_clk}
+    frequency: 12MHz
+  data_pins:
+    - ${pin.cam.y2}
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin: ${pin.cam.vs}
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin: ${pin.cam.p_clk}
+  # Metadata
+  id: espcam
+  name: "Camera OV2640"
+  # Image settings
+  resolution: 640x480
+  jpeg_quality: 12
+  max_framerate: 1 fps
+  frame_buffer_count: 2 # defaults to 1
+  vertical_flip: true
+  horizontal_mirror: true
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  # White balance
+  wb_mode: auto

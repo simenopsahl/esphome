@@ -29,6 +29,61 @@ time:
               else:
                 - logger.log: "No sensors updated - skipping display refresh."
 
+sensor:
+  # Create sensors for monitoring remotely.
+  - platform: template
+    name: "Display Last Update"
+    device_class: timestamp
+    entity_category: "diagnostic"
+    id: display_last_update
+  - platform: template
+    name: "Recorded Display Refresh"
+    accuracy_decimals: 0
+    unit_of_measurement: "Refreshes"
+    state_class: "total_increasing"
+    entity_category: "diagnostic"
+    lambda: 'return id(recorded_display_refresh);'
+    # Alternate epaper colors
+    on_value:
+      - then:
+          - lambda: |-
+              // This C++ logic updates the color globals
+              if (((int)x) % 5 == 0) {
+                // On refreshes 0, 5, 10, etc., set Black background, White text
+                id(epaper_bg_color) = COLOR_ON;
+                id(epaper_text_color) = COLOR_OFF;
+              } else {
+                // On all other refreshes, set White background, Black text
+                id(epaper_bg_color) = COLOR_OFF;
+                id(epaper_text_color) = COLOR_ON;
+              }
+
+# Buttons in Home Assistant
+button:
+  - platform: template
+    name: "Refresh Screen"
+    entity_category: config
+    on_press:
+      - then:
+          - script.execute: update_screen
+
+  - platform: template
+    name: "Repair Screen"
+    entity_category: config
+    on_press:
+      - then:
+          - script.wait: update_screen
+          - logger.log: "Trying to repair screen"
+          - repeat: 
+              count: 5
+              then:
+                - script.wait: update_screen
+                - script.wait: repair_script
+                - script.execute: repair_script
+          - script.wait: repair_script
+          - logger.log: "Repair script finished"
+          - display.page.show: ${display.home_page}
+
 script:
   # Script for updating screen - Refresh display and publish refresh count and time.
   - id: update_screen
@@ -83,58 +138,3 @@ globals:
     restore_value: yes
     max_restore_data_length: 16
     initial_value: 'COLOR_ON' # Default to black text
-
-# Buttons in Home Assistant
-button:
-  - platform: template
-    name: "Refresh Screen"
-    entity_category: config
-    on_press:
-      - then:
-          - script.execute: update_screen
-
-  - platform: template
-    name: "Repair Screen"
-    entity_category: config
-    on_press:
-      - then:
-          - script.wait: update_screen
-          - logger.log: "Trying to repair screen"
-          - repeat: 
-              count: 5
-              then:
-                - script.wait: update_screen
-                - script.wait: repair_script
-                - script.execute: repair_script
-          - script.wait: repair_script
-          - logger.log: "Repair script finished"
-          - display.page.show: ${display.home_page}
-
-sensor:
-  # Create sensors for monitoring remotely.
-  - platform: template
-    name: "Display Last Update"
-    device_class: timestamp
-    entity_category: "diagnostic"
-    id: display_last_update
-  - platform: template
-    name: "Recorded Display Refresh"
-    accuracy_decimals: 0
-    unit_of_measurement: "Refreshes"
-    state_class: "total_increasing"
-    entity_category: "diagnostic"
-    lambda: 'return id(recorded_display_refresh);'
-    # Alternate epaper colors
-    on_value:
-      - then:
-          - lambda: |-
-              // This C++ logic updates the color globals
-              if (((int)x) % 5 == 0) {
-                // On refreshes 0, 5, 10, etc., set Black background, White text
-                id(epaper_bg_color) = COLOR_ON;
-                id(epaper_text_color) = COLOR_OFF;
-              } else {
-                // On all other refreshes, set White background, Black text
-                id(epaper_bg_color) = COLOR_OFF;
-                id(epaper_text_color) = COLOR_ON;
-              }

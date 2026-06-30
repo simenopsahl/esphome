@@ -5,6 +5,10 @@ labels: [esp32, psram, ILI9342, display, MPU6886, speaker]
 # M5Stack Fire
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_fire.yaml
+
 substitutions:
   device:
     model: "M5Stack Fire"
@@ -14,10 +18,6 @@ substitutions:
   module:
     internal:
       i2c_bus: i2c_internal
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_fire.yaml
 
 esphome:
   project:
@@ -46,52 +46,20 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-#external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/ssieb/custom_components
-#    components: [ip5306]
-
-#ip5306:
-#  battery_level:
-#    id: ip5306_battery_level
-#    name: Battery Level
-#  charger_connected:
-#    id: ip5306_charger_connected
-#  charge_full:
-#    id: ip5306_charge_full
-
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
   miso_pin: ${pin.int.spi.miso}
 
+# Speaker (only got buzzer to work)
+#i2s_audio:
+#  i2s_lrclk_pin: ${pin.int.audio.i2s_lrclk}
 
-# IR
-#remote_transmitter:
-#  pin: ${ir_pin}
-#  carrier_duty_percent: 50%
-#  rmt_symbols: ${device.rmt_symbols_block}
-
-# 320x240 ILI9342C LCD
-display:
-  - platform: mipi_spi
-    id: display_lcd
-    model: ili9342
-    cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin: ${pin.int.spi.disp.dc}
-    reset_pin: ${pin.int.spi.disp.reset}
-    data_rate: 20Mhz
-    dimensions:
-      height: 240
-      width: 320
-    transform:
-      swap_xy: false
-      mirror_x: false
-      mirror_y: false
-    invert_colors: true
-    update_interval: 10s
-    auto_clear_enabled: false
+#external_components:
+#  - source:
+#      type: git
+#      url: https://github.com/ssieb/custom_components
+#    components: [ip5306]
 
 output:
   # backlight output
@@ -115,16 +83,25 @@ light:
     name: "Backlight"
     entity_category: config
 
-# Speaker (only got buzzer to work)
-#i2s_audio:
-#  i2s_lrclk_pin: ${pin.int.audio.i2s_lrclk}
-
-#media_player:
-#  - platform: i2s_audio
-#    id: media_player_out
-#    dac_type: internal
-#    mode: stereo
-#    name: "Internal Media Player"
+# 320x240 ILI9342C LCD
+display:
+  - platform: mipi_spi
+    id: display_lcd
+    model: ili9342
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin: ${pin.int.spi.disp.dc}
+    reset_pin: ${pin.int.spi.disp.reset}
+    data_rate: 20Mhz
+    dimensions:
+      height: 240
+      width: 320
+    transform:
+      swap_xy: false
+      mirror_x: false
+      mirror_y: false
+    invert_colors: true
+    update_interval: 10s
+    auto_clear_enabled: false
 
 # Buttons
 binary_sensor:
@@ -231,3 +208,25 @@ script:
           level: "1%"
       - delay: 30ms
       - output.turn_off: buzzer
+
+# IR
+#remote_transmitter:
+#  pin: ${ir_pin}
+#  carrier_duty_percent: 50%
+#  rmt_symbols: ${device.rmt_symbols_block}
+
+#media_player:
+#  - platform: i2s_audio
+#    id: media_player_out
+#    dac_type: internal
+#    mode: stereo
+#    name: "Internal Media Player"
+
+#ip5306:
+#  battery_level:
+#    id: ip5306_battery_level
+#    name: Battery Level
+#  charger_connected:
+#    id: ip5306_charger_connected
+#  charge_full:
+#    id: ip5306_charge_full

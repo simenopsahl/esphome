@@ -52,6 +52,14 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin:
+    number: ${pin.audio.i2s_lrclk}
+    ignore_strapping_warning: true
+  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+  i2s_mclk_pin: ${pin.audio.i2s_mclk}
+
 # Button
 binary_sensor:
   - platform: gpio
@@ -69,13 +77,26 @@ binary_sensor:
     name: Button
     entity_category: diagnostic
 
-i2s_audio:
-  id: i2s_audio_bus
-  i2s_lrclk_pin:
-    number: ${pin.audio.i2s_lrclk}
-    ignore_strapping_warning: true
-  i2s_bclk_pin: ${pin.audio.i2s_bclk}
-  i2s_mclk_pin: ${pin.audio.i2s_mclk}
+switch:
+  - platform: gpio
+    id: speaker_enable
+    name: Speaker Enable
+    pin: ${pin.audio.pwr}
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: template
+    id: mic_mute
+    name: Microphone Mute
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+    on_turn_on:
+        - microphone.mute:
 
 audio_dac:
   - platform: es8311
@@ -103,24 +124,3 @@ speaker:
     sample_rate: 48000
     bits_per_sample: 16bit
     channel: left
-
-switch:
-  - platform: gpio
-    id: speaker_enable
-    name: Speaker Enable
-    pin: ${pin.audio.pwr}
-    restore_mode: RESTORE_DEFAULT_ON
-    entity_category: config
-    disabled_by_default: true
-
-  - platform: template
-    id: mic_mute
-    name: Microphone Mute
-    icon: "mdi:microphone-off"
-    optimistic: true
-    restore_mode: RESTORE_DEFAULT_OFF
-    entity_category: config
-    on_turn_off:
-        - microphone.unmute:
-    on_turn_on:
-        - microphone.mute:

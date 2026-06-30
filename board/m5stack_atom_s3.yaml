@@ -5,16 +5,16 @@ labels: [esp32s3, psram, ST7789V, display, MPU6886]
 # M5Stack AtomS3
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_s3.yaml
+
 substitutions:
   device:
     model: "M5Stack Atom S3"
     rmt_symbols_block: 48 
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_atom_s3.yaml
 
 esphome:
   project:
@@ -43,12 +43,6 @@ spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
 
-# IR
-#remote_transmitter:
-#  pin: ${pin.light.ir}
-#  carrier_duty_percent: 50%
-#  rmt_symbols: ${device.rmt_symbols_block}
-
 output:
   - platform: ledc
     id: backlight_output
@@ -71,23 +65,6 @@ light:
     name: "Backlight"
     entity_category: config
 
-# Button
-binary_sensor:
-  - platform: gpio
-    id: btn_display
-    pin:
-      number: ${pin.btn}
-      inverted: true
-      mode:
-        input: true
-        pullup: true
-    filters:
-      - delayed_off: 10ms
-    on_press:
-      - logger.log: Button Pressed
-    name: Button
-    entity_category: diagnostic
-
 display:
   - platform: mipi_spi
     model: st7789v
@@ -106,6 +83,23 @@ display:
       offset_height: 1
       pad_width: 2
       pad_height: 1
+
+# Button
+binary_sensor:
+  - platform: gpio
+    id: btn_display
+    pin:
+      number: ${pin.btn}
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Button Pressed
+    name: Button
+    entity_category: diagnostic
 
 #sensor:
     # MPU6886 IMU
@@ -168,3 +162,9 @@ display:
 #        - sliding_window_moving_average:
 #            window_size: 6
 #            send_every: 3
+
+# IR
+#remote_transmitter:
+#  pin: ${pin.light.ir}
+#  carrier_duty_percent: 50%
+#  rmt_symbols: ${device.rmt_symbols_block}

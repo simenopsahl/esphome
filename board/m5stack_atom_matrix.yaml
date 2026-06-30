@@ -5,16 +5,16 @@ labels: [esp32, WS2812, RGB, RMT_LED, display]
 # M5Stack Atom Matrix v1.1
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_atom_lite.yaml
+
 substitutions:
   device:
     model: "M5Stack Atom Matrix"
     rmt_symbols_block: 64
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_atom_lite.yaml
 
 esphome:
   project:

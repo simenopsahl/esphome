@@ -26,92 +26,6 @@ substitutions:
       packet_mode: "false"
       num_preamble: "2"
 
-logger:
-  logs:
-    cc1101: DEBUG
-    remote_transmitter: DEBUG
-    remote_receiver: DEBUG
-    radio_frequency: DEBUG
-
-# Module CC1101
-cc1101:
-  id: radio_cc1101_async
-  # Hardware settings
-  cs_pin: ${pin.ext.mbus.p21}
-  gdo0_pin:
-    number: ${pin.ext.mbus.p22}
-    allow_other_uses: true
-#  gdo2_pin: ${pin.ext.mbus.p2}
-  # General settings
-  frequency: ${module.cc1101.frequency}
-  output_power: ${module.cc1101.output_power}
-  modulation_type: ${module.cc1101.modulation_type}
-  symbol_rate: ${module.cc1101.symbol_rate}
-  rx_attenuation: ${module.cc1101.rx_attenuation}
-  dc_blocking_filter: false
-  # Tuner settings
-  filter_bandwidth: ${module.cc1101.filter_bandwidth}
-  fsk_deviation: ${module.cc1101.fsk_deviation}
-  # Packet Mode settings
-  packet_mode: ${module.cc1101.packet_mode}
-
-# Can NOT toggle packet mode at runtime, use separate package file
-remote_transmitter:
-  id: rf_tx
-  pin:
-    number: ${pin.ext.mbus.p22}  # Must match GDO0
-    allow_other_uses: true
-  carrier_duty_percent: 100%
-  on_transmit:
-    then:
-      - cc1101.begin_tx:
-      - lvgl.label.update:
-          id: lbl_cc1101_state
-          text: "Sender..."
-      - lvgl.label.update:
-          id: lbl_cc1101_packet
-          text: "..."
-      - lvgl.led.update:
-          id: led_cc1101_state
-          color: c_purple
-  on_complete:
-    then:
-      - cc1101.begin_rx:
-      - lvgl.label.update:
-          id: lbl_cc1101_state
-          text: "Mottar..."
-      - lvgl.led.update:
-          id: led_cc1101_state
-          color: c_green
-
-remote_receiver:
-  id: rf_rx
-  pin: ${pin.ext.mbus.p2}  # Must match GDO2
-  dump: raw
-
-radio_frequency:
-  - platform: ir_rf_proxy
-    id: rf_proxy_tx
-    name: "CC1101 Proxy Transmitter"
-    remote_transmitter_id: rf_tx
-    frequency: ${module.cc1101.frequency}
-    # Optional: retune the CC1101 when an API request specifies a different
-    # carrier frequency.  `x` is the radio_frequency call object.
-    on_control:
-      then:
-        - if:
-            condition:
-              lambda: "return x.get_frequency().has_value() && *x.get_frequency() > 0;"
-            then:
-              - cc1101.set_frequency:
-                  value: !lambda "return *x.get_frequency();"
-
-  - platform: ir_rf_proxy
-    id: rf_proxy_rx
-    name: "CC1101 Proxy Receiver"
-    remote_receiver_id: rf_rx
-    frequency: ${module.cc1101.frequency}
-
 esphome:
   on_boot:
     # Sync CC1101 settings on boot (in case we changed them from Home Assistant)
@@ -176,6 +90,57 @@ esphome:
               switch.is_on: cc1101_rx
             then:
               - cc1101.begin_rx:
+
+logger:
+  logs:
+    cc1101: DEBUG
+    remote_transmitter: DEBUG
+    remote_receiver: DEBUG
+    radio_frequency: DEBUG
+
+button:
+  # Put CC1101 into idle mode from Home Assistant
+  - platform: template
+    id: cc1101_idle
+    name: "CC1101 Idle"
+    icon: "mdi:email-lock"
+    entity_category: config
+    on_press:
+      - then:
+          - cc1101.set_idle:
+          - delay: 1s
+          - switch.turn_off: cc1101_rx
+      - then:
+          - lvgl.label.update:
+              id: lbl_cc1101_state
+              text: "Stopper"
+          - lvgl.led.update:
+              id: led_cc1101_state
+              color: c_yellow
+
+.sizing:
+  - &page_styles
+    <<: !include ../../gui/styles/page_styles.yaml
+    page_pad_top: 32
+    page_pad_bottom: 32
+    screen_height: 240
+    screen_width: 320
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 240 - (2 * 32) - (2 * 1) = 170
+    usable_screen_height: 170
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 320  (2 * 4) = 312
+    usable_screen_width: 312
+
+  - &container_styles
+    <<: !include ../../gui/styles/container_styles.yaml
+    container_pad_top: 1
+    container_pad_bottom: 1
+    container_pad_left: 4
+    container_pad_right: 4
+    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
 
 # Adjustments
 number:
@@ -437,49 +402,62 @@ switch:
               id: led_cc1101_state
               color: c_red
 
-button:
-  # Put CC1101 into idle mode from Home Assistant
-  - platform: template
-    id: cc1101_idle
-    name: "CC1101 Idle"
-    icon: "mdi:email-lock"
-    entity_category: config
-    on_press:
-      - then:
-          - cc1101.set_idle:
-          - delay: 1s
-          - switch.turn_off: cc1101_rx
-      - then:
-          - lvgl.label.update:
-              id: lbl_cc1101_state
-              text: "Stopper"
-          - lvgl.led.update:
-              id: led_cc1101_state
-              color: c_yellow
+# Can NOT toggle packet mode at runtime, use separate package file
+remote_transmitter:
+  id: rf_tx
+  pin:
+    number: ${pin.ext.mbus.p22}  # Must match GDO0
+    allow_other_uses: true
+  carrier_duty_percent: 100%
+  on_transmit:
+    then:
+      - cc1101.begin_tx:
+      - lvgl.label.update:
+          id: lbl_cc1101_state
+          text: "Sender..."
+      - lvgl.label.update:
+          id: lbl_cc1101_packet
+          text: "..."
+      - lvgl.led.update:
+          id: led_cc1101_state
+          color: c_purple
+  on_complete:
+    then:
+      - cc1101.begin_rx:
+      - lvgl.label.update:
+          id: lbl_cc1101_state
+          text: "Mottar..."
+      - lvgl.led.update:
+          id: led_cc1101_state
+          color: c_green
 
-.sizing:
-  - &page_styles
-    <<: !include ../../gui/styles/page_styles.yaml
-    page_pad_top: 32
-    page_pad_bottom: 32
-    screen_height: 240
-    screen_width: 320
-    # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 32) - (2 * 1) = 170
-    usable_screen_height: 170
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 320  (2 * 4) = 312
-    usable_screen_width: 312
+remote_receiver:
+  id: rf_rx
+  pin: ${pin.ext.mbus.p2}  # Must match GDO2
+  dump: raw
 
-  - &container_styles
-    <<: !include ../../gui/styles/container_styles.yaml
-    container_pad_top: 1
-    container_pad_bottom: 1
-    container_pad_left: 4
-    container_pad_right: 4
-    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
+radio_frequency:
+  - platform: ir_rf_proxy
+    id: rf_proxy_tx
+    name: "CC1101 Proxy Transmitter"
+    remote_transmitter_id: rf_tx
+    frequency: ${module.cc1101.frequency}
+    # Optional: retune the CC1101 when an API request specifies a different
+    # carrier frequency.  `x` is the radio_frequency call object.
+    on_control:
+      then:
+        - if:
+            condition:
+              lambda: "return x.get_frequency().has_value() && *x.get_frequency() > 0;"
+            then:
+              - cc1101.set_frequency:
+                  value: !lambda "return *x.get_frequency();"
+
+  - platform: ir_rf_proxy
+    id: rf_proxy_rx
+    name: "CC1101 Proxy Receiver"
+    remote_receiver_id: rf_rx
+    frequency: ${module.cc1101.frequency}
 
 lvgl:
   pages:
@@ -488,3 +466,25 @@ lvgl:
         vars:
           <<: [*page_styles, *container_styles]
           page_title: Radio
+
+# Module CC1101
+cc1101:
+  id: radio_cc1101_async
+  # Hardware settings
+  cs_pin: ${pin.ext.mbus.p21}
+  gdo0_pin:
+    number: ${pin.ext.mbus.p22}
+    allow_other_uses: true
+#  gdo2_pin: ${pin.ext.mbus.p2}
+  # General settings
+  frequency: ${module.cc1101.frequency}
+  output_power: ${module.cc1101.output_power}
+  modulation_type: ${module.cc1101.modulation_type}
+  symbol_rate: ${module.cc1101.symbol_rate}
+  rx_attenuation: ${module.cc1101.rx_attenuation}
+  dc_blocking_filter: false
+  # Tuner settings
+  filter_bandwidth: ${module.cc1101.filter_bandwidth}
+  fsk_deviation: ${module.cc1101.fsk_deviation}
+  # Packet Mode settings
+  packet_mode: ${module.cc1101.packet_mode}

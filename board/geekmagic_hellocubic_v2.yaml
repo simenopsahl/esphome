@@ -33,6 +33,11 @@ esp32:
 
 psram:
 
+spi:
+  clk_pin: ${pin.spi.clk}
+  mosi_pin: ${pin.spi.mosi}
+  interface: hardware
+
 i2c:
 # Internal
   - id: i2c_internal
@@ -41,11 +46,6 @@ i2c:
     frequency: 100kHz
 #    timeout: 5ms
     scan: true
-
-spi:
-  clk_pin: ${pin.spi.clk}
-  mosi_pin: ${pin.spi.mosi}
-  interface: hardware
 
 output:
   - platform: ledc
@@ -64,6 +64,38 @@ light:
       brightness: 25%
     name: "Backlight"
     entity_category: config
+
+display:
+#  - platform: ili9xxx
+#    id: display_lcd
+#    model: st7789v
+#    data_rate: 40MHz
+#    dc_pin: ${pin.spi.disp.dc}
+#    reset_pin: ${pin.spi.disp.reset}
+#    spi_mode: MODE3
+#    dimensions:
+#      width: 240
+#      height: 240
+#      offset_height: 0
+#      offset_width: 0
+#    invert_colors: true
+#    auto_clear_enabled: false
+#    update_interval: never
+  - platform: mipi_spi
+    model: st7789v
+    id: display_lcd
+    data_rate: 40MHz
+    dc_pin: ${pin.spi.disp.dc}
+    reset_pin: ${pin.spi.disp.reset}
+    spi_mode: MODE3
+    dimensions:
+      width: 240
+      height: 240
+      offset_height: 0
+      offset_width: 0
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 10s
 
 sensor:
   - platform: mpu6050
@@ -131,35 +163,3 @@ sensor:
         - sliding_window_moving_average:
             window_size: 60
             send_every: 30
-
-display:
-#  - platform: ili9xxx
-#    id: display_lcd
-#    model: st7789v
-#    data_rate: 40MHz
-#    dc_pin: ${pin.spi.disp.dc}
-#    reset_pin: ${pin.spi.disp.reset}
-#    spi_mode: MODE3
-#    dimensions:
-#      width: 240
-#      height: 240
-#      offset_height: 0
-#      offset_width: 0
-#    invert_colors: true
-#    auto_clear_enabled: false
-#    update_interval: never
-  - platform: mipi_spi
-    model: st7789v
-    id: display_lcd
-    data_rate: 40MHz
-    dc_pin: ${pin.spi.disp.dc}
-    reset_pin: ${pin.spi.disp.reset}
-    spi_mode: MODE3
-    dimensions:
-      width: 240
-      height: 240
-      offset_height: 0
-      offset_width: 0
-    invert_colors: true
-    auto_clear_enabled: false
-    update_interval: 10s

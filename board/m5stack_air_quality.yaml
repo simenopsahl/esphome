@@ -7,6 +7,13 @@ labels: [esp32s3, BM8563, RTC, SCD40, CO2, temperature, humidity, SEN55, particu
 # M5Stack PM2.5 Air Quality
 #
 
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_air_quality.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+  epaper: !include module/epaper.yaml
+  status_led: !include ../features/system_status_led.yaml
+
 substitutions:
   time_timezone: "Europe/Oslo"
   display:
@@ -19,13 +26,6 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
-
-# Pins for this model
-packages:
-  pins: !include pins/m5stack_air_quality.yaml
-  i2c_int: !include extension/internal_i2c.yaml
-  epaper: !include module/epaper.yaml
-  status_led: !include ../features/system_status_led.yaml
 
 esphome:
   project:
@@ -74,10 +74,6 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-spi:
-  clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
-
 time:
   - platform: bm8563
     i2c_id: ${module.internal.i2c_bus}
@@ -88,6 +84,10 @@ time:
     on_time_sync:
       - then:
           - bm8563.write_time:
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
 
 output:
   - platform: gpio
@@ -138,6 +138,32 @@ light:
       blue: 0%
     name: "LED"
     entity_category: config
+
+display:
+  # 200 x 200 resolution
+  - platform: waveshare_epaper
+    id: display_eink
+    model: 1.54inv2
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin:
+      number: ${pin.int.spi.disp.dc}
+      ignore_strapping_warning: true
+    reset_pin: ${pin.int.spi.disp.reset}
+    busy_pin:
+      number: ${pin.int.spi.disp.busy}
+      inverted: false
+    full_update_every: 5
+#    reset_duration: 2ms
+    update_interval: never
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill(id(epaper_text_color));
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill(id(epaper_bg_color));
 
 binary_sensor:
   - platform: gpio
@@ -215,82 +241,6 @@ binary_sensor:
       - logger.log: Power Hold On
     on_release:
       - logger.log: Power Hold Off
-
-button:
-  - platform: template
-    name: "CO2 Force Manual Calibration"
-    entity_category: "config"
-    on_press:
-      - then:
-          - scd4x.perform_forced_calibration:
-              value: !lambda 'return id(co2_cal).state;'
-
-  - platform: template
-    name: "SEN55 Force Manual Clean"
-    entity_category: "config"
-    on_press:
-      - then:
-          - sen5x.start_fan_autoclean: sen55_sensor
-
-number:
-  - platform: template
-    name: "CO2 Calibration Value"
-    optimistic: true
-    min_value: 400
-    max_value: 1000
-    step: 5
-    id: co2_cal
-    icon: "mdi:molecule-co2"
-    entity_category: "config"
-
-script:
-  # Script for buzzer beep
-  - id: buzzer_on
-    then:
-      - output.turn_on: buzzer
-      - output.ledc.set_frequency:
-          id: buzzer
-          frequency: "500Hz"
-      - output.set_level:
-          id: buzzer
-          level: "1%"
-  - id: buzzer_beep
-    then:
-      - output.turn_on: buzzer
-      - output.ledc.set_frequency:
-          id: buzzer
-          frequency: "500Hz"
-      - output.set_level:
-          id: buzzer
-          level: "1%"
-      - delay: 50ms
-      - output.turn_off: buzzer
-
-display:
-  # 200 x 200 resolution
-  - platform: waveshare_epaper
-    id: display_eink
-    model: 1.54inv2
-    cs_pin: ${pin.int.spi.disp.cs}
-    dc_pin:
-      number: ${pin.int.spi.disp.dc}
-      ignore_strapping_warning: true
-    reset_pin: ${pin.int.spi.disp.reset}
-    busy_pin:
-      number: ${pin.int.spi.disp.busy}
-      inverted: false
-    full_update_every: 5
-#    reset_duration: 2ms
-    update_interval: never
-    pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_text_color));
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_bg_color));
 
 sensor:
   - platform: scd4x
@@ -446,3 +396,53 @@ sensor:
 #    entity_category: diagnostic
 #    device_class: battery
 #    unit_of_measurement: "%"
+
+button:
+  - platform: template
+    name: "CO2 Force Manual Calibration"
+    entity_category: "config"
+    on_press:
+      - then:
+          - scd4x.perform_forced_calibration:
+              value: !lambda 'return id(co2_cal).state;'
+
+  - platform: template
+    name: "SEN55 Force Manual Clean"
+    entity_category: "config"
+    on_press:
+      - then:
+          - sen5x.start_fan_autoclean: sen55_sensor
+
+number:
+  - platform: template
+    name: "CO2 Calibration Value"
+    optimistic: true
+    min_value: 400
+    max_value: 1000
+    step: 5
+    id: co2_cal
+    icon: "mdi:molecule-co2"
+    entity_category: "config"
+
+script:
+  # Script for buzzer beep
+  - id: buzzer_on
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+  - id: buzzer_beep
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 50ms
+      - output.turn_off: buzzer
