@@ -165,7 +165,9 @@ display:
   - platform: mipi_spi
     id: display_lcd
     model: ili9342
-    cs_pin: ${pin.int.spi.disp.cs}
+    cs_pin:
+      number: ${pin.int.spi.disp.cs}
+      ignore_strapping_warning: true
     dc_pin:
       number: ${pin.int.spi.disp.dc}
       allow_other_uses: true
@@ -290,7 +292,7 @@ switch:
     pin:
       aw9523b_id: aw9523b_hub
       number: 15
-    # BOOST_EN
+    # BOOST_EN = 1
     restore_mode: RESTORE_DEFAULT_ON
     entity_category: config
 

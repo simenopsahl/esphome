@@ -87,6 +87,7 @@ binary_sensor:
     pin:
       number: ${pin.btn}
       inverted: true
+      ignore_strapping_warning: true
     filters:
       - delayed_off: 10ms
     on_press:

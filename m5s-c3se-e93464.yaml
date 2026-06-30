@@ -41,6 +41,11 @@ substitutions:
   display:
     home_page: page_temperature
 
+# 2026.6.3 mipi_spi inver_colors fix
+external_components:
+  - source: github://pr#17247
+    components: [mipi_spi]
+
 esphome:
   comment: ${device.model} @ ${device.location}
   name: ${device.name}

@@ -92,7 +92,9 @@ spi:
 output:
   - platform: ledc
     id: buzzer
-    pin: ${pin.audio.buzzer}
+    pin:
+      number: ${pin.audio.buzzer}
+      ignore_strapping_warning: true
 #  - platform: gpio
 #    id: power_hold
 #    pin:
@@ -192,6 +194,7 @@ binary_sensor:
     pin:
       number: ${pin.btn.top}
       inverted: true
+      ignore_strapping_warning: true
       mode:
         input: true
         pullup: true
