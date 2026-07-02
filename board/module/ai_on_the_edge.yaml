@@ -1,0 +1,248 @@
+---
+# https://github.com/nliaudat/esphome_ai_component
+
+substitutions:
+  # camera
+  camera:
+    # NOTE: OV2640 + ESP32 camera driver cannot reliably do grayscale AND windowing at the same time.
+    # Using JPEG pixel format with the camera; grayscale conversion is done in software by the ImageProcessor
+    # when a grayscale model (model_channels == 1) is loaded.
+    pixel_format: JPEG  # (cropping implementation is faster with RGB888 format) | Displays: RGB565, RGB888 | Cameras: YUV422, YUV420, RAW | Efficiency: Grayscale, YUV420, JPEG
+    ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
+    # pixel_format: GRAYSCALE
+    resolution: 640x480  # 800x600 #640x480 #https://esphome.io/components/esp32_camera.html
+    # jpeg_quality: 10 # From 10 (best) to 63 (worst). | Must be 0 if non JPEG
+    jpeg_quality: 15
+    max_framerate: 1fps
+    idle_framerate: 0.2fps
+  # Meter settings
+  meter:
+    # Unit of measurement for the meter (e.g. m^3, kWh, L)
+    unit: L
+    # device class for the meter (e.g. water, energy, gas)
+    device_class: water
+    # state class for the meter (e.g. total_increasing, total, measurement)
+    state_class: total_increasing
+  time:
+    reboot_days_of_week: MON
+    reboot_hours: 5
+    reboot_minutes: 0
+    reboot_seconds: 0
+
+packages:
+  # Component-specific controls (comment to disable individual controls)
+  - !include ai_on_the_edge/components/esp32_camera_utils_controls.yaml
+  - !include ai_on_the_edge/components/flash_light_controller_controls.yaml
+  - !include ai_on_the_edge/components/meter_reader_tflite_controls.yaml
+  - !include ai_on_the_edge/components/value_validator_controls.yaml
+  # Debug sensors
+  - !include ai_on_the_edge/debug_board.yaml
+  # camera configs
+  - !include ai_on_the_edge/camera_options.yaml
+  - !include ai_on_the_edge/esp32_camera.yaml
+  # - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
+
+preferences:
+  flash_write_interval: 60min
+
+esphome:
+  on_loop:
+    - lambda: |-
+          if (id(espcam_updated)) {
+            id(espcam).update_camera_parameters();
+            if(id(gl_debug)) { id(espcam).dump_config(); }
+            id(espcam_updated) = false;
+          }
+
+time:
+  - platform: sntp
+    timezone: ${time_timezone}
+    servers: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org]
+    on_time:
+      - seconds: ${time.reboot_seconds}
+        minutes: ${time.reboot_minutes}
+        hours: ${time.reboot_hours}
+        days_of_week: ${time.reboot_days_of_week}
+        then:
+          - button.press: button_restart
+
+external_components:
+  - source: github://nliaudat/esphome_ai_component
+    components:
+      # Choose the reader type you need:
+      - meter_reader_tflite   # AI-powered digit recognition
+      # - ssocr_reader        # Seven-segment OCR (no AI)
+      # - analog_reader       # Analog gauge/dial reader (no AI)
+
+      # Supporting components:
+      - value_validator       # Validation engine (recommended)
+      - tflite_micro_helper   # Required for meter_reader_tflite
+      - esp32_camera_utils    # Image processing utilities
+      - flash_light_controller
+      - data_collector        # Optional: For collecting training data
+
+# Enable logging
+logger:
+  logs:
+    esp32_camera: WARN
+    meter_reader_tflite: DEBUG
+    ModelHandler: DEBUG
+    ImageProcessor: DEBUG
+    tflite_coordinator: DEBUG
+    internal_temperature: ERROR
+    internal_temperature.esp32: ERROR
+
+globals:
+  # the debug parameter determines whether a config dump is done after making changes
+  # this is helpful when doing initial setup, but once everything is working, I turn it off
+  - id: gl_debug
+    type: bool
+    initial_value: 'false'
+  # value to track if camera parameters have been changed
+  #   used to trigger the loop() code inserted in 'esphome' section above
+  - id: espcam_updated
+    type: bool
+    initial_value: 'false'
+
+  - id: crop_zones
+    type: std::string
+    max_restore_data_length: 254
+    initial_value: "\"[]\""
+
+    # #debug config
+    # initial_value: '"[[9, 10, 49, 74], [64, 10, 104, 74], [118, 9, 158, 81], [173, 9, 213, 81], [230, 9, 270, 81], [286, 10, 326, 82], [339, 11, 379, 83], [394, 10, 434, 82]]"'
+    #    # Note: The outer quotes are escaped with single quotes + double quotes ("...")
+
+tflite_micro_helper:
+  debug: false
+
+esp32_camera_utils:
+  id: espcam_utils
+  camera_id: espcam
+  debug: false
+  ### zoom available for OV2640, OV3660, OV5640, SC101IOT, SC030IOT from crop zones (explicit)
+  ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
+  # camera_window:  # can be set in http://[hassio]/developer-tools/action > esphome.[s3cam_tflite]_set_camera_window
+  #   offset_x: 928 # multiple of 4
+  #   offset_y: 480 # multiple of 4
+  #   width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+  #   height: 88 #  multiple of 4 or 16 if rotation enabled and 4:3 proportions with width for best quality
+
+  # enable_rotation: true
+  # rotation: 270 # 0, 90, 180, 270 (special case built-in "accelerated" for 90, 180, 270 )
+
+  # enable_scaler: true
+  # scaler:
+  #   width: 640
+  #   height: 480
+
+  # enable_cropper: true
+  # cropper:
+  #   width: 320
+  #   height: 240
+  #   offset_x: 0
+  #   offset_y: 0
+  
+  # enable_drawing: true # enable drawing subsystem, needed if meter_reader_tflite: generate_preview: true + show_crop_areas: true
+
+  debug_memory: false
+
+# optional : flash light at taking image
+flash_light_controller:
+  id: camera_flash_controller
+  flash_light: flash_light
+  flash_pre_time: 7000ms # 7 seconds before update (time to stabilize) (works with 5sec on my board)
+  flash_post_time: 200ms # 2 seconds after update (works with 100ms on my board)
+  debug: false
+
+value_validator:
+  id: meter_value_validator
+  # Basic Validation
+  # Allow values < previous value (default: false)
+  allow_negative_rates: false
+  # Max allowed absolute change (default: 100)
+  max_absolute_diff: 300
+  # Max rate change as percentage (default: 15%)
+  #max_rate_change: 0.15
+
+  # Smart Validation
+  # Enable adaptive validation (default: true)
+  enable_smart_validation: true
+  # Window size for pattern analysis (default: 5)
+  smart_validation_window: 5
+
+  # Confidence Thresholds
+  # Threshold for high confidence (default: 90%)
+  high_confidence_threshold: 0.90
+  # Min confidence per digit (default: 85%)
+  per_digit_confidence_threshold: 0.85
+  # Require all digits meet threshold (default: false)
+  strict_confidence_check: true
+  #first_reading_digit_threshold: 0.70
+
+  # Memory Management
+  max_history_size: 50kB               # Max history memory usage (default: 50kB)
+
+meter_reader_tflite:
+  id: tflite_meter_reader
+  validator: meter_value_validator
+  # confidence_threshold: 0.85 # Only if validator is disabled
+  camera_id: espcam
+  #model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"  # best performance / accuracy
+  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite" # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
+  #model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite" # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
+  #model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite" # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
+  #model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite" From AI-On-The-Edge
+
+  update_interval: 60s
+
+  # collect_low_confidence: true # [Optional] Default: true. Required for data collector. Defines what is considered "low confidence" (uses confidence_threshold).
+  # collect_min_global_confidence: 0.90 # [Optional] Default: 0.90. Low confidence override for data collection (Average < Value). Prerequisite: data_collector.
+  # collect_min_digit_confidence: 0.90 # [Optional] Default: 0.90. Low confidence override for data collection (Any Digit < Value). Prerequisite: data_collector.
+
+  debug: false
+  debug_image: false # static embedded image (debug.jpg)
+  debug_image_out_serial: false
+  debug_memory: false
+  debug_timing: false
+
+  # Preview of what the AI sees (Rotated Live Cam)
+  # Set to true to enable continuous updates, or false for on-demand only (via button)
+  generate_preview: false # need web_server: port: 80 (wait for update_interval to be reached) + esp32_camera_utils: enable drawing subsystem
+  # show_crop_areas: true # DEV (not ready for production) Draw boxes on preview
+  ## other needs :
+    # esp32_camera_utils: enable_drawing: true
+    # generate_preview: true
+    # show_crop_areas: true
+    # web_server:
+        # port: 80  # commented  uncomment
+    # - !include camera_webserver.yaml
+
+  crop_zones_global: crop_zones  # Reference the global variables set in globals_AI_component.yaml | To update, use http://[hassio]/developer-tools/action >esphome.[s3cam_tflite]_set_crop_zones | to get, use the tools>draw_regions.py
+  flash_light_controller: camera_flash_controller
+
+  # data_collector: ${id_prefix}_data_collector
+  # collect_low_confidence: true
+
+  value_sensor: kamstrup_meter_value
+  confidence_sensor: tmr_meter_confidence
+
+  inference_logs: tmr_inference_logs
+  main_logs: tmr_main_logs
+
+  total_inference_time_sensor: tmr_inference_time
+  capture_to_publish_time_sensor: tmr_capture_to_publish_time
+
+  # enable_flash_calibration: false # still in dev
+
+  ### Advanced parameters
+  # frame_request_timeout: 15000  # ms (1000-60000)
+  # tensor_arena_size: "110KB"
+  # Pool efficiency monitoring (optional, requires DEBUG_METER_READER_MEMORY)
+  # pool_job_efficiency_sensor: ${id_prefix}_pool_job_efficiency
+  # pool_result_efficiency_sensor: ${id_prefix}_pool_result_efficiency
+  # arena_efficiency_sensor: ${id_prefix}_arena_efficiency
+  # heap_fragmentation_sensor: ${id_prefix}_heap_fragmentation
+
+  unload_button: tmr_unload_btn
+  reload_button: tmr_reload_btn

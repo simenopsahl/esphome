@@ -1,0 +1,183 @@
+---
+# https://github.com/nliaudat/esphome_ai_component
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap Free"
+      entity_category: diagnostic
+      disabled_by_default: true
+    # fragmentation:
+    #   name: "Heap Fragmentation"
+    block:
+      name: "Heap Max Block"
+      entity_category: diagnostic
+      disabled_by_default: true
+    loop_time:
+      name: "Loop Time"
+      entity_category: diagnostic
+    psram:
+      name: "PSRAM Free"
+      entity_category: diagnostic
+    cpu_frequency:
+      name: "CPU Frequency"
+      entity_category: diagnostic
+      disabled_by_default: true
+
+  # CPU Temperature
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic
+  # Memory sensors using correct ESP-IDF functions
+  - platform: template
+    name: "RAM Free"
+    id: ram_free
+    unit_of_measurement: "B"
+    device_class: data_size
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      return heap_caps_get_free_size(MALLOC_CAP_8BIT);
+  - platform: template
+    name: "RAM Total"
+    id: ram_total
+    unit_of_measurement: "B"
+    device_class: data_size
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      return heap_caps_get_total_size(MALLOC_CAP_8BIT);
+  - platform: template
+    name: "RAM Used"
+    id: ram_used
+    unit_of_measurement: "B"
+    device_class: data_size
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      return heap_caps_get_total_size(MALLOC_CAP_8BIT) - heap_caps_get_free_size(MALLOC_CAP_8BIT);
+  - platform: template
+    name: "RAM Free Percentage"
+    id: ram_free_percentage
+    unit_of_measurement: "%"
+    device_class: battery
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      size_t total = heap_caps_get_total_size(MALLOC_CAP_8BIT);
+      size_t free = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+      if (total > 0) {
+        return (free * 100.0) / total;
+      }
+      return 0;
+  # SPIRAM sensors
+  - platform: template
+    name: "SPIRAM Free"
+    id: spiram_free
+    unit_of_measurement: "B"
+    device_class: data_size
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      #ifdef BOARD_HAS_PSRAM
+        return heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+      #else
+        return 0;
+      #endif
+  - platform: template
+    name: "SPIRAM Total"
+    id: spiram_total
+    unit_of_measurement: "B"
+    device_class: data_size
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      #ifdef BOARD_HAS_PSRAM
+        return heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
+      #else
+        return 0;
+      #endif
+  - platform: template
+    name: "SPIRAM Used"
+    id: spiram_used
+    unit_of_measurement: "B"
+    device_class: data_size
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      #ifdef BOARD_HAS_PSRAM
+        return heap_caps_get_total_size(MALLOC_CAP_SPIRAM) - heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+      #else
+        return 0;
+      #endif
+  - platform: template
+    name: "SPIRAM Free Percentage"
+    id: spiram_free_percentage
+    unit_of_measurement: "%"
+    device_class: battery
+    state_class: measurement
+    icon: "mdi:memory"
+    update_interval: 5s
+    entity_category: diagnostic
+    lambda: |-
+      #ifdef BOARD_HAS_PSRAM
+        size_t total = heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
+        size_t free = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+        if (total > 0) {
+          return (free * 100.0) / total;
+        }
+      #endif
+      return 0;
+  # Inference Pool Efficiency Monitoring
+  - platform: template
+    name: "Inference Job Pool Efficiency"
+    id: inference_job_pool_efficiency
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    state_class: measurement
+    icon: "mdi:buffer"
+    entity_category: diagnostic
+  - platform: template
+    name: "Inference Result Pool Efficiency"
+    id: inference_result_pool_efficiency
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    state_class: measurement
+    icon: "mdi:buffer"
+    entity_category: diagnostic
+  - platform: template
+    name: "Arena Efficiency"
+    id: arena_efficiency
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    state_class: measurement
+    icon: "mdi:chip"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heap Fragmentation"
+    id: heap_fragmentation
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+    state_class: measurement
+    icon: "mdi:memory"
+    entity_category: diagnostic

@@ -1,0 +1,78 @@
+---
+# PINs for ESP32_CAM
+# https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L182
+
+substitutions:
+  pin:
+    light:
+      led: GPIO33
+      flash: GPIO4
+    int:
+      spi:
+        clk: GPIO14
+        mosi: GPIO15
+        miso: GPIO2
+        cs: GPIO15
+      i2c:
+        sda: GPIO26
+        scl: GPIO27
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO5
+      y3: GPIO18
+      y4: GPIO19
+      y5: GPIO21
+      y6: GPIO36
+      y7: GPIO39
+      y8: GPIO34
+      y9: GPIO35
+      vs: GPIO25
+      hs: GPIO23
+      p_clk: GPIO22
+      m_clk: GPIO0
+      pwr: GPIO32
+    card:
+      d0: GPIO2
+      d1: GPIO4
+      d2: GPIO12
+      d3: GPIO13
+      cs: GPIO13
+      cmd: GPIO15
+      clk: GPIO14
+    
+    ext:
+      h1:
+        p1: nc
+        p2: nc
+        p3: nc
+        p4: nc
+        p5: nc
+        p6: GPIO0
+        p7: GPIO16
+        p8: nc
+      h2:
+        p1: GPIO4
+        p2: GPIO2
+        p3: GPIO14
+        p4: nc
+        p5: GPIO15
+        p6: GPIO12
+        p7: nc
+        p8: nc
+
+# Not tested
+    uart:
+      tx0: nc
+      rx2: GPIO16
+      rts0: nc
+      cts0: nc
+      tx1: nc
+      rx1: nc
+    spi:
+      clk: nc
+      mosi: nc
+      miso: nc
+      cs: nc
+      clk_p: nc
+      clk_n: nc
