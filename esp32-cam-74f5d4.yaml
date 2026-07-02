@@ -4,6 +4,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/esp32_cam.yaml
+  ai-on-the-edge: !include board/module/ai_on_the_edge.yaml
 
 substitutions:
   common:
