@@ -34,8 +34,6 @@ esphome:
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location_1}
-  project:
-    version: "1.0.0"
   # Define areas (optional)
   areas:
     - id: area_ute_foran
