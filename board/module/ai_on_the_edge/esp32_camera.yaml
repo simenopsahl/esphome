@@ -31,7 +31,7 @@ esp32_camera:
   # ImageProcessor handle grayscale conversion in software for grayscale models.
   pixel_format: JPEG  # pixel_format: ${camera.pixel_format}
 
-  task_stack_size: 8192
+  # task_stack_size: 8192
   # frame_size: 8  # Reduced from default 16
 
   # The following parameters can be changed on the fly after the camera is started

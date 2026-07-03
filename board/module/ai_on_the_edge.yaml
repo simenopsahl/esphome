@@ -46,6 +46,10 @@ preferences:
   flash_write_interval: 60min
 
 esphome:
+  on_boot:
+    - priority: 999.0
+      then:
+        - delay: 500ms
   on_loop:
     - lambda: |-
           if (id(espcam_updated)) {

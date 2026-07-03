@@ -1,0 +1,123 @@
+---
+# PINs for ESP32_CAM
+# https://github.com/giovi321/ESP32-cam-OV5640
+
+substitutions:
+  pin:
+    light:
+      led: GPIO25
+      flash: nc
+    int:
+      spi:
+        clk: GPIO14
+        mosi: GPIO15
+        miso: GPIO2
+        cs: GPIO15
+      i2c:
+        sda: GPIO22
+        scl: GPIO23
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO2
+      y3: GPIO14
+      y4: GPIO35
+      y5: GPIO12
+      y6: GPIO27
+      y7: GPIO33
+      y8: GPIO34
+      y9: GPIO39
+      vs: GPIO18
+      hs: GPIO36
+      p_clk: GPIO26
+      m_clk: GPIO15
+      rst: GPIO5
+      pwr: nc
+    card:
+      d0: GPIO2
+      d1: GPIO4
+      d2: GPIO12
+      d3: GPIO13
+      cs: GPIO13
+      cmd: GPIO15
+      clk: GPIO14
+    ip5306:
+      led1: GPIO4
+      led2: GPIO13
+    
+    ext:
+      h1:
+        p1: GPIO0
+        p2: GPIO13
+        p3: EN
+        p4: GPIO25
+        p5: GPIO32
+        p6: GPIO38
+        p7: GPIO37
+        p8: 5V
+        p9: 3V
+        p10: GND
+      h2:
+        p1: GPIO21
+        p2: U0TXD
+        p3: U0RXD
+        p4: GPIO19
+        p5: GPIO17
+        p6: GPIO16
+        p7: GPIO4
+        p8: 5V
+        p9: 3V
+        p10: GND
+
+# Not tested
+    uart:
+      tx0: nc
+      rx2: GPIO16
+      rts0: nc
+      cts0: nc
+      tx1: nc
+      rx1: nc
+    spi:
+      clk: nc
+      mosi: nc
+      miso: nc
+      cs: nc
+      clk_p: nc
+      clk_n: nc
+
+# Parameter Configuration:
+# CPU Frequency:"240MHz(WiFi/BT)"
+# Core Debug Level:"None"
+# Erase All Flash Before Sketch Upload:"Disabled
+# Events Run On:"Core1"
+# Flash Frequency:"80MHz"
+# Flash Mode:"DIO"
+# Flash Size:"4MB(32Mb)"
+# JTAG Adapter:"Disabled"
+# Arduino Runs On:"Core 0"
+# Partition Scheme:"Huge APP(3MB No OTA/1MB SPIFFS)
+# PSRAM:"Enabled"
+# Upload Speed:"921600"
+
+
+
+# IO Parameter Configuration:
+#define RESET_GPIO_NUM 5
+#define XCLK_GPIO_NUM 15
+
+#define SIOD_GPIO_NUM 22
+#define SIOC_GPIO_NUM 23
+
+#define D0_GPIO_NUM 2
+#define D1_GPIO_NUM 14
+#define D2_GPIO_NUM 35
+#define D3_GPIO_NUM 12
+#define D4_GPIO_NUM 27
+#define D5_GPIO_NUM 33
+#define D6_GPIO_NUM 34
+#define D7_GPIO_NUM 39
+#define VSYNC_GPIO_NUM 18
+#define HREF_GPIO_NUM 36
+#define PCLK_GPIO_NUM 26
+
+#define LED_GPIO_NUM 25
