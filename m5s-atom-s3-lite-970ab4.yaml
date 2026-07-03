@@ -28,8 +28,6 @@ esphome:
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
-  project:
-    version: "1.0.0"
 
 wifi:
 #  use_address: 192.168.69.58
