@@ -13,8 +13,6 @@ substitutions:
   camera:
     resolution: 800x600
     jpeg_quality: 20
-    max_framerate: 1fps
-    idle_framerate: 0.1fps
   device:
     name: esp32-cam-74f5d4
     location: "Kjøkken"
