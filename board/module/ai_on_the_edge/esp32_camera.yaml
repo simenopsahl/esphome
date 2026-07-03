@@ -20,38 +20,42 @@ esp32_camera:
   resolution: ${camera.resolution}  # ${camera_width}X${camera_height}    # 320X240 # for testing, quicker screen reactions
   jpeg_quality: ${camera.jpeg_quality}  # 10 # 40 # 12
   # Frame Settings
-  # max_framerate: 10fps
-  # idle_framerate: 0.1fps # 10sec
   max_framerate: ${camera.max_framerate}  # 1fps
   idle_framerate: ${camera.idle_framerate}  # 0.1fps # 10sec
-  # frame_buffer_count: 2  # Double buffering at driver level
-  frame_buffer_location: PSRAM  # DRAM # available in the release 2025.8.0  # # new with https://github.com/esphome/esphome/pull/9496
+  frame_buffer_count: 1  # 1-2 Double buffering at driver level
   # NOTE: OV2640 + ESP32 camera driver cannot reliably do grayscale AND windowing at the same time.
   # When using camera_window in esp32_camera_utils, keep pixel_format as JPEG and let the
   # ImageProcessor handle grayscale conversion in software for grayscale models.
-  pixel_format: JPEG  # pixel_format: ${camera.pixel_format}
+  pixel_format: ${camera.pixel_format}  # pixel_format: JPEG
 
   # task_stack_size: 8192
   # frame_size: 8  # Reduced from default 16
 
   # The following parameters can be changed on the fly after the camera is started
   #  by calling update_camera_parameters() in lambda
-  vertical_flip: false
-  horizontal_mirror: false
+  vertical_flip: true
+  horizontal_mirror: true
   # contrast, brightness, & saturation seem to have little to no effect when called using update_camera_parameters()
   #  at least for my camera - esp32-s3-wroom-1 N8R8 from Freenove
-  contrast: 0
+  contrast: 1
   brightness: 0
-  saturation: 0
-  special_effect: NONE
+  saturation: -1
+  special_effect: none
   # exposure settings
-  aec_mode: AUTO
-  aec2: True
+  aec_mode: auto
+  aec2: true
   ae_level: 0
   aec_value: 580
   # gain settings
-  agc_mode: AUTO
-  agc_gain_ceiling: 2X
+  agc_mode: auto
   agc_value: 0
+  agc_gain_ceiling: 4x
   # white balance setting
-  wb_mode: AUTO
+  wb_mode: auto
+
+# if you want to stream images use this and add a picture card using this devices IP:Port for the image_url
+# esp32_camera_web_server:
+#   - port: 8080
+#     mode: stream
+#   - port: 8081
+#     mode: snapshot

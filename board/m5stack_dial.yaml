@@ -27,7 +27,8 @@ substitutions:
 
 esphome:
   project:
-    name: "M5Stack.Dial v1.1"
+    name: "M5Stack.Dial"
+    version: "1.1"
   on_boot:
     - priority: 800
       then:

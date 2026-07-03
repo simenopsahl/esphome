@@ -20,6 +20,7 @@ substitutions:
 esphome:
   project:
     name: "M5Stack.Atom S3 Lite"
+    version: "1.0.0"
 
 esp32:
 # ESP32-S3FN8

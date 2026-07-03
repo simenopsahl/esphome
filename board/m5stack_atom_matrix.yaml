@@ -19,6 +19,7 @@ substitutions:
 esphome:
   project:
     name: "M5Stack.Atom Matrix"
+    version: "1.0.0"
 
 esp32:
 # ESP32-PICO-D4@Dual-core processor, 240MHz

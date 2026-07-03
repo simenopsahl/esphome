@@ -26,6 +26,7 @@ substitutions:
 esphome:
   project:
     name: "M5Stack.CoreInk"
+    version: "1.0.0"
 # i2c RTC only with one additional i2c bus
 #  on_boot:
 #    - priority: 800

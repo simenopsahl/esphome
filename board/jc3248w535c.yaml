@@ -17,6 +17,7 @@ substitutions:
 esphome:
   project:
     name: 'Sunton.3,5" 320x480'
+    version: "1.0.0"
 
 esp32:
 # ESP32-S3R8 (Dual-core, 240MHz)

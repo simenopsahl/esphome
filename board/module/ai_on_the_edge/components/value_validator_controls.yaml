@@ -5,26 +5,26 @@
 # Exposes all value_validator parameters for runtime configuration
 switch:
   # Allow Negative Rates
-  - platform: template
-    name: "Allow Negative Rates"
-    id: vv_allow_negative_rates
-    icon: "mdi:arrow-down-bold"
-    entity_category: config
-    optimistic: true
-    restore_mode: RESTORE_DEFAULT_OFF
-    turn_on_action:
-      - lambda: |-
-          if (id(meter_value_validator) != nullptr) {
-            id(meter_value_validator)->set_allow_negative_rates(true);
-          }
-    turn_off_action:
-      - lambda: |-
-          if (id(meter_value_validator) != nullptr) {
-            id(meter_value_validator)->set_allow_negative_rates(false);
-          }
+  # - platform: template
+  #   name: "VV Allow Negative Rates"
+  #   id: vv_allow_negative_rates
+  #   icon: "mdi:arrow-down-bold"
+  #   entity_category: config
+  #   optimistic: true
+  #   restore_mode: RESTORE_DEFAULT_OFF
+  #   turn_on_action:
+  #     - lambda: |-
+  #         if (id(meter_value_validator) != nullptr) {
+  #           id(meter_value_validator)->set_allow_negative_rates(true);
+  #         }
+  #   turn_off_action:
+  #     - lambda: |-
+  #         if (id(meter_value_validator) != nullptr) {
+  #           id(meter_value_validator)->set_allow_negative_rates(false);
+  #         }
   # Enable Smart Validation
   - platform: template
-    name: "Enable Smart Validation"
+    name: "VV Enable Smart Validation"
     id: vv_enable_smart_validation
     icon: "mdi:brain"
     entity_category: config
@@ -42,7 +42,7 @@ switch:
           }
   # Strict Confidence Check
   - platform: template
-    name: "Strict Confidence Check"
+    name: "VV Strict Confidence Check"
     id: vv_strict_confidence_check
     icon: "mdi:check-decagram"
     entity_category: config
@@ -63,7 +63,7 @@ switch:
 number:
   # Max Absolute Difference
   - platform: template
-    name: "Max Absolute Difference"
+    name: "VV Max Absolute Difference"
     id: vv_max_absolute_diff_num
     icon: "mdi:delta"
     min_value: 0
@@ -80,7 +80,7 @@ number:
           }
   # Max Rate Change (percentage)
   - platform: template
-    name: "Max Rate Change"
+    name: "VV Max Rate Change"
     id: vv_max_rate_change
     icon: "mdi:speedometer"
     unit_of_measurement: "%"
@@ -98,7 +98,7 @@ number:
           }
   # Smart Validation Window
   - platform: template
-    name: "Smart Validation Window"
+    name: "VV Smart Validation Window"
     id: vv_smart_validation_window
     icon: "mdi:window-open"
     unit_of_measurement: "readings"
@@ -116,7 +116,7 @@ number:
           }
   # High Confidence Threshold
   - platform: template
-    name: "High Confidence Threshold"
+    name: "VV High Confidence Threshold"
     id: vv_high_confidence_threshold
     icon: "mdi:gauge-full"
     unit_of_measurement: "%"
@@ -134,7 +134,7 @@ number:
           }
   # Per-Digit Confidence Threshold
   - platform: template
-    name: "Per-Digit Confidence Threshold"
+    name: "VV Per-Digit Confidence Threshold"
     id: vv_per_digit_confidence_threshold
     icon: "mdi:format-list-numbered"
     unit_of_measurement: "%"

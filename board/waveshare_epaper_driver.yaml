@@ -20,6 +20,7 @@ substitutions:
 esphome:
   project:
     name: "Waveshare.EPaper"
+    version: "1.0.0"
   on_boot:
       - priority: 200.0
         then:

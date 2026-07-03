@@ -6,7 +6,7 @@
 switch:
   # Pause AI Processing
   - platform: template
-    name: "Pause AI Processing"
+    name: "TFl Pause AI Processing"
     id: tmr_pause_ai_processing
     icon: "mdi:pause"
     entity_category: config
@@ -24,7 +24,7 @@ switch:
           }
   # Setup Mode (Preview)
   - platform: template
-    name: "Setup Mode (Preview)"
+    name: "TFl Setup Mode (Preview)"
     id: tmr_setup_mode_preview
     icon: "mdi:camera-cog"
     entity_category: config
@@ -43,7 +43,7 @@ switch:
 
   # # Show Crop Areas
   # - platform: template
-  #   name: "Show Crop Areas"
+  #   name: "TFl Show Crop Areas"
   #   id: tmr_show_crop_areas
   #   icon: "mdi:crop"
   #   entity_category: config
@@ -62,7 +62,7 @@ switch:
 
   # # Debug Mode
   # - platform: template
-  #   name: "Debug Mode"
+  #   name: "TFl Debug Mode"
   #   id: tmr_debug_mode
   #   icon: "mdi:bug"
   #   entity_category: config
@@ -71,7 +71,7 @@ switch:
 
   # # Debug Image
   # - platform: template
-  #   name: "Debug Image"
+  #   name: "TFl Debug Image"
   #   id: tmr_debug_image
   #   icon: "mdi:image-search"
   #   entity_category: config
@@ -80,7 +80,7 @@ switch:
 
   # # Enable Flash Calibration
   # - platform: template
-  #   name: "Enable Flash Calibration"
+  #   name: "TFl Enable Flash Calibration"
   #   id: tmr_enable_flash_calibration
   #   icon: "mdi:flash-auto"
   #   entity_category: config
@@ -91,14 +91,14 @@ switch:
 number:
   # Update Interval
   - platform: template
-    name: "Update Interval"
+    name: "TFl Update Interval"
     id: tmr_meter_update_interval
     icon: "mdi:timer"
     unit_of_measurement: "s"
     min_value: 1
     max_value: 3600
     step: 1
-    initial_value: 60
+    initial_value: 90
     entity_category: config
     optimistic: true
     restore_value: true
@@ -110,7 +110,7 @@ number:
 
   # Confidence Threshold (only used when no external validator is configured)
   # - platform: template
-  #   name: "Confidence Threshold"
+  #   name: "TFl Confidence Threshold"
   #   id: tmr_confidence_threshold
   #   icon: "mdi:speedometer"
   #   unit_of_measurement: "%"
@@ -129,7 +129,7 @@ number:
 
   # Frame Request Timeout
   # - platform: template
-  #   name: "Frame Request Timeout"
+  #   name: "TFl Frame Request Timeout"
   #   id: tmr_frame_request_timeout
   #   icon: "mdi:timer-alert"
   #   unit_of_measurement: "ms"
@@ -148,7 +148,7 @@ number:
 
   # Set Last Valid Value
   - platform: template
-    name: "Set Last Valid Value"
+    name: "TFl Set Last Valid Value"
     id: tmr_set_last_valid
     icon: "mdi:restore"
     min_value: 0
@@ -166,7 +166,7 @@ number:
 button:
   # # Start Flash Calibration
   # - platform: template
-  #   name: "Start Flash Calibration"
+  #   name: "TFl Start Flash Calibration"
   #   id: tmr_start_flash_calibration_btn
   #   icon: "mdi:timer-sand"
   #   entity_category: config
@@ -178,14 +178,14 @@ button:
 
   # Unload AI Components
   - platform: template
-    name: "Unload AI Components"
+    name: "TFl Unload AI Components"
     id: tmr_unload_btn
     icon: "mdi:download-off"
     entity_category: config
 
   # Reload AI Components
   - platform: template
-    name: "Reload AI Components"
+    name: "TFl Reload AI Components"
     id: tmr_reload_btn
     icon: "mdi:reload"
     entity_category: config
@@ -196,14 +196,29 @@ sensor:
     name: "Water Meter Reading"
     id: kamstrup_meter_value
     unit_of_measurement: "${meter.unit}"
-    accuracy_decimals: 0
-    icon: "mdi:counter"
+    accuracy_decimals: 3
+    icon: mdi:water-pump
     state_class: ${meter.state_class}
     device_class: ${meter.device_class}
+    filters:
+      # Converts the raw 12058 into 12.058
+      - multiply: 0.001
+      # Prevents the AI from sending a wild misread (like 999999) 
+      # which would permanently ruin your HA Energy Dashboard stats.
+      # Only accepts readings that are greater than or equal to the last valid reading.
+      # - filter_out: nan
+      # - lambda: |-
+      #     static float last_valid_value = 0.0;
+      #     if (x >= last_valid_value) {
+      #       last_valid_value = x;
+      #       return x;
+      #     } else {
+      #       return {}; // Ignore the reading if it went down
+      #     }
 
   # Meter Reading Confidence
   - platform: template
-    name: "Meter Reading Confidence"
+    name: "TFl Meter Reading Confidence"
     id: tmr_meter_confidence
     unit_of_measurement: "%"
     accuracy_decimals: 2
@@ -212,7 +227,7 @@ sensor:
   # Inference Time
   - platform: template
     id: tmr_inference_time
-    name: "Inference Time"
+    name: "TFl Inference Time"
     unit_of_measurement: "ms"
     accuracy_decimals: 0
     state_class: measurement
@@ -221,7 +236,7 @@ sensor:
   # Capture to Publish Time
   - platform: template
     id: tmr_capture_to_publish_time
-    name: "Capture to Publish Time"
+    name: "TFl Capture to Publish Time"
     unit_of_measurement: "ms"
     accuracy_decimals: 0
     state_class: measurement
@@ -230,7 +245,7 @@ sensor:
 text:
   # Set Last Valid Value (String) - Supports leading zeros
   - platform: template
-    name: "Set Last Valid Value (String)"
+    name: "TFl Set Last Valid Value (String)"
     id: tmr_set_last_valid_string
     icon: "mdi:form-textbox"
     mode: text
@@ -238,6 +253,7 @@ text:
     optimistic: true
     min_length: 1
     max_length: 20
+    initial_value: ${meter.last_valid_value}
     set_action:
       - lambda: |-
           if (id(tflite_meter_reader) != nullptr) {
@@ -280,18 +296,20 @@ api:
 text_sensor:
   # Inference Logs
   - platform: template
-    name: "Inference Logs"
+    name: "TFl Inference Logs"
     id: tmr_inference_logs
     icon: "mdi:text-box-outline"
+    entity_category: diagnostic
 
   # Main Logs
   - platform: template
     name: "Main Logs"
     id: tmr_main_logs
     icon: "mdi:text-box-multiple-outline"
+    entity_category: diagnostic
 
   # Crop Zones
   - platform: template
-    name: "Crop Zones"
+    name: "Cam Crop Zones"
     id: crop_zones_sensor
     icon: "mdi:crop"

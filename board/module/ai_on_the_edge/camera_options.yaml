@@ -3,12 +3,12 @@
 
 # create switches for turning a parameter on or off
 switch:
-  # on/off switch for Vertical Flip (my default = off, therefore: RESTORE_DEFAULT_OFF)
+  # on/off switch for Vertical Flip (my default = on, therefore: RESTORE_DEFAULT_ON)
   - platform: template
-    name: "Vertical Flip"
+    name: "Cam Vertical Flip"
     id: espcam_v_flip
     icon: mdi:swap-vertical
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: RESTORE_DEFAULT_ON
     optimistic: true
     turn_on_action:
       lambda: |-
@@ -20,7 +20,7 @@ switch:
         id(espcam_updated) = true;
   # on/off switch for Horizontal Mirror (my default = on, therefore: RESTORE_DEFAULT_ON)
   - platform: template
-    name: "Horizontal Mirror"
+    name: "Cam Horizontal Mirror"
     id: espcam_h_mirror
     icon: mdi:reflect-horizontal
     restore_mode: RESTORE_DEFAULT_ON
@@ -33,12 +33,12 @@ switch:
       lambda: |-
         id(espcam).set_horizontal_mirror(false);
         id(espcam_updated) = true;
-  # on/off switch for Auto Exposure 2 (my default = off, therefore: RESTORE_DEFAULT_OFF)
+  # on/off switch for Auto Exposure 2 (my default = on, therefore: RESTORE_DEFAULT_ON)
   - platform: template
-    name: "Auto Exposure 2"
+    name: "Cam Auto Exposure 2"
     id: espcam_aec_2
     icon: mdi:auto-fix
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: RESTORE_DEFAULT_ON
     optimistic: true
     turn_on_action:
       lambda: |-
@@ -55,7 +55,7 @@ select:
   #  - see the note in the esp32_camera section above about the first 5 image parameters
   # I left this here in case it ever starts working
   #  - platform: template
-  #    name: "Resolution"
+  #    name: "Cam Resolution"
   #    id: espcam_res
   #    options:
   #      - "160x120"
@@ -77,27 +77,27 @@ select:
   #          // some function to change the frame_size
   #          id(espcam_updated) = true;
   # Option list for Special Effects
-  - platform: template
-    name: "Special Effects"
-    icon: mdi:filter
-    id: espcam_effect
-    options:
-      - "None"
-      - "Negative"
-      - "Grayscale"
-      - "Red Tint"
-      - "Green Tint"
-      - "Blue Tint"
-      - "Sepia"
-    initial_option: "None"
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_special_effect((esphome::esp32_camera::ESP32SpecialEffect)id(espcam_effect).active_index().value());
-        id(espcam_updated) = true;
+  # - platform: template
+  #   name: "Cam Special Effects"
+  #   icon: mdi:filter
+  #   id: espcam_effect
+  #   options:
+  #     - "None"
+  #     - "Negative"
+  #     - "Grayscale"
+  #     - "Red Tint"
+  #     - "Green Tint"
+  #     - "Blue Tint"
+  #     - "Sepia"
+  #   initial_option: "None"
+  #   optimistic: True
+  #   on_value:
+  #     lambda: |-
+  #       id(espcam).set_special_effect((esphome::esp32_camera::ESP32SpecialEffect)id(espcam_effect).active_index().value());
+  #       id(espcam_updated) = true;
   # Option List for White Balance
   - platform: template
-    name: "White Balance Mode"
+    name: "Cam White Balance Mode"
     id: espcam_wb
     icon: mdi:white-balance-auto
     options:
@@ -114,7 +114,7 @@ select:
         id(espcam_updated) = true;
   # Option list for AEC mode
   - platform: template
-    name: "Auto Exposure Mode"
+    name: "Cam Auto Exposure Mode"
     id: espcam_aec
     icon: mdi:auto-fix
     options:
@@ -129,7 +129,7 @@ select:
         id(espcam_updated) = true;
   # Option list for Gain Control Mode
   - platform: template
-    name: "Gain Control Mode"
+    name: "Cam Gain Control Mode"
     id: espcam_gc
     icon: mdi:auto-fix
     options:
@@ -143,7 +143,7 @@ select:
         id(espcam_updated) = true;
   # Option list for Gain Ceiling (apparently this is somewhat equivilant to ISO settings)
   - platform: template
-    name: "Gain Ceiling"
+    name: "Cam Gain Ceiling"
     id: espcam_g_ceiling
     options:
       - "2x"
@@ -165,7 +165,7 @@ number:
   # While the sliders for Contrast, Brightness, and Saturation all work and change the parameters of the sensor
   # they do not seem to make any difference to the image output
   - platform: template
-    name: "Contrast"
+    name: "Cam Contrast"
     id: espcam_contrast
     icon: mdi:contrast-box
     min_value: -2
@@ -180,7 +180,7 @@ number:
         id(espcam_updated) = true;
   # Number Slider for Brightness
   - platform: template
-    name: "Brightness"
+    name: "Cam Brightness"
     id: espcam_brightness
     icon: mdi:brightness-6
     min_value: -2
@@ -195,7 +195,7 @@ number:
         id(espcam_updated) = true;
   # Number Slider for Saturation
   - platform: template
-    name: "Saturation"
+    name: "Cam Saturation"
     id: espcam_saturation
     icon: mdi:palette-outline
     min_value: -2
@@ -210,7 +210,7 @@ number:
         id(espcam_updated) = true;
   # Number Slider for Gain Value
   - platform: template
-    name: "Gain Value"
+    name: "Cam Gain Value"
     id: espcam_g_value
     min_value: 0
     max_value: 30
@@ -224,7 +224,7 @@ number:
         id(espcam_updated) = true;
   # Number slider for AE Level
   - platform: template
-    name: "AE Level"
+    name: "Cam AE Level"
     id: espcam_ae_level
     min_value: -2
     max_value: 2
@@ -239,7 +239,7 @@ number:
   # Number Slider for AE Value (step set to 10)
   # I tried using steps of 1 (too fine to control) and 100 (to coarse for the values) and settled on 10
   - platform: template
-    name: "AE Value"
+    name: "Cam AE Value"
     id: espcam_ae_value
     min_value: 0
     max_value: 1200

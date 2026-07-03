@@ -30,6 +30,7 @@ substitutions:
 esphome:
   project:
     name: "M5Stack.Air Quality"
+    version: "1.0.0"
   on_boot:
     - priority: 800
       then:

@@ -32,6 +32,11 @@ esp32:
       compiler_optimization: PERF
       enable_idf_experimental_features: true
 
+esphome:
+  project:
+    name: "ESP32S3.USB OTG"
+    version: "1.0.0"
+
 psram:
   mode: quad
   speed: 80MHz

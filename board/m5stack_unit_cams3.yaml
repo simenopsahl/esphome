@@ -23,6 +23,7 @@ substitutions:
 esphome:
   project:
     name: "M5Stack.Unit CamS3"
+    version: "1.0.0"
 
 esp32:
 # ESP32-S3-WROOM-1-N16R8

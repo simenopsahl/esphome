@@ -27,6 +27,7 @@ substitutions:
 esphome:
   project:
     name: "M5Stack.Atom S3R-M12"
+    version: "1.0.0"
   on_boot:
     - priority: 800
       then:

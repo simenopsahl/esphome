@@ -12,13 +12,13 @@ substitutions:
     # pixel_format: GRAYSCALE
     resolution: 640x480  # 800x600 #640x480 #https://esphome.io/components/esp32_camera.html
     # jpeg_quality: 10 # From 10 (best) to 63 (worst). | Must be 0 if non JPEG
-    jpeg_quality: 15
+    jpeg_quality: 20
     max_framerate: 1fps
-    idle_framerate: 0.2fps
+    idle_framerate: 0.1fps
   # Meter settings
   meter:
-    # Unit of measurement for the meter (e.g. m^3, kWh, L)
-    unit: L
+    # Unit of measurement for the meter (e.g. m³, kWh, L)
+    unit: m³
     # device class for the meter (e.g. water, energy, gas)
     device_class: water
     # state class for the meter (e.g. total_increasing, total, measurement)
@@ -38,7 +38,7 @@ packages:
   # Debug sensors
   - !include ai_on_the_edge/debug_board.yaml
   # camera configs
-  - !include ai_on_the_edge/camera_options.yaml
+#  - !include ai_on_the_edge/camera_options.yaml
   - !include ai_on_the_edge/esp32_camera.yaml
   # - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
 
@@ -58,17 +58,22 @@ esphome:
             id(espcam_updated) = false;
           }
 
-time:
-  - platform: sntp
-    timezone: ${time_timezone}
-    servers: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org]
-    on_time:
-      - seconds: ${time.reboot_seconds}
-        minutes: ${time.reboot_minutes}
-        hours: ${time.reboot_hours}
-        days_of_week: ${time.reboot_days_of_week}
-        then:
-          - button.press: button_restart
+# time:
+#   - platform: sntp
+#     timezone: ${time_timezone}
+#     servers: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org]
+#     on_time:
+#       - seconds: ${time.reboot_seconds}
+#         minutes: ${time.reboot_minutes}
+#         hours: ${time.reboot_hours}
+#         days_of_week: ${time.reboot_days_of_week}
+#         then:
+#           - button.press: button_restart
+
+api:
+  max_send_queue: 10
+  batch_delay: 150ms
+  reboot_timeout: 0
 
 external_components:
   - source: github://nliaudat/esphome_ai_component
@@ -83,7 +88,7 @@ external_components:
       - tflite_micro_helper   # Required for meter_reader_tflite
       - esp32_camera_utils    # Image processing utilities
       - flash_light_controller
-      - data_collector        # Optional: For collecting training data
+      # - data_collector        # Optional: For collecting training data
 
 # Enable logging
 logger:
@@ -111,11 +116,19 @@ globals:
   - id: crop_zones
     type: std::string
     max_restore_data_length: 254
-    initial_value: "\"[]\""
 
-    # #debug config
-    # initial_value: '"[[9, 10, 49, 74], [64, 10, 104, 74], [118, 9, 158, 81], [173, 9, 213, 81], [230, 9, 270, 81], [286, 10, 326, 82], [339, 11, 379, 83], [394, 10, 434, 82]]"'
-    #    # Note: The outer quotes are escaped with single quotes + double quotes ("...")
+    # Blank
+#    initial_value: "\"[]\""
+    # Note: The outer quotes are escaped with single quotes + double quotes ("...")
+
+    # 640x480 numbers
+#    initial_value: '"[[11,13,51,96],[51,13,98,96],[98,13,145,97],[144,15,193,98],[197,16,241,98],[240,15,285,98],[285,15,335,97],[335,14,381,97],[381,17,430,98]]"'
+    
+    # 800x600 numbers
+#    initial_value: '"[[16,22,59,104],[59,22,106,104],[106,23,151,105],[151,23,198,104],[199,23,247,105],[246,22,293,105],[292,23,342,106],[343,23,387,106],[391,26,437,106]]"'
+
+    # 800x600 alt numbers
+    initial_value: '"[[17,22,60,104],[60,22,106,105],[106,23,151,105],[152,23,198,104],[199,23,247,105],[246,23,293,105],[295,24,341,106],[345,24,387,106],[391,26,437,106]]"'
 
 tflite_micro_helper:
   debug: false
@@ -126,11 +139,19 @@ esp32_camera_utils:
   debug: false
   ### zoom available for OV2640, OV3660, OV5640, SC101IOT, SC030IOT from crop zones (explicit)
   ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
-  # camera_window:  # can be set in http://[hassio]/developer-tools/action > esphome.[s3cam_tflite]_set_camera_window
-  #   offset_x: 928 # multiple of 4
-  #   offset_y: 480 # multiple of 4
-  #   width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
-  #   height: 88 #  multiple of 4 or 16 if rotation enabled and 4:3 proportions with width for best quality
+  # 640x480 crop zone
+#  camera_window:
+#    offset_x: 472 # multiple of 4
+#    offset_y: 504 # multiple of 4
+#    width: 448 # multiple of 8
+#    height: 112 # multiple of 8
+  # 800x600 crop zone
+  camera_window:
+    offset_x: 464 # multiple of 4
+    offset_y: 496 # multiple of 4
+    width: 528 # multiple of 8
+    height: 200 # multiple of 8
+  
 
   # enable_rotation: true
   # rotation: 270 # 0, 90, 180, 270 (special case built-in "accelerated" for 90, 180, 270 )
@@ -155,8 +176,8 @@ esp32_camera_utils:
 flash_light_controller:
   id: camera_flash_controller
   flash_light: flash_light
-  flash_pre_time: 7000ms # 7 seconds before update (time to stabilize) (works with 5sec on my board)
-  flash_post_time: 200ms # 2 seconds after update (works with 100ms on my board)
+  flash_pre_time: 8000ms # 8 seconds before update (time to stabilize)
+  flash_post_time: 1500ms # 2 seconds after update
   debug: false
 
 value_validator:
@@ -167,7 +188,7 @@ value_validator:
   # Max allowed absolute change (default: 100)
   max_absolute_diff: 300
   # Max rate change as percentage (default: 15%)
-  #max_rate_change: 0.15
+  max_rate_change: 0.15
 
   # Smart Validation
   # Enable adaptive validation (default: true)
@@ -192,13 +213,13 @@ meter_reader_tflite:
   validator: meter_value_validator
   # confidence_threshold: 0.85 # Only if validator is disabled
   camera_id: espcam
-  #model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"  # best performance / accuracy
-  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite" # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
-  #model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite" # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
-  #model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite" # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
-  #model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite" From AI-On-The-Edge
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"  # best performance / accuracy
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite" # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite" # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite" # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
+  model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite" # From AI-On-The-Edge
 
-  update_interval: 60s
+  update_interval: 90s
 
   # collect_low_confidence: true # [Optional] Default: true. Required for data collector. Defines what is considered "low confidence" (uses confidence_threshold).
   # collect_min_global_confidence: 0.90 # [Optional] Default: 0.90. Low confidence override for data collection (Average < Value). Prerequisite: data_collector.

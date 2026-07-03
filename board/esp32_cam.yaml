@@ -1,7 +1,5 @@
 labels: [esp32]
 ---
-# WIP
-# Camera not working
 
 # Pins for this model
 packages:
@@ -24,6 +22,7 @@ esp32:
   variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz
+  watchdog_timeout: 10s
   framework: 
     type: ${device.framework.type}
     advanced:
@@ -31,6 +30,9 @@ esp32:
       minimum_chip_revision: 3.1
       sram1_as_iram: true
       enable_idf_experimental_features: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
     sdkconfig_options:
       CONFIG_ESP32_SPIRAM_SUPPORT: y
       # CONFIG_ESP32_SPIRAM_SPEED_40M: y
@@ -54,6 +56,9 @@ esp32:
       CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 esphome:
+  project:
+    name: "ESP32.CAM"
+    version: "1.0.0"
   platformio_options:
     board_build.extra_flags:
       - -DBOARD_HAS_PSRAM
@@ -78,6 +83,7 @@ output:
   - platform: ledc
     id: flash_output
     pin: ${pin.light.flash}
+    max_power: 0.5
 
 light:
   - platform: monochromatic # Camera Flash
@@ -119,8 +125,8 @@ esp32_camera:
   jpeg_quality: 12
   max_framerate: 1 fps
   frame_buffer_count: 2 # defaults to 1 (1-2)
-  vertical_flip: true
-  horizontal_mirror: true
+  vertical_flip: false
+  horizontal_mirror: false
   # Exposure
   aec_mode: auto
   aec2: true # defaults to false

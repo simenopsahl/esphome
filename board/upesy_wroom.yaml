@@ -19,6 +19,11 @@ substitutions:
       internal:
         frequency: 100kHz
 
+esphome:
+  project:
+    name: "ESP32.UPesy WROOM"
+    version: "1.0.0"
+
 esp32:
 # uPesy ESP-WROOM-32
 #  board: upesy_wroom
