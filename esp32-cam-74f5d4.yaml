@@ -14,7 +14,7 @@ substitutions:
     resolution: 800x600
     jpeg_quality: 18
   meter:
-    last_valid_value: "000012060"
+    last_valid_value: "000012062"
   device:
     name: esp32-cam-74f5d4
     location: "Kjøkken"
