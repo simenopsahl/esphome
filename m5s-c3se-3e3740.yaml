@@ -47,8 +47,6 @@ esphome:
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
-  project:
-    version: "1.0.0"
 
 wifi:
   use_address: ${device.name}.local
