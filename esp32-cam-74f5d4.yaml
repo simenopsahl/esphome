@@ -11,7 +11,7 @@ substitutions:
     log_level: WARN
 #    log_baud_rate: "115200"
   camera:
-    resolution: 800x600
+    resolution: 640x480
     jpeg_quality: 18
   meter:
     last_valid_value: "000012306"
