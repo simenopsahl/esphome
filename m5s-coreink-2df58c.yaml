@@ -5,7 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_coreink.yaml
-  rgb_led: !include board/module/unit_rgb_led.yaml
+  rgb_led: !include board/module/unit_rgb3.yaml
 
 substitutions:
   common:
