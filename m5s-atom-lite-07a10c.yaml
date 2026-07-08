@@ -22,8 +22,6 @@ substitutions:
     location: "Loft"
     framework:
       type: esp-idf
-  lvgl:
-    home_page: page_analog_clock
 
 esphome:
   comment: ${device.model} @ ${device.location}
