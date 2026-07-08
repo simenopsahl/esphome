@@ -13,7 +13,7 @@ substitutions:
 #    log_level: WARN
 #    log_baud_rate: "115200"
   device:
-    name: m5s-as3r-voice-d5e2cc
+    name: m5s-as3r-voice-0f4dfc
     location: "Storage"
     framework:
       type: esp-idf
