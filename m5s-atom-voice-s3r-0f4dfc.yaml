@@ -18,7 +18,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_imu
+    home_page: page_info
 
 esphome:
   comment: ${device.model} @ ${device.location}
