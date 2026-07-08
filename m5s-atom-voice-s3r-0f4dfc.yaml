@@ -1,0 +1,34 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+#  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_atom_s3r_voice.yaml
+  grove: !include board/extension/grove_i2c.yaml
+  disp: !include board/module/unit_oled.yaml
+
+substitutions:
+  common:
+#    log_level: WARN
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-as3r-voice-0f4dfc
+    location: "Storage"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_imu
+
+esphome:
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
+
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.73
