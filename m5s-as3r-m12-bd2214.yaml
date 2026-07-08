@@ -5,8 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r_m12.yaml
-  grove: !include board/extension/grove_i2c.yaml
-  tof: !include board/module/unit_tof.yaml
+  rgb_led: !include board/module/unit_rgb3.yaml
 
 substitutions:
   common:
