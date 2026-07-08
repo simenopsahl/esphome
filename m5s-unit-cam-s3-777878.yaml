@@ -1,7 +1,6 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_unit_cams3.yaml
