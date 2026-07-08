@@ -8,7 +8,7 @@ packages:
 
 substitutions:
   common:
-#    log_level: WARN
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-u-cam-s3-777878
