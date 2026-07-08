@@ -7,6 +7,7 @@ packages:
   board: !include board/m5stack_atom_s3r.yaml
   imu: !include board/module/chip_imu_bmi270.yaml
   audio: !include board/module/atomic_voice_base.yaml
+  ncir: !include board/module/unit_ncir.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
