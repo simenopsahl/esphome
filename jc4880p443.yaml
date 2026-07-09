@@ -51,3 +51,20 @@ time:
         then:
           - script.execute: lvgl_time_update
 
+
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: presence1
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: presence2
+  # Turn on display while room is occupied
+  - id: !extend presence_detected
+    lambda: !lambda |-
+      if ( (id(presence1).state) or (id(presence2).state) ) {
+        return true;
+      } else {
+        return false;
+      }
