@@ -1,0 +1,30 @@
+# Board: Guition ESP32-P4-M3-Dev
+# Definition: definitions/boards/guition_esp32_p4_m3_dev/manifest.yaml
+
+esphome:
+  name: jc4880p443
+  friendly_name: jc4880p443
+
+esp32:
+  variant: esp32p4
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+  encryption:
+    key: "1ZcIAn+q0pwpgMQrIk1TsynnBcHxn9NFbCV28uv3qx4="
+
+ota:
+  - platform: esphome
+
+ethernet:
+  clk:
+    mode: CLK_EXT_IN
+    pin: GPIO50
+  mdc_pin: GPIO31
+  mdio_pin: GPIO52
+  phy_addr: 1
+  power_pin: GPIO51
+  type: IP101
