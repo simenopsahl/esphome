@@ -17,7 +17,7 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: jc4880p443
