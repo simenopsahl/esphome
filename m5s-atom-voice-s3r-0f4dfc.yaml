@@ -38,3 +38,4 @@ binary_sensor:
   - id: !extend btn_front
     on_press:
       - display.page.show_next: display_oled
+      - component.update: display_oled
