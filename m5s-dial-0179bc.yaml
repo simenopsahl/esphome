@@ -70,3 +70,17 @@ binary_sensor:
       } else {
         return false;
       }
+  - id: !extend button_front
+    on_press:
+      - script.execute: go_home
+
+sensor:
+  - id: !extend rotaryencoder
+    on_anticlockwise:
+      - lvgl.page.previous:
+          animation: OVER_LEFT
+          time: 250ms
+    on_clockwise: 
+      - lvgl.page.next:
+          animation: OVER_RIGHT
+          time: 250ms
