@@ -1,30 +1,53 @@
-# Board: Guition ESP32-P4-M3-Dev
-# Definition: definitions/boards/guition_esp32_p4_m3_dev/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
+  board: !include board/jc4880p443ciwy.yaml
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/800x480.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: jc4880p443
+    location: "Storage"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_analog_clock
 
 esphome:
-  name: jc4880p443
-  friendly_name: jc4880p443
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
-esp32:
-  variant: esp32p4
-  framework:
-    type: esp-idf
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.36
 
-logger:
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
 
-api:
-  encryption:
-    key: "1ZcIAn+q0pwpgMQrIk1TsynnBcHxn9NFbCV28uv3qx4="
-
-ota:
-  - platform: esphome
-
-ethernet:
-  clk:
-    mode: CLK_EXT_IN
-    pin: GPIO50
-  mdc_pin: GPIO31
-  mdio_pin: GPIO52
-  phy_addr: 1
-  power_pin: GPIO51
-  type: IP101
