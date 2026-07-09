@@ -6,6 +6,16 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_dial.yaml
 
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/240x320.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.etg2_stue_temperature
+  }}
+
 substitutions:
   common:
 #    log_level: WARN
@@ -19,6 +29,8 @@ substitutions:
     i2c:
       grove:
         frequency: 40kHz
+  display:
+    home_page: page_analog_clock
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -32,3 +44,29 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.76
+
+# --- LVGL CLOCKS ---
+time:
+  - id: !extend time_rtc
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: presence1
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: presence2
+  # Turn on display while room is occupied
+  - id: !extend presence_detected
+    lambda: !lambda |-
+      if ( (id(presence1).state) or (id(presence2).state) ) {
+        return true;
+      } else {
+        return false;
+      }
