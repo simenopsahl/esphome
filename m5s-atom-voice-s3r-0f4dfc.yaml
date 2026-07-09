@@ -33,14 +33,8 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.73
 
-# Check if person is home
 binary_sensor:
-  - platform: homeassistant
-    entity_id: binary_sensor.etg2_occupancy
-    id: presence_detected
-
   # Button Press
   - id: !extend btn_front
     on_press:
       - display.page.show_next: display_oled
-      - script.execute: update_screen
