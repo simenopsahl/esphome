@@ -1,0 +1,281 @@
+labels: [esp32p4, psram, JC4880P443, display, i2c]
+---
+# https://github.com/agillis/esphome-modular-lvgl-buttons/blob/main/example_code/guition-esp32-p4-jc4880p443-display_modular.yaml
+# Base functions for:
+# Guition module ESP32-P4 & ESP32-C6 with 4.3" display and camera (JC4880P443C_I_W_Y)
+#
+  
+# Pins for this model
+packages:
+  pins: !include pins/jc4880p443ciwy.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+
+substitutions:
+  extension:
+    i2c:
+      internal:
+        frequency: 400kHz
+  device:
+    model: 'Guition 4,3"'
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+esphome:
+  project:
+    name: 'Guition.4,3" 480x800'
+    version: "1.0.0"
+
+esp32:
+# ESP32-P4R32 (Dual-core, 360MHz)
+# PSRAM: 32MB
+  variant: esp32p4
+  engineering_sample: true
+  flash_size: 16MB
+  cpu_frequency: 360MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+      enable_idf_experimental_features: true
+    sdkconfig_options:
+      # Memory allocation for large RGB graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
+
+esp_ldo:
+  - channel: 3
+    voltage: 2.5V
+
+psram:
+  mode: hex
+  speed: 200MHz
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+preferences:
+  flash_write_interval: 5min
+
+http_request:  # Needed by esp32_hosted-update and any JSON stuff
+  buffer_size_rx: 2048
+
+# Network hardware
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  reset_pin: ${pin.int.c6_hosted.rst}
+
+# Firmware update for esp32_hosted ESP32-C6
+update:
+  - platform: esp32_hosted
+    name: "C6 CoProcessor Update"
+    icon: mdi:chip
+    type: http
+    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
+    update_interval: 6h
+
+# Internal outputs
+output:
+  # Backlight LED
+  - platform: ledc
+    id: backlight_output
+    pin: ${pin.disp.bl}
+    frequency: 100Hz
+    inverted: false
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+display:
+  - platform: mipi_dsi
+    id: display_lcd
+    model: JC4880P443
+    dimensions:
+      height: 800
+      width: 480
+    auto_clear_enabled: false
+    update_interval: 10s
+
+# Touchscreen
+touchscreen:
+  - platform: gt911
+    i2c_id: i2c_internal
+    id: touchscreen_gt911
+    display: display_lcd
+    reset_pin: ${pin.touch.rst}
+    transform:
+      swap_xy: false
+      mirror_x: false
+      mirror_y: false
+    on_touch:
+      - logger.log:
+          tag: "Touch"
+          level: INFO
+          format: Touch %d at (%d, %d)
+          args: [ 'touch.id', 'touch.x', 'touch.y' ]
+
+# esp32_camera:
+#   i2c_id: i2c_internal
+#   id: espcam
+#   # PINS
+#   external_clock:
+#     pin: ${pin.cam.m_clk}
+#     frequency: 20MHz
+#   data_pins:
+#     - ${pin.cam.y2}
+#     - ${pin.cam.y3}
+#     - ${pin.cam.y4}
+#     - ${pin.cam.y5}
+#     - ${pin.cam.y6}
+#     - ${pin.cam.y7}
+#     - ${pin.cam.y8}
+#     - ${pin.cam.y9}
+#   vsync_pin: ${pin.cam.vs}
+#   href_pin: ${pin.cam.hs}
+#   pixel_clock_pin: ${pin.cam.p_clk}
+#   power_down_pin: ${pin.cam.pwr}
+#   # Metadata
+#   name: "Camera OV02C10"
+#   # Image settings
+#   resolution: 640x480
+#   jpeg_quality: 20
+#   max_framerate: 5 fps
+#   frame_buffer_count: 2 # defaults to 1
+# #  vertical_flip: true
+# #  horizontal_mirror: true
+
+# Audio - speaker/mic
+i2s_audio:
+  - id: i2s_audio_bus
+    i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+    i2s_bclk_pin: ${pin.audio.i2s_bclk}
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+
+audio_dac:
+  - platform: es8311
+    i2c_id: i2c_internal
+    id: dac_es8311
+    address: 0x18
+
+audio_adc:
+  - platform: es7210
+    i2c_id: i2c_internal
+    id: adc_es7210
+    address: 0x36
+
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    i2s_audio_id: i2s_audio_bus
+    i2s_din_pin: ${pin.audio.mic}
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    adc_type: external
+    channel: left
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_audio_bus
+    i2s_dout_pin: ${pin.audio.spk}
+    audio_dac: dac_es8311
+    dac_type: external
+    channel: mono
+    buffer_duration: 750ms
+    bits_per_sample: 16bit
+    sample_rate: 48000
+
+  - platform: mixer
+    id: mixing_speaker
+    output_speaker: i2s_speaker
+    task_stack_in_psram: true
+    source_speakers:
+      - id: announcement_mixing_input
+        timeout: never
+      - id: media_mixing_input
+        timeout: never
+
+  - platform: resampler
+    id: announcement_resampling_speaker
+    output_speaker: announcement_mixing_input
+    sample_rate: 48000
+    bits_per_sample: 16
+    task_stack_in_psram: true
+
+  - platform: resampler
+    id: media_resampling_speaker
+    output_speaker: media_mixing_input
+    sample_rate: 48000
+    bits_per_sample: 16
+    task_stack_in_psram: true
+
+switch:
+  # Speaker Amplifier Enable
+  - platform: gpio
+    id: speaker_enable
+    pin: ${pin.audio.amp}
+    restore_mode: RESTORE_DEFAULT_ON
+    name: "Speaker Enable"
+    icon: "mdi:volume-high"
+    entity_category: config
+
+  - platform: template
+    id: mic_mute
+    name: Microphone Mute
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+    on_turn_on:
+        - microphone.mute:
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 2000ms
+    rms:
+      name: "Noise Level"
+      id: average_loudness
+      filters:
+        - multiply: -1
+  # CPU Temperature
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic
+
+# Special LVGL settings required for this display
+lvgl:
+  byte_order: little_endian
+# Some screens need little_endian byte order and some need big_endian
+# this sets the byte order for all the images loaded in this file and the packages as well
+image:
+  defaults:
+    byte_order: little_endian

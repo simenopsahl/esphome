@@ -9,8 +9,10 @@ labels: [esp32s3, psram, BMI270, OV3660, camera, i2c]
 # Pins for this model
 packages:
   pins: !include pins/m5stack_atom_s3r.yaml
-  i2c_int: !include extension/internal_i2c.yaml
-  imu: !include module/chip_imu_bmi270.yaml
+# Limit of 2 i2c buses on ESP32-S3, one already occupied by camera
+# Include internal IMU or grove i2c in top level device config
+#  i2c_int: !include extension/internal_i2c.yaml
+#  imu: !include module/chip_imu_bmi270.yaml
 
 substitutions:
   time_timezone: "Europe/Oslo"
@@ -46,20 +48,36 @@ esp32:
     advanced:
       compiler_optimization: PERF
       execute_from_psram: true
+      enable_idf_experimental_features: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
     type: ${device.framework.type}
+    sdkconfig_options:
+      CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 psram:
   mode: octal
   speed: 80MHz
 
 wifi:
+  output_power: 10dB
+  power_save_mode: light
+  use_psram: true
   enable_btm: true
   enable_rrm: true
 
+preferences:
+  flash_write_interval: 30min
+
+logger:
+  logs:
+    esp32_camera: DEBUG
+
 i2c:
   - id: i2c_cam
-    sda: ${pin.int.i2c.sda}
-    scl: ${pin.int.i2c.scl}
+    sda: ${pin.cam.sda}
+    scl: ${pin.cam.scl}
     frequency: 100kHz
     timeout: 10ms
     scan: true
@@ -88,19 +106,34 @@ esp32_camera:
   vsync_pin: ${pin.cam.vs}
   href_pin: ${pin.cam.hs}
   pixel_clock_pin: ${pin.cam.p_clk}
-  power_down_pin: ${pin.cam.pwr}
+#  power_down_pin: ${pin.cam.pwr} # Set at boot
   # Metadata
   id: espcam
-  name: "Camera"
+  name: "Camera OV3660"
   # Image settings
   resolution: 640x480
-  jpeg_quality: 12
-  max_framerate: 1 fps
+  jpeg_quality: 20
+  max_framerate: 2 fps
   frame_buffer_count: 2 # defaults to 1
-  vertical_flip: true
-  horizontal_mirror: true
   # Exposure
   aec_mode: auto
   aec2: true # defaults to false
+  ae_level: 2
+  agc_gain_ceiling: 8x
   # White balance
   wb_mode: auto
+
+sensor:
+  # CPU Temperature
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic
+
+status_led:
+  pin: ${pin.light.led}

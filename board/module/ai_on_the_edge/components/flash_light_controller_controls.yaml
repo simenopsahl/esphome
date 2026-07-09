@@ -12,17 +12,18 @@ number:
     id: flc_pre_time_setting
     icon: "mdi:lightning-bolt"
     unit_of_measurement: "ms"
-    min_value: 0
-    max_value: 10000
+    device_class: duration
+    min_value: 2500
+    max_value: 20000
     step: 100
-    initial_value: 8000
+    initial_value: 14000
     entity_category: config
     optimistic: true
     restore_value: true
     set_action:
       - lambda: |-
-          if (id(camera_flash_controller) != nullptr) {
-            id(camera_flash_controller)->set_flash_pre_time((uint32_t)x);
+          if (id(component_flash_controller) != nullptr) {
+            id(component_flash_controller)->set_flash_pre_time((uint32_t)x);
           }
   # Flash Post-Time
   - platform: template
@@ -30,15 +31,16 @@ number:
     id: flc_post_time_setting
     icon: "mdi:lightning-bolt-outline"
     unit_of_measurement: "ms"
+    device_class: duration
     min_value: 0
     max_value: 5000
     step: 100
-    initial_value: 1500
+    initial_value: 1000
     entity_category: config
     optimistic: true
     restore_value: true
     set_action:
       - lambda: |-
-          if (id(camera_flash_controller) != nullptr) {
-            id(camera_flash_controller)->set_flash_post_time((uint32_t)x);
+          if (id(component_flash_controller) != nullptr) {
+            id(component_flash_controller)->set_flash_post_time((uint32_t)x);
           }

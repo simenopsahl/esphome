@@ -1,0 +1,130 @@
+---
+# PINs for Guition module ESP32-P4 & ESP32-C6 with 4.3" display and camera (JC4880P443C_I_W_Y)
+# Model:  esp32-p4 n16r32 + esp32c6
+# FLASH:  16MB
+# PSRAM:  32MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO36
+      disp_bl: GPIO23
+    int:
+      i2c:
+        sda: GPIO7
+        scl: GPIO8
+      spi:
+        clk: GPIO43
+        dat1: nc
+        dat2: nc
+        dat3: nc
+        dat4: nc
+        disp:
+          cs: nc
+        card:
+          clk: GPIO43
+          cmd: GPIO44
+          d0: GPIO39
+          d1: GPIO40
+          d2: GPIO41
+          d3: GPIO42
+      bat_feedback: nc
+      c6_hosted:
+        rst: GPIO54
+        cmd: GPIO19
+        clk: GPIO18
+        d0: GPIO14
+        d1: GPIO15
+        d2: GPIO16
+        d3: GPIO17
+    
+    disp:
+      bl: GPIO23
+      rst: GPIO5
+    touch:
+      rst: GPIO3 # GPIO22
+      int: GPIO21
+    btn:
+      boot: GPIO35
+    
+    audio:
+      i2s_lrclk: GPIO10
+      i2s_bclk: GPIO12
+      i2s_mclk: GPIO13
+      i2s_dout: GPIO9
+      i2s_din: GPIO48
+      mic: GPIO48
+      spk: GPIO9
+      amp: GPIO11
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO35
+      y3: GPIO36
+      y4: GPIO37
+      y5: GPIO38
+      y6: GPIO39
+      y7: GPIO40
+      y8: GPIO41
+      y9: GPIO45
+      vs: GPIO43
+      hs: GPIO42
+      p_clk: GPIO44
+      m_clk: GPIO48
+      pwr: GPIO21
+    
+    ext:
+      mx125_spk_2p:
+        p1: nc
+        p2: nc
+      mx125_bat_2p:
+        p1: nc
+        p2: nc
+      mx125_uart0_4p:
+        p1: nc
+        p2: nc
+        p3: nc
+        p4: nc
+      mx125_uart_4p:
+        p1: nc
+        p2: nc
+        p3: nc
+        p4: nc
+      mx125_485_4p:
+        p1: nc
+        p2: nc
+        p3: nc
+        p4: nc
+      sh100_i2c_4p:
+        p1: nc
+        p2: nc
+        p3: nc
+        p4: nc
+      bus_2x13p:
+        p1: 3v3
+        p2: 3v3
+        p3: GND
+        p4: GPIO52
+        p5: GPIO51
+        p6: GPIO50
+        p7: GPIO49
+        p8: GPIO35
+        p9: GPIO34
+        p10: GPIO32
+        p11: GPIO28
+        p12: i2c_sda
+        p13: i2c_scl
+        p14: 5v
+        p15: 5v
+        p16: GND
+        p17: GPIO33
+        p18: GPIO31
+        p19: GPIO30
+        p20: GPIO29
+        p21: GND
+        p22: esp_3v3
+        p23: c6_u0rx
+        p24: c6_u0tx
+        p25: c6_io9
+        p26: c6_chip_pu
+

@@ -61,6 +61,7 @@ psram:
   speed: 40MHz
 
 wifi:
+  use_psram: true
   enable_btm: true
   enable_rrm: true
 
@@ -113,10 +114,6 @@ output:
 #      allow_other_uses: true
 
 light:
-  # Enable status LED
-  - platform: status_led
-    id: status_light
-    pin: ${pin.light.led}
   # TFT Backlight
   - platform: monochromatic
     output:  backlight_output
@@ -367,3 +364,6 @@ script:
 #        allow_other_uses: true
 #      - number: ${pin.btn.front}
 #        allow_other_uses: true
+
+status_led:
+  pin: ${pin.light.led}

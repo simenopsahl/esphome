@@ -1,0 +1,119 @@
+labels: [es8311, msm381a3729h9bpc, speaker, microphone, sound_level, i2s_audio]
+---
+# https://docs.m5stack.com/en/atom/Atomic%20Echo%20Base
+# https://docs.m5stack.com/en/homeassistant/voice_assistant/atoms3r_with_atomic_echo_base_voice_assistant
+# Atomic Voice Base
+# 
+
+substitutions:
+  pin:
+    ext:
+      i2c:
+        hat:
+          sda: ${pin.ext.base.p4.p2}
+          scl: ${pin.ext.base.p4.p1}
+    audio:
+      mic: ${pin.ext.base.p5.p2}
+      i2s_lrclk: ${pin.ext.base.p5.p3}
+      spk: ${pin.ext.base.p5.p4}
+      i2s_bclk: ${pin.ext.base.p5.p5}
+
+packages:
+  hat_i2c: !include ../extension/hat_i2c.yaml
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - switch.turn_on: sound_level_enabled
+
+# Ehco Base GPIO Expander
+pi4ioe5v6408:
+  - id: hub_pi4ioe5v6408
+    i2c_id: i2c_hat
+
+# I2S Bus Configuration
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+
+audio_dac:
+  - platform: es8311
+    i2c_id: i2c_hat
+    id: dac_es8311
+    bits_per_sample: 16bit
+    sample_rate: 48000
+    use_microphone: false  # analog microphone here
+    use_mclk: false        # no mclk pin is connected
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic_mems
+    bits_per_sample: 32bit
+    channel: left
+    sample_rate: 16000
+    use_apll: true
+    adc_type: external
+    i2s_din_pin: ${pin.audio.mic}
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    dac_type: external
+    audio_dac: dac_es8311
+    use_apll: true
+    id: i2s_speaker
+    i2s_dout_pin: ${pin.audio.spk}
+    sample_rate: 16000
+    channel: stereo
+
+media_player:
+  - platform: speaker
+    name: "Echo Base Player"
+    id: echo_base_player
+    volume_initial: 0.1
+    volume_max: 0.8
+    announcement_pipeline:
+      speaker: i2s_speaker
+      format: FLAC
+      sample_rate: 16000
+      num_channels: 1
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 2000ms
+    rms:
+      name: "Noise Level"
+      id: average_loudness
+      filters:
+        - multiply: -1
+
+switch:
+  # NS4150B
+  - platform: gpio
+    id: speaker_enable
+    pin:
+      pi4ioe5v6408: hub_pi4ioe5v6408
+      number: 0
+      mode:
+        output: true
+    restore_mode: RESTORE_DEFAULT_ON
+    name: "Speaker Enable"
+    icon: "mdi:volume-high"
+    entity_category: config
+
+  - platform: template
+    id: sound_level_enabled
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    name: "Sound Level Tracking"
+    icon: "mdi:waveform"
+    entity_category: config
+    on_turn_off:
+        - sound_level.stop: sound_level_sensor
+    on_turn_on:
+        - sound_level.start: sound_level_sensor

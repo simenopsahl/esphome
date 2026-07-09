@@ -5,7 +5,7 @@ labels: [SK6812, led, gpio]
 
 substitutions:
   module:
-    rgb_in_pin: ${pin.ext.gpio.grove.in}
+    rgb_in_pin: ${pin.ext.gpio.grove.out}
 
 # UNIT RGB
 light:
@@ -32,7 +32,7 @@ light:
             - state: false
               duration: 2000ms
               transition_length: 1000ms
-    default_transition_length: 100ms
+    default_transition_length: 250ms
     initial_state:
       state: true
       brightness: 50%
@@ -40,4 +40,4 @@ light:
       red: 100%
       green: 0%
       blue: 0%
-    name: Unit RGB
+    name: "Unit RGB"

@@ -17,6 +17,7 @@ substitutions:
           reset: GPIO48
     
     light:
+      led: GPIO18
       ir: GPIO47
     
     ext:
@@ -50,6 +51,18 @@ substitutions:
         port_abc:
           in: GPIO8
           out: GPIO7
+      base:
+        p4:
+          p1: GPIO39
+          p2: GPIO38
+          p3: 5v
+          p4: gnd
+        p5:
+          p1: 3v3
+          p2: GPIO5
+          p3: GPIO6
+          p4: GPIO7
+          p5: GPIO8
         
     btn: GPIO41
 

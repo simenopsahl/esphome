@@ -72,7 +72,6 @@ sensor:
     name: "RAM Free Percentage"
     id: ram_free_percentage
     unit_of_measurement: "%"
-    device_class: battery
     state_class: measurement
     icon: "mdi:memory"
     update_interval: 5s
@@ -134,7 +133,6 @@ sensor:
     name: "SPIRAM Free Percentage"
     id: spiram_free_percentage
     unit_of_measurement: "%"
-    device_class: battery
     state_class: measurement
     icon: "mdi:memory"
     update_interval: 5s

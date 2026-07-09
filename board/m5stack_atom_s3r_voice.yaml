@@ -1,6 +1,7 @@
 labels: [esp32s3, psram, ES8311, I2S, microphone, speaker, i2c]
 ---
 # https://docs.m5stack.com/en/core/Atom_EchoS3R
+# https://docs.m5stack.com/en/homeassistant/voice_assistant/atom_echos3r_voice_assistant
 # https://github.com/m5stack/esphome-yaml/blob/main/common/atom-echos3r-satellite-base.yaml
 # Base functions for:
 # M5Stack Atom Voice S3R
@@ -18,14 +19,14 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
   device:
-    model: "M5Stack Atom Voice S3R"
+    model: "M5Stack Atom S3R Voice"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
 
 esphome:
   project:
-    name: "M5Stack Atom Voice S3R"
+    name: "M5Stack.Atom S3R Voice"
     version: "1.0.0"
 
 esp32:
@@ -50,9 +51,11 @@ psram:
   speed: 80MHz
 
 wifi:
+  use_psram: true
   enable_btm: true
   enable_rrm: true
 
+# I2S Bus Configuration
 i2s_audio:
   id: i2s_audio_bus
   i2s_lrclk_pin:
@@ -79,19 +82,33 @@ microphone:
 
 speaker:
   - platform: i2s_audio
-    i2s_audio_id: i2s_shared
-    id: speaker_i2s
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_speaker
     i2s_dout_pin: ${pin.audio.i2s_dout}
     dac_type: external
     audio_dac: dac_es8311
-    sample_rate: 48000
+    use_apll: true
+    sample_rate: 16000
     bits_per_sample: 16bit
     channel: left
+
+media_player:
+  - platform: speaker
+    name: "Echo Base Player"
+    id: echo_base_player
+    volume_initial: 0.1
+    volume_max: 0.8
+    task_stack_in_psram: true
+    announcement_pipeline:
+      speaker: i2s_speaker
+      format: FLAC
+      sample_rate: 16000
+      num_channels: 1
 
 # Button
 binary_sensor:
   - platform: gpio
-    id: btn_display
+    id: btn_front
     pin:
       number: ${pin.btn}
       inverted: true
@@ -108,9 +125,10 @@ binary_sensor:
 switch:
   - platform: gpio
     id: speaker_enable
-    name: Speaker Enable
     pin: ${pin.audio.pwr}
     restore_mode: RESTORE_DEFAULT_ON
+    name: "Speaker Enable"
+    icon: "mdi:volume-high"
     entity_category: config
     disabled_by_default: true
 
@@ -125,3 +143,15 @@ switch:
         - microphone.unmute:
     on_turn_on:
         - microphone.mute:
+
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 1250ms
+    rms:
+      name: "Noise Level"
+      id: average_loudness
+      filters:
+        - multiply: -1

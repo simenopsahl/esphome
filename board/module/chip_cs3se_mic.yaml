@@ -31,9 +31,9 @@ sensor:
   - platform: sound_level
     id: sound_level_sensor
     passive: false
-    measurement_duration: 1250ms
+    measurement_duration: 2000ms
     rms:
-      name: "Average Loudness"
+      name: "Noise Level"
       id: average_loudness
       filters:
         - multiply: -1

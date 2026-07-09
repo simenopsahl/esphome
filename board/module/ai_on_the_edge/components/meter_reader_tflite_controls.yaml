@@ -6,7 +6,7 @@
 switch:
   # Pause AI Processing
   - platform: template
-    name: "TFl Pause AI Processing"
+    name: "TfL Pause AI Processing"
     id: tmr_pause_ai_processing
     icon: "mdi:pause"
     entity_category: config
@@ -14,17 +14,17 @@ switch:
     restore_mode: RESTORE_DEFAULT_OFF
     turn_on_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_pause_processing(true);
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_pause_processing(true);
           }
     turn_off_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_pause_processing(false);
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_pause_processing(false);
           }
   # Setup Mode (Preview)
   - platform: template
-    name: "TFl Setup Mode (Preview)"
+    name: "TfL Setup Mode (Preview)"
     id: tmr_setup_mode_preview
     icon: "mdi:camera-cog"
     entity_category: config
@@ -32,18 +32,18 @@ switch:
     restore_mode: RESTORE_DEFAULT_OFF
     turn_on_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_generate_preview(true);
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_generate_preview(true);
           }
     turn_off_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_generate_preview(false);
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_generate_preview(false);
           }
 
   # # Show Crop Areas
   # - platform: template
-  #   name: "TFl Show Crop Areas"
+  #   name: "TfL Show Crop Areas"
   #   id: tmr_show_crop_areas
   #   icon: "mdi:crop"
   #   entity_category: config
@@ -51,18 +51,18 @@ switch:
   #   restore_mode: RESTORE_DEFAULT_ON
   #   turn_on_action:
   #     - lambda: |-
-  #         if (id(tflite_meter_reader) != nullptr) {
-  #           id(tflite_meter_reader)->set_show_crop_areas(true);
+  #         if (id(component_meter_reader) != nullptr) {
+  #           id(component_meter_reader)->set_show_crop_areas(true);
   #         }
   #   turn_off_action:
   #     - lambda: |-
-  #         if (id(tflite_meter_reader) != nullptr) {
-  #           id(tflite_meter_reader)->set_show_crop_areas(false);
+  #         if (id(component_meter_reader) != nullptr) {
+  #           id(component_meter_reader)->set_show_crop_areas(false);
   #         }
 
   # # Debug Mode
   # - platform: template
-  #   name: "TFl Debug Mode"
+  #   name: "TfL Debug Mode"
   #   id: tmr_debug_mode
   #   icon: "mdi:bug"
   #   entity_category: config
@@ -71,7 +71,7 @@ switch:
 
   # # Debug Image
   # - platform: template
-  #   name: "TFl Debug Image"
+  #   name: "TfL Debug Image"
   #   id: tmr_debug_image
   #   icon: "mdi:image-search"
   #   entity_category: config
@@ -80,7 +80,7 @@ switch:
 
   # # Enable Flash Calibration
   # - platform: template
-  #   name: "TFl Enable Flash Calibration"
+  #   name: "TfL Enable Flash Calibration"
   #   id: tmr_enable_flash_calibration
   #   icon: "mdi:flash-auto"
   #   entity_category: config
@@ -91,26 +91,27 @@ switch:
 number:
   # Update Interval
   - platform: template
-    name: "TFl Update Interval"
+    name: "TfL Update Interval"
     id: tmr_meter_update_interval
     icon: "mdi:timer"
     unit_of_measurement: "s"
+    device_class: duration
     min_value: 1
     max_value: 3600
     step: 1
-    initial_value: 90
+    initial_value: 60
     entity_category: config
     optimistic: true
     restore_value: true
     set_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_update_interval((uint32_t)(x * 1000));
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_update_interval((uint32_t)(x * 1000));
           }
 
   # Confidence Threshold (only used when no external validator is configured)
   # - platform: template
-  #   name: "TFl Confidence Threshold"
+  #   name: "TfL Confidence Threshold"
   #   id: tmr_confidence_threshold
   #   icon: "mdi:speedometer"
   #   unit_of_measurement: "%"
@@ -123,16 +124,17 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(tflite_meter_reader) != nullptr) {
-  #           id(tflite_meter_reader)->set_confidence_threshold(x / 100.0);
+  #         if (id(component_meter_reader) != nullptr) {
+  #           id(component_meter_reader)->set_confidence_threshold(x / 100.0);
   #         }
 
   # Frame Request Timeout
   # - platform: template
-  #   name: "TFl Frame Request Timeout"
+  #   name: "TfL Frame Request Timeout"
   #   id: tmr_frame_request_timeout
   #   icon: "mdi:timer-alert"
   #   unit_of_measurement: "ms"
+  #   device_class: duration
   #   min_value: 1000
   #   max_value: 60000
   #   step: 1000
@@ -142,13 +144,13 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(tflite_meter_reader) != nullptr) {
-  #           id(tflite_meter_reader)->set_frame_request_timeout((uint32_t)x);
+  #         if (id(component_meter_reader) != nullptr) {
+  #           id(component_meter_reader)->set_frame_request_timeout((uint32_t)x);
   #         }
 
   # Set Last Valid Value
   - platform: template
-    name: "TFl Set Last Valid Value"
+    name: "TfL Set Last Valid Value"
     id: tmr_set_last_valid
     icon: "mdi:restore"
     min_value: 0
@@ -159,33 +161,37 @@ number:
     optimistic: true
     set_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_last_valid_value(x);
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_last_valid_value(x);
+          }
+      - lambda: |-
+          if (id(component_value_validator) != nullptr) {
+            id(component_value_validator)->set_last_valid_reading(x);
           }
 
 button:
   # # Start Flash Calibration
   # - platform: template
-  #   name: "TFl Start Flash Calibration"
+  #   name: "TfL Start Flash Calibration"
   #   id: tmr_start_flash_calibration_btn
   #   icon: "mdi:timer-sand"
   #   entity_category: config
   #   on_press:
   #     - lambda: |-
-  #         if (id(tflite_meter_reader) != nullptr) {
-  #           id(tflite_meter_reader)->start_flash_calibration();
+  #         if (id(component_meter_reader) != nullptr) {
+  #           id(component_meter_reader)->start_flash_calibration();
   #         }
 
   # Unload AI Components
   - platform: template
-    name: "TFl Unload AI Components"
+    name: "TfL Unload AI Components"
     id: tmr_unload_btn
     icon: "mdi:download-off"
     entity_category: config
 
   # Reload AI Components
   - platform: template
-    name: "TFl Reload AI Components"
+    name: "TfL Reload AI Components"
     id: tmr_reload_btn
     icon: "mdi:reload"
     entity_category: config
@@ -193,13 +199,14 @@ button:
 sensor:
   # Meter Reading
   - platform: template
-    name: "Water Meter Reading"
-    id: kamstrup_meter_value
+    name: "TfL Meter Reading"
+    id: tmr_meter_value
     unit_of_measurement: "${meter.unit}"
     accuracy_decimals: 3
-    icon: mdi:water-pump
+    icon: mdi:counter
     state_class: ${meter.state_class}
     device_class: ${meter.device_class}
+    entity_category: diagnostic
     filters:
       # Converts the raw 12058 into 12.058
       - multiply: 0.001
@@ -218,34 +225,39 @@ sensor:
 
   # Meter Reading Confidence
   - platform: template
-    name: "TFl Meter Reading Confidence"
+    name: "TfL Meter Reading Confidence"
     id: tmr_meter_confidence
     unit_of_measurement: "%"
     accuracy_decimals: 2
     icon: "mdi:percent"
+    entity_category: diagnostic
 
   # Inference Time
   - platform: template
     id: tmr_inference_time
-    name: "TFl Inference Time"
+    name: "TfL Inference Time"
     unit_of_measurement: "ms"
     accuracy_decimals: 0
+    device_class: duration
     state_class: measurement
     icon: mdi:timer-outline
+    entity_category: diagnostic
 
   # Capture to Publish Time
   - platform: template
     id: tmr_capture_to_publish_time
-    name: "TFl Capture to Publish Time"
+    name: "TfL Capture to Publish Time"
     unit_of_measurement: "ms"
     accuracy_decimals: 0
+    device_class: duration
     state_class: measurement
     icon: mdi:timer-sand
+    entity_category: diagnostic
 
 text:
   # Set Last Valid Value (String) - Supports leading zeros
   - platform: template
-    name: "TFl Set Last Valid Value (String)"
+    name: "TfL Set Last Valid Value (String)"
     id: tmr_set_last_valid_string
     icon: "mdi:form-textbox"
     mode: text
@@ -253,11 +265,15 @@ text:
     optimistic: true
     min_length: 1
     max_length: 20
-    initial_value: ${meter.last_valid_value}
+#    initial_value: ${meter.last_valid_value}
     set_action:
       - lambda: |-
-          if (id(tflite_meter_reader) != nullptr) {
-            id(tflite_meter_reader)->set_last_valid_value(x);
+          if (id(component_meter_reader) != nullptr) {
+            id(component_meter_reader)->set_last_valid_value(x);
+          }
+      - lambda: |-
+          if (id(component_value_validator) != nullptr) {
+            id(component_value_validator)->set_last_valid_reading(x);
           }
 
 # API Services
@@ -267,36 +283,36 @@ api:
     - service: get_meter_data
       then:
         - lambda: |-
-            auto val = id(tflite_meter_reader).get_value_sensor()->state;
-            auto conf = id(tflite_meter_reader).get_confidence_sensor()->state;
+            auto val = id(component_meter_reader).get_value_sensor()->state;
+            auto conf = id(component_meter_reader).get_confidence_sensor()->state;
             ESP_LOGD("api", "Meter Data: Value=%.2f, Confidence=%.2f", val, conf);
 
     # Set Crop Zones
-    - service: set_crop_zones
-      variables:
-        zones: string
-      then:
-        - text_sensor.template.publish:
-            id: crop_zones_sensor
-            state: !lambda 'return zones;'
-        - lambda: |-
-            id(crop_zones) = zones;
-            id(tflite_meter_reader).set_crop_zones(zones);
+    # - service: set_crop_zones
+    #   variables:
+    #     zones: string
+    #   then:
+    #     - text_sensor.template.publish:
+    #         id: crop_zones_sensor
+    #         state: !lambda 'return zones;'
+    #     - lambda: |-
+    #         id(crop_zones) = zones;
+    #         id(tflite_meter_reader).set_crop_zones(zones);
 
     # Trigger Inference
     - service: trigger_inference
       then:
-        - lambda: 'id(tflite_meter_reader).force_flash_inference();'
+        - lambda: 'id(component_meter_reader).force_flash_inference();'
 
     # Start Flash Calibration
     - service: start_flash_calibration
       then:
-        - lambda: 'id(tflite_meter_reader).start_flash_calibration();'
+        - lambda: 'id(component_meter_reader).start_flash_calibration();'
 
 text_sensor:
   # Inference Logs
   - platform: template
-    name: "TFl Inference Logs"
+    name: "TfL Inference Logs"
     id: tmr_inference_logs
     icon: "mdi:text-box-outline"
     entity_category: diagnostic
@@ -309,7 +325,8 @@ text_sensor:
     entity_category: diagnostic
 
   # Crop Zones
-  - platform: template
-    name: "Cam Crop Zones"
-    id: crop_zones_sensor
-    icon: "mdi:crop"
+  # - platform: template
+  #   name: "Cam Crop Zones"
+  #   id: crop_zones_sensor
+  #   icon: "mdi:crop"
+  #   entity_category: diagnostic

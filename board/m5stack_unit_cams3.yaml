@@ -30,14 +30,46 @@ esp32:
   variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
+  watchdog_timeout: 15s
   framework:
     advanced:
       compiler_optimization: PERF
+      execute_from_psram: true
+      enable_idf_experimental_features: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
     type: ${device.framework.type}
+    sdkconfig_options:
+      CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 psram:
   mode: octal
   speed: 80MHz
+
+wifi:
+  output_power: 10dB
+  power_save_mode: light
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+ota:
+  allow_partition_access: true
+
+preferences:
+  flash_write_interval: 30min
+
+logger:
+  logs:
+    i2s_audio: ERROR
+    microphone: ERROR
+    esp32_camera: DEBUG
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: ${pin.int.spi.miso}
 
 esp32_camera:
   i2c_id: i2c_internal
@@ -45,7 +77,7 @@ esp32_camera:
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
-    frequency: 20MHz
+    frequency: 8MHz
   data_pins:
     - ${pin.cam.y2}
     - ${pin.cam.y3}
@@ -63,22 +95,60 @@ esp32_camera:
   name: "Camera PY260"
   # Image settings
   resolution: 640x480
-  jpeg_quality: 12
-  max_framerate: 1 fps
-  frame_buffer_count: 2 # defaults to 1
-  vertical_flip: true
-  horizontal_mirror: true
-  # Exposure
-  aec_mode: auto
-  aec2: true # defaults to false
-  # White balance
-  wb_mode: auto
+  jpeg_quality: 20
+  max_framerate: 2 fps
+  frame_buffer_count: 1 # defaults to 1
+#  vertical_flip: true
+#  horizontal_mirror: true
 
-switch:
-  - platform: gpio
-    id: camera_led
-    name: "Camera LED"
-    pin:
-      number: ${pin.light.led}
-      inverted: true
-    restore_mode: ALWAYS_ON
+# Enable status LED
+status_led:
+  pin: ${pin.light.led}
+
+sensor:
+  # - platform: sound_level
+  #   id: sound_level_sensor
+  #   passive: false
+  #   measurement_duration: 2000ms
+  #   rms:
+  #     name: "PDM Noise Level"
+  #     id: pdm_average_loudness
+  #     filters:
+  #       - multiply: -1
+  # CPU Temperature
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic
+
+# i2s_audio:
+#   id: i2s_audio_bus
+#   i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+
+# microphone:
+#   - platform: i2s_audio
+#     i2s_audio_id: i2s_audio_bus
+#     id: i2s_mic_pdm
+#     bits_per_sample: 8bit
+#     sample_rate: 4000
+#     i2s_din_pin: ${pin.audio.mic}
+#     adc_type: external
+#     pdm: true
+
+# switch:
+#   - platform: template
+#     id: mic_mute
+#     name: Microphone Mute
+#     icon: "mdi:microphone-off"
+#     optimistic: true
+#     restore_mode: RESTORE_DEFAULT_OFF
+#     entity_category: config
+#     on_turn_off:
+#         - microphone.unmute:
+#     on_turn_on:
+#         - microphone.mute:

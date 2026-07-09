@@ -2,10 +2,13 @@ labels: [SH1107, display, i2c]
 ---
 # https://docs.m5stack.com/en/unit/oled
 # https://esphome.io/components/display/ssd1306/
+# https://github.com/Chill-Division/M5Stack-ESPHome/issues/13
 
 substitutions:
   module:
     oled_i2c_bus: i2c_grove
+  display:
+    home_page: page_info
 
 # Unit OLED
 display:
@@ -13,8 +16,10 @@ display:
     i2c_id: ${module.oled_i2c_bus}
     id: display_oled
     model: SH1107 128x64
-    contrast: 100%
+    contrast: 75%
     update_interval: 5s
+    rotation: 90
+    offset_y: 96
     pages:
       - id: page_black
         lambda: |-
@@ -24,3 +29,133 @@ display:
         lambda: |-
           // Fill background.
           it.fill(COLOR_ON);
+      - id: page_test
+        lambda: |-
+          // Fill background.
+          it.fill(COLOR_OFF);
+          // Draw test text.
+          // Left side text, top, middle and bottom.
+          it.print(0, 0, id(f9), COLOR_ON, TextAlign::TOP_LEFT, "f9");
+          it.print(0, it.get_height()/2, id(f11), COLOR_ON, TextAlign::CENTER_LEFT, "f11");
+          it.print(0, it.get_height(), id(f13), COLOR_ON, TextAlign::BOTTOM_LEFT, "f13");
+          // Right side text, top, middle and bottom.
+          it.print(it.get_width(), 0, id(f15), COLOR_ON, TextAlign::TOP_RIGHT, "f15");
+          it.print(it.get_width(), it.get_height()/2, id(f15b), COLOR_ON, TextAlign::CENTER_RIGHT, "f15b");
+          it.print(it.get_width(), it.get_height(), id(f17b), COLOR_ON, TextAlign::BOTTOM_RIGHT, "f17b");
+          // Center big text
+          it.print(it.get_width()/2, it.get_height()/2, id(f25b), COLOR_ON, TextAlign::CENTER, "f25b");
+      - id: page_info
+        lambda: |-
+          // Fill background.
+          it.fill( COLOR_OFF );
+
+          // NAME
+          it.printf( it.get_width()/2, 2, id(f11), COLOR_ON, TextAlign::TOP_CENTER, "%s", App.get_name().c_str() );
+          // MAC
+          it.printf( 22, it.get_height()/2, id(f13), COLOR_ON, TextAlign::CENTER_LEFT, "%s", id(sensor_mac_address).state.c_str() );
+          // IP
+          it.printf( 22, it.get_height()-2, id(f13), COLOR_ON, TextAlign::BOTTOM_LEFT, "%s", id(sensor_ip_address).state.c_str() );
+
+          // Show wifi icon.
+          if ( id(component_wifi).is_connected() ) {
+            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, COLOR_ON, COLOR_OFF );
+          }
+          // Show HA icon.
+          if ( id(component_api).is_connected() ) {
+            it.image( 0, it.get_height()-22, id(i_api), ImageAlign::BOTTOM_LEFT, COLOR_ON, COLOR_OFF );
+          }
+
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_homeassistant).now().timestamp;
+          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
+          it.printf( it.get_width(), it.get_height(), id(f9), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%s", str );
+
+font:
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 400
+    id: f9
+    size: 9
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '!','~',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 400
+    id: f11
+    size: 11
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 400
+    id: f13
+    size: 13
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 400
+    id: f15
+    size: 15
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    id: f15b
+    size: 15
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    id: f17b
+    size: 17
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    id: f25b
+    size: 25
+    glyphs: *norwegian-glyphs
+
+image:
+  - id: i_wifi
+    file: mdi:wifi
+    type: binary
+    resize: 18x18
+  - id: i_api
+    file: mdi:home-assistant
+    type: binary
+    resize: 18x18
+
+  - id: i_refresh
+    file: mdi:refresh
+    type: binary
+    resize: 18x18
+  - id: i_next
+    file: mdi:arrow-right-thick
+    type: binary
+    resize: 18x18
+  - id: i_home
+    file: mdi:home
+    type: binary
+    resize: 18x18
+
+  - id: i_info
+    file: mdi:information
+    type: binary
+    resize: 18x18
+  - id: i_temp
+    file: mdi:thermometer
+    type: binary
+    resize: 18x18

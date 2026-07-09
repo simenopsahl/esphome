@@ -1,5 +1,9 @@
 ---
 # PINs for ESP32S3 USB_OTG
+# Model:  esp32-s3 n16r8
+# Light:  SK6812 RGB Rear facing
+# FLASH:  16MB
+# PSRAM:  8MB
 # https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L448
 
 substitutions:

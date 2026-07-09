@@ -36,6 +36,8 @@ substitutions:
       i2s_dati: GPIO48
       mic: GPIO48
     cam:
+      sda: GPIO17
+      scl: GPIO41
       y0: nc
       y1: nc
       y2: GPIO6

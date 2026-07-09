@@ -1,0 +1,61 @@
+---
+# PINs for ESP32-S3_CAM w/ single flash LED
+
+substitutions:
+  pin:
+    # light:
+    #   led: GPIO2
+    #   flash: GPIO3
+    # int:
+    #   spi:
+    #     clk: GPIO39
+    #     mosi: GPIO38
+    #     miso: GPIO2
+    #     cs: GPIO38
+    #   i2c:
+    #     sda: GPIO4
+    #     scl: GPIO5
+    # cam:
+    #   y0: nc
+    #   y1: nc
+    #   y2: GPIO11
+    #   y3: GPIO9
+    #   y4: GPIO8
+    #   y5: GPIO10
+    #   y6: GPIO12
+    #   y7: GPIO18
+    #   y8: GPIO17
+    #   y9: GPIO16
+    #   vs: GPIO6
+    #   hs: GPIO7
+    #   p_clk: GPIO13
+    #   m_clk: GPIO15
+    #   pwr: nc
+    # card:
+    #   d0: GPIO40
+    #   d1: nc
+    #   d2: nc
+    #   d3: nc
+    #   cs: GPIO38
+    #   cmd: GPIO38
+    #   clk: GPIO39
+    
+    ext:
+      h1:
+        p1: en
+        p2: u0tx
+        p3: u0rx
+        p4: 3v3
+        p5: gnd
+        p6: GPIO0
+        p7: GPIO2
+        p8: 3v3
+      h2:
+        p1: GPIO14
+        p2: GPIO21
+        p3: GPIO41
+        p4: GPIO42
+        p5: GPIO45
+        p6: GPIO46
+        p7: gnd
+        p8: 5v

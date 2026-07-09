@@ -39,6 +39,18 @@ substitutions:
         port_abc:
           in: GPIO33
           out: GPIO23
+      base:
+        p4:
+          p1: GPIO21
+          p2: GPIO25
+          p3: 5v
+          p4: gnd
+        p5:
+          p1: 3v3
+          p2: GPIO22
+          p3: GPIO19
+          p4: GPIO23
+          p5: GPIO33
     
     btn: GPIO39
 

@@ -42,6 +42,9 @@ psram:
   speed: 80MHz
 
 wifi:
+  output_power: 10dB
+  power_save_mode: light
+  use_psram: true
   enable_btm: true
   enable_rrm: true
 

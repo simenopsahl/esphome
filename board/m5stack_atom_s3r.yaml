@@ -9,6 +9,7 @@ labels: [esp32s3, psram, ST7789V, display, BMI270]
 packages:
   pins: !include pins/m5stack_atom_s3r.yaml
   i2c_int: !include extension/internal_i2c.yaml
+  imu: !include module/chip_imu_bmi270.yaml
 
 substitutions:
   time_timezone: "Europe/Oslo"
@@ -52,6 +53,7 @@ psram:
   speed: 80MHz
 
 wifi:
+  use_psram: true
   enable_btm: true
   enable_rrm: true
 

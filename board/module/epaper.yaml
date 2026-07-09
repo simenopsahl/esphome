@@ -89,6 +89,7 @@ sensor:
 # Buttons in Home Assistant
 button:
   - platform: template
+    id: btn_refresh_screen
     name: "Refresh Screen"
     entity_category: config
     on_press:
@@ -96,6 +97,7 @@ button:
           - script.execute: update_screen
 
   - platform: template
+    id: btn_repair_screen
     name: "Repair Screen"
     entity_category: config
     on_press:

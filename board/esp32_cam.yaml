@@ -69,6 +69,9 @@ esphome:
 psram:
 
 wifi:
+  output_power: 10dB
+  power_save_mode: light
+  use_psram: true
   enable_btm: true
   enable_rrm: true
 
@@ -83,13 +86,13 @@ output:
   - platform: ledc
     id: flash_output
     pin: ${pin.light.flash}
-    max_power: 0.5
+    max_power: 0.35
 
 light:
   - platform: monochromatic # Camera Flash
     output: flash_output
     id: flash_light
-    default_transition_length: 0ms
+    default_transition_length: 50ms
     restore_mode: RESTORE_AND_OFF
     initial_state:
       state: off
@@ -102,7 +105,7 @@ esp32_camera:
     pin:
       number: ${pin.cam.m_clk}
       ignore_strapping_warning: true
-    frequency: 20MHz
+    frequency: 12MHz
   data_pins:
     - number: ${pin.cam.y2}
       ignore_strapping_warning: true
@@ -122,7 +125,7 @@ esp32_camera:
   name: "Camera"
   # Image settings
   resolution: 640x480
-  jpeg_quality: 12
+#  jpeg_quality: 12
   max_framerate: 1 fps
   frame_buffer_count: 2 # defaults to 1 (1-2)
   vertical_flip: false

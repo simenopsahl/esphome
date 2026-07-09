@@ -50,6 +50,11 @@ psram:
   mode: octal
   speed: 80MHz
 
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
 spi:
   clk_pin: ${pin.spi.clk}
   mosi_pin: ${pin.spi.mosi}

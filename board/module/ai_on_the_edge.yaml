@@ -23,6 +23,7 @@ substitutions:
     device_class: water
     # state class for the meter (e.g. total_increasing, total, measurement)
     state_class: total_increasing
+    last_valid_value: "000012306"
   time:
     reboot_days_of_week: MON
     reboot_hours: 5
@@ -52,10 +53,10 @@ esphome:
         - delay: 500ms
   on_loop:
     - lambda: |-
-          if (id(espcam_updated)) {
+          if (id(global_espcam_updated)) {
             id(espcam).update_camera_parameters();
-            if(id(gl_debug)) { id(espcam).dump_config(); }
-            id(espcam_updated) = false;
+            if(id(global_debug)) { id(espcam).dump_config(); }
+            id(global_espcam_updated) = false;
           }
 
 # time:
@@ -93,100 +94,118 @@ external_components:
 # Enable logging
 logger:
   logs:
-    esp32_camera: WARN
+    esp32_camera: INFO
     meter_reader_tflite: DEBUG
     ModelHandler: DEBUG
     ImageProcessor: DEBUG
     tflite_coordinator: DEBUG
+    value_validator: DEBUG
     internal_temperature: ERROR
     internal_temperature.esp32: ERROR
 
 globals:
   # the debug parameter determines whether a config dump is done after making changes
   # this is helpful when doing initial setup, but once everything is working, I turn it off
-  - id: gl_debug
+  - id: global_debug
     type: bool
     initial_value: 'false'
   # value to track if camera parameters have been changed
   #   used to trigger the loop() code inserted in 'esphome' section above
-  - id: espcam_updated
+  - id: global_espcam_updated
     type: bool
     initial_value: 'false'
 
-  - id: crop_zones
+  - id: global_crop_zones
     type: std::string
     max_restore_data_length: 254
-
     # Blank
 #    initial_value: "\"[]\""
     # Note: The outer quotes are escaped with single quotes + double quotes ("...")
 
-    # 640x480 numbers
-#    initial_value: '"[[11,13,51,96],[51,13,98,96],[98,13,145,97],[144,15,193,98],[197,16,241,98],[240,15,285,98],[285,15,335,97],[335,14,381,97],[381,17,430,98]]"'
-    
     # 800x600 numbers
-#    initial_value: '"[[16,22,59,104],[59,22,106,104],[106,23,151,105],[151,23,198,104],[199,23,247,105],[246,22,293,105],[292,23,342,106],[343,23,387,106],[391,26,437,106]]"'
-
-    # 800x600 alt numbers
-    initial_value: '"[[17,22,60,104],[60,22,106,105],[106,23,151,105],[152,23,198,104],[199,23,247,105],[246,23,293,105],[295,24,341,106],[345,24,387,106],[391,26,437,106]]"'
+    initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
 
 tflite_micro_helper:
   debug: false
 
 esp32_camera_utils:
-  id: espcam_utils
+  id: component_espcam_utils
   camera_id: espcam
   debug: false
   ### zoom available for OV2640, OV3660, OV5640, SC101IOT, SC030IOT from crop zones (explicit)
   ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
-  # 640x480 crop zone
-#  camera_window:
-#    offset_x: 472 # multiple of 4
-#    offset_y: 504 # multiple of 4
-#    width: 448 # multiple of 8
-#    height: 112 # multiple of 8
-  # 800x600 crop zone
-  camera_window:
-    offset_x: 464 # multiple of 4
-    offset_y: 496 # multiple of 4
-    width: 528 # multiple of 8
-    height: 200 # multiple of 8
-  
 
-  # enable_rotation: true
+  # 800x600 tighter crop zone
+  camera_window:
+    offset_x: 480 # multiple of 4
+    offset_y: 500 # multiple of 4
+    width: 432 # multiple of 8
+    height: 104 # multiple of 8
+
+  enable_rotation: false
   # rotation: 270 # 0, 90, 180, 270 (special case built-in "accelerated" for 90, 180, 270 )
 
-  # enable_scaler: true
+  enable_scaler: false
   # scaler:
   #   width: 640
   #   height: 480
 
-  # enable_cropper: true
+  enable_cropper: false
   # cropper:
   #   width: 320
   #   height: 240
   #   offset_x: 0
   #   offset_y: 0
   
-  # enable_drawing: true # enable drawing subsystem, needed if meter_reader_tflite: generate_preview: true + show_crop_areas: true
+  enable_drawing: false # enable drawing subsystem, needed if meter_reader_tflite: generate_preview: true + show_crop_areas: true
 
   debug_memory: false
 
 # optional : flash light at taking image
 flash_light_controller:
-  id: camera_flash_controller
+  id: component_flash_controller
   flash_light: flash_light
-  flash_pre_time: 8000ms # 8 seconds before update (time to stabilize)
-  flash_post_time: 1500ms # 2 seconds after update
+  flash_pre_time: 14000ms # 14 seconds before update (time to stabilize)
+  flash_post_time: 1000ms # 1 second after update
   debug: false
 
 value_validator:
-  id: meter_value_validator
+  id: component_value_validator
+  validated_value_sensor:
+    id: sensor_last_valid_reading
+    name: "Water Meter Reading"
+    unit_of_measurement: "${meter.unit}"
+    accuracy_decimals: 3
+    icon: mdi:water-pump
+    state_class: ${meter.state_class}
+    device_class: ${meter.device_class}
+    filters:
+      # Converts the raw 12058 into 12.058
+      - multiply: 0.001
+      # Prevents the AI from sending a wild misread (like 999999) 
+      # which would permanently ruin your HA Energy Dashboard stats.
+      # Only accepts readings that are greater than or equal to the last valid reading.
+      # - filter_out: nan
+      # - lambda: |-
+      #     static float last_valid_value = 0.0;
+      #     if (x >= last_valid_value) {
+      #       last_valid_value = x;
+      #       return x;
+      #     } else {
+      #       return {}; // Ignore the reading if it went down
+      #     }
+  validator_state_sensor:
+    id: sensor_validator_logs
+    name: "VV State Logs"
+    icon: "mdi:text-box-outline"
+    entity_category: diagnostic
   # Basic Validation
+  enable_dial_correction: false
   # Allow values < previous value (default: false)
   allow_negative_rates: false
-  # Max allowed absolute change (default: 100)
-  max_absolute_diff: 300
+  small_negative_tolerance: 15
+  # Max allowed absolute change (default: 500)
+  max_absolute_diff: 500
   # Max rate change as percentage (default: 15%)
   max_rate_change: 0.15
 
@@ -194,30 +213,39 @@ value_validator:
   # Enable adaptive validation (default: true)
   enable_smart_validation: true
   # Window size for pattern analysis (default: 5)
-  smart_validation_window: 5
+  smart_validation_window: 10
+  max_consecutive_rejections: 20
 
   # Confidence Thresholds
   # Threshold for high confidence (default: 90%)
   high_confidence_threshold: 0.90
   # Min confidence per digit (default: 85%)
-  per_digit_confidence_threshold: 0.85
+  per_digit_confidence_threshold: 0.70
   # Require all digits meet threshold (default: false)
-  strict_confidence_check: true
-  #first_reading_digit_threshold: 0.70
+  strict_confidence_check: false
+  first_reading_digit_threshold: 0.70
 
   # Memory Management
   max_history_size: 50kB               # Max history memory usage (default: 50kB)
+  persist_state: true
 
 meter_reader_tflite:
-  id: tflite_meter_reader
-  validator: meter_value_validator
+  id: component_meter_reader
+  validator: component_value_validator
   # confidence_threshold: 0.85 # Only if validator is disabled
   camera_id: espcam
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"  # best performance / accuracy
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite" # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite" # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite" # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
-  model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite" # From AI-On-The-Edge
+  camera_resolution: 800x600
+  # best performance / accuracy
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"
+  # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
+  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite"
+  # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite"
+  # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite"
+  # From AI-On-The-Edge
+#  model: "board/module/ai_on_the_edge/models/dig-class11_1910_s2_q.tflite"
+#  model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite"
 
   update_interval: 90s
 
@@ -243,13 +271,13 @@ meter_reader_tflite:
         # port: 80  # commented  uncomment
     # - !include camera_webserver.yaml
 
-  crop_zones_global: crop_zones  # Reference the global variables set in globals_AI_component.yaml | To update, use http://[hassio]/developer-tools/action >esphome.[s3cam_tflite]_set_crop_zones | to get, use the tools>draw_regions.py
-  flash_light_controller: camera_flash_controller
+  crop_zones_global: global_crop_zones  # Reference the global variables set in globals_AI_component.yaml | To update, use http://[hassio]/developer-tools/action >esphome.[s3cam_tflite]_set_crop_zones | to get, use the tools>draw_regions.py
+  flash_light_controller: component_flash_controller
 
   # data_collector: ${id_prefix}_data_collector
   # collect_low_confidence: true
 
-  value_sensor: kamstrup_meter_value
+  value_sensor: tmr_meter_value
   confidence_sensor: tmr_meter_confidence
 
   inference_logs: tmr_inference_logs

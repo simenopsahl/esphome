@@ -72,9 +72,6 @@ time:
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
-  miso_pin: 
-    number: ${pin.int.spi.miso}
-    allow_other_uses: true
 
 output:
   # backlight output
@@ -85,7 +82,9 @@ output:
   # Buzzer
   - platform: ledc
     id: buzzer
-    pin: ${pin.audio.buzzer}
+    pin:
+      number: ${pin.audio.buzzer}
+      ignore_strapping_warning: true
     frequency: 4000Hz
 
 light:
@@ -107,10 +106,9 @@ display:
     model: GC9A01A
     cs_pin: ${pin.int.spi.disp.cs}
     dc_pin: ${pin.int.spi.disp.dc}
-    reset_pin: ${pin.int.spi.disp.reset}
-    busy_pin:
-      number: ${pin.int.spi.disp.busy}
-      inverted: false
+    reset_pin:
+      number: ${pin.int.spi.disp.reset}
+      allow_other_uses: true
     data_rate: 40MHz
     invert_colors: true
     auto_clear_enabled: false
@@ -119,16 +117,16 @@ display:
 touchscreen:
   - platform: ft5x06
     i2c_id: ${module.internal.i2c_bus}
+    address: 0x38
+    interrupt_pin: ${pin.int.touch.int}
     id: touchscreen_ft5x06
     on_touch:
       - then:
-          - lambda: |-
-                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
-                    touch.x,
-                    touch.y,
-                    touch.x_raw,
-                    touch.y_raw
-                    );  
+          - logger.log:
+              tag: "Touch"
+              level: INFO
+              format: "Touch %d at (%d, %d)"
+              args: [ 'touch.id', 'touch.x', 'touch.y' ]
           - if:
               condition:
                 - light.is_off: backlight_light
@@ -160,7 +158,9 @@ binary_sensor:
     id: pwr_hold
     name: Power Hold
     entity_category: diagnostic
-    pin: ${pin.int.pwr_mos}
+    pin:
+      number: ${pin.int.pwr_mos}
+      ignore_strapping_warning: true
     on_press:
       - logger.log: Power Hold On
     on_release:
@@ -168,7 +168,7 @@ binary_sensor:
 
 sensor:
   - platform: rotary_encoder
-    id: encoder
+    id: rotaryencoder
     name: "Rotary Encoder"
     entity_category: diagnostic
     pin_a:
@@ -177,9 +177,8 @@ sensor:
     pin_b:
       number: ${pin.btn.b}
       mode: INPUT_PULLUP
-    resolution: 4
-    min_value: -32768
-    max_value: 32767
+    resolution: 1
+    restore_mode: ALWAYS_ZERO
     publish_initial_value: true
 
 script:
@@ -205,9 +204,21 @@ script:
       - delay: 50ms
       - output.turn_off: buzzer
 
+lvgl:
+  buffer_size: 25%
+  draw_rounding: 1
+  encoders:
+    sensor: rotaryencoder
+    enter_button: button_front
+    group: control_group
+
 rc522_i2c:
   - id: nfc_reader
     i2c_id: ${module.internal.i2c_bus}
+    address: 0x28
+    reset_pin:
+      number: ${pin.int.rfid.reset}
+      allow_other_uses: true
     update_interval: 500ms
     on_tag:
       - lambda: |-

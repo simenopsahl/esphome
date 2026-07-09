@@ -115,8 +115,8 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
-  #           id(espcam_camera_utils)->set_rotation(x);
+  #         if (id(component_espcam_utils) != nullptr) {
+  #           id(component_espcam_utils)->set_rotation(x);
   #         }
 
   # # ===== Scaler Controls (comment out if not using scaler) =====
@@ -135,9 +135,9 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
+  #         if (id(component_espcam_utils) != nullptr) {
   #           int h = id(espcam_scaler_height).state;
-  #           id(espcam_camera_utils)->set_scaler_config((int)x, h);
+  #           id(component_espcam_utils)->set_scaler_config((int)x, h);
   #         }
 
   # # Scaler Height
@@ -155,9 +155,9 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
+  #         if (id(component_espcam_utils) != nullptr) {
   #           int w = id(espcam_scaler_width).state;
-  #           id(espcam_camera_utils)->set_scaler_config(w, (int)x);
+  #           id(component_espcam_utils)->set_scaler_config(w, (int)x);
   #         }
 
   # # ===== Cropper Controls (comment out if not using cropper) =====
@@ -176,11 +176,11 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
+  #         if (id(component_espcam_utils) != nullptr) {
   #           int h = id(espcam_cropper_height).state;
   #           int ox = id(espcam_cropper_offset_x).state;
   #           int oy = id(espcam_cropper_offset_y).state;
-  #           id(espcam_camera_utils)->set_cropper_config((int)x, h, ox, oy);
+  #           id(component_espcam_utils)->set_cropper_config((int)x, h, ox, oy);
   #         }
 
   # # Cropper Height
@@ -198,11 +198,11 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
+  #         if (id(component_espcam_utils) != nullptr) {
   #           int w = id(espcam_cropper_width).state;
   #           int ox = id(espcam_cropper_offset_x).state;
   #           int oy = id(espcam_cropper_offset_y).state;
-  #           id(espcam_camera_utils)->set_cropper_config(w, (int)x, ox, oy);
+  #           id(component_espcam_utils)->set_cropper_config(w, (int)x, ox, oy);
   #         }
 
   # # Cropper Offset X
@@ -220,11 +220,11 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
+  #         if (id(component_espcam_utils) != nullptr) {
   #           int w = id(espcam_cropper_width).state;
   #           int h = id(espcam_cropper_height).state;
   #           int oy = id(espcam_cropper_offset_y).state;
-  #           id(espcam_camera_utils)->set_cropper_config(w, h, (int)x, oy);
+  #           id(component_espcam_utils)->set_cropper_config(w, h, (int)x, oy);
   #         }
 
   # # Cropper Offset Y
@@ -242,9 +242,9 @@ number:
   #   restore_value: true
   #   set_action:
   #     - lambda: |-
-  #         if (id(espcam_camera_utils) != nullptr) {
+  #         if (id(component_espcam_utils) != nullptr) {
   #           int w = id(espcam_cropper_width).state;
   #           int h = id(espcam_cropper_height).state;
   #           int ox = id(espcam_cropper_offset_x).state;
-  #           id(espcam_camera_utils)->set_cropper_config(w, h, ox, (int)x);
+  #           id(component_espcam_utils)->set_cropper_config(w, h, ox, (int)x);
   #         }
