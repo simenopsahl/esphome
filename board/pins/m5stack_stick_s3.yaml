@@ -4,17 +4,24 @@
 
 substitutions:
   pin:
+    btn:
+      power: GPIO35
+      side: GPIO12
+      front: GPIO11
+
     int:
       i2c:
         sda: GPIO47
         scl: GPIO48
+        int: GPIO4
       spi:
         clk: GPIO40
         mosi: GPIO39
         disp:
           cs: GPIO41
           dc: nc
-          reset: GPIO21
+          rst: GPIO21
+          bl: GPIO38
       pwr_mos: GPIO4
       bat_feedback: GPIO0
     
@@ -33,6 +40,13 @@ substitutions:
       spk: GPIO14
       mic: GPIO16
     
+    m5pm1:
+      chg_stat: GPIO0
+      irq: GPIO1
+      l3b_en: GPIO2
+      spk_pulse: GPIO3
+      imu_int: GPIO4
+    
     ext:
       i2c:
         grove:
@@ -41,6 +55,9 @@ substitutions:
         hat:
           sda: GPIO43
           scl: GPIO6
+        hat2:
+          sda: GPIO8
+          scl: boot
       uart:
         grove:
           tx: GPIO10
@@ -48,6 +65,9 @@ substitutions:
         hat:
           tx: GPIO43
           rx: GPIO6
+        hat2:
+          tx: GPIO8
+          rx: boot
       gpio:
         grove:
           in: GPIO10
@@ -55,11 +75,44 @@ substitutions:
         hat:
           in: GPIO7
           out: GPIO6
-    
-    btn:
-      power: GPIO35
-      side: GPIO12
-      front: GPIO11
+        hat2:
+          in: GPIO1
+          out: boot
+      hat2:
+        left:
+          p1: gnd
+          p2: 5v_ext
+          p3: boot
+          p4: GPIO1
+          p5: GPIO8
+          p6: bat
+          p7: 3v3
+          p8: 5v_in
+        right:
+          p1: GPIO5
+          p2: GPIO4
+          p3: GPIO6
+          p4: GPIO7
+          p5: GPIO43
+          p6: GPIO44
+          p7: GPIO2
+          p8: GPIO3
+        p1: gnd
+        p2: GPIO5
+        p3: 5v_ext
+        p4: GPIO4
+        p5: boot
+        p6: GPIO6
+        p7: GPIO1
+        p8: GPIO7
+        p9: GPIO8
+        p10: GPIO43
+        p11: bat
+        p12: GPIO44
+        p13: 3v3
+        p14: GPIO2
+        p15: 5v_in
+        p16: GPIO3
 
   # Internal
   i2c_int_sda_pin: GPIO21
