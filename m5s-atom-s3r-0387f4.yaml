@@ -6,9 +6,9 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
 #  i2c_int: !include extension/internal_i2c.yaml
-  hat: !include board/extension/hat_i2c.yaml
+  grove: !include board/extension/grove_i2c.yaml
 #  env: !include board/module/hat_env_iii.yaml
-  dlight: !include board/module/hat_dlight.yaml
+  ncir: !include board/module/unit_ncir.yaml
 
   # --- FEATURE PACKAGES ---
 #  combined_env_sensors: !include features/combined_env_sensors.yaml
