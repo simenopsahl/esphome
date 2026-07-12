@@ -5,7 +5,9 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3.yaml
+  hat: !include board/extension/hat_i2c.yaml
   pir: !include board/module/unit_pir.yaml
+  dlight: !include board/module/hat_dlight.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -20,7 +22,7 @@ packages:
 
 substitutions:
   common:
-    log_level: WARN
+#    log_level: WARN
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-a35af0
