@@ -23,7 +23,7 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-sticks3-d55a84
@@ -32,6 +32,12 @@ substitutions:
       type: esp-idf
   display:
     home_page: page_temperature
+
+logger:
+  logs:
+    app: DEBUG
+    esp-idf: DEBUG
+    i2c: DEBUG
 
 esphome:
   comment: ${device.model} @ ${device.location}
