@@ -23,7 +23,7 @@ packages:
 
 substitutions:
   common:
-#    log_level: DEBUG
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-sticks3-d55a84
