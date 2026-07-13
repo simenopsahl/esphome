@@ -23,7 +23,7 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-sticks3-d55a84
@@ -38,6 +38,11 @@ logger:
     app: DEBUG
     esp-idf: DEBUG
     i2c: DEBUG
+    i2c.idf: DEBUG
+    component: DEBUG
+    bmi270: DEBUG
+    es8311: DEBUG
+    bme68c_bsec2: DEBUG
 
 esphome:
   comment: ${device.model} @ ${device.location}
