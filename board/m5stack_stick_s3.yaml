@@ -4,7 +4,6 @@ labels: [esp32s3, psram, ST7789P3, microphone]
 # M5Stack StickS3
 #
 
-# HAT and Mic shared pins
 # Pins for this model
 packages:
   pins: !include pins/m5stack_stick_s3.yaml
@@ -27,48 +26,57 @@ esphome:
     name: "M5Stack.StickS3"
     version: "1.0.0"
   on_boot:
-    - priority: 800
+    - priority: 1200
       then:
         - lambda: |-
-            // Safely hijack the existing ESPHome I2C bus instead of creating a new one
-            auto* pmic_bus = id(${module.internal.i2c_bus});
-            
-            uint8_t pmic_addr = 0x6e;
-            uint8_t reg_addr;
-            uint8_t reg_val = 0;
-            
-            // --- STEP 1: Enable 5V Boost (Register 0x06, Bit 3) ---
-            reg_addr = 0x06;
-            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
-              reg_val |= 0x08; 
-              uint8_t write_payload[2] = {reg_addr, reg_val};
-              pmic_bus->write(pmic_addr, write_payload, 2);
+            // 1. Configure the new ESP-IDF v5 Master Bus
+            i2c_master_bus_config_t bus_config = {};
+            bus_config.i2c_port = -1; // Auto-allocate a free hardware port
+            bus_config.sda_io_num = GPIO_NUM_47;
+            bus_config.scl_io_num = GPIO_NUM_48;
+            bus_config.clk_source = I2C_CLK_SRC_DEFAULT;
+            bus_config.glitch_ignore_cnt = 7;
+            bus_config.flags.enable_internal_pullup = true;
+
+            i2c_master_bus_handle_t bus_handle;
+            if (i2c_new_master_bus(&bus_config, &bus_handle) != ESP_OK) return;
+
+            // 2. Add the PMIC device to the bus
+            i2c_device_config_t dev_config = {};
+            dev_config.dev_addr_length = I2C_ADDR_BIT_LEN_7;
+            dev_config.device_address = 0x6E;
+            dev_config.scl_speed_hz = 100000;
+
+            i2c_master_dev_handle_t dev_handle;
+            if (i2c_master_bus_add_device(bus_handle, &dev_config, &dev_handle) != ESP_OK) {
+              i2c_del_master_bus(bus_handle);
+              return;
             }
+
+            // 3. Helper function for Read-Modify-Write using driver_ng
+            auto update_reg = [&](uint8_t reg, uint8_t set_bits, uint8_t clear_bits) {
+                uint8_t val = 0;
+                if (i2c_master_transmit_receive(dev_handle, &reg, 1, &val, 1, 1000) == ESP_OK) {
+                    val |= set_bits;
+                    val &= ~clear_bits;
+                    uint8_t write_buf[2] = {reg, val};
+                    i2c_master_transmit(dev_handle, write_buf, 2, 1000);
+                }
+            };
+
+            // --- STEP 1: Enable 5V Boost (Register 0x06, Bit 3) ---
+            update_reg(0x06, 0x08, 0x00);
             
             // --- STEP 2: Configure PMIC GPIO2 for L3B_EN ---
+            update_reg(0x10, 0x04, 0x00); // Set Output Mode
+            update_reg(0x13, 0x00, 0x04); // Set Push-Pull
+            update_reg(0x11, 0x04, 0x00); // Drive HIGH
+
+            // 4. Safely destroy the v5 hardware handle to completely free the port!
+            i2c_master_bus_rm_device(dev_handle);
+            i2c_del_master_bus(bus_handle);
             
-            // A. Set GPIO2 to Output Mode (Register 0x10, Bit 2 = 1)
-            reg_addr = 0x10;
-            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
-              reg_val |= 0x04; 
-              uint8_t write_payload[2] = {reg_addr, reg_val};
-              pmic_bus->write(pmic_addr, write_payload, 2);
-            }
-            // B. Set GPIO2 to Push-Pull Mode (Register 0x13, Bit 2 = 0)
-            reg_addr = 0x13;
-            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
-              reg_val &= ~0x04; // Clear Bit 2 without affecting other GPIOs
-              uint8_t write_payload[2] = {reg_addr, reg_val};
-              pmic_bus->write(pmic_addr, write_payload, 2);
-            }
-            // C. Drive GPIO2 HIGH to enable L3B (Register 0x11, Bit 2 = 1)
-            reg_addr = 0x11;
-            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
-              reg_val |= 0x04; 
-              uint8_t write_payload[2] = {reg_addr, reg_val};
-              pmic_bus->write(pmic_addr, write_payload, 2);
-            }
-            // Allow 150ms for the L3B power rail to stabilize before ESPHome probes the chips
+            // Allow 150ms for the Grove sensor and L3B rail to boot and release the SCL lines
             vTaskDelay(pdMS_TO_TICKS(150));
 
 esp32:
@@ -100,6 +108,34 @@ logger:
     remote_receiver: DEBUG
     remote_transmitter: DEBUG
     infrared: DEBUG
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [ m5pm1 ]
+
+# M5PM1
+m5pm1:
+  id: pmic_m5pm1
+  i2c_id: i2c_internal
+  address: 0x6E
+  update_interval: 30s
+  battery_voltage:
+    id: m5pm1_battery_volt
+    name: "M5PM1 Battery Voltage"
+    entity_category: diagnostic
+    disabled_by_default: true
+  on_battery:
+    id: m5pm1_onbattery
+    name: "M5PM1 On Battery"
+    entity_category: diagnostic
+    disabled_by_default: true
+  on_usb:
+    id: m5pm1_onusb
+    name: "M5PM1 On USB"
+    entity_category: diagnostic
+    disabled_by_default: true
 
 spi:
   clk_pin: ${pin.int.spi.clk}
