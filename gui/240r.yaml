@@ -68,8 +68,8 @@ font: !include
     nordpool_row_3_height: 16 # text_sm +2
     # Calculate the usable graph area for the page
     # (usable_height - row_1_height - row_3_height - (line_width / 2))
-    # 184 - 18 - 16 - 3 = 147
-    nordpool_row_2_height: 147
+    # 184 - 18 - 16 - (6/2) = 147
+    nordpool_row_2_height: 146
     # -- GRAPH CONFIGURATION --
     nordpool_line_width: 6
 
