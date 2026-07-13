@@ -31,6 +31,7 @@ substitutions:
 logger:
   level: VERBOSE
   logs:
+    app: VERBOSE
     esp-idf: DEBUG
     i2c: VERBOSE
     es8311: VERBOSE
