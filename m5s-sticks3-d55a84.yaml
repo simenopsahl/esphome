@@ -33,17 +33,6 @@ substitutions:
   display:
     home_page: page_temperature
 
-logger:
-  logs:
-    app: DEBUG
-    esp-idf: DEBUG
-    i2c: DEBUG
-    i2c.idf: DEBUG
-    component: DEBUG
-    bmi270: DEBUG
-    es8311: DEBUG
-    bme68c_bsec2: DEBUG
-
 esphome:
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
