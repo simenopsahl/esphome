@@ -18,7 +18,7 @@ packages:
 
 substitutions:
   common:
-    log_level: VERBOSE
+    log_level: INFO
 #    log_baud_rate: "115200"
   device:
     name: m5s-sticks3-d55a84
@@ -30,6 +30,11 @@ substitutions:
 
 logger:
   level: VERBOSE
+  logs:
+    esp-idf: DEBUG
+    i2c: VERBOSE
+    es8311: VERBOSE
+    bmi270: VERBOSE
 
 esphome:
   comment: ${device.model} @ ${device.location}
