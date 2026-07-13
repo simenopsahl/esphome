@@ -10,7 +10,7 @@ labels: [esp32s3, psram, BMI270, OV3660, camera, i2c]
 packages:
   pins: !include pins/m5stack_atom_s3r.yaml
 # Limit of 2 i2c buses on ESP32-S3, one already occupied by camera
-# Include internal IMU or grove i2c in top level device config
+# Include internal IMU or Grove/HAT i2c in top level device config
 #  i2c_int: !include extension/internal_i2c.yaml
 #  imu: !include module/chip_imu_bmi270.yaml
 
@@ -30,13 +30,13 @@ esphome:
   project:
     name: "M5Stack.Atom S3R-M12"
     version: "1.0.0"
-  on_boot:
-    - priority: 800
-      then:
-        - lambda: |-
-            gpio_set_direction(GPIO_NUM_18, GPIO_MODE_OUTPUT);
-            gpio_set_level(GPIO_NUM_18, 0);
-            vTaskDelay(pdMS_TO_TICKS(1500));
+  # on_boot:
+  #   - priority: 800
+  #     then:
+  #       - lambda: |-
+  #           gpio_set_direction(GPIO_NUM_18, GPIO_MODE_OUTPUT);
+  #           gpio_set_level(GPIO_NUM_18, 0);
+  #           vTaskDelay(pdMS_TO_TICKS(1500));
 
 esp32:
 # ESP32-S3-PICO-1-N8R8@Dual-core Xtensa LX7, up to 240MHz
@@ -73,6 +73,18 @@ preferences:
 logger:
   logs:
     esp32_camera: DEBUG
+
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: [ early_init ]
+
+early_init:
+  id: power_up_barrier
+  pins:
+    - pin:
+        number: ${pin.cam.pwr}
+      level: false
+  delay: 500ms
 
 i2c:
   - id: i2c_cam

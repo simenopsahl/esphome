@@ -94,8 +94,8 @@ speaker:
 
 media_player:
   - platform: speaker
-    name: "Echo Base Player"
-    id: echo_base_player
+    name: "S3R Voice Player"
+    id: s3r_voice_player
     volume_initial: 0.1
     volume_max: 0.8
     task_stack_in_psram: true
@@ -143,7 +143,6 @@ switch:
         - microphone.unmute:
     on_turn_on:
         - microphone.mute:
-
 
 sensor:
   - platform: sound_level

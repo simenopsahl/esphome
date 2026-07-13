@@ -8,6 +8,8 @@ labels: [esp32s3, psram, ST7789V, display, BMI270]
 # Pins for this model
 packages:
   pins: !include pins/m5stack_atom_s3r.yaml
+# Limit of 2 i2c buses on ESP32-S3, one already used for lp5562 LED driver
+# Include Grove *OR* HAT i2c in top level config
   i2c_int: !include extension/internal_i2c.yaml
   imu: !include module/chip_imu_bmi270.yaml
 
@@ -69,8 +71,8 @@ lp5562:
   i2c_id: ${module.internal.i2c_bus}
   id: led_lp5562
   use_internal_clk: true
-#  high_pwm_freq: true
-#  logarithmic_dimming: true
+  high_pwm_freq: true
+  logarithmic_dimming: true
 #  red_current: 15.5
 #  green_current: 16.5
 #  blue_current: 22.5
@@ -160,3 +162,10 @@ binary_sensor:
 #  pin: ${pin.light.ir}
 #  carrier_duty_percent: 50%
 #  rmt_symbols: ${device.rmt_symbols_block}
+
+motion:
+  - id: !extend motion_bmi270
+    axis_map:
+      x: x
+      y: "-y"
+      z: z

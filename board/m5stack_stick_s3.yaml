@@ -1,0 +1,266 @@
+labels: [esp32s3, psram, ST7789P3, microphone]
+---
+# Base functions for:
+# M5Stack StickS3
+#
+
+# HAT and Mic shared pins
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_stick_s3.yaml
+# Limit of 2 i2c buses on ESP32-S3, one already used for IMU (and M5PM1)
+# Include Grove *OR* HAT i2c in top level config
+  i2c_int: !include extension/internal_i2c.yaml
+  imu: !include module/chip_imu_bmi270.yaml
+
+substitutions:
+  hat_shared: "false"
+  grove_shared: "false"
+  device:
+    model: "M5Stack StickS3"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+esphome:
+  project:
+    name: "M5Stack.StickS3"
+    version: "1.0.0"
+  on_boot:
+    - priority: 800
+      then:
+        - lambda: |-
+            // Safely hijack the existing ESPHome I2C bus instead of creating a new one
+            auto* pmic_bus = id(${module.internal.i2c_bus});
+            
+            uint8_t pmic_addr = 0x6e;
+            uint8_t reg_addr;
+            uint8_t reg_val = 0;
+            
+            // --- STEP 1: Enable 5V Boost (Register 0x06, Bit 3) ---
+            reg_addr = 0x06;
+            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
+              reg_val |= 0x08; 
+              uint8_t write_payload[2] = {reg_addr, reg_val};
+              pmic_bus->write(pmic_addr, write_payload, 2);
+            }
+            
+            // --- STEP 2: Configure PMIC GPIO2 for L3B_EN ---
+            
+            // A. Set GPIO2 to Output Mode (Register 0x10, Bit 2 = 1)
+            reg_addr = 0x10;
+            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
+              reg_val |= 0x04; 
+              uint8_t write_payload[2] = {reg_addr, reg_val};
+              pmic_bus->write(pmic_addr, write_payload, 2);
+            }
+            // B. Set GPIO2 to Push-Pull Mode (Register 0x13, Bit 2 = 0)
+            reg_addr = 0x13;
+            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
+              reg_val &= ~0x04; // Clear Bit 2 without affecting other GPIOs
+              uint8_t write_payload[2] = {reg_addr, reg_val};
+              pmic_bus->write(pmic_addr, write_payload, 2);
+            }
+            // C. Drive GPIO2 HIGH to enable L3B (Register 0x11, Bit 2 = 1)
+            reg_addr = 0x11;
+            if (pmic_bus->write(pmic_addr, &reg_addr, 1) && pmic_bus->read(pmic_addr, &reg_val, 1)) {
+              reg_val |= 0x04; 
+              uint8_t write_payload[2] = {reg_addr, reg_val};
+              pmic_bus->write(pmic_addr, write_payload, 2);
+            }
+            // Allow 150ms for the L3B power rail to stabilize before ESPHome probes the chips
+            vTaskDelay(pdMS_TO_TICKS(150));
+
+esp32:
+# ESP32-S3-PICO-1-N8R8 @ Dual-core processor, up to 240MHz
+# PSRAM: 8MB Octal
+  variant: esp32s3
+  flash_size: 8MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+    sdkconfig_options:
+      # Memory allocation rules for display buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+logger:
+  logs:
+    remote_receiver: DEBUG
+    remote_transmitter: DEBUG
+    infrared: DEBUG
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+
+# I2S Bus Configuration
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+  i2s_mclk_pin: ${pin.audio.i2s_mclk}
+
+output:
+  # TFT Backlight
+  - platform: ledc
+    id: backlight_output
+    pin: ${pin.light.disp_bl}
+
+light:
+  # TFT Backlight
+  - platform: monochromatic
+    output:  backlight_output
+    id: backlight_light
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+# 1.14 inch, 135*240 Colorful TFT LCD, ST7789P3
+display:
+  - platform: mipi_spi
+    id: display_lcd
+    model: st7789v
+    cs_pin: ${pin.int.spi.disp.cs}
+    dc_pin:
+      number: ${pin.int.spi.disp.dc}
+      ignore_strapping_warning: true
+    reset_pin: ${pin.int.spi.disp.rst}
+    dimensions:
+      height: 240
+      width: 135
+      offset_height: 40
+      offset_width: 52
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 10s
+
+audio_dac:
+  - platform: es8311
+    i2c_id: ${module.internal.i2c_bus}
+    id: dac_es8311
+    bits_per_sample: 16bit
+    sample_rate: 48000
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_speaker
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    dac_type: external
+    audio_dac: dac_es8311
+    use_apll: true
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    channel: stereo
+
+media_player:
+  - platform: speaker
+    name: "StickS3 Player"
+    id: stick_s3_player
+    volume_initial: 0.1
+    volume_max: 0.6
+    task_stack_in_psram: true
+    announcement_pipeline:
+      speaker: i2s_speaker
+      format: FLAC
+      sample_rate: 16000
+      num_channels: 1
+
+binary_sensor:
+  # Side Button
+  - platform: gpio
+    id: button_side
+    pin:
+      number: ${pin.btn.side}
+      inverted: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Side Button Pressed
+    name: Side Button
+    entity_category: diagnostic
+  # Front Button
+  - platform: gpio
+    id: button_front
+    pin:
+      number: ${pin.btn.front}
+      inverted: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Front Button Pressed
+    name: Front Button
+    entity_category: diagnostic
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 1250ms
+    rms:
+      name: "Noise Level"
+      id: average_loudness
+      filters:
+        - multiply: -1
+
+switch:
+  - platform: template
+    id: mic_mute
+    name: Microphone Mute
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+    on_turn_on:
+        - microphone.mute:
+
+remote_transmitter:
+  id: ir_tx
+  pin:
+    number: ${pin.light.ir.tx}
+    ignore_strapping_warning: true
+  carrier_duty_percent: 50%
+  rmt_symbols: ${device.rmt_symbols_block}
+
+remote_receiver:
+  id: ir_rx
+  pin: ${pin.light.ir.rx}
+  rmt_symbols: ${device.rmt_symbols_block}
+  dump: raw
+
+# Infrared platform — creates infrared entities
+infrared:
+  - platform: ir_rf_proxy
+    name: IR Transmitter
+    remote_transmitter_id: ir_tx
+  - platform: ir_rf_proxy
+    name: IR Receiver
+    receiver_frequency: 38kHz
+    remote_receiver_id: ir_rx

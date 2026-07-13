@@ -19,7 +19,7 @@ substitutions:
         mosi: GPIO39
         disp:
           cs: GPIO41
-          dc: nc
+          dc: GPIO45
           rst: GPIO21
           bl: GPIO38
       pwr_mos: GPIO4

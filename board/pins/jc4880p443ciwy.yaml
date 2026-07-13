@@ -96,10 +96,10 @@ substitutions:
         p3: nc
         p4: nc
       sh100_i2c_4p:
-        p1: nc
-        p2: nc
-        p3: nc
-        p4: nc
+        p1: gnd
+        p2: 3v3
+        p3: GPIO25 # SCL
+        p4: GPIO23 # SDA
       bus_2x13p:
         p1: 3v3
         p2: 3v3
