@@ -32,7 +32,7 @@ logger:
   level: VERBOSE
   logs:
     app: VERBOSE
-    esp-idf: DEBUG
+    esp-idf: VERBOSE
     i2c: VERBOSE
     es8311: VERBOSE
     bmi270: VERBOSE
