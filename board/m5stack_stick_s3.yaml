@@ -109,33 +109,33 @@ logger:
     remote_transmitter: DEBUG
     infrared: DEBUG
 
-external_components:
-  - source:
-      type: local
-      path: components
-    components: [ m5pm1 ]
+# https://github.com/ccsmart/M5SS3-esphome
+# external_components:
+#   - source:
+#       type: local
+#       path: components
+#     components: [ m5pm1 ]
 
-# M5PM1
-m5pm1:
-  id: pmic_m5pm1
-  i2c_id: i2c_internal
-  address: 0x6E
-  update_interval: 30s
-  battery_voltage:
-    id: m5pm1_battery_volt
-    name: "M5PM1 Battery Voltage"
-    entity_category: diagnostic
-    disabled_by_default: true
-  on_battery:
-    id: m5pm1_onbattery
-    name: "M5PM1 On Battery"
-    entity_category: diagnostic
-    disabled_by_default: true
-  on_usb:
-    id: m5pm1_onusb
-    name: "M5PM1 On USB"
-    entity_category: diagnostic
-    disabled_by_default: true
+# m5pm1:
+#   id: pmic_m5pm1
+#   i2c_id: i2c_internal
+#   address: 0x6E
+#   update_interval: 30s
+#   battery_voltage:
+#     id: m5pm1_battery_volt
+#     name: "M5PM1 Battery Voltage"
+#     entity_category: diagnostic
+#     disabled_by_default: true
+#   on_battery:
+#     id: m5pm1_onbattery
+#     name: "M5PM1 On Battery"
+#     entity_category: diagnostic
+#     disabled_by_default: true
+#   on_usb:
+#     id: m5pm1_onusb
+#     name: "M5PM1 On USB"
+#     entity_category: diagnostic
+#     disabled_by_default: true
 
 spi:
   clk_pin: ${pin.int.spi.clk}
