@@ -1,15 +1,18 @@
 labels: [esp32]
 ---
+# WIP
+# Camera not working
 
 # Pins for this model
 packages:
-  pins: !include pins/esp32_cam.yaml
+  pins: !include pins/freenove_esp32s3_n16r8_cam.yaml
   i2c: !include extension/internal_i2c.yaml
+#  status_led: !include ../features/system_status_led.yaml
 
 substitutions:
   device:
-    model: "ESP32_CAM"
-    rmt_symbols_block: 64
+    model: "Freenove ESP32S3 Cam"
+    rmt_symbols_block: 48
     framework:
       type: esp-idf
   extension:
@@ -18,33 +21,29 @@ substitutions:
         frequency: 200kHz
 
 esp32:
-# ESP32-WROOM-32
-  variant: esp32
-  flash_size: 4MB
+# ESP32-S3 WROOM N16R8
+  variant: esp32s3
+  flash_size: 16MB
   cpu_frequency: 240MHz
-  watchdog_timeout: 10s
   framework: 
     type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
-      minimum_chip_revision: 3.1
-      sram1_as_iram: true
       enable_idf_experimental_features: true
+      execute_from_psram: true
       loop_task_stack_size: 16384
       assertion_level: DISABLE
       enable_lwip_assert : false
     sdkconfig_options:
-      CONFIG_ESP32_SPIRAM_SUPPORT: y
-      # CONFIG_ESP32_SPIRAM_SPEED_40M: y
-      CONFIG_COMPILER_OPTIMIZATION_PERF: y
-      CONFIG_ESP32_DEFAULT_CPU_FREQ_240: y
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
       CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
       CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
-      # CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
-      # CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
+      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
       CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
       CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
-      CONFIG_FATFS_LFN_STACK: "y"  # to support long file name in sdcard
       CONFIG_TASK_WDT: "y"  # prevents watchdog timeouts
       CONFIG_TASK_WDT_TIMEOUT_S: "30"  # prevents watchdog timeouts
       CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU0: "n"  # prevents watchdog timeouts
@@ -57,16 +56,15 @@ esp32:
 
 esphome:
   project:
-    name: "ESP32.CAM"
+    name: "Freenove.ESP32S3 Cam"
     version: "1.0.0"
-  platformio_options:
-    board_build.extra_flags:
-      - -DBOARD_HAS_PSRAM
-      - -DTF_LITE_STATIC_MEMORY  # for tflite micro
-      - -DTF_LITE_DISABLE_X86_NEON  #for tflite micro
-      - -DESP_NN  #use hardware acceleration : https://github.com/espressif/esp-nn (only if using tflite)
+
+logger:
+  hardware_uart: UART0
 
 psram:
+  mode: octal
+  speed: 80MHz
 
 wifi:
   output_power: 10dB
@@ -77,38 +75,53 @@ wifi:
 
 spi:
   clk_pin: ${pin.int.spi.clk}
-  mosi_pin:
-    number: ${pin.int.spi.mosi}
-    ignore_strapping_warning: true
-
-output:
-  # flash output
-  - platform: ledc
-    id: flash_output
-    pin: ${pin.light.flash}
-    max_power: 0.35
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: ${pin.int.spi.miso}
 
 light:
-  - platform: monochromatic # Camera Flash
-    output: flash_output
-    id: flash_light
-    default_transition_length: 50ms
-    restore_mode: RESTORE_AND_OFF
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    rgb_order: GRB
+    pin: ${pin.light.rgb}
+    num_leds: 1
+    rmt_symbols: ${device.rmt_symbols_block}
+    chipset: ws2812
+    color_correct: [75%, 75%, 75%]
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 200ms on, 1500ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+    default_transition_length: 100ms
     initial_state:
-      state: off
-    name: "Flash"
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "LED"
+    entity_category: config
 
 esp32_camera:
   i2c_id: i2c_internal
   # PINS
   external_clock:
-    pin:
-      number: ${pin.cam.m_clk}
-      ignore_strapping_warning: true
+    pin: ${pin.cam.m_clk}
     frequency: 20MHz
   data_pins:
-    - number: ${pin.cam.y2}
-      ignore_strapping_warning: true
+    - ${pin.cam.y2}
     - ${pin.cam.y3}
     - ${pin.cam.y4}
     - ${pin.cam.y5}
@@ -119,23 +132,31 @@ esp32_camera:
   vsync_pin: ${pin.cam.vs}
   href_pin: ${pin.cam.hs}
   pixel_clock_pin: ${pin.cam.p_clk}
-  power_down_pin: ${pin.cam.pwr}
   # Metadata
   id: espcam
-  name: "Camera"
+  name: "Camera OV5640"
   # Image settings
-  resolution: 640x480
+  resolution: 800x600
   pixel_format: JPEG
   jpeg_quality: 20
-  max_framerate: 1 fps
-  frame_buffer_count: 2 # defaults to 1 (1-2)
   vertical_flip: false
   horizontal_mirror: false
+  max_framerate: 2 fps
+  frame_buffer_count: 2 # defaults to 1
   # Exposure
   aec_mode: auto
   aec2: true # defaults to false
+  ae_level: 2
+  agc_gain_ceiling: 8x
   # White balance
   wb_mode: auto
+
+# If NOT JPEG pixel_format
+#camera_encoder:
+#  type: esp32_camera
+#  quality: 70
+#  buffer_size: 524288
+#  buffer_expand_size: 2097152
 
 status_led:
   pin: ${pin.light.led}

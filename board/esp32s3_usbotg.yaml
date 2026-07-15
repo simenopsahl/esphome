@@ -26,11 +26,17 @@ esp32:
   variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
-  framework: 
-    type: ${device.framework.type}
+  framework:
     advanced:
       compiler_optimization: PERF
+      execute_from_psram: true
       enable_idf_experimental_features: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
+    type: ${device.framework.type}
+    sdkconfig_options:
+      CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 esphome:
   project:
@@ -93,7 +99,7 @@ esp32_camera:
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
-    frequency: 12MHz
+    frequency: 20MHz
   data_pins:
     - ${pin.cam.y2}
     - ${pin.cam.y3}
@@ -111,7 +117,8 @@ esp32_camera:
   name: "Camera OV2640"
   # Image settings
   resolution: 640x480
-  jpeg_quality: 12
+  pixel_format: JPEG
+  jpeg_quality: 20
   max_framerate: 1 fps
   frame_buffer_count: 2 # defaults to 1
   vertical_flip: true
@@ -124,3 +131,14 @@ esp32_camera:
 
 status_led:
   pin: ${pin.light.led}
+
+sensor:
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic

@@ -16,7 +16,7 @@ substitutions:
       spi:
         clk: GPIO39
         mosi: GPIO38
-        miso: GPIO2
+        miso: GPIO40
         cs: GPIO38
       i2c:
         sda: GPIO4

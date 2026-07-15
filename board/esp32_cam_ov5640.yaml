@@ -100,7 +100,8 @@ esp32_camera:
   name: "Camera"
   # Image settings
   resolution: 1024x768
-#  jpeg_quality: 15
+  pixel_format: JPEG
+  jpeg_quality: 20
   max_framerate: 1 fps
   frame_buffer_count: 2 # defaults to 1 (1-2)
   vertical_flip: true
@@ -113,3 +114,14 @@ esp32_camera:
 
 status_led:
   pin: ${pin.light.led}
+
+sensor:
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic

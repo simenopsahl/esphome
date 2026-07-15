@@ -7,7 +7,7 @@ labels: [esp32s3, psram, ST7789P3, microphone]
 # Pins for this model
 packages:
   pins: !include pins/m5stack_stick_s3.yaml
-# Limit of 2 i2c buses on ESP32-S3, one already used for IMU (and M5PM1)
+# Limit of 2 i2c buses on ESP32-S3, one already used for M5PM1 (and IMU)
 # Include Grove *OR* HAT i2c in top level config
   i2c_int: !include extension/internal_i2c.yaml
   imu: !include module/chip_imu_bmi270.yaml
@@ -76,7 +76,7 @@ esphome:
             i2c_master_bus_rm_device(dev_handle);
             i2c_del_master_bus(bus_handle);
             
-            // Allow 150ms for the Grove sensor and L3B rail to boot and release the SCL lines
+            // Allow 150ms for the Grove/HAT sensor and L3B rail to boot and release the SCL lines
             vTaskDelay(pdMS_TO_TICKS(150));
 
 esp32:

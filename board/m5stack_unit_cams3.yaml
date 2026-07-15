@@ -100,6 +100,13 @@ esp32_camera:
   frame_buffer_count: 1 # defaults to 1
 #  vertical_flip: true
 #  horizontal_mirror: true
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  ae_level: 2
+  agc_gain_ceiling: 8x
+  # White balance
+  wb_mode: auto
 
 # Enable status LED
 status_led:
@@ -115,7 +122,6 @@ sensor:
   #     id: pdm_average_loudness
   #     filters:
   #       - multiply: -1
-  # CPU Temperature
   - platform: internal_temperature
     name: "CPU Temperature"
     id: cpu_temperature

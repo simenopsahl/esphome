@@ -10,6 +10,8 @@ labels: [esp32s3, psram, ES8311, I2S, microphone, speaker, i2c]
 # Pins for this model
 packages:
   pins: !include pins/m5stack_atom_s3r.yaml
+# Limit of 2 i2c buses on ESP32-S3, one already used for es8311
+# Include Grove *OR* HAT i2c in top level config
   i2c_int: !include extension/internal_i2c.yaml
 
 substitutions:
