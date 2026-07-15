@@ -12,8 +12,6 @@ substitutions:
   camera:
     resolution: 800x600
     jpeg_quality: 20
-  meter:
-    last_valid_value: "000012306"
   device:
     name: freenove-esp32s3-cam-74f5d4
     location: "Storage"
