@@ -33,15 +33,3 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.94
-
-sensor:
-  - id: !remove ram_total
-  - id: !remove ram_free_percentage
-
-  - id: !remove spiram_total
-  - id: !remove spiram_free_percentage
-
-  - id: !remove inference_job_pool_efficiency
-  - id: !remove inference_result_pool_efficiency
-  - id: !remove arena_efficiency
-  - id: !remove heap_fragmentation
