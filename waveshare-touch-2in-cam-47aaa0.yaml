@@ -78,8 +78,8 @@ lvgl:
             align: CENTER
             widgets:
               - container:
-                  max_height: 180
-                  max_width: 180
+                  max_height: 200
+                  max_width: 200
                   styles: circle
                   bg_color: c_bg_s
                   bg_opa: cover
@@ -116,14 +116,14 @@ lvgl:
                       id: indicator_container
                       width: 100%
                       height: 100%
-                      transform_pivot_x: 50%
-                      transform_pivot_y: 50%
+                      transform_pivot_x: 75%
+                      transform_pivot_y: 75%
                       widgets:
                         - container:
                             id: indicator
                             styles: circle
-                            width: 12%
-                            height: 12%
+                            width: 10%
+                            height: 10%
                             bg_color: c_red
                             bg_opa: 100%
                             x: 10
