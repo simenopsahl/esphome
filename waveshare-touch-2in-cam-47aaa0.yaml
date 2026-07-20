@@ -5,6 +5,16 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/waveshare_esp32s3_touch_2in_cam.yaml
 
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/320x240.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.etg2_stue_temperature
+  }}
+
 substitutions:
   common:
     log_level: DEBUG
