@@ -10,7 +10,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: esp32-s3-cam-mac
+    name: esp32-s3-cam-d28abc
     location: "Storage"
     framework:
       type: esp-idf
