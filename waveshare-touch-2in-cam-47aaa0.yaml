@@ -17,7 +17,7 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: waveshare-touch-2in-cam-47aaa0
@@ -41,11 +41,11 @@ wifi:
     static_ip: 192.168.71.113
 
 lvgl:
-  buffer_size: 40%
+  buffer_size: 50%
   style_definitions:
     - id: circle
       radius: circle
-      outline_width: 1
+      outline_width: 2
       outline_color: c_yellow
       align: center
     - id: dashline
@@ -108,26 +108,19 @@ lvgl:
                         - [100%, 50%]
                   - container:
                       styles: circle
-                      width: 10%
-                      height: 10%
+                      width: 8%
+                      height: 8%
                       bg_color: c_gray
                       bg_opa: 50%
                   - container:
-                      id: indicator_container
-                      width: 100%
-                      height: 100%
-                      transform_pivot_x: 25%
-                      transform_pivot_y: 25%
-                      widgets:
-                        - container:
-                            id: indicator
-                            styles: circle
-                            width: 10%
-                            height: 10%
-                            bg_color: c_red
-                            bg_opa: 100%
-                            x: 10
-                            y: 10
+                      id: indicator
+                      styles: circle
+                      width: 10%
+                      height: 10%
+                      bg_color: c_red
+                      bg_opa: 100%
+                      x: 10
+                      y: 10
               - label:
                   text: R
                   align: bottom_mid
@@ -176,14 +169,14 @@ script:
           lvgl.widget.update:
             id: indicator
             bg_color: c_green
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 35);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 35);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 100);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 100);
         else:
           lvgl.widget.update:
             id: indicator
             bg_color: c_red
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 35);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 35);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 100);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 100);
 
 sensor:
   - id: !extend motion_roll
