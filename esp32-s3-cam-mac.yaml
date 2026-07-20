@@ -20,3 +20,10 @@ esphome:
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
+
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.97
