@@ -78,8 +78,8 @@ lvgl:
             align: CENTER
             widgets:
               - container:
-                  max_height: 66
-                  max_width: 66
+                  max_height: 180
+                  max_width: 180
                   styles: circle
                   bg_color: c_bg_s
                   bg_opa: cover
@@ -127,12 +127,12 @@ lvgl:
               - label:
                   text: R
                   align: bottom_mid
-                  text_font: font_sm
+                  text_font: font_md
                   text_color: c_dark_gray
               - label:
                   text: F
                   align: top_mid
-                  text_font: font_sm
+                  text_font: font_md
                   text_color: c_dark_gray
               - label:
                   text: L
