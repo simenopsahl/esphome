@@ -4,7 +4,7 @@ packages:
   <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
-  board: !include board/esp32doit_devkit_v1.yaml
+  board: !include board/esp32_doit_devkit_v1.yaml
 
 substitutions:
   common:
