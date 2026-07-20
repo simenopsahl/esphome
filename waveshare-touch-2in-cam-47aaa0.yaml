@@ -24,6 +24,8 @@ substitutions:
     location: "Storage"
     framework:
       type: esp-idf
+  display:
+    home_page: page_temperature
 
 esphome:
   comment: ${device.model} @ ${device.location}
