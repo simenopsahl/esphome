@@ -8,7 +8,7 @@ packages:
 
 substitutions:
   device:
-    model: "ESP32_CAM"
+    model: "ESP32-Cam"
     rmt_symbols_block: 64
     framework:
       type: esp-idf
@@ -52,14 +52,8 @@ esp32:
 
 esphome:
   project:
-    name: "ESP32.CAM"
+    name: "ESP32-CAM.Ai-Thinker"
     version: "1.0.0"
-  platformio_options:
-    board_build.extra_flags:
-      - -DBOARD_HAS_PSRAM
-      - -DTF_LITE_STATIC_MEMORY  # for tflite micro
-      - -DTF_LITE_DISABLE_X86_NEON  #for tflite micro
-      - -DESP_NN  #use hardware acceleration : https://github.com/espressif/esp-nn (only if using tflite)
 
 psram:
 

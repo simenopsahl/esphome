@@ -1,17 +1,14 @@
 labels: [esp32s3, psram, camera]
 ---
-# WIP
-# Camera not working
 
 # Pins for this model
 packages:
   pins: !include pins/esp32s3_cam_n16r8_freenove.yaml
   i2c: !include extension/internal_i2c.yaml
-#  status_led: !include ../features/system_status_led.yaml
 
 substitutions:
   device:
-    model: "Freenove ESP32S3 Cam"
+    model: "ESP32-S3-Cam Freenove"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -36,28 +33,25 @@ esp32:
       assertion_level: DISABLE
       enable_lwip_assert : false
     sdkconfig_options:
+      # Caching Optimizations
       CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
       CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
       CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
       CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
-      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
-      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
-      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
       CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
       CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
-      CONFIG_TASK_WDT: "y"  # prevents watchdog timeouts
-      CONFIG_TASK_WDT_TIMEOUT_S: "30"  # prevents watchdog timeouts
-      CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU0: "n"  # prevents watchdog timeouts
-      # ## needed by new jpeg camera : https://github.com/esphome/esphome/pull/9496
-      CONFIG_SPIRAM_SUPPORT: y
-      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
-      CONFIG_SPIRAM_USE_MALLOC: y
       CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+      
+      # Camera Specifics
       CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 esphome:
   project:
-    name: "Freenove.ESP32S3 Cam"
+    name: "Freenove.ESP32-S3-Cam"
     version: "1.0.0"
 
 logger:

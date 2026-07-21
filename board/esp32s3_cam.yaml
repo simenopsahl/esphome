@@ -54,9 +54,6 @@ esphome:
     name: "AliExpress.ESP32-S3-CAM"
     version: "1.2.0"
 
-#logger:
-#  hardware_uart: UART0
-
 psram:
   mode: octal
   speed: 80MHz

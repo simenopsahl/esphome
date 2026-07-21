@@ -11,7 +11,7 @@ packages:
 
 substitutions:
   device:
-    model: "S3 OTG CAM"
+    model: "ESP32-S3-Cam OTG"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -37,11 +37,25 @@ esp32:
       enable_lwip_assert : false
     type: ${device.framework.type}
     sdkconfig_options:
+      # Caching Optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
+      CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
+      CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
+      CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+      
+      # Camera Specifics
       CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 esphome:
   project:
-    name: "ESP32S3.USB OTG"
+    name: "ESP32-S3-CAM.USB OTG"
     version: "1.0.0"
 
 psram:
