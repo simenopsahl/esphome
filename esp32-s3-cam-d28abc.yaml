@@ -20,7 +20,7 @@ substitutions:
       camera:
         flash_light: rgb_led
         resolution: 800x600
-        jpeg_quality: 18
+        jpeg_quality: 10
         agc_gain_ceiling: 16x
 
 esphome:
