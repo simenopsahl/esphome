@@ -10,16 +10,18 @@ substitutions:
   common:
     log_level: WARN
 #    log_baud_rate: "115200"
-  camera:
-    resolution: 800x600
-    jpeg_quality: 20
-  meter:
-    last_valid_value: "000016494"
   device:
     name: esp32-cam-74f5d4
     location: "Kjøkken"
     framework:
       type: esp-idf
+  module:
+    ai_on_the_edge:
+      camera:
+        resolution: 800x600
+        jpeg_quality: 20
+      meter:
+        last_valid_value: "000016494"
 
 esphome:
   comment: ${device.model} @ ${device.location}
