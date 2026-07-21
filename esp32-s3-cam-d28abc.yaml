@@ -22,6 +22,7 @@ substitutions:
         resolution: 1024x768
         jpeg_quality: 10
         agc_gain_ceiling: 16x
+        wb_mode: auto
 
 esphome:
   comment: ${device.model} @ ${device.location}
