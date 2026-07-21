@@ -4,16 +4,23 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/esp32s3_cam_n16r8_mb.yaml
+  ai-on-the-edge: !include board/module/ai_on_the_edge.yaml
 
 substitutions:
   common:
-#    log_level: DEBUG
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: esp32-s3-cam-d28abc
     location: "Storage"
     framework:
       type: esp-idf
+  module:
+    ai_on_the_edge:
+      camera:
+        flash_light: rgb_led
+        resolution: 1600x1200
+        jpeg_quality: 25
 
 esphome:
   comment: ${device.model} @ ${device.location}
