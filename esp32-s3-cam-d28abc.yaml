@@ -19,8 +19,8 @@ substitutions:
     ai_on_the_edge:
       camera:
         flash_light: rgb_led
-        resolution: 1024x768
-        jpeg_quality: 25
+        resolution: 800x600
+        jpeg_quality: 18
         agc_gain_ceiling: 16x
 
 esphome:
