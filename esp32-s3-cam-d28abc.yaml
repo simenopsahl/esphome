@@ -19,7 +19,7 @@ substitutions:
     ai_on_the_edge:
       camera:
         flash_light: rgb_led
-        resolution: 800x600
+        resolution: 1024x768
         jpeg_quality: 10
         agc_gain_ceiling: 16x
 
