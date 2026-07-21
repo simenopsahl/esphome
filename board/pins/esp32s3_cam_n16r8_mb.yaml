@@ -1,0 +1,69 @@
+---
+# PINs for ESP32-S3-CAM MB
+# ESP:  esp32-s3 n16r8
+# Light:  Single Flash
+# FLASH:  16MB
+# PSRAM:  8MB
+# https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L336
+
+substitutions:
+  pin:
+    light:
+      led: GPIO2
+      rgb: GPIO48
+    int:
+      spi:
+        clk: GPIO39
+        mosi: GPIO38
+        miso: GPIO40
+        cs: GPIO38
+      i2c:
+        sda: GPIO4
+        scl: GPIO5
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO11
+      y3: GPIO9
+      y4: GPIO8
+      y5: GPIO10
+      y6: GPIO12
+      y7: GPIO18
+      y8: GPIO17
+      y9: GPIO16
+      vs: GPIO6
+      hs: GPIO7
+      p_clk: GPIO13
+      m_clk: GPIO15
+      rst: -1
+      pwr: -1
+    card:
+      d0: GPIO40
+      d1: GPIO41
+      d2: GPIO14
+      d3: GPIO47
+      cs: GPIO38
+      cmd: GPIO38
+      clk: GPIO39
+    
+    ext:
+      h1:
+        p1: 3v3
+        p2: gnd
+        p3: GPIO0
+        p4: GPIO20
+        p5: GPIO19
+        p6: u0rx
+        p7: u0tx
+        p8: rst
+      h2:
+        p1: 5v
+        p2: gnd
+        p3: GPIO14
+        p4: GPIO47
+        p5: GPIO38
+        p6: GPIO39
+        p7: GPIO40
+        p8: GPIO41
+
+# OrderID:  3075049747013317

@@ -1,0 +1,216 @@
+# for horizontal 240x320 displays
+
+font: !include
+  file: fonts/fonts.yaml
+  vars:
+    text_sm: 14
+    text_md: 18
+    text_lg: 22
+    text_xl: 26
+    text_xxl: 30
+    text_hg: 56
+    text_fl: 112
+    icons_sm: 18
+    icons_md: 24
+    icons_lg: 30
+    icons_xl: 38
+    icons_xxl: 48
+
+.sizing:
+  - &nav_widget_styles
+    height: 32
+    padding: 12
+    page_title_font: font_md # mdi-md or font_md
+
+  - &page_styles
+    <<: !include styles/page_styles.yaml
+    page_pad_top: 32
+    page_pad_bottom: 32
+    screen_height: 320
+    screen_width: 240
+    # Calculate the usable height for the page content area
+    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
+    # 320 - (2 * 32) - (2 * 2) = 252
+    usable_screen_height: 252
+    # Calculate the usable width for the page content area
+    # (screen_width - (2 * container_pad))
+    # 240 - (2 * 2) = 236
+    usable_screen_width: 236
+
+  - &container_styles
+    <<: !include styles/container_styles.yaml
+    container_pad_top: 2
+    container_pad_bottom: 2
+    container_pad_left: 2
+    container_pad_right: 2
+    container_scrollable: false # prevents scrollbars on pages where space is used up to the last pixel
+
+  - &boot_screen_styles
+    img_size: 160x160
+    spinner_size: 50
+    spinner_arc: 8
+    logo_offset: 34
+    spinner_offset: 70
+
+  - &button_layout
+    <<: !include styles/button_layout.yaml
+    pad_column: 5
+    pad_row: 4
+
+  - &clock_page_styles
+    clock_meter_size: 186
+    clock_translate_x: 0
+    clock_translate_y: 114
+
+  - &nordpool_page_styles
+    # Proportions for the 3 rows in the grid layout (labels, graph, labels)
+    nordpool_row_1_height: 20 # text_md +2
+    nordpool_row_3_height: 16 # text_sm +2
+    # Calculate the usable graph area for the page
+    # (usable_height - row_1_height - row_3_height - (line_width / 2))
+    # 252 - 20 - 16 - (6/2) = 213
+    nordpool_row_2_height: 212
+    # -- GRAPH CONFIGURATION --
+    nordpool_line_width: 6
+
+  - &weather_page_styles
+    # Variables for the main layout grid
+    # Calculation for this 320x240 screen:
+    weather_row_1: 3
+    weather_row_2: 4
+    # Total fr units = 3 + 4 = 7
+    # Row 1 height = (3 / 7) * 252px = ~108px
+    # Row 2 height = (4 / 7) * 252px = ~144px
+    weather_row_1_height: 108
+    weather_row_2_height: 144
+    # Calculation for this 240x320 screen:
+    weather_column_1: 5
+    weather_column_2: 6
+    # Total fr units = 5 + 6 = 11
+    # Column 1 width = (5 / 11) * 236px = ~107px
+    # Column 2 width = (6 / 11) * 236px = ~128px
+    weather_column_1_width: 107
+    weather_column_2_width: 128
+    # Variables for the forecast objects at the bottom
+    weather_forecast_column_width: 54
+    weather_forecast_grid_pad_column: 5
+    weather_forecast_obj_radius: 3
+    weather_forecast_obj_pad_top: 0
+    weather_forecast_obj_pad_bottom: 0
+    # Font for the "Været nå" text
+    weather_today_condition_font: font_lg
+    weather_today_temp_font: font_xl
+    # Font for the forecast temperature
+    weather_forecast_temp_font: font_md
+    # Font for the forecast timestamp
+    weather_forecast_time_font: font_sm
+    initial_today_icon_src: "unknown_66"
+    initial_forecast_icon_src: "unknown_36"
+
+  - &button_widget_vars
+    width: 75
+    height: 114
+
+  - &wide_button_widget_vars
+    width: 234
+    height: 75
+
+script:
+  - id: go_home
+    then:
+      - lvgl.page.show: ${display.home_page}
+
+lvgl:
+  id: display_lvgl
+  buffer_size: 75%
+  default_font: font_md
+  theme: !include themes/main.yaml
+  bottom_layer: 0x000000
+  bg_color: 0x000000
+  top_layer:
+    widgets:
+      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
+      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
+      - <<: !include { file: widgets/boot_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
+      - <<: !include { file: widgets/ota_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
+  pages:
+    - id: page_splash
+      skip: true
+      on_load:
+        - then:
+            - script.execute: go_home
+
+    # analog clock
+    - <<: !include
+        file: pages/clock/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *clock_page_styles]
+          page_title: "Klokke"
+
+    # room temperature
+    - <<: !include
+        file: pages/temperature/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Temperatur"
+
+    # nordpool prices
+    - <<: !include
+        file: pages/nordpool/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *nordpool_page_styles]
+          page_title: "NordPool"
+
+    # weather forecast
+    - <<: !include
+        file: pages/weather/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *weather_page_styles]
+          page_title: "Vær"
+
+    # device status
+    - <<: !include
+        file: pages/status/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Enhet"
+
+packages:
+  # header
+  header_sensors: !include { file: widgets/header/sensors.yaml }
+  # boot screen
+  boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml, vars: { <<: *boot_screen_styles } }
+  # ota screen
+  ota_screen_sensors: !include { file: widgets/ota_screen/sensors.yaml, vars: { <<: *boot_screen_styles } }
+  # clock screen
+  clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
+  # nordpool screen
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*page_styles, *nordpool_page_styles] } }
+  # device status screen
+  device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
+  # automatic screen control
+  control_auto_display: !include { file: functions/control_auto_display.yaml }
+  # remote page navigation
+  control_navigation: !include { file: functions/control_navigation.yaml }
+
+  # Weather packages
+  # Build icon set from .svg files
+  weather_icons_34: !include
+    file: weather/weather_icons.yaml
+    vars:
+      size: 36
+  # Display weather forcast using icon set (defined above)
+  weather_forcast_34: !include
+    file: weather/weather_forecast.yaml
+    vars:
+      size: 36
+  # Big icons for today weather
+  weather_icons_60: !include
+    file: weather/weather_icons.yaml
+    vars:
+      size: 66
+  # Get todays weather and display it
+  weather_today_60: !include
+    file: weather/weather_today.yaml
+    vars:
+      size: 66

@@ -32,7 +32,7 @@ substitutions:
       p_clk: GPIO26
       m_clk: GPIO15
       rst: GPIO5
-      pwr: nc
+      pwr: -1
     card:
       d0: GPIO2
       d1: GPIO4
@@ -41,9 +41,6 @@ substitutions:
       cs: GPIO13
       cmd: GPIO15
       clk: GPIO14
-    ip5306:
-      led1: GPIO4
-      led2: GPIO13
     
     ext:
       h1:

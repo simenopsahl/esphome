@@ -1,0 +1,69 @@
+---
+# PINs for ESP32_S3-R8_EYE w/ dual flash LED
+# Model:  esp32-s3 r8
+# Light:  Dual Flash
+# FLASH:  8MB
+# PSRAM:  8MB
+# https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L336
+
+substitutions:
+  pin:
+    light:
+      led: GPIO2
+      flash: GPIO3
+    int:
+      spi:
+        clk: GPIO39
+        mosi: GPIO38
+        miso: GPIO2
+        cs: GPIO38
+      i2c:
+        sda: GPIO4
+        scl: GPIO5
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO11
+      y3: GPIO9
+      y4: GPIO8
+      y5: GPIO10
+      y6: GPIO12
+      y7: GPIO18
+      y8: GPIO17
+      y9: GPIO16
+      vs: GPIO6
+      hs: GPIO7
+      p_clk: GPIO13
+      m_clk: GPIO15
+      rst: -1
+      pwr: -1
+    card:
+      d0: GPIO40
+      d1: nc
+      d2: nc
+      d3: nc
+      cs: GPIO38
+      cmd: GPIO38
+      clk: GPIO39
+    
+    ext:
+      h1:
+        p1: rst
+        p2: GPIO44
+        p3: GPIO43
+        p4: GPIO42
+        p5: GPIO41
+        p6: GPIO46
+        p7: GND
+        p8: 3v3
+      h2:
+        p1: GPIO0
+        p2: GPIO14
+        p3: GPIO47
+        p4: nc
+        p5: GPIO48
+        p6: GPIO1
+        p7: GND
+        p8: 5v
+
+# OrderID:  3074668919493317

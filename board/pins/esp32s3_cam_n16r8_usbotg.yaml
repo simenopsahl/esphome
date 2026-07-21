@@ -1,0 +1,109 @@
+---
+# PINs for ESP32S3 USB_OTG
+# Model:  esp32-s3 n16r8
+# Light:  SK6812 RGB Rear facing
+# FLASH:  16MB
+# PSRAM:  8MB
+# https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L448
+
+substitutions:
+  pin:
+    light:
+      rgb: GPIO33
+      led: GPIO34
+    int:
+      spi:
+        clk: GPIO42
+        mosi: GPIO39
+        miso: GPIO41
+        cs: GPIO38
+      i2c:
+        sda: GPIO21
+        scl: GPIO14
+      i2s:
+        lrclk: GPIO37
+        bclk: GPIO36
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO5
+      y3: GPIO3
+      y4: GPIO2
+      y5: GPIO4
+      y6: GPIO6
+      y7: GPIO8
+      y8: GPIO9
+      y9: GPIO11
+      vs: GPIO13
+      hs: GPIO12
+      p_clk: GPIO7
+      m_clk: GPIO10
+      rst: -1
+      pwr: -1
+    card:
+      d0: GPIO41
+      d1: nc
+      d2: nc
+      d3: GPIO38
+      cs: GPIO38
+      cmd: GPIO39
+      clk: GPIO42
+    mic:
+      din: GPIO35
+
+# Not tested
+    uart:
+      tx0: GPIO43
+      rx0: GPIO44
+      rts0: GPIO15
+      cts0: GPIO16
+      tx1: GPIO17
+      rx1: GPIO18
+    spi:
+      clk: GPIO11
+      mosi: GPIO3
+      miso: GPIO12
+      cs: GPIO2
+      clk_p: GPIO11
+      clk_n: GPIO9
+      f:
+        clk1: GPIO12
+        clk2: GPIO14
+        cs0: GPIO10
+        io4: GPIO10
+        io5: GPIO11
+        io6: GPIO12
+        io7: GPIO13
+        dqs: GPIO14
+        wp: GPIO38
+        q: GPIO13
+        d: GPIO11
+        hd: GPIO9
+      sub:
+        clk1: GPIO12
+        clk2: GPIO14
+        cs0: GPIO10
+        cs1: GPIO39
+        wp: GPIO14
+        q: GPIO21
+        d: GPIO11
+        hd: GPIO9
+    spi_alt:
+      clk: GPIO39
+      mosi: GPIO42
+      miso: GPIO41
+      cs: GPIO38
+    mt:
+      clk: GPIO39
+      ms: GPIO8
+      d0: GPIO40
+      d1: GPIO7
+    clk_out1:
+      clk1: GPIO7
+      clk2: GPIO43
+    clk_out2:
+      clk1: GPIO40
+      clk2: GPIO44
+    clk_out3:
+      clk1: GPIO18
+      clk2: GPIO39

@@ -41,6 +41,20 @@ esp32:
       enable_lwip_assert : false
     type: ${device.framework.type}
     sdkconfig_options:
+      # Caching Optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
+      CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
+      CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
+      CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+      
+      # Camera Specifics
       CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 psram:

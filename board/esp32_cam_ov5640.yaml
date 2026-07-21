@@ -1,4 +1,4 @@
-labels: [esp32]
+labels: [esp32, psram, ov5640, camera]
 ---
 
 # Pins for this model
@@ -22,6 +22,7 @@ esp32:
   variant: esp32
   flash_size: 4MB
   cpu_frequency: 240MHz
+  watchdog_timeout: 10s
   framework: 
     type: ${device.framework.type}
     advanced:
@@ -29,25 +30,20 @@ esp32:
       sram1_as_iram: true
       enable_idf_experimental_features: true
     sdkconfig_options:
-      CONFIG_ESP32_SPIRAM_SUPPORT: y
-      # CONFIG_ESP32_SPIRAM_SPEED_40M: y
-      CONFIG_COMPILER_OPTIMIZATION_PERF: y
-      CONFIG_ESP32_DEFAULT_CPU_FREQ_240: y
+      # Caching Optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
       CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
-      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
-      # CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
-      # CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
       CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
       CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
-      CONFIG_FATFS_LFN_STACK: "y"  # to support long file name in sdcard
-      CONFIG_TASK_WDT: "y"  # prevents watchdog timeouts
-      CONFIG_TASK_WDT_TIMEOUT_S: "30"  # prevents watchdog timeouts
-      CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU0: "n"  # prevents watchdog timeouts
-      # ## needed by new jpeg camera : https://github.com/esphome/esphome/pull/9496
-      CONFIG_SPIRAM_SUPPORT: y
-      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
-      CONFIG_SPIRAM_USE_MALLOC: y
       CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+      
+      # Camera Specifics
       CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
 
 esphome:

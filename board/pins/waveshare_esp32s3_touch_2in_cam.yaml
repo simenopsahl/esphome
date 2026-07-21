@@ -1,0 +1,130 @@
+---
+# PINs for WaveShare ESP32-S3 Touch LCD 2" w/ Camera
+# Model:  esp32-s3 n16r8
+# FLASH:  16MB
+# PSRAM:  8MB
+# https://www.waveshare.com/esp32-s3-touch-lcd-2.htm
+# https://docs.waveshare.com/ESP32-S3-Touch-LCD-2
+
+substitutions:
+  pin:
+    light:
+      led: nc
+      rgb: nc
+      disp_bl: GPIO1
+    int:
+      spi:
+        clk: GPIO39
+        mosi: GPIO38
+        miso: GPIO40
+      i2c:
+        sda: GPIO48
+        scl: GPIO47
+      uart:
+        0:
+          tx: GPIO43
+          rx: GPIO44
+        1:
+          tx: GPIO19
+          rx: GPIO20
+      bat_feedback: GPIO5
+    disp:
+      bl: GPIO1
+      cs: GPIO45
+      dc: GPIO42
+      rst: GPIO0
+    cam:
+      sda: GPIO21
+      scl: GPIO16
+      y0: nc
+      y1: nc
+      y2: GPIO12
+      y3: GPIO13
+      y4: GPIO15
+      y5: GPIO11
+      y6: GPIO14
+      y7: GPIO10
+      y8: GPIO7
+      y9: GPIO2
+      vs: GPIO6
+      hs: GPIO4
+      p_clk: GPIO9
+      m_clk: GPIO8
+      rst: -1
+      pwr: GPIO17
+    card:
+      d0: nc
+      d1: nc
+      d2: nc
+      d3: nc
+      cs: GPIO41
+      cmd: GPIO38
+      clk: GPIO39
+    touch:
+      sda: GPIO48
+      scl: GPIO47
+      int: GPIO46
+    imu:
+      sda: GPIO48
+      scl: GPIO47
+      int: GPIO3
+    
+    ext:
+      h1:
+        p1: 3v3
+        p2: gnd
+        p3: u0tx
+        p4: u0rx
+        p5: GPIO47
+        p6: GPIO48
+        p7: GPIO15
+        p8: GPIO13
+        p9: GPIO11
+        p10: GPIO12
+        p11: GPIO14
+        p12: GPIO9
+        p13: gnd
+        p14: vbat
+      h2:
+        p1: GPIO2
+        p2: GPIO4
+        p3: GPIO6
+        p4: GPIO16
+        p5: GPIO17
+        p6: GPIO18
+        p7: GPIO21
+        p8: GPIO8
+        p9: GPIO7
+        p10: GPIO10
+        p11: GPIO20
+        p12: GPIO19
+        p13: gnd
+        p14: 5v
+      p1: 3v3
+      p2: gnd
+      p3: u0tx
+      p4: u0rx
+      p5: GPIO47
+      p6: GPIO48
+      p7: GPIO15
+      p8: GPIO13
+      p9: GPIO11
+      p10: GPIO12
+      p11: GPIO14
+      p12: GPIO9
+      p13: gnd
+      p14: vbat
+      p15: GPIO2
+      p16: GPIO4
+      p17: GPIO6
+      p18: GPIO16
+      p19: GPIO17
+      p20: GPIO18
+      p21: GPIO21
+      p22: GPIO8
+      p23: GPIO7
+      p24: GPIO10
+      p25: GPIO20
+      p26: GPIO19
+      p27: gnd
+      p28: 5v

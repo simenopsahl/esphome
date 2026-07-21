@@ -57,6 +57,13 @@ api:
         - rtttl.play:
             rtttl: !lambda 'return tune;'
 
+external_components:
+  - source:
+      type: git
+      url: https://github.com/lubeda/EsphoMaTrixv2
+      ref: 2026.7.1
+    components: [ ehmtxv2 ]
+
 time:
   - id: !extend time_homeassistant
     on_time_sync:
@@ -84,14 +91,6 @@ i2c:
   scl: ${pin.int.i2c.scl}
   frequency: 200kHz
   scan: true
-
-external_components:
-  - source:
-      type: git
-      url: https://github.com/lubeda/EsphoMaTrixv2
-      ref: 2026.4.1
-    refresh: 60s
-    components: [ ehmtxv2 ]
 
 output:
   - platform: ledc

@@ -53,36 +53,36 @@ substitutions:
           sda: GPIO9
           scl: GPIO10
         hat:
+          sda: GPIO8
+          scl: GPIO0
+        hat2:
           sda: GPIO43
           scl: GPIO6
-        hat2:
-          sda: GPIO8
-          scl: boot
       uart:
         grove:
           tx: GPIO10
           rx: GPIO9
         hat:
+          tx: GPIO8
+          rx: GPIO0
+        hat2:
           tx: GPIO43
           rx: GPIO6
-        hat2:
-          tx: GPIO8
-          rx: boot
       gpio:
         grove:
           in: GPIO10
           out: GPIO9
         hat:
+          in: GPIO1
+          out: GPIO0
+        hat2:
           in: GPIO7
           out: GPIO6
-        hat2:
-          in: GPIO1
-          out: boot
       hat2:
         left:
           p1: gnd
           p2: 5v_ext
-          p3: boot
+          p3: GPIO0
           p4: GPIO1
           p5: GPIO8
           p6: bat

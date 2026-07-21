@@ -37,7 +37,7 @@ packages:
   - !include ai_on_the_edge/components/meter_reader_tflite_controls.yaml
   - !include ai_on_the_edge/components/value_validator_controls.yaml
   # Debug sensors
-  - !include ai_on_the_edge/debug_board.yaml
+#  - !include ai_on_the_edge/debug_board.yaml
   # camera configs
 #  - !include ai_on_the_edge/camera_options.yaml
   - !include ai_on_the_edge/esp32_camera.yaml

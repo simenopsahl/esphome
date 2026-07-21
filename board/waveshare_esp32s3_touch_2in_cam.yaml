@@ -1,0 +1,413 @@
+labels: [esp32s3, psram, st7789t3, display, cst816d, touch, camera, qmi8658, imu]
+---
+# https://www.waveshare.com/esp32-s3-touch-lcd-2.htm?sku=29668
+# https://docs.waveshare.com/ESP32-S3-Touch-LCD-2
+# https://spotpear.com/wiki/ESP32-S3R8-2-inch-LCD-Display--ST7789-TouchScreen-Camera.html
+# Base functions for:
+# WaveShare ESP32-S3 Touch LCD 2" w/ Camera
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/waveshare_esp32s3_touch_2in_cam.yaml
+  i2c: !include extension/internal_i2c.yaml
+
+substitutions:
+  device:
+    model: "Waveshare 2in w Cam"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  extension:
+    i2c:
+      internal:
+        frequency: 100kHz
+
+esphome:
+  project:
+    name: "Waveshare.2in w Cam"
+    version: "1.0.0"
+
+esp32:
+# esp32-s3 n16r8
+# FLASH:  16MB
+# PSRAM:  8MB
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      enable_idf_experimental_features: true
+      execute_from_psram: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
+    sdkconfig_options:
+      # Caching Optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
+      CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
+      CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
+      CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+      
+      # Camera Specifics
+      CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
+    type: ${device.framework.type}
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+wifi:
+  use_psram: true
+  power_save_mode: light
+  enable_btm: true
+  enable_rrm: true
+
+logger:
+  deassert_rts_dtr: true
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: ${pin.int.spi.miso}
+
+i2c:
+  - id: i2c_cam
+    sda: ${pin.cam.sda}
+    scl: ${pin.cam.scl}
+    frequency: 200kHz
+    timeout: 10ms
+    scan: true
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: ${pin.light.disp_bl}
+    max_power: 0.8
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 250ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+esp32_camera:
+  i2c_id: i2c_cam
+  # PINS
+  external_clock:
+    pin: ${pin.cam.m_clk}
+    frequency: 12MHz
+  data_pins:
+    - ${pin.cam.y2}
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin: ${pin.cam.vs}
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin: ${pin.cam.p_clk}
+#  power_down_pin: ${pin.cam.pwr}
+  # Metadata
+  id: espcam
+  name: "Camera"
+  # Image settings
+  resolution: 800x600
+  pixel_format: JPEG
+  jpeg_quality: 20
+  vertical_flip: false
+  horizontal_mirror: false
+  max_framerate: 2 fps
+  frame_buffer_count: 2 # defaults to 1
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  ae_level: 2
+  agc_gain_ceiling: 8x
+  # White balance
+  wb_mode: auto
+
+# If NOT JPEG pixel_format
+#camera_encoder:
+#  type: esp32_camera
+#  quality: 70
+#  buffer_size: 524288
+#  buffer_expand_size: 2097152
+
+display:
+  - platform: mipi_spi
+    id: display_lcd
+    model: st7789v
+    cs_pin:
+      number: ${pin.disp.cs}
+      ignore_strapping_warning: true
+    dc_pin: ${pin.disp.dc}
+#    reset_pin: ${pin.disp.rst}
+    dimensions:
+      width: 240
+      height: 320
+    data_rate: 40Mhz
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 10s
+
+touchscreen:
+  - platform: cst816
+    i2c_id: ${module.internal.i2c_bus}
+    id: touchscreen_cst816
+# Causes WiFi issues?
+# https://www.reddit.com/r/Esphome/comments/1mjebql/tricks_to_get_past_current_esphome_issues_with/
+  #  interrupt_pin:
+  #    number: ${pin.touch.int}
+  #    ignore_strapping_warning: true
+    on_touch:
+      - then:
+          - logger.log:
+              tag: "Touch"
+              level: INFO
+              format: "Touch %d at (%d, %d)"
+              args: [ 'touch.id', 'touch.x', 'touch.y' ]
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
+
+motion:
+  - platform: qmi8658
+    i2c_id: ${module.internal.i2c_bus}
+    id: motion_qmi8658
+    accelerometer_range: 4g
+    gyroscope_range: 2048dps
+    gyroscope_odr: 2000Hz
+    update_interval: 100ms
+    axis_map:
+      x: x
+      y: y
+      z: "-z"
+
+sensor:
+  - platform: motion
+    type: acceleration_x
+    id: motion_accel_x
+    name: "Motion Accel X"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: motion
+    type: acceleration_y
+    id: motion_accel_y
+    name: "Motion Accel Y"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: motion
+    type: acceleration_z
+    id: motion_accel_z
+    name: "Motion Accel Z"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: motion
+    type: gyroscope_x
+    id: motion_gyro_x
+    name: "Motion Gyro X"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    disabled_by_default: True
+  - platform: motion
+    type: gyroscope_y
+    id: motion_gyro_y
+    name: "Motion Gyro Y"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    disabled_by_default: True
+  - platform: motion
+    type: gyroscope_z
+    id: motion_gyro_z
+    name: "Motion Gyro Z"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    disabled_by_default: True
+  - platform: motion
+    type: pitch
+    id: motion_pitch
+    name: "Motion Pitch"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+    disabled_by_default: True
+  - platform: motion
+    type: roll
+    id: motion_roll
+    name: "Motion Roll"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+    disabled_by_default: True
+    on_value:
+      script.execute: update_motion
+
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic
+
+script:
+  - id: update_motion
+    then:
+    - if:
+        condition:
+          lambda: return abs(id(motion_roll).state) < 1.0f && abs(id(motion_pitch).state) < 1.0f;
+        then:
+          lvgl.widget.update:
+            id: indicator
+            bg_color: c_green
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 90);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 90);
+        else:
+          lvgl.widget.update:
+            id: indicator
+            bg_color: c_red
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 90);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 90);
+
+lvgl:
+  style_definitions:
+    - id: circle
+      radius: circle
+      outline_width: 2
+      outline_color: c_yellow
+      align: center
+    - id: dashline
+      width: 100%
+      height: 100%
+      line_dash_width: 4
+      line_dash_gap: 4
+      line_color: c_yellow
+  pages:
+    - id: page_imu
+      pad_top: 32
+      pad_bottom: 32
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: IMU
+      <<: !include
+        file: ../gui/functions/swipe_navigation.yaml
+      widgets:
+        - obj:
+            pad_top: 2
+            pad_bottom: 2
+            pad_left: 2
+            pad_right: 2
+            scrollable: false
+            width: 100%
+            height: 100%
+            border_width: 0
+            radius: 0
+            align: CENTER
+            widgets:
+              - container:
+                  max_height: 200
+                  max_width: 200
+                  styles: circle
+                  bg_color: c_bg_s
+                  bg_opa: cover
+                  widgets:
+                  - container:
+                      styles: circle
+                      width: 75%
+                      height: 75%
+                  - container:
+                      styles: circle
+                      width: 50%
+                      height: 50%
+                  - container:
+                      styles: circle
+                      width: 25%
+                      height: 25%
+                  - line:
+                      styles: dashline
+                      points:
+                        - 50%,0
+                        - 50%,100%
+                  - line:
+                      styles: dashline
+                      points:
+                        - {x: 0, y: 50%}
+                        - [100%, 50%]
+                  - container:
+                      styles: circle
+                      width: 8%
+                      height: 8%
+                      bg_color: c_gray
+                      bg_opa: 50%
+                  - container:
+                      id: indicator
+                      styles: circle
+                      width: 10%
+                      height: 10%
+                      bg_color: c_red
+                      bg_opa: 100%
+                      x: 10
+                      y: 10
+              - label:
+                  text: R
+                  align: bottom_mid
+                  text_font: font_md
+                  text_color: c_dark_gray
+              - label:
+                  text: F
+                  align: top_mid
+                  text_font: font_md
+                  text_color: c_dark_gray
+              - label:
+                  text: L
+                  align: left_mid
+                  text_font: font_md
+                  text_color: c_dark_gray
+              - label:
+                  text: R
+                  align: right_mid
+                  text_font: font_md
+                  text_color: c_dark_gray

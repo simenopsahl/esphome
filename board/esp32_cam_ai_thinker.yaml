@@ -1,0 +1,147 @@
+labels: [esp32, psram, camera]
+---
+
+# Pins for this model
+packages:
+  pins: !include pins/esp32_cam_ai_thinker.yaml
+  i2c: !include extension/internal_i2c.yaml
+
+substitutions:
+  device:
+    model: "ESP32_CAM"
+    rmt_symbols_block: 64
+    framework:
+      type: esp-idf
+  extension:
+    i2c:
+      internal:
+        frequency: 200kHz
+
+esp32:
+# ESP32-WROOM-32
+  variant: esp32
+  flash_size: 4MB
+  cpu_frequency: 240MHz
+  watchdog_timeout: 10s
+  framework: 
+    type: ${device.framework.type}
+    advanced:
+      compiler_optimization: PERF
+      minimum_chip_revision: 3.1
+      sram1_as_iram: true
+      enable_idf_experimental_features: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
+    sdkconfig_options:
+      # Caching Optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
+      CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
+      CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
+      CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+      
+      # Camera Specifics
+      CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
+
+esphome:
+  project:
+    name: "ESP32.CAM"
+    version: "1.0.0"
+  platformio_options:
+    board_build.extra_flags:
+      - -DBOARD_HAS_PSRAM
+      - -DTF_LITE_STATIC_MEMORY  # for tflite micro
+      - -DTF_LITE_DISABLE_X86_NEON  #for tflite micro
+      - -DESP_NN  #use hardware acceleration : https://github.com/espressif/esp-nn (only if using tflite)
+
+psram:
+
+wifi:
+  output_power: 10dB
+  power_save_mode: light
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin:
+    number: ${pin.int.spi.mosi}
+    ignore_strapping_warning: true
+
+output:
+  # flash output
+  - platform: ledc
+    id: flash_output
+    pin: ${pin.light.flash}
+    max_power: 0.35
+
+light:
+  - platform: monochromatic # Camera Flash
+    output: flash_output
+    id: flash_light
+    default_transition_length: 50ms
+    restore_mode: RESTORE_AND_OFF
+    initial_state:
+      state: off
+    name: "Flash"
+
+esp32_camera:
+  i2c_id: i2c_internal
+  # PINS
+  external_clock:
+    pin:
+      number: ${pin.cam.m_clk}
+      ignore_strapping_warning: true
+    frequency: 14MHz
+  data_pins:
+    - number: ${pin.cam.y2}
+      ignore_strapping_warning: true
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin: ${pin.cam.vs}
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin: ${pin.cam.p_clk}
+  power_down_pin: ${pin.cam.pwr}
+  # Metadata
+  id: espcam
+  name: "Camera"
+  # Image settings
+  resolution: 640x480
+  pixel_format: JPEG
+  jpeg_quality: 20
+  max_framerate: 1 fps
+  frame_buffer_count: 2 # defaults to 1 (1-2)
+  vertical_flip: false
+  horizontal_mirror: false
+  # Exposure
+  aec_mode: auto
+  aec2: true # defaults to false
+  # White balance
+  wb_mode: auto
+
+status_led:
+  pin: ${pin.light.led}
+
+sensor:
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic

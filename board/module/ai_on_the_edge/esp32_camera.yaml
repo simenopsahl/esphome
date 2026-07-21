@@ -48,8 +48,8 @@ esp32_camera:
   aec_value: 580
   # gain settings
   agc_mode: auto
-  agc_value: 1
-  agc_gain_ceiling: 4x
+  agc_value: 2
+  agc_gain_ceiling: 8x
   # white balance setting
   wb_mode: auto
 
