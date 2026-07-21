@@ -21,6 +21,7 @@ substitutions:
         flash_light: rgb_led
         resolution: 1600x1200
         jpeg_quality: 25
+        agc_gain_ceiling: 16x
 
 esphome:
   comment: ${device.model} @ ${device.location}
