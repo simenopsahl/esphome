@@ -21,7 +21,7 @@ substitutions:
         flash_light: rgb_led
         resolution: 1024x768
         jpeg_quality: 10
-        agc_gain_ceiling: 32x
+        agc_gain_ceiling: 64x
         wb_mode: cloudy
 
 esphome:
