@@ -56,8 +56,8 @@ esp32_camera_utils:
 #    width: 288 # multiple of 8
 #    height: 72 # multiple of 8
 #  camera_window:
-#    offset_x: 360 # multiple of 4
-#    offset_y: 440 # multiple of 4
+#    offset_x: 380 # multiple of 4
+#    offset_y: 460 # multiple of 4
 #    width: 432 # multiple of 8
 #    height: 96 # multiple of 8
 
