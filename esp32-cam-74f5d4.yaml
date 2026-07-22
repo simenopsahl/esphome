@@ -42,3 +42,9 @@ globals:
     initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
 
 esp32_camera_utils:
+# 800x600 tighter crop zone
+  camera_window:
+    offset_x: 480 # multiple of 4
+    offset_y: 500 # multiple of 4
+    width: 432 # multiple of 8
+    height: 104 # multiple of 8
