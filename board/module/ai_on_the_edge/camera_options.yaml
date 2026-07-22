@@ -1,100 +1,8 @@
 ---
 # https://github.com/nliaudat/esphome_ai_component
 
-# create switches for turning a parameter on or off
-switch:
-  # on/off switch for Vertical Flip (my default = on, therefore: RESTORE_DEFAULT_ON)
-  - platform: template
-    name: "Cam Vertical Flip"
-    id: espcam_v_flip
-    icon: mdi:swap-vertical
-    restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
-    turn_on_action:
-      lambda: |-
-        id(espcam).set_vertical_flip(true);
-        id(global_espcam_updated) = true;
-    turn_off_action:
-      lambda: |-
-        id(espcam).set_vertical_flip(false);
-        id(global_espcam_updated) = true;
-  # on/off switch for Horizontal Mirror (my default = on, therefore: RESTORE_DEFAULT_ON)
-  - platform: template
-    name: "Cam Horizontal Mirror"
-    id: espcam_h_mirror
-    icon: mdi:reflect-horizontal
-    restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
-    turn_on_action:
-      lambda: |-
-        id(espcam).set_horizontal_mirror(true);
-        id(global_espcam_updated) = true;
-    turn_off_action:
-      lambda: |-
-        id(espcam).set_horizontal_mirror(false);
-        id(global_espcam_updated) = true;
-  # on/off switch for Auto Exposure 2 (my default = on, therefore: RESTORE_DEFAULT_ON)
-  - platform: template
-    name: "Cam Auto Exposure 2"
-    id: espcam_aec_2
-    icon: mdi:auto-fix
-    restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
-    turn_on_action:
-      lambda: |-
-        id(espcam).set_aec2(true);
-        id(global_espcam_updated) = true;
-    turn_off_action:
-      lambda: |-
-        id(espcam).set_aec2(false);
-        id(global_espcam_updated) = true;
-
 # configure selects for these parameters to make them available in HA
 select:
-  # while you can change the frame_size (aka resolution) value while the camera is running, it will have no effect
-  #  - see the note in the esp32_camera section above about the first 5 image parameters
-  # I left this here in case it ever starts working
-  #  - platform: template
-  #    name: "Cam Resolution"
-  #    id: espcam_res
-  #    options:
-  #      - "160x120"
-  #      - "176x144"
-  #      - "240x176"
-  #      - "320x240"
-  #      - "400x296"
-  #      - "640x480"
-  #      - "800x600"
-  #      - "1024x768"
-  #      - "1280x1024"
-  #      - "1600x1200"
-  #    initial_option: "800x600"
-  #    optimistic: True
-  #    restore_value: True
-  #    on_value:
-  #      - lambda: |-
-  #          id(espcam).set_frame_size((esphome::esp32_camera::ESP32CameraFrameSize)id(espcam_res).active_index().value());
-  #          // some function to change the frame_size
-  #          id(global_espcam_updated) = true;
-  # Option list for Special Effects
-  # - platform: template
-  #   name: "Cam Special Effects"
-  #   icon: mdi:filter
-  #   id: espcam_effect
-  #   options:
-  #     - "None"
-  #     - "Negative"
-  #     - "Grayscale"
-  #     - "Red Tint"
-  #     - "Green Tint"
-  #     - "Blue Tint"
-  #     - "Sepia"
-  #   initial_option: "None"
-  #   optimistic: True
-  #   on_value:
-  #     lambda: |-
-  #       id(espcam).set_special_effect((esphome::esp32_camera::ESP32SpecialEffect)id(espcam_effect).active_index().value());
-  #       id(global_espcam_updated) = true;
   # Option List for White Balance
   - platform: template
     name: "Cam White Balance Mode"
@@ -106,40 +14,13 @@ select:
       - "Cloudy"
       - "Office"
       - "Home"
-    initial_option: "Auto"
+    initial_option: ${module.ai_on_the_edge.camera.wb_mode | capitalize}
     optimistic: True
+    entity_category: config
+    disabled_by_default: true
     on_value:
       lambda: |-
         id(espcam).set_wb_mode((esphome::esp32_camera::ESP32WhiteBalanceMode)id(espcam_wb).active_index().value());
-        id(global_espcam_updated) = true;
-  # Option list for AEC mode
-  - platform: template
-    name: "Cam Auto Exposure Mode"
-    id: espcam_aec
-    icon: mdi:auto-fix
-    options:
-      - "Manual"
-      - "Auto"
-    initial_option: "Auto"
-    optimistic: True
-    on_value:
-      lambda: |-
-        // Note: AEC uses the Enum defined for Gain_control, since both have "auto" & "manual"
-        id(espcam).set_aec_mode((esphome::esp32_camera::ESP32GainControlMode)id(espcam_aec).active_index().value());
-        id(global_espcam_updated) = true;
-  # Option list for Gain Control Mode
-  - platform: template
-    name: "Cam Gain Control Mode"
-    id: espcam_gc
-    icon: mdi:auto-fix
-    options:
-      - "Manual"
-      - "Auto"
-    initial_option: "Auto"
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_agc_mode((esphome::esp32_camera::ESP32GainControlMode)id(espcam_gc).active_index().value());
         id(global_espcam_updated) = true;
   # Option list for Gain Ceiling (apparently this is somewhat equivilant to ISO settings)
   - platform: template
@@ -153,8 +34,10 @@ select:
       - "32x"
       - "64x"
       - "128x"
-    initial_option: "2x"
+    initial_option: ${module.ai_on_the_edge.camera.agc_gain_ceiling}
     optimistic: True
+    entity_category: config
+    disabled_by_default: true
     on_value:
       lambda: |-
         id(espcam).set_agc_gain_ceiling((esphome::esp32_camera::ESP32AgcGainCeiling)id(espcam_g_ceiling).active_index().value());
@@ -162,66 +45,6 @@ select:
 
 # configure number sliders for these parameters to make them available in HA
 number:
-  # While the sliders for Contrast, Brightness, and Saturation all work and change the parameters of the sensor
-  # they do not seem to make any difference to the image output
-  - platform: template
-    name: "Cam Contrast"
-    id: espcam_contrast
-    icon: mdi:contrast-box
-    min_value: -2
-    max_value: 2
-    step: 1
-    initial_value: 0
-    mode: SLIDER
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_contrast(id(espcam_contrast).state);
-        id(global_espcam_updated) = true;
-  # Number Slider for Brightness
-  - platform: template
-    name: "Cam Brightness"
-    id: espcam_brightness
-    icon: mdi:brightness-6
-    min_value: -2
-    max_value: 2
-    step: 1
-    initial_value: 0
-    mode: SLIDER
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_brightness(id(espcam_brightness).state);
-        id(global_espcam_updated) = true;
-  # Number Slider for Saturation
-  - platform: template
-    name: "Cam Saturation"
-    id: espcam_saturation
-    icon: mdi:palette-outline
-    min_value: -2
-    max_value: 2
-    step: 1
-    initial_value: 0
-    mode: SLIDER
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_saturation(id(espcam_saturation).state);
-        id(global_espcam_updated) = true;
-  # Number Slider for Gain Value
-  - platform: template
-    name: "Cam Gain Value"
-    id: espcam_g_value
-    min_value: 0
-    max_value: 30
-    step: 1
-    initial_value: 0
-    mode: SLIDER
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_agc_value(id(espcam_g_value).state);
-        id(global_espcam_updated) = true;
   # Number slider for AE Level
   - platform: template
     name: "Cam AE Level"
@@ -229,25 +52,12 @@ number:
     min_value: -2
     max_value: 2
     step: 1
-    initial_value: 0
+    initial_value: 2
     mode: SLIDER
     optimistic: True
+    entity_category: config
+    disabled_by_default: true
     on_value:
       lambda: |-
         id(espcam).set_ae_level(id(espcam_ae_level).state);
-        id(global_espcam_updated) = true;
-  # Number Slider for AE Value (step set to 10)
-  # I tried using steps of 1 (too fine to control) and 100 (to coarse for the values) and settled on 10
-  - platform: template
-    name: "Cam AE Value"
-    id: espcam_ae_value
-    min_value: 0
-    max_value: 1200
-    step: 10
-    initial_value: 0
-    mode: SLIDER
-    optimistic: True
-    on_value:
-      lambda: |-
-        id(espcam).set_aec_value(id(espcam_ae_value).state);
         id(global_espcam_updated) = true;

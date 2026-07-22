@@ -36,17 +36,6 @@ sensor:
   #   entity_category: diagnostic
   #   lambda: |-
   #     return heap_caps_get_free_size(MALLOC_CAP_8BIT);
-  - platform: template
-    name: "RAM Total"
-    id: ram_total
-    unit_of_measurement: "B"
-    device_class: data_size
-    state_class: measurement
-    icon: "mdi:memory"
-    update_interval: 5s
-    entity_category: diagnostic
-    lambda: |-
-      return heap_caps_get_total_size(MALLOC_CAP_8BIT);
   # - platform: template
   #   name: "RAM Used"
   #   id: ram_used
@@ -65,7 +54,9 @@ sensor:
     state_class: measurement
     icon: "mdi:memory"
     update_interval: 5s
+    accuracy_decimals: 0
     entity_category: diagnostic
+    disabled_by_default: true
     lambda: |-
       size_t total = heap_caps_get_total_size(MALLOC_CAP_8BIT);
       size_t free = heap_caps_get_free_size(MALLOC_CAP_8BIT);
@@ -73,6 +64,8 @@ sensor:
         return (free * 100.0) / total;
       }
       return 0;
+    filters:
+      - delta: 1.0
   # SPIRAM sensors
   # - platform: template
   #   name: "SPIRAM Free"
@@ -89,21 +82,6 @@ sensor:
   #     #else
   #       return 0;
   #     #endif
-  - platform: template
-    name: "SPIRAM Total"
-    id: spiram_total
-    unit_of_measurement: "B"
-    device_class: data_size
-    state_class: measurement
-    icon: "mdi:memory"
-    update_interval: 5s
-    entity_category: diagnostic
-    lambda: |-
-      #ifdef BOARD_HAS_PSRAM
-        return heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
-      #else
-        return 0;
-      #endif
   # - platform: template
   #   name: "SPIRAM Used"
   #   id: spiram_used
@@ -126,7 +104,9 @@ sensor:
     state_class: measurement
     icon: "mdi:memory"
     update_interval: 5s
+    accuracy_decimals: 0
     entity_category: diagnostic
+    disabled_by_default: true
     lambda: |-
       #ifdef BOARD_HAS_PSRAM
         size_t total = heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
@@ -136,36 +116,50 @@ sensor:
         }
       #endif
       return 0;
+    filters:
+      - delta: 1.0
   # Inference Pool Efficiency Monitoring
   - platform: template
     name: "Inference Job Pool Efficiency"
     id: inference_job_pool_efficiency
     unit_of_measurement: "%"
-    accuracy_decimals: 1
+    accuracy_decimals: 0
     state_class: measurement
     icon: "mdi:buffer"
     entity_category: diagnostic
+    disabled_by_default: true
+    filters:
+      - delta: 1.0
   - platform: template
     name: "Inference Result Pool Efficiency"
     id: inference_result_pool_efficiency
     unit_of_measurement: "%"
-    accuracy_decimals: 1
+    accuracy_decimals: 0
     state_class: measurement
     icon: "mdi:buffer"
     entity_category: diagnostic
+    disabled_by_default: true
+    filters:
+      - delta: 1.0
   - platform: template
     name: "Arena Efficiency"
     id: arena_efficiency
     unit_of_measurement: "%"
-    accuracy_decimals: 1
+    accuracy_decimals: 0
     state_class: measurement
     icon: "mdi:chip"
     entity_category: diagnostic
+    disabled_by_default: true
+    filters:
+      - delta: 1.0
   - platform: template
     name: "Heap Fragmentation"
     id: heap_fragmentation
     unit_of_measurement: "%"
-    accuracy_decimals: 1
+    accuracy_decimals: 0
     state_class: measurement
     icon: "mdi:memory"
     entity_category: diagnostic
+    disabled_by_default: true
+    filters:
+      - delta: 1.0

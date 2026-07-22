@@ -59,7 +59,7 @@ logger:
 
 psram:
   mode: octal
-  speed: 80MHz
+  speed: 40MHz
 
 wifi:
   power_save_mode: light
@@ -80,7 +80,7 @@ light:
     num_leds: 1
     rmt_symbols: ${device.rmt_symbols_block}
     chipset: ws2812
-    color_correct: [75%, 75%, 75%]
+    color_correct: [76%, 76%, 76%]
     effects:
       - pulse:
       - strobe:
@@ -97,9 +97,9 @@ light:
             - state: false
               duration: 2000ms
               transition_length: 1000ms
-    default_transition_length: 100ms
+    default_transition_length: 250ms
     initial_state:
-      state: true
+      state: off
       brightness: 50%
       color_brightness: 100%
       red: 100%
@@ -113,7 +113,7 @@ esp32_camera:
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
-    frequency: 14MHz
+    frequency: 20MHz
   data_pins:
     - ${pin.cam.y2}
     - ${pin.cam.y3}
@@ -130,9 +130,9 @@ esp32_camera:
   id: espcam
   name: "Camera"
   # Image settings
-  resolution: 1024x768
+  resolution: 1600x1200
   pixel_format: JPEG
-  jpeg_quality: 20
+  jpeg_quality: 25
   vertical_flip: false
   horizontal_mirror: false
   max_framerate: 2 fps
@@ -165,3 +165,5 @@ sensor:
     icon: "mdi:thermometer"
     update_interval: 5s
     entity_category: diagnostic
+    filters:
+      - delta: 0.1

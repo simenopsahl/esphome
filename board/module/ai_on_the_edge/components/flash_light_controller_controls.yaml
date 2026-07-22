@@ -16,7 +16,7 @@ number:
     min_value: 2500
     max_value: 20000
     step: 100
-    initial_value: 14000
+    initial_value: 19000
     entity_category: config
     optimistic: true
     restore_value: true

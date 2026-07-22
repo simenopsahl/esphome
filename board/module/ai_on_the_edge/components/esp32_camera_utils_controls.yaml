@@ -6,7 +6,7 @@
 # Comment out sections you don't need to reduce Home Assistant entity count
 switch:
   # - platform: template
-  #   name: "Enable Rotation"
+  #   name: "CamUtil Enable Rotation"
   #   id: espcam_enable_rotation
   #   icon: "mdi:rotate-3d"
   #   entity_category: config
@@ -15,7 +15,7 @@ switch:
 
   # # Enable Scaler
   # - platform: template
-  #   name: "Enable Scaler"
+  #   name: "CamUtil Enable Scaler"
   #   id: espcam_enable_scaler
   #   icon: "mdi:resize"
   #   entity_category: config
@@ -24,85 +24,85 @@ switch:
 
   # # Enable Cropper
   # - platform: template
-  #   name: "Enable Cropper"
+  #   name: "CamUtil Enable Cropper"
   #   id: espcam_enable_cropper
   #   icon: "mdi:crop"
   #   entity_category: config
   #   optimistic: true
   #   restore_mode: RESTORE_DEFAULT_ON
 
-  # # Enable Drawing
-  # - platform: template
-  #   name: "Enable Drawing"
-  #   id: espcam_enable_drawing
-  #   icon: "mdi:draw"
-  #   entity_category: config
-  #   optimistic: true
-  #   restore_mode: RESTORE_DEFAULT_ON
+  # Enable Drawing
+  - platform: template
+    name: "CamUtil Enable Drawing"
+    id: espcam_enable_drawing
+    icon: "mdi:draw"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
 
 
 # configure number sliders for these parameters to make them available in HA
 number:
   # Camera Window - Offset X
-  # - platform: template
-  #   name: "Camera Window Offset X"
-  #   id: espcam_cam_window_offset_x
-  #   icon: "mdi:arrow-left-right"
-  #   unit_of_measurement: "px"
-  #   min_value: 0
-  #   max_value: 1600
-  #   step: 4
-  #   initial_value: 0
-  #   entity_category: config
-  #   optimistic: true
-  #   restore_value: true
+  - platform: template
+    name: "CamUtil Window Offset X"
+    id: espcam_cam_window_offset_x
+    icon: "mdi:arrow-left-right"
+    unit_of_measurement: "px"
+    min_value: 0
+    max_value: 1600
+    step: 4
+    initial_value: 0
+    entity_category: config
+    optimistic: true
+    restore_value: true
 
-  # # Camera Window - Offset Y
-  # - platform: template
-  #   name: "Camera Window Offset Y"
-  #   id: espcam_cam_window_offset_y
-  #   icon: "mdi:arrow-up-down"
-  #   unit_of_measurement: "px"
-  #   min_value: 0
-  #   max_value: 1200
-  #   step: 4
-  #   initial_value: 0
-  #   entity_category: config
-  #   optimistic: true
-  #   restore_value: true
+  # Camera Window - Offset Y
+  - platform: template
+    name: "CamUtil Window Offset Y"
+    id: espcam_cam_window_offset_y
+    icon: "mdi:arrow-up-down"
+    unit_of_measurement: "px"
+    min_value: 0
+    max_value: 1200
+    step: 4
+    initial_value: 0
+    entity_category: config
+    optimistic: true
+    restore_value: true
 
-  # # Camera Window - Width
-  # - platform: template
-  #   name: "Camera Window Width"
-  #   id: espcam_cam_window_width
-  #   icon: "mdi:arrow-expand-horizontal"
-  #   unit_of_measurement: "px"
-  #   min_value: 32
-  #   max_value: 1600
-  #   step: 4
-  #   initial_value: 640
-  #   entity_category: config
-  #   optimistic: true
-  #   restore_value: true
+  # Camera Window - Width
+  - platform: template
+    name: "CamUtil Window Width"
+    id: espcam_cam_window_width
+    icon: "mdi:arrow-expand-horizontal"
+    unit_of_measurement: "px"
+    min_value: 32
+    max_value: 1600
+    step: 4
+    initial_value: 640
+    entity_category: config
+    optimistic: true
+    restore_value: true
 
   # # Camera Window - Height
-  # - platform: template
-  #   name: "Camera Window Height"
-  #   id: espcam_cam_window_height
-  #   icon: "mdi:arrow-expand-vertical"
-  #   unit_of_measurement: "px"
-  #   min_value: 32
-  #   max_value: 1200
-  #   step: 4
-  #   initial_value: 480
-  #   entity_category: config
-  #   optimistic: true
-  #   restore_value: true
+  - platform: template
+    name: "CamUtil Window Height"
+    id: espcam_cam_window_height
+    icon: "mdi:arrow-expand-vertical"
+    unit_of_measurement: "px"
+    min_value: 32
+    max_value: 1200
+    step: 4
+    initial_value: 480
+    entity_category: config
+    optimistic: true
+    restore_value: true
 
   # # ===== Rotation Control (comment out if not using rotation) =====
   # # Image Rotation
   # - platform: template
-  #   name: "Camera Rotation"
+  #   name: "CamUtil Camera Rotation"
   #   id: espcam_camera_rotation
   #   icon: "mdi:rotate-3d-variant"
   #   unit_of_measurement: " deg"
@@ -122,7 +122,7 @@ number:
   # # ===== Scaler Controls (comment out if not using scaler) =====
   # # Scaler Width
   # - platform: template
-  #   name: "Scaler Width"
+  #   name: "CamUtil Scaler Width"
   #   id: espcam_scaler_width
   #   icon: "mdi:resize"
   #   unit_of_measurement: "px"
@@ -142,7 +142,7 @@ number:
 
   # # Scaler Height
   # - platform: template
-  #   name: "Scaler Height"
+  #   name: "CamUtil Scaler Height"
   #   id: espcam_scaler_height
   #   icon: "mdi:resize"
   #   unit_of_measurement: "px"
@@ -163,7 +163,7 @@ number:
   # # ===== Cropper Controls (comment out if not using cropper) =====
   # # Cropper Width
   # - platform: template
-  #   name: "Cropper Width"
+  #   name: "CamUtil Cropper Width"
   #   id: espcam_cropper_width
   #   icon: "mdi:crop"
   #   unit_of_measurement: "px"
@@ -185,7 +185,7 @@ number:
 
   # # Cropper Height
   # - platform: template
-  #   name: "Cropper Height"
+  #   name: "CamUtil Cropper Height"
   #   id: espcam_cropper_height
   #   icon: "mdi:crop"
   #   unit_of_measurement: "px"
@@ -207,7 +207,7 @@ number:
 
   # # Cropper Offset X
   # - platform: template
-  #   name: "Cropper Offset X"
+  #   name: "CamUtil Cropper Offset X"
   #   id: espcam_cropper_offset_x
   #   icon: "mdi:arrow-right"
   #   unit_of_measurement: "px"
@@ -229,7 +229,7 @@ number:
 
   # # Cropper Offset Y
   # - platform: template
-  #   name: "Cropper Offset Y"
+  #   name: "CamUtil Cropper Offset Y"
   #   id: espcam_cropper_offset_y
   #   icon: "mdi:arrow-down"
   #   unit_of_measurement: "px"
@@ -248,3 +248,26 @@ number:
   #           int ox = id(espcam_cropper_offset_x).state;
   #           id(component_espcam_utils)->set_cropper_config(w, h, ox, (int)x);
   #         }
+
+# API Services
+api:
+  services:
+    # Set Camera Window
+    - service: set_camera_window
+      variables:
+        offset_x: int
+        offset_y: int
+        width: int
+        height: int
+      then:
+        - lambda: |-
+            if (offset_x >= 0 && offset_y >= 0 && width > 0 && height > 0) {
+              id(component_espcam_utils)->set_camera_window(offset_x, offset_y, width, height);
+            }
+
+    # Reset Camera Window
+    - service: reset_camera_window
+      then:
+        - lambda: |-
+            int width, height;
+            id(component_espcam_utils)->reset_window(width, height);

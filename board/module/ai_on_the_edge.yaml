@@ -2,33 +2,38 @@
 # https://github.com/nliaudat/esphome_ai_component
 
 substitutions:
-  # camera
-  camera:
-    # NOTE: OV2640 + ESP32 camera driver cannot reliably do grayscale AND windowing at the same time.
-    # Using JPEG pixel format with the camera; grayscale conversion is done in software by the ImageProcessor
-    # when a grayscale model (model_channels == 1) is loaded.
-    pixel_format: JPEG  # (cropping implementation is faster with RGB888 format) | Displays: RGB565, RGB888 | Cameras: YUV422, YUV420, RAW | Efficiency: Grayscale, YUV420, JPEG
-    ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
-    # pixel_format: GRAYSCALE
-    resolution: 640x480  # 800x600 #640x480 #https://esphome.io/components/esp32_camera.html
-    # jpeg_quality: 10 # From 10 (best) to 63 (worst). | Must be 0 if non JPEG
-    jpeg_quality: 20
-    max_framerate: 1fps
-    idle_framerate: 0.1fps
-  # Meter settings
-  meter:
-    # Unit of measurement for the meter (e.g. m³, kWh, L)
-    unit: m³
-    # device class for the meter (e.g. water, energy, gas)
-    device_class: water
-    # state class for the meter (e.g. total_increasing, total, measurement)
-    state_class: total_increasing
-    last_valid_value: "000012306"
-  time:
-    reboot_days_of_week: MON
-    reboot_hours: 5
-    reboot_minutes: 0
-    reboot_seconds: 0
+  module:
+    ai_on_the_edge:
+      # camera
+      camera:
+        flash_light: flash_light
+        # NOTE: OV2640 + ESP32 camera driver cannot reliably do grayscale AND windowing at the same time.
+        # Using JPEG pixel format with the camera; grayscale conversion is done in software by the ImageProcessor
+        # when a grayscale model (model_channels == 1) is loaded.
+        pixel_format: JPEG  # (cropping implementation is faster with RGB888 format) | Displays: RGB565, RGB888 | Cameras: YUV422, YUV420, RAW | Efficiency: Grayscale, YUV420, JPEG
+        ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
+        # pixel_format: GRAYSCALE
+        resolution: 640x480  # 800x600 #640x480 #https://esphome.io/components/esp32_camera.html
+        # jpeg_quality: 10 # From 10 (best) to 63 (worst). | Must be 0 if non JPEG
+        jpeg_quality: 20
+        max_framerate: 1fps
+        idle_framerate: 0.1fps
+        agc_gain_ceiling: 8x
+        wb_mode: auto
+      # Meter settings
+      meter:
+        # Unit of measurement for the meter (e.g. m³, kWh, L)
+        unit: m³
+        # device class for the meter (e.g. water, energy, gas)
+        device_class: water
+        # state class for the meter (e.g. total_increasing, total, measurement)
+        state_class: total_increasing
+        last_valid_value: "000016909"
+      time:
+        reboot_days_of_week: MON
+        reboot_hours: 5
+        reboot_minutes: 0
+        reboot_seconds: 0
 
 packages:
   # Component-specific controls (comment to disable individual controls)
@@ -37,14 +42,17 @@ packages:
   - !include ai_on_the_edge/components/meter_reader_tflite_controls.yaml
   - !include ai_on_the_edge/components/value_validator_controls.yaml
   # Debug sensors
-#  - !include ai_on_the_edge/debug_board.yaml
+  - !include ai_on_the_edge/debug_board.yaml
   # camera configs
-#  - !include ai_on_the_edge/camera_options.yaml
+  - !include ai_on_the_edge/camera_options.yaml
   - !include ai_on_the_edge/esp32_camera.yaml
-  # - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
+  - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
 
 preferences:
   flash_write_interval: 60min
+
+ota:
+  allow_partition_access: true
 
 esphome:
   on_boot:
@@ -58,12 +66,12 @@ esphome:
             if(id(global_debug)) { id(espcam).dump_config(); }
             id(global_espcam_updated) = false;
           }
-  platformio_options:
-    board_build.extra_flags:
-      - -DBOARD_HAS_PSRAM
-      - -DTF_LITE_STATIC_MEMORY  # for tflite micro
-      - -DTF_LITE_DISABLE_X86_NEON  #for tflite micro
-      - -DESP_NN  #use hardware acceleration : https://github.com/espressif/esp-nn (only if using tflite)
+  build_flags:
+    - "-DBOARD_HAS_PSRAM"
+    - "-DTF_LITE_STATIC_MEMORY"  # for tflite micro
+    - "-DTF_LITE_DISABLE_X86_NEON"  #for tflite micro
+    - "-DMAX_OPERATORS=25"  #default is 30
+    - "-DESP_NN"  #use hardware acceleration : https://github.com/espressif/esp-nn (only if using tflite)
 
 # time:
 #   - platform: sntp
@@ -78,7 +86,7 @@ esphome:
 #           - button.press: button_restart
 
 api:
-  max_send_queue: 10
+  max_send_queue: 20
   batch_delay: 150ms
   reboot_timeout: 0
 
@@ -114,7 +122,7 @@ globals:
   # this is helpful when doing initial setup, but once everything is working, I turn it off
   - id: global_debug
     type: bool
-    initial_value: 'false'
+    initial_value: 'true'
   # value to track if camera parameters have been changed
   #   used to trigger the loop() code inserted in 'esphome' section above
   - id: global_espcam_updated
@@ -125,11 +133,14 @@ globals:
     type: std::string
     max_restore_data_length: 254
     # Blank
-#    initial_value: "\"[]\""
+    initial_value: "\"[]\""
     # Note: The outer quotes are escaped with single quotes + double quotes ("...")
 
     # 800x600 numbers
-    initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
+#    initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
+    
+    # 1024x768 numbers
+#    initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
 
 tflite_micro_helper:
   debug: false
@@ -141,12 +152,31 @@ esp32_camera_utils:
   ### zoom available for OV2640, OV3660, OV5640, SC101IOT, SC030IOT from crop zones (explicit)
   ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
 
-  # 800x600 tighter crop zone
-  camera_window:
-    offset_x: 480 # multiple of 4
-    offset_y: 500 # multiple of 4
-    width: 432 # multiple of 8
-    height: 104 # multiple of 8
+  # 800x600 crop zone
+#  camera_window:
+#    offset_x: 480 # multiple of 4
+#    offset_y: 500 # multiple of 4
+#    width: 432 # multiple of 8
+#    height: 104 # multiple of 8
+
+  # 1024x768 crop zone
+#  camera_window:
+#    offset_x: 464 # multiple of 4
+#    offset_y: 488 # multiple of 4
+#    width: 440 # multiple of 8
+#    height: 104 # multiple of 8
+#  camera_window:
+#    offset_x: 288 # multiple of 4
+#    offset_y: 312 # multiple of 4
+#    width: 288 # multiple of 8
+#    height: 72 # multiple of 8
+
+  # 1600x1200 crop zone
+#  camera_window:
+#    offset_x: 464 # multiple of 4
+#    offset_y: 488 # multiple of 4
+#    width: 440 # multiple of 8
+#    height: 112 # multiple of 8
 
   enable_rotation: false
   # rotation: 270 # 0, 90, 180, 270 (special case built-in "accelerated" for 90, 180, 270 )
@@ -163,15 +193,20 @@ esp32_camera_utils:
   #   offset_x: 0
   #   offset_y: 0
   
-  enable_drawing: false # enable drawing subsystem, needed if meter_reader_tflite: generate_preview: true + show_crop_areas: true
+  enable_drawing: true # enable drawing subsystem,
+  # needed if 
+  #meter_reader_tflite:
+  #  generate_preview: true
+  #  +
+  #  show_crop_areas: true
 
   debug_memory: false
 
 # optional : flash light at taking image
 flash_light_controller:
   id: component_flash_controller
-  flash_light: flash_light
-  flash_pre_time: 14000ms # 14 seconds before update (time to stabilize)
+  flash_light: ${module.ai_on_the_edge.camera.flash_light}
+  flash_pre_time: 19000ms # 19 seconds before update (time to stabilize)
   flash_post_time: 1000ms # 1 second after update
   debug: false
 
@@ -180,11 +215,11 @@ value_validator:
   validated_value_sensor:
     id: sensor_last_valid_reading
     name: "Water Meter Reading"
-    unit_of_measurement: "${meter.unit}"
+    unit_of_measurement: "${module.ai_on_the_edge.meter.unit}"
     accuracy_decimals: 3
     icon: mdi:water-pump
-    state_class: ${meter.state_class}
-    device_class: ${meter.device_class}
+    state_class: ${module.ai_on_the_edge.meter.state_class}
+    device_class: ${module.ai_on_the_edge.meter.device_class}
     filters:
       # Converts the raw 12058 into 12.058
       - multiply: 0.001
@@ -240,18 +275,23 @@ meter_reader_tflite:
   validator: component_value_validator
   # confidence_threshold: 0.85 # Only if validator is disabled
   camera_id: espcam
-  camera_resolution: 800x600
+  camera_resolution: ${module.ai_on_the_edge.camera.resolution}
   # best performance / accuracy
 #  model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"
   # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
-  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite"
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite"
   # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
 #  model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite"
   # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
 #  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite"
+  # 99.06 acc | inference in 1300ms | 105.91 KB memory footprint
+  model: "board/module/ai_on_the_edge/models/digit_recognizer_v40_quantized_integer_quant_uint8.tflite"
+  tensor_arena_size: 50KB # 18kb actual | 100kb default
   # From AI-On-The-Edge
 #  model: "board/module/ai_on_the_edge/models/dig-class11_1910_s2_q.tflite"
 #  model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite"
+
+  output_processing: direct_class
 
   update_interval: 90s
 
@@ -262,7 +302,7 @@ meter_reader_tflite:
   debug: false
   debug_image: false # static embedded image (debug.jpg)
   debug_image_out_serial: false
-  debug_memory: false
+  debug_memory: true
   debug_timing: false
 
   # Preview of what the AI sees (Rotated Live Cam)
@@ -296,12 +336,11 @@ meter_reader_tflite:
 
   ### Advanced parameters
   # frame_request_timeout: 15000  # ms (1000-60000)
-  # tensor_arena_size: "110KB"
   # Pool efficiency monitoring (optional, requires DEBUG_METER_READER_MEMORY)
-  # pool_job_efficiency_sensor: ${id_prefix}_pool_job_efficiency
-  # pool_result_efficiency_sensor: ${id_prefix}_pool_result_efficiency
-  # arena_efficiency_sensor: ${id_prefix}_arena_efficiency
-  # heap_fragmentation_sensor: ${id_prefix}_heap_fragmentation
+  pool_job_efficiency_sensor: inference_job_pool_efficiency
+  pool_result_efficiency_sensor: inference_result_pool_efficiency
+  arena_efficiency_sensor: arena_efficiency
+  heap_fragmentation_sensor: heap_fragmentation
 
   unload_button: tmr_unload_btn
   reload_button: tmr_reload_btn

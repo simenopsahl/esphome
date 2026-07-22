@@ -99,7 +99,7 @@ number:
     min_value: 1
     max_value: 3600
     step: 1
-    initial_value: 60
+    initial_value: 90
     entity_category: config
     optimistic: true
     restore_value: true
@@ -201,11 +201,11 @@ sensor:
   - platform: template
     name: "TfL Meter Reading"
     id: tmr_meter_value
-    unit_of_measurement: "${meter.unit}"
+    unit_of_measurement: "${module.ai_on_the_edge.meter.unit}"
     accuracy_decimals: 3
     icon: mdi:counter
-    state_class: ${meter.state_class}
-    device_class: ${meter.device_class}
+    state_class: ${module.ai_on_the_edge.meter.state_class}
+    device_class: ${module.ai_on_the_edge.meter.device_class}
     entity_category: diagnostic
     filters:
       # Converts the raw 12058 into 12.058
