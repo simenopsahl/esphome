@@ -66,3 +66,35 @@ meter_reader_tflite:
   
 tflite_micro_helper:
   debug: true
+
+text_sensor:
+  - id: !extend sensor_debug_reset_reason
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_debug_device
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ip_address
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ip_address_0
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ip_address_1
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ip_address_2
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ip_address_3
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ip_address_4
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_ssid
+    web_server:
+      sorting_group_id: debug_device
+  - id: !extend sensor_mac_address
+    web_server:
+      sorting_group_id: debug_device
