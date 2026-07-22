@@ -44,17 +44,13 @@ wifi:
 
 esp32_camera_utils:
   debug: true
-  # 1024x768 crop zone
+  # 800x600 crop zone
 #  camera_window:
-#    offset_x: 464 # multiple of 4
-#    offset_y: 488 # multiple of 4
+#    offset_x: 480 # multiple of 4
+#    offset_y: 500 # multiple of 4
 #    width: 432 # multiple of 8
-#    height: 96 # multiple of 8
-#  camera_window:
-#    offset_x: 288 # multiple of 4
-#    offset_y: 312 # multiple of 4
-#    width: 288 # multiple of 8
-#    height: 72 # multiple of 8
+#    height: 104 # multiple of 8
+  # 1024x768 crop zone
 #  camera_window:
 #    offset_x: 456 # multiple of 4
 #    offset_y: 488 # multiple of 4
