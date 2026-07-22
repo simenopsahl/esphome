@@ -37,4 +37,4 @@ wifi:
     static_ip: 192.168.71.94
 
 globals:
-  - id: !extend component_espcam_utils
+  - id: !extend global_crop_zones
