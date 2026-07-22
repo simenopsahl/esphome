@@ -21,7 +21,7 @@ substitutions:
         resolution: 800x600
         jpeg_quality: 20
       meter:
-        last_valid_value: "000016494"
+        last_valid_value: "000016909"
 
 esphome:
   comment: ${device.model} @ ${device.location}
