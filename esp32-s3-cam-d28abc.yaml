@@ -60,4 +60,4 @@ meter_reader_tflite:
   debug: true
   
 tflite_micro_helper:
-  debug: false
+  debug: true
