@@ -62,6 +62,9 @@ esp32_camera_utils:
 #    width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 #    height: 120 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 
+  enable_rotation: false
+  # rotation: 270 # 0, 90, 180, 270 (special case built-in "accelerated" for 90, 180, 270 )
+
 meter_reader_tflite:
   debug: true
   
