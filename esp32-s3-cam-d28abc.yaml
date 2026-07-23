@@ -23,6 +23,8 @@ substitutions:
         jpeg_quality: 10
         agc_gain_ceiling: 128x
         wb_mode: cloudy
+      meter:
+        last_valid_value: "000016909"
 
 esphome:
   comment: ${device.model} @ ${device.location}
