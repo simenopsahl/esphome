@@ -8,7 +8,7 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: esp32-s3-cam-d28abc
