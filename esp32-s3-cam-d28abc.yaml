@@ -50,6 +50,11 @@ esp32_camera_utils:
 #    offset_y: 500 # multiple of 4
 #    width: 432 # multiple of 8
 #    height: 104 # multiple of 8
+#  camera_window:
+#    offset_x: 476 # multiple of 4
+#    offset_y: 500 # multiple of 4
+#    width: 432 # multiple of 8
+#    height: 104 # multiple of 8
   # 1024x768 crop zone
 #  camera_window:
 #    offset_x: 456 # multiple of 4
