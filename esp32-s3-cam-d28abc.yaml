@@ -46,6 +46,7 @@ wifi:
 
 esp32_camera:
   vertical_flip: false
+  horizontal_mirror: false
 
 esp32_camera_utils:
   debug: true
