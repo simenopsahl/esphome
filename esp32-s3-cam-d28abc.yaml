@@ -44,14 +44,17 @@ wifi:
     # 1024x768 numbers
 #    initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
 
+esp32_camera:
+  vertical_flip: false
+
 esp32_camera_utils:
   debug: true
   # 1024x768 crop zone
-  camera_window:
-    offset_x: 452 # multiple of 4
-    offset_y: 484 # multiple of 4
-    width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
-    height: 120 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+#  camera_window:
+#    offset_x: 452 # multiple of 4
+#    offset_y: 484 # multiple of 4
+#    width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+#    height: 120 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 
 meter_reader_tflite:
   debug: true
