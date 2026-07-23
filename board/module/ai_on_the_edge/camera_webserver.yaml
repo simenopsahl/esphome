@@ -4,9 +4,232 @@
 esp32_camera_web_server:
   - port: 8080
     mode: stream
-    # - port: 8081
-    #   mode: snapshot
+  - port: 8081
+    mode: snapshot
 
 web_server:
   port: 80
+  version: 3
   log: false
+  sorting_groups:
+#    - id: (Required, ID): Manually specify the ID used for the group
+#      name (Required, string): A string representing the group name which is displayed as the header of the group
+#      sorting_weight (Optional, float): A float representing the weight of the group. A group with a smaller
+  - id: camera_utils
+    name: "Camera Utils"
+    sorting_weight: 75
+  - id: flash_control
+    name: "Flash Control"
+    sorting_weight: 65
+  - id: camera_controls
+    name: "Camera Control"
+    sorting_weight: 70
+  - id: value_validator_controls
+    name: "Value Validator Controls"
+    sorting_weight: 80
+  - id: tensor_controls
+    name: "Tensor Controls"
+    sorting_weight: 85
+  - id: debug_information
+    name: "Debug Information"
+    sorting_weight: 90
+  - id: debug_device
+    name: "Device Information"
+    sorting_weight: 95
+
+
+# Extend and add web server groups
+value_validator:
+  # ai_on_the_edge.yaml
+  validator_state_sensor:
+    web_server:
+      sorting_group_id: debug_information
+
+button:
+  # meter_reader_tflite_controls.yaml
+  - id: !extend tmr_unload_btn
+    web_server:
+      sorting_group_id: tensor_controls
+  - id: !extend tmr_reload_btn
+    web_server:
+      sorting_group_id: tensor_controls
+
+light:
+  # board_config.yaml
+  - id: !extend ${module.ai_on_the_edge.camera.flash_light}
+    web_server:
+      sorting_group_id: flash_control
+
+number:
+  # camera_options.yaml
+  - id: !extend espcam_ae_level
+    web_server:
+      sorting_group_id: camera_controls
+  # esp32_camera_utils_controls.yaml
+  - id: !extend espcam_cam_window_offset_x
+    web_server:
+      sorting_group_id: camera_utils
+  - id: !extend espcam_cam_window_offset_y
+    web_server:
+      sorting_group_id: camera_utils
+  - id: !extend espcam_cam_window_width
+    web_server:
+      sorting_group_id: camera_utils
+  - id: !extend espcam_cam_window_height
+    web_server:
+      sorting_group_id: camera_utils
+  # flash_light_controller_controls.yaml
+  - id: !extend flc_pre_time_setting
+    web_server:
+      sorting_group_id: flash_control
+  - id: !extend flc_post_time_setting
+    web_server:
+      sorting_group_id: flash_control
+  # meter_reader_tflite_controls.yaml
+  - id: !extend tmr_meter_update_interval
+    web_server:
+      sorting_group_id: tensor_controls
+  - id: !extend tmr_set_last_valid
+    web_server:
+      sorting_group_id: tensor_controls
+  # value_validator_controls.yaml
+  - id: !extend vv_max_absolute_diff_num
+    web_server:
+      sorting_group_id: value_validator_controls
+  - id: !extend vv_max_rate_change
+    web_server:
+      sorting_group_id: value_validator_controls
+  - id: !extend vv_smart_validation_window
+    web_server:
+      sorting_group_id: value_validator_controls
+  - id: !extend vv_high_confidence_threshold
+    web_server:
+      sorting_group_id: value_validator_controls
+  - id: !extend vv_per_digit_confidence_threshold
+    web_server:
+      sorting_group_id: value_validator_controls
+
+select:
+  # camera_options.yaml
+  - id: !extend espcam_wb
+    web_server:
+      sorting_group_id: camera_controls
+  - id: !extend espcam_g_ceiling
+    web_server:
+      sorting_group_id: camera_controls
+  # logger.yaml
+  - id: !extend logger_select
+    web_server:
+      sorting_group_id: debug_device
+
+sensor:
+  # debug_board.yaml
+  - id: !extend ram_free_percentage
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend spiram_free_percentage
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend inference_job_pool_efficiency
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend inference_result_pool_efficiency
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend arena_efficiency
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend heap_fragmentation
+    web_server:
+      sorting_group_id: debug_information
+  # status.yaml
+  - id: !extend sensor_uptime
+    web_server:
+      sorting_group_id: debug_device
+  # wifi.yaml
+  - id: !extend sensor_wifi_signal
+    web_server:
+      sorting_group_id: debug_device
+  # board_config.yaml
+  - id: !extend cpu_temperature
+    web_server:
+      sorting_group_id: debug_device
+  # meter_reader_tflite_controls.yaml
+  - id: !extend tmr_meter_confidence
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend tmr_inference_time
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend tmr_capture_to_publish_time
+    web_server:
+      sorting_group_id: debug_information
+
+switch:
+  # esp32_camera_utils_controls.yaml
+  - id: !extend espcam_enable_drawing
+    web_server:
+      sorting_group_id: camera_utils
+  # meter_reader_tflite_controls.yaml
+  - id: !extend tmr_pause_ai_processing
+    web_server:
+      sorting_group_id: tensor_controls
+  - id: !extend tmr_setup_mode_preview
+    web_server:
+      sorting_group_id: tensor_controls
+  # value_validator_controls.yaml
+  - id: !extend vv_enable_smart_validation
+    web_server:
+      sorting_group_id: value_validator_controls
+  - id: !extend vv_strict_confidence_check
+    web_server:
+      sorting_group_id: value_validator_controls
+
+text:
+  # meter_reader_tflite_controls.yaml
+  - id: !extend tmr_set_last_valid_string
+    web_server:
+      sorting_group_id: tensor_controls
+  
+text_sensor:
+  # meter_reader_tflite_controls.yaml
+  - id: !extend tmr_inference_logs
+    web_server:
+      sorting_group_id: debug_information
+  - id: !extend tmr_main_logs
+    web_server:
+      sorting_group_id: debug_information
+  # debug.yaml
+  - id: !extend sensor_debug
+    reset_reason:
+      web_server:
+        sorting_group_id: debug_device
+    device:
+      web_server:
+        sorting_group_id: debug_device
+  # wifi.yaml
+  - id: !extend sensor_wifi_info
+    ip_address:
+      web_server:
+        sorting_group_id: debug_device
+      address_0:
+        web_server:
+          sorting_group_id: debug_device
+      address_1:
+        web_server:
+          sorting_group_id: debug_device
+      address_2:
+        web_server:
+          sorting_group_id: debug_device
+      address_3:
+        web_server:
+          sorting_group_id: debug_device
+      address_4:
+        web_server:
+          sorting_group_id: debug_device
+    ssid:
+      web_server:
+        sorting_group_id: debug_device
+    mac_address:
+      web_server:
+        sorting_group_id: debug_device

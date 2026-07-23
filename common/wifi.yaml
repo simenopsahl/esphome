@@ -32,6 +32,7 @@ sensor:
 text_sensor:
   # https://esphome.io/components/text_sensor/wifi_info
   - platform: wifi_info
+    id: sensor_wifi_info
     ip_address:
       id: sensor_ip_address
       name: "IP Address"

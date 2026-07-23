@@ -46,7 +46,7 @@ packages:
   # camera configs
   - !include ai_on_the_edge/camera_options.yaml
   - !include ai_on_the_edge/esp32_camera.yaml
-  - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
+#  - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
 
 preferences:
   flash_write_interval: 60min
@@ -109,6 +109,7 @@ external_components:
 logger:
   logs:
     esp32_camera: INFO
+    esp32_camera_utils: DEBUG
     meter_reader_tflite: DEBUG
     ModelHandler: DEBUG
     ImageProcessor: DEBUG
@@ -156,27 +157,22 @@ esp32_camera_utils:
 #  camera_window:
 #    offset_x: 480 # multiple of 4
 #    offset_y: 500 # multiple of 4
-#    width: 432 # multiple of 8
-#    height: 104 # multiple of 8
+#    width: 432 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+#    height: 104 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 
   # 1024x768 crop zone
 #  camera_window:
-#    offset_x: 464 # multiple of 4
-#    offset_y: 488 # multiple of 4
-#    width: 440 # multiple of 8
-#    height: 104 # multiple of 8
-#  camera_window:
-#    offset_x: 288 # multiple of 4
-#    offset_y: 312 # multiple of 4
-#    width: 288 # multiple of 8
-#    height: 72 # multiple of 8
+#    offset_x: 452 # multiple of 4
+#    offset_y: 484 # multiple of 4
+#    width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+#    height: 120 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 
   # 1600x1200 crop zone
 #  camera_window:
 #    offset_x: 464 # multiple of 4
 #    offset_y: 488 # multiple of 4
-#    width: 440 # multiple of 8
-#    height: 112 # multiple of 8
+#    width: 440 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+#    height: 112 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 
   enable_rotation: false
   # rotation: 270 # 0, 90, 180, 270 (special case built-in "accelerated" for 90, 180, 270 )
@@ -206,7 +202,7 @@ esp32_camera_utils:
 flash_light_controller:
   id: component_flash_controller
   flash_light: ${module.ai_on_the_edge.camera.flash_light}
-  flash_pre_time: 19000ms # 19 seconds before update (time to stabilize)
+  flash_pre_time: 14000ms # 19 seconds before update (time to stabilize)
   flash_post_time: 1000ms # 1 second after update
   debug: false
 

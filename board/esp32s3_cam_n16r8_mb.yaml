@@ -80,7 +80,7 @@ light:
     num_leds: 1
     rmt_symbols: ${device.rmt_symbols_block}
     chipset: ws2812
-    color_correct: [76%, 76%, 76%]
+    color_correct: [90%, 90%, 90%]
     effects:
       - pulse:
       - strobe:

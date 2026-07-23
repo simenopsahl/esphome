@@ -30,6 +30,7 @@ switch:
     entity_category: config
     optimistic: true
     restore_mode: RESTORE_DEFAULT_ON
+    disabled_by_default: true
     turn_on_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {
@@ -48,6 +49,7 @@ switch:
     entity_category: config
     optimistic: true
     restore_mode: RESTORE_DEFAULT_OFF
+    disabled_by_default: true
     turn_on_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {
@@ -73,6 +75,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
     set_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {
@@ -91,6 +94,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
     set_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {
@@ -109,6 +113,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
     set_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {
@@ -127,6 +132,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
     set_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {
@@ -145,6 +151,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
     set_action:
       - lambda: |-
           if (id(component_value_validator) != nullptr) {

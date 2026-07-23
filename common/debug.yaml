@@ -10,6 +10,7 @@ debug:
 
 text_sensor:
   - platform: debug
+    id: sensor_debug
     reset_reason:
       id: sensor_debug_reset_reason
       name: "Reset reason"

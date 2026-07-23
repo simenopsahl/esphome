@@ -56,6 +56,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
 
   # Camera Window - Offset Y
   - platform: template
@@ -70,6 +71,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
 
   # Camera Window - Width
   - platform: template
@@ -84,6 +86,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
 
   # # Camera Window - Height
   - platform: template
@@ -98,6 +101,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: true
+    disabled_by_default: true
 
   # # ===== Rotation Control (comment out if not using rotation) =====
   # # Image Rotation
