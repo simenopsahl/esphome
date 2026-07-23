@@ -57,3 +57,6 @@ meter_reader_tflite:
 tflite_micro_helper:
   debug: true
 
+light:
+  - id: !extend rgb_led
+    color_correct: [77%, 77%, 77%]
