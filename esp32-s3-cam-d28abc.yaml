@@ -44,23 +44,12 @@ wifi:
 
 esp32_camera_utils:
   debug: true
-  # 800x600 crop zone
-#  camera_window:
-#    offset_x: 464 # multiple of 4
-#    offset_y: 492 # multiple of 4
-#    width: 432 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
-#    height: 104 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
-#  camera_window:
-#    offset_x: 480 # multiple of 4
-#    offset_y: 500 # multiple of 4
-#    width: 432 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
-#    height: 104 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
   # 1024x768 crop zone
-#  camera_window:
-#    offset_x: 452 # multiple of 4
-#    offset_y: 484 # multiple of 4
-#    width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
-#    height: 120 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+  camera_window:
+    offset_x: 452 # multiple of 4
+    offset_y: 484 # multiple of 4
+    width: 448 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
+    height: 120 # multiple of 4 or 16 if rotation enabled and 4:3 proportions with height for best quality
 
 meter_reader_tflite:
   debug: true
