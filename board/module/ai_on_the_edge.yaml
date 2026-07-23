@@ -46,7 +46,7 @@ packages:
   # camera configs
   - !include ai_on_the_edge/camera_options.yaml
   - !include ai_on_the_edge/esp32_camera.yaml
-#  - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
+  - !include ai_on_the_edge/camera_webserver.yaml # generate_preview must be set to true if used
 
 preferences:
   flash_write_interval: 60min
