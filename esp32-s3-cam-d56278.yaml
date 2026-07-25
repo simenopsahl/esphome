@@ -33,19 +33,38 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.100
 
-output:
-  # flash output
-  - platform: ledc
-    id: led_output
-    pin: ${pin.ext.h2.p2}
-    max_power: 0.9
-
 light:
-  - platform: monochromatic
-    output: led_output
-    id: led_light
-    default_transition_length: 250ms
-    restore_mode: RESTORE_AND_OFF
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    rgb_order: GRB
+    pin: ${pin.ext.h2.p2}
+    num_leds: 4
+    rmt_symbols: ${device.rmt_symbols_block}
+    chipset: ws2812
+    color_correct: [90%, 90%, 90%]
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 200ms on, 1500ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+    default_transition_length: 100ms
     initial_state:
-      state: off
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
     name: "LED"
+    entity_category: config
