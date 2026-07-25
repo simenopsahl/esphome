@@ -17,12 +17,13 @@ substitutions:
       type: esp-idf
   module:
     camera:
-      flash_light: rgb_led
       resolution: 1024x768
       jpeg_quality: 10
       agc_gain_ceiling: 128x
       wb_mode: cloudy
     ai_on_the_edge:
+      camera:
+        flash_light: rgb_led
       meter:
         last_valid_value: "000016909"
 
