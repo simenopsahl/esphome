@@ -69,7 +69,8 @@ meter_reader_tflite:
   debug: true
   
 tflite_micro_helper:
-  debug: true
+  - id: !extend digit_model
+    debug: true
 
 light:
   - id: !extend rgb_led
