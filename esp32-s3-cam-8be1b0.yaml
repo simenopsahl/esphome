@@ -14,6 +14,11 @@ substitutions:
     location: "Storage"
     framework:
       type: esp-idf
+  module:
+    camera:
+      resolution: 1024x768
+      jpeg_quality: 20
+      agc_gain_ceiling: 128x
 
 esphome:
   comment: ${device.model} @ ${device.location}
