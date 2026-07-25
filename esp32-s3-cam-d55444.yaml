@@ -32,3 +32,21 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.99
+
+output:
+  # LED output
+  - platform: ledc
+    id: led_output
+    pin: ${pin.ext.h2.p2}
+
+light:
+  # NullLab White LED Diode
+  - platform: monochromatic
+    output: led_output
+    id: led_light
+    default_transition_length: 50ms
+    restore_mode: RESTORE_AND_OFF
+    initial_state:
+      state: off
+    name: "LED"
+    entity_category: config
