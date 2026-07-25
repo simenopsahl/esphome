@@ -34,6 +34,7 @@ wifi:
     static_ip: 192.168.71.100
 
 light:
+  # NullLab ws2812 8bit bar
   - platform: esp32_rmt_led_strip
     id: rgb_led
     rgb_order: GRB
