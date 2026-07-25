@@ -16,10 +16,11 @@ substitutions:
     framework:
       type: esp-idf
   module:
+    camera:
+      resolution: 800x600
+      jpeg_quality: 20
+      agc_gain_ceiling: 16x
     ai_on_the_edge:
-      camera:
-        resolution: 800x600
-        jpeg_quality: 20
       meter:
         last_valid_value: "000016909"
 
