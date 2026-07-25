@@ -1,24 +1,39 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
+  board: !include board/esp32s3_cam_n8r8_eye.yaml
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: esp32-s3-cam-d55444
+    location: "Storage"
+    framework:
+      type: esp-idf
+  module:
+    ai_on_the_edge:
+      camera:
+        flash_light: rgb_led
+        resolution: 1024x768
+        jpeg_quality: 10
+        agc_gain_ceiling: 128x
+        wb_mode: cloudy
+      meter:
+        last_valid_value: "000016909"
+
 esphome:
-  name: esp32-s3-cam-d55444
-  friendly_name: ESPHome Web
-  min_version: 2026.4.0
-  name_add_mac_suffix: false
-
-esp32:
-  variant: esp32s3
-  framework:
-    type: esp-idf
-
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-
-# Allow Over-The-Air updates
-ota:
-- platform: esphome
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.99
