@@ -27,3 +27,20 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.100
+
+output:
+  # flash output
+  - platform: ledc
+    id: led_output
+    pin: ${pin.ext.h2.p2}
+    max_power: 0.9
+
+light:
+  - platform: monochromatic
+    output: led_output
+    id: led_light
+    default_transition_length: 250ms
+    restore_mode: RESTORE_AND_OFF
+    initial_state:
+      state: off
+    name: "LED"
