@@ -21,6 +21,14 @@ substitutions:
   module:
     internal:
       i2c_bus: i2c_internal
+    camera:
+      pixel_format: JPEG
+      resolution: 800x600
+      jpeg_quality: 20
+      max_framerate: 2fps
+      idle_framerate: 0.1fps
+      agc_gain_ceiling: 64x
+      wb_mode: auto
   extension:
     i2c:
       internal:
@@ -130,20 +138,21 @@ esp32_camera:
   id: espcam
   name: "Camera"
   # Image settings
-  resolution: 800x600
-  pixel_format: JPEG
-  jpeg_quality: 20
+  resolution: ${module.camera.resolution}
+  pixel_format: ${module.camera.pixel_format}
+  jpeg_quality: ${module.camera.jpeg_quality}
   vertical_flip: false
   horizontal_mirror: false
-  max_framerate: 2 fps
+  max_framerate: ${module.camera.max_framerate}
+  idle_framerate: ${module.camera.idle_framerate}
   frame_buffer_count: 2 # defaults to 1
   # Exposure
   aec_mode: auto
   aec2: true # defaults to false
   ae_level: 2
-  agc_gain_ceiling: 8x
+  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
   # White balance
-  wb_mode: auto
+  wb_mode: ${module.camera.wb_mode}
 
 # If NOT JPEG pixel_format
 #camera_encoder:

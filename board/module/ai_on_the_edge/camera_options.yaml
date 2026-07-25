@@ -14,7 +14,7 @@ select:
       - "Cloudy"
       - "Office"
       - "Home"
-    initial_option: ${module.ai_on_the_edge.camera.wb_mode | capitalize}
+    initial_option: ${module.camera.wb_mode | capitalize}
     optimistic: True
     entity_category: config
     disabled_by_default: true
@@ -34,7 +34,7 @@ select:
       - "32x"
       - "64x"
       - "128x"
-    initial_option: ${module.ai_on_the_edge.camera.agc_gain_ceiling}
+    initial_option: ${module.camera.agc_gain_ceiling}
     optimistic: True
     entity_category: config
     disabled_by_default: true

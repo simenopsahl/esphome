@@ -3,23 +3,24 @@
 
 substitutions:
   module:
+    # camera
+    camera:
+      # NOTE: OV2640 + ESP32 camera driver cannot reliably do grayscale AND windowing at the same time.
+      # Using JPEG pixel format with the camera; grayscale conversion is done in software by the ImageProcessor
+      # when a grayscale model (model_channels == 1) is loaded.
+      pixel_format: JPEG  # (cropping implementation is faster with RGB888 format) | Displays: RGB565, RGB888 | Cameras: YUV422, YUV420, RAW | Efficiency: Grayscale, YUV420, JPEG
+      ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
+      # pixel_format: GRAYSCALE
+      resolution: 640x480  # 800x600 #640x480 #https://esphome.io/components/esp32_camera.html
+      # jpeg_quality: 10 # From 10 (best) to 63 (worst). | Must be 0 if non JPEG
+      jpeg_quality: 20
+      max_framerate: 1fps
+      idle_framerate: 0.1fps
+      agc_gain_ceiling: 8x
+      wb_mode: auto
     ai_on_the_edge:
-      # camera
       camera:
         flash_light: flash_light
-        # NOTE: OV2640 + ESP32 camera driver cannot reliably do grayscale AND windowing at the same time.
-        # Using JPEG pixel format with the camera; grayscale conversion is done in software by the ImageProcessor
-        # when a grayscale model (model_channels == 1) is loaded.
-        pixel_format: JPEG  # (cropping implementation is faster with RGB888 format) | Displays: RGB565, RGB888 | Cameras: YUV422, YUV420, RAW | Efficiency: Grayscale, YUV420, JPEG
-        ### windowing not available natively in grayscale mode (OV2640) due to driver limitations. The image is forced JPEG and then converted to grayscale in software by the ImageProcessor
-        # pixel_format: GRAYSCALE
-        resolution: 640x480  # 800x600 #640x480 #https://esphome.io/components/esp32_camera.html
-        # jpeg_quality: 10 # From 10 (best) to 63 (worst). | Must be 0 if non JPEG
-        jpeg_quality: 20
-        max_framerate: 1fps
-        idle_framerate: 0.1fps
-        agc_gain_ceiling: 8x
-        wb_mode: auto
       # Meter settings
       meter:
         # Unit of measurement for the meter (e.g. m³, kWh, L)
@@ -70,7 +71,7 @@ esphome:
     - "-DBOARD_HAS_PSRAM"
     - "-DTF_LITE_STATIC_MEMORY"  # for tflite micro
     - "-DTF_LITE_DISABLE_X86_NEON"  #for tflite micro
-    - "-DMAX_OPERATORS=25"  #default is 30
+#    - "-DMAX_OPERATORS=25"  #default is 30
     - "-DESP_NN"  #use hardware acceleration : https://github.com/espressif/esp-nn (only if using tflite)
 
 # time:
@@ -114,6 +115,7 @@ logger:
     ModelHandler: DEBUG
     ImageProcessor: DEBUG
     tflite_coordinator: DEBUG
+    tflite_micro_helper: DEBUG
     value_validator: DEBUG
     internal_temperature: ERROR
     internal_temperature.esp32: ERROR
@@ -144,7 +146,24 @@ globals:
 #    initial_value: '"[[3,8,49,90],[49,8,93,90],[94,9,138,90],[141,10,186,91],[189,12,233,91],[236,11,279,91],[285,12,326,91],[331,13,373,91],[378,15,422,92]]"'
 
 tflite_micro_helper:
-  debug: false
+  # best performance / accuracy
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"
+  # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite"
+  # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite"
+  # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite"
+  # 99.06 acc | inference in 1300ms | 105.91 KB memory footprint
+#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v40_quantized_integer_quant_uint8.tflite"
+  # From AI-On-The-Edge
+#  model: "board/module/ai_on_the_edge/models/dig-class11_1910_s2_q.tflite"
+#  model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite"
+  - id: digit_model
+    tensor_arena_size: 50KB
+    model_type: image
+    output_processing: direct_class
+    model: "board/module/ai_on_the_edge/models/digit_recognizer_v40_quantized_integer_quant_uint8.tflite"
 
 esp32_camera_utils:
   id: component_espcam_utils
@@ -268,26 +287,10 @@ value_validator:
 
 meter_reader_tflite:
   id: component_meter_reader
-  validator: component_value_validator
-  # confidence_threshold: 0.85 # Only if validator is disabled
+  model: digit_model
   camera_id: espcam
-  camera_resolution: ${module.ai_on_the_edge.camera.resolution}
-  # best performance / accuracy
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v3_quantized_integer_quant_uint8.tflite"
-  # 99.46% acc | inference in 4150ms | 263.76 KB memory footprint
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v16_quantized_integer_quant_uint8.tflite"
-  # 97.87% acc | inference in 2300ms | 262.33 KB memory footprint | good with very bad images
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v23_quantized_integer_quant_uint8.tflite"
-  # 98.86% acc | inference in 2600ms | 135.29 KB memory footprint
-#  model: "board/module/ai_on_the_edge/models/digit_recognizer_v24_quantized_integer_quant_uint8.tflite"
-  # 99.06 acc | inference in 1300ms | 105.91 KB memory footprint
-  model: "board/module/ai_on_the_edge/models/digit_recognizer_v40_quantized_integer_quant_uint8.tflite"
-  tensor_arena_size: 50KB # 18kb actual | 100kb default
-  # From AI-On-The-Edge
-#  model: "board/module/ai_on_the_edge/models/dig-class11_1910_s2_q.tflite"
-#  model: "board/module/ai_on_the_edge/models/dig-class11_2000_s2_q.tflite"
-
-  output_processing: direct_class
+  camera_resolution: ${module.camera.resolution}
+  validator: component_value_validator
 
   update_interval: 90s
 

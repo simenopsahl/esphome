@@ -20,6 +20,14 @@ substitutions:
   module:
     internal:
       i2c_bus: i2c_internal
+    camera:
+      pixel_format: JPEG
+      resolution: 640x480
+      jpeg_quality: 20
+      max_framerate: 2fps
+      idle_framerate: 0.1fps
+      agc_gain_ceiling: 8x
+      wb_mode: auto
   device:
     model: "M5Stack Atom S3R-M12"
     rmt_symbols_block: 48
@@ -97,14 +105,15 @@ early_init:
   pins:
     - pin:
         number: ${pin.cam.pwr}
+#        allow_other_uses: true
       level: false
-  delay: 500ms
+  delay: 1500ms
 
 i2c:
   - id: i2c_cam
     sda: ${pin.cam.sda}
     scl: ${pin.cam.scl}
-    frequency: 100kHz
+    frequency: 200kHz
     timeout: 10ms
     scan: true
 
@@ -115,7 +124,7 @@ i2c:
 #  rmt_symbols: ${device.rmt_symbols_block}
 
 esp32_camera:
-  i2c_id: i2c_internal
+  i2c_id: i2c_cam
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
@@ -136,19 +145,20 @@ esp32_camera:
   id: espcam
   name: "Camera OV3640"
   # Image settings
-  resolution: 800x600
-  pixel_format: JPEG
-  jpeg_quality: 20
+  resolution: ${module.camera.resolution}
+  pixel_format: ${module.camera.pixel_format}
+  jpeg_quality: ${module.camera.jpeg_quality}
   vertical_flip: false
-  max_framerate: 2 fps
+  max_framerate: ${module.camera.max_framerate}
+  idle_framerate: ${module.camera.idle_framerate}
   frame_buffer_count: 2 # defaults to 1
   # Exposure
   aec_mode: auto
   aec2: true # defaults to false
   ae_level: 2
-  agc_gain_ceiling: 8x
+  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
   # White balance
-  wb_mode: auto
+  wb_mode: ${module.camera.wb_mode}
 
 # If NOT JPEG pixel_format
 #camera_encoder:
@@ -168,5 +178,7 @@ sensor:
     update_interval: 5s
     entity_category: diagnostic
 
-status_led:
-  pin: ${pin.light.led}
+#status_led:
+#  pin:
+#    number: ${pin.light.led}
+#    allow_other_uses: true

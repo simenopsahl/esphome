@@ -4,6 +4,7 @@
 # Light:  Dual Flash
 # FLASH:  8MB
 # PSRAM:  8MB
+# https://github.com/nulllaborg/esp32s3-cam
 # https://github.com/s60sc/ESP32-CAM_MJPEG2SD/blob/master/camera_pins.h#L336
 
 substitutions:
@@ -15,7 +16,7 @@ substitutions:
       spi:
         clk: GPIO39
         mosi: GPIO38
-        miso: GPIO2
+        miso: GPIO40
         cs: GPIO38
       i2c:
         sda: GPIO4
@@ -49,20 +50,20 @@ substitutions:
     ext:
       h1:
         p1: rst
-        p2: GPIO44
-        p3: GPIO43
-        p4: GPIO42
-        p5: GPIO41
-        p6: GPIO46
+        p2: GPIO44 # u0txr # clk_out2
+        p3: GPIO43 # u0txd # clk_out1
+        p4: GPIO42 # mtms
+        p5: GPIO41 # mtdi # clk_out1
+        p6: GPIO46 # log
         p7: GND
         p8: 3v3
       h2:
-        p1: GPIO0
-        p2: GPIO14
-        p3: GPIO47
+        p1: GPIO0 # boot
+        p2: GPIO14 # rtc # touch14
+        p3: GPIO47 # spiclk_p
         p4: nc
-        p5: GPIO48
-        p6: GPIO1
+        p5: GPIO48 # spiclk_n
+        p6: GPIO1 # rtc # touch1 # adc1_0
         p7: GND
         p8: 5v
 
