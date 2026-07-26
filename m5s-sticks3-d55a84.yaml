@@ -32,6 +32,9 @@ substitutions:
       type: esp-idf
   display:
     home_page: page_temperature
+    page:
+      temperature:
+        area_label: T22
 
 esphome:
   comment: ${device.model} @ ${device.location}
