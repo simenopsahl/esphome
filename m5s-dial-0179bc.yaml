@@ -13,7 +13,7 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
-    entity_id: sensor.etg2_stue_temperature
+    entity_id: sensor.t22_temperature
   }}
 
 substitutions:
@@ -31,6 +31,9 @@ substitutions:
         frequency: 40kHz
   display:
     home_page: page_analog_clock
+    page:
+      temperature:
+        area_label: T22
 
 esphome:
   comment: ${device.model} @ ${device.location}
