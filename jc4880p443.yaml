@@ -26,6 +26,9 @@ substitutions:
       type: esp-idf
   display:
     home_page: page_analog_clock
+    page:
+      temperature:
+        area_label: T22
 
 esphome:
   comment: ${device.model} @ ${device.location}
