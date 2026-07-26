@@ -43,6 +43,9 @@ substitutions:
       i2c_bus: i2c_mbus
   display:
     home_page: page_cc1101
+    page:
+      temperature:
+        area_label: T22
 
 esphome:
   comment: ${device.model} @ ${device.location}
