@@ -86,12 +86,6 @@ binary_sensor:
         return false;
       }
 
-display:
-  - id: !extend display_lcd
-    dimensions:
-      offset_height: 191
-      offset_width: 110
-
 lvgl:
   buffer_size: 40%
   rotation: 180
