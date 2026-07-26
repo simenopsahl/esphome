@@ -31,6 +31,9 @@ substitutions:
       agc_gain_ceiling: 64x
   display:
     home_page: page_imu
+    page:
+      temperature:
+        area_label: T22
 
 esphome:
   comment: ${device.model} @ ${device.location}
