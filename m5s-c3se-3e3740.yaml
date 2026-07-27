@@ -211,7 +211,7 @@ sensor:
               id: tank_dynamic_max
               value: !lambda return std::max(id(tank_dynamic_max), (int)round(x * 10.0));
   - platform: homeassistant
-    entity_id: sensor.etg1_bad_vvb_mix_temperature
+    entity_id: sensor.etg1_bad_vvb_temperature_mix
     id: vvb_temperature_mix
     on_value:
       - then:
