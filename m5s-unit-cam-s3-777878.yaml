@@ -16,9 +16,9 @@ substitutions:
       type: esp-idf
   module:
     camera:
-      resolution: 1024x768
+      resolution: 800x600
       jpeg_quality: 20
-      agc_gain_ceiling: 128x
+      agc_gain_ceiling: 64x
 
 esphome:
   comment: ${device.model} @ ${device.location}
