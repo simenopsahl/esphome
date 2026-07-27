@@ -60,7 +60,6 @@ time:
 
 lvgl:
   buffer_size: 40%
-  rotation: 180
   style_definitions:
     - id: circle
       radius: circle
@@ -97,8 +96,8 @@ lvgl:
             align: CENTER
             widgets:
               - container:
-                  max_height: 66
-                  max_width: 66
+                  max_height: 76
+                  max_width: 76
                   styles: circle
                   bg_color: c_bg_s
                   bg_opa: cover
@@ -174,14 +173,14 @@ script:
           lvgl.widget.update:
             id: indicator
             bg_color: c_green
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 36);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 36);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 39);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 39);
         else:
           lvgl.widget.update:
             id: indicator
             bg_color: c_red
-            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 36);
-            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 36);
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 39);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 39);
 
 binary_sensor:
   # Call sensors from HA.
