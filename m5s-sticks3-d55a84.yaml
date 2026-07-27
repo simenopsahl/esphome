@@ -60,6 +60,128 @@ time:
 
 lvgl:
   buffer_size: 40%
+  rotation: 180
+  style_definitions:
+    - id: circle
+      radius: circle
+      outline_width: 1
+      outline_color: c_yellow
+      align: center
+    - id: dashline
+      width: 100%
+      height: 100%
+      line_dash_width: 4
+      line_dash_gap: 4
+      line_color: c_yellow
+  pages:
+    - id: page_imu
+      pad_top: 26
+      pad_bottom: 0
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: "\U000F0D49" # axis-arrow
+      <<: !include
+        file: gui/functions/swipe_navigation.yaml
+      widgets:
+        - obj:
+            pad_top: 1
+            pad_bottom: 8
+            pad_left: 3
+            pad_right: 3
+            scrollable: false
+            width: 100%
+            height: 100%
+            border_width: 0
+            radius: 0
+            align: CENTER
+            widgets:
+              - container:
+                  max_height: 66
+                  max_width: 66
+                  styles: circle
+                  bg_color: c_bg_s
+                  bg_opa: cover
+                  widgets:
+                  - container:
+                      styles: circle
+                      width: 66%
+                      height: 66%
+                  - container:
+                      styles: circle
+                      width: 33%
+                      height: 33%
+                  - line:
+                      styles: dashline
+                      points:
+                        - 50%,0
+                        - 50%,100%
+                  - line:
+                      styles: dashline
+                      points:
+                        - {x: 0, y: 50%}
+                        - [100%, 50%]
+                  - container:
+                      styles: circle
+                      width: 10%
+                      height: 10%
+                      bg_color: c_gray
+                      bg_opa: 50%
+                  - container:
+                      id: indicator_container
+                      width: 100%
+                      height: 100%
+                      transform_pivot_x: 50%
+                      transform_pivot_y: 50%
+                      widgets:
+                        - container:
+                            id: indicator
+                            styles: circle
+                            width: 12%
+                            height: 12%
+                            bg_color: c_red
+                            bg_opa: 100%
+                            x: 10
+                            y: 10
+              - label:
+                  text: R
+                  align: bottom_mid
+                  text_font: font_sm
+                  text_color: c_dark_gray
+              - label:
+                  text: F
+                  align: top_mid
+                  text_font: font_sm
+                  text_color: c_dark_gray
+              - label:
+                  text: L
+                  align: left_mid
+                  text_font: font_md
+                  text_color: c_dark_gray
+              - label:
+                  text: R
+                  align: right_mid
+                  text_font: font_md
+                  text_color: c_dark_gray
+
+script:
+  - id: update_motion
+    then:
+    - if:
+        condition:
+          lambda: return abs(id(motion_roll).state) < 1.0f && abs(id(motion_pitch).state) < 1.0f;
+        then:
+          lvgl.widget.update:
+            id: indicator
+            bg_color: c_green
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 36);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 36);
+        else:
+          lvgl.widget.update:
+            id: indicator
+            bg_color: c_red
+            x: !lambda return (int)(clamp(id(motion_roll).state, -20.0f, 20.0f) / 20.0f * 36);
+            y: !lambda return (int)(clamp(id(motion_pitch).state, -20.0f, 20.0f) / 20.0f * 36);
 
 binary_sensor:
   # Call sensors from HA.
@@ -88,6 +210,10 @@ binary_sensor:
       - lvgl.page.next
 
 sensor:
+  - id: !extend motion_roll
+    on_value:
+      script.execute: update_motion
+
   - id: !extend temperature_local
     sources:
       # Base BTC
