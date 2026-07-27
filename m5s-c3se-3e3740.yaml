@@ -149,3 +149,20 @@ sensor:
               text:
                 format: "%.0f"
                 args: [ 'x' ]
+
+  - platform: homeassistant
+    entity_id: sensor.etg1_bad_vvb_temperature_bottom
+    id: vvb_temperature_bottom
+  - platform: homeassistant
+    entity_id: sensor.etg1_bad_vvb_temperature_top
+    id: vvb_temperature_top
+  - platform: homeassistant
+    entity_id: sensor.etg1_bad_vvb_mix_temperature
+    id: vvb_temperature_mix
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: lbl_temp_kmeter_mix_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
