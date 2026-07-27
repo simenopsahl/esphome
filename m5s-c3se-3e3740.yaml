@@ -167,28 +167,31 @@ sensor:
               text:
                 format: "%.1f"
                 args: [ 'x' ]
-          # Auto-calibrate the dynamic minimum
-          - globals.set:
-              id: tank_dynamic_min
-              value: !lambda return std::min(id(tank_dynamic_min), (int)round(x * 10.0));
-          # Update the bar graphic using the new dynamic globals
+          # Auto-calibrate the dynamic min/max
+          - script.execute:
+              id: update_tank_dynamic_min
+              current_temp: !lambda "return x;"
+          - script.execute:
+              id: update_tank_dynamic_max
+              current_temp: !lambda "return x;"
+          # Update the bar graphic using the float globals
           - lvgl.bar.update:
               id: tank_graphic
-              mode: RANGE
-              # 1. Update the physical scale of the widget
-              min_value: !lambda return id(tank_dynamic_min);
-              max_value: !lambda return id(tank_dynamic_max);
-              # 2. Keep the red indicator anchored to the top of our new dynamic max
-              value: !lambda return id(tank_dynamic_max);
-              # 3. Calculate the inverted thermocline using the dynamic limits
-              start_value: !lambda |-
+              # 1. Cast the float globals to integers for LVGL's limits
+              min_value: !lambda return (int)round(id(tank_dynamic_min) * 10.0);
+              max_value: !lambda return (int)round(id(tank_dynamic_max) * 10.0);
+              
+              # 2. Calculate the inverted height using integers
+              value: !lambda |-
                 int current = (int)round(x * 10.0);
-                int min_val = id(tank_dynamic_min);
-                int max_val = id(tank_dynamic_max);
-                // Invert the reading
-                int mapped_start = max_val - (current - min_val);
-                // Safely constrain
-                return std::max(min_val, std::min(max_val, mapped_start));
+                int min_val = (int)round(id(tank_dynamic_min) * 10.0);
+                int max_val = (int)round(id(tank_dynamic_max) * 10.0);
+                
+                // Invert the reading: when at min_val, bar is full (blue).
+                int mapped_value = max_val - (current - min_val);
+                
+                // Safely constrain so LVGL doesn't throw a rendering error
+                return std::max(min_val, std::min(max_val, mapped_value));
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_top
     id: vvb_temperature_top
@@ -206,10 +209,6 @@ sensor:
               text:
                 format: "%.1f"
                 args: [ 'x' ]
-          # Auto-calibrate the dynamic maximum
-          - globals.set:
-              id: tank_dynamic_max
-              value: !lambda return std::max(id(tank_dynamic_max), (int)round(x * 10.0));
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_mix
     id: vvb_temperature_mix
