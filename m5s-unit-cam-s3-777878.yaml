@@ -17,7 +17,7 @@ substitutions:
   module:
     camera:
       resolution: 800x600
-      jpeg_quality: 12
+      jpeg_quality: 20
       agc_gain_ceiling: 64x
 
 esphome:
