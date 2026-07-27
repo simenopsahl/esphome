@@ -153,9 +153,63 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_bottom
     id: vvb_temperature_bottom
+    on_value:
+      - then:
+          # Update the shadow label
+          - lvgl.label.update:
+              id: lbl_temp_kmeter_bottom_shadow
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+          # Update the main foreground label
+          - lvgl.label.update:
+              id: lbl_temp_kmeter_bottom_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+          # Auto-calibrate the dynamic minimum
+          - globals.set:
+              id: tank_dynamic_min
+              value: !lambda return std::min(id(tank_dynamic_min), (int)round(x * 10.0));
+          # Update the bar graphic using the new dynamic globals
+          - lvgl.bar.update:
+              id: tank_graphic
+              mode: RANGE
+              # 1. Update the physical scale of the widget
+              min_value: !lambda return id(tank_dynamic_min);
+              max_value: !lambda return id(tank_dynamic_max);
+              # 2. Keep the red indicator anchored to the top of our new dynamic max
+              value: !lambda return id(tank_dynamic_max);
+              # 3. Calculate the inverted thermocline using the dynamic limits
+              start_value: !lambda |-
+                int current = (int)round(x * 10.0);
+                int min_val = id(tank_dynamic_min);
+                int max_val = id(tank_dynamic_max);
+                // Invert the reading
+                int mapped_start = max_val - (current - min_val);
+                // Safely constrain
+                return std::max(min_val, std::min(max_val, mapped_start));
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_top
     id: vvb_temperature_top
+    on_value:
+      - then:
+          # Update the shadow label
+          - lvgl.label.update:
+              id: lbl_temp_kmeter_top_shadow
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+          # Update the main foreground label
+          - lvgl.label.update:
+              id: lbl_temp_kmeter_top_value
+              text:
+                format: "%.1f"
+                args: [ 'x' ]
+          # Auto-calibrate the dynamic maximum
+          - globals.set:
+              id: tank_dynamic_max
+              value: !lambda return std::max(id(tank_dynamic_max), (int)round(x * 10.0));
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_mix_temperature
     id: vvb_temperature_mix
