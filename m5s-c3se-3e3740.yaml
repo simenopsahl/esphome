@@ -30,7 +30,7 @@ packages:
 
 substitutions:
   common:
-    log_level: WARN
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-3e3740
@@ -187,11 +187,17 @@ sensor:
                 int min_val = (int)round(id(tank_dynamic_min) * 10.0);
                 int max_val = (int)round(id(tank_dynamic_max) * 10.0);
                 
-                // Invert the reading: when at min_val, bar is full (blue).
+                // Invert the reading
                 int mapped_value = max_val - (current - min_val);
                 
-                // Safely constrain so LVGL doesn't throw a rendering error
-                return std::max(min_val, std::min(max_val, mapped_value));
+                // Safely constrain
+                int final_val = std::max(min_val, std::min(max_val, mapped_value));
+                
+                // Print the variables to the log as a Warning
+                ESP_LOGW("tank_bar", "cur: %d | min: %d | max: %d | map: %d | final: %d", 
+                         current, min_val, max_val, mapped_value, final_val);
+                
+                return final_val;
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_top
     id: vvb_temperature_top
