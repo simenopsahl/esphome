@@ -3,13 +3,13 @@
 
 text_sensor:
   - platform: homeassistant
-    entity_id: weather.hjemme
+    entity_id: weather.local
     id: ha_weather_condition
     on_value:
       - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: weather_condition_icon, input_id: ha_weather_condition  } }
 
   - platform: homeassistant
-    entity_id: weather.hjemme
+    entity_id: weather.local
     attribute: temperature
     id: ha_weather_temperature
     on_value:

@@ -19,6 +19,15 @@ substitutions:
     i2c:
       internal:
         frequency: 200kHz
+  module:
+    camera:
+      pixel_format: JPEG
+      resolution: 640x480
+      jpeg_quality: 20
+      max_framerate: 2fps
+      idle_framerate: 0.1fps
+      agc_gain_ceiling: 8x
+      wb_mode: auto
 
 esphome:
   project:
@@ -59,10 +68,9 @@ esp32:
 
 psram:
   mode: octal
-  speed: 80MHz
+  speed: 40MHz
 
 wifi:
-  output_power: 10dB
   power_save_mode: light
   use_psram: true
   enable_btm: true
@@ -91,7 +99,7 @@ esp32_camera:
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
-    frequency: 8MHz
+    frequency: 16MHz
   data_pins:
     - ${pin.cam.y2}
     - ${pin.cam.y3}
@@ -108,9 +116,11 @@ esp32_camera:
   # Metadata
   name: "Camera PY260"
   # Image settings
-  resolution: 640x480
-  jpeg_quality: 20
-  max_framerate: 2 fps
+  resolution: ${module.camera.resolution}
+  pixel_format: JPEG
+  jpeg_quality: ${module.camera.jpeg_quality}
+  max_framerate: ${module.camera.max_framerate}
+  idle_framerate: ${module.camera.idle_framerate}
   frame_buffer_count: 1 # defaults to 1
 #  vertical_flip: true
 #  horizontal_mirror: true
@@ -118,13 +128,44 @@ esp32_camera:
   aec_mode: auto
   aec2: true # defaults to false
   ae_level: 2
-  agc_gain_ceiling: 8x
+  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
   # White balance
-  wb_mode: auto
+  wb_mode: ${module.camera.wb_mode}
 
 # Enable status LED
 status_led:
-  pin: ${pin.light.led}
+  pin:
+    number: ${pin.light.led}
+    inverted: true
+
+# i2s_audio:
+#   id: i2s_audio_bus
+#   i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+
+# microphone:
+#   - platform: i2s_audio
+#     i2s_audio_id: i2s_audio_bus
+#     id: i2s_mic_pdm
+#     adc_type: external
+#     channel: left
+# #    sample_rate: 4000
+#     bits_per_sample: 16bit
+#     use_apll: true
+#     i2s_din_pin: ${pin.audio.mic}
+#     pdm: true
+
+# switch:
+#   - platform: template
+#     id: mic_mute
+#     name: Microphone Mute
+#     icon: "mdi:microphone-off"
+#     optimistic: true
+#     restore_mode: RESTORE_DEFAULT_OFF
+#     entity_category: config
+#     on_turn_off:
+#         - microphone.unmute:
+#     on_turn_on:
+#         - microphone.mute:
 
 sensor:
   # - platform: sound_level
@@ -145,30 +186,3 @@ sensor:
     icon: "mdi:thermometer"
     update_interval: 5s
     entity_category: diagnostic
-
-# i2s_audio:
-#   id: i2s_audio_bus
-#   i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
-
-# microphone:
-#   - platform: i2s_audio
-#     i2s_audio_id: i2s_audio_bus
-#     id: i2s_mic_pdm
-#     bits_per_sample: 8bit
-#     sample_rate: 4000
-#     i2s_din_pin: ${pin.audio.mic}
-#     adc_type: external
-#     pdm: true
-
-# switch:
-#   - platform: template
-#     id: mic_mute
-#     name: Microphone Mute
-#     icon: "mdi:microphone-off"
-#     optimistic: true
-#     restore_mode: RESTORE_DEFAULT_OFF
-#     entity_category: config
-#     on_turn_off:
-#         - microphone.unmute:
-#     on_turn_on:
-#         - microphone.mute:

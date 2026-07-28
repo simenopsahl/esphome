@@ -60,7 +60,7 @@
                         file: ../../widgets/labels/text.yaml
                         vars:
                           uid: room_temp_area
-                          text: "Rom"
+                          text: ${display.page.temperature.area_label}
                           text_font: font_lg
                           color: c_text_s
                           align: left

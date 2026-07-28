@@ -66,7 +66,7 @@
                       text_color: c_text_s
                   - label: # area
                       id: room_temp_area
-                      text: "Rom"
+                      text: ${display.page.temperature.area_label}
                       text_font: font_lg
                       text_color: c_text_s
                   - label: # temperature unit

@@ -12,11 +12,11 @@ substitutions:
     # The bar uses inverted logic: hot water (red) is anchored to the top of the tank.
     # As the bottom probe cools, the red indicator shrinks upwards to reveal cold water (blue).
     
-    # tank_temp_min: The coldest the bottom probe gets (red indicator shrinks to the top).
-    tank_temp_min: "300" # Represents 30.0°C (Heavy usage dip)
+    # tank_temp_min: The coldest the bottom probe gets
+    tank_temp_min: "32.0" # Heavy usage dip
     
-    # tank_temp_max: The hottest the bottom probe gets (red indicator fills down to the bottom).
-    tank_temp_max: "550" # Represents 55.0°C (Normal resting temp)
+    # tank_temp_max: The hottest the bottom probe gets
+    tank_temp_max: "53.0" # Normal resting temp
 
 # Enable logging for this component
 logger:
@@ -26,12 +26,12 @@ logger:
 globals:
   # Stores the dynamic minimum (Coldest recorded temperature)
   - id: tank_dynamic_min
-    type: int
-    initial_value: ${module.tank_temp_min | pprint} # pprint to bypass parser issues
+    type: float
+    initial_value: "32.0"
   # Stores the dynamic maximum (Hottest recorded temperature)
   - id: tank_dynamic_max
-    type: int
-    initial_value: ${module.tank_temp_max | pprint}
+    type: float
+    initial_value: "53.0"
 
 external_components:
   - source: github://m5stack/esphome-yaml/components
@@ -59,80 +59,80 @@ sensor:
     id: dual_kmeter_1_sensor
     channel: KMETER_1
     update_interval: 45s
-    name: "Temperature DualKMeter 1"
+    name: "Temperature DualKMeter 1" # Top probe
     device_class: "temperature"
     state_class: "measurement"
     filters:
       - sliding_window_moving_average:
           window_size: 2
-          send_every: 1
-    on_value:
-      - then:
-          # Update the shadow label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter1_shadow
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Update the main foreground label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter1_value
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Auto-calibrate the dynamic minimum
-          - globals.set:
-              id: tank_dynamic_min
-              value: !lambda return std::min(id(tank_dynamic_min), (int)round(x * 10.0));
-          # Update the bar graphic using the new dynamic globals
-          - lvgl.bar.update:
-              id: tank_graphic
-              mode: RANGE
-              # 1. Update the physical scale of the widget
-              min_value: !lambda return id(tank_dynamic_min);
-              max_value: !lambda return id(tank_dynamic_max);
-              # 2. Keep the red indicator anchored to the top of our new dynamic max
-              value: !lambda return id(tank_dynamic_max);
-              # 3. Calculate the inverted thermocline using the dynamic limits
-              start_value: !lambda |-
-                int current = (int)round(x * 10.0);
-                int min_val = id(tank_dynamic_min);
-                int max_val = id(tank_dynamic_max);
-                // Invert the reading
-                int mapped_start = max_val - (current - min_val);
-                // Safely constrain
-                return std::max(min_val, std::min(max_val, mapped_start));
+    #       send_every: 1
+    # on_value:
+    #   - then:
+    #       # Update the shadow label
+    #       - lvgl.label.update:
+    #           id: lbl_temp_kmeter_top_shadow
+    #           text:
+    #             format: "%.1f"
+    #             args: [ 'x' ]
+    #       # Update the main foreground label
+    #       - lvgl.label.update:
+    #           id: lbl_temp_kmeter_top_value
+    #           text:
+    #             format: "%.1f"
+    #             args: [ 'x' ]
+    #       # Auto-calibrate the dynamic maximum
+    #       - globals.set:
+    #           id: tank_dynamic_max
+    #           value: !lambda return std::max(id(tank_dynamic_max), (int)round(x * 10.0));
   # Top of tank
   - platform: dual_kmeter
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_2_sensor
     channel: KMETER_2
     update_interval: 45s
-    name: "Temperature DualKMeter 2"
+    name: "Temperature DualKMeter 2" # Bottom probe
     device_class: "temperature"
     state_class: "measurement"
     filters:
       - sliding_window_moving_average:
           window_size: 2
           send_every: 1
-    on_value:
-      - then:
-          # Update the shadow label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter2_shadow
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Update the main foreground label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter2_value
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Auto-calibrate the dynamic maximum
-          - globals.set:
-              id: tank_dynamic_max
-              value: !lambda return std::max(id(tank_dynamic_max), (int)round(x * 10.0));
+    # on_value:
+    #   - then:
+    #       # Update the shadow label
+    #       - lvgl.label.update:
+    #           id: lbl_temp_kmeter_bottom_shadow
+    #           text:
+    #             format: "%.1f"
+    #             args: [ 'x' ]
+    #       # Update the main foreground label
+    #       - lvgl.label.update:
+    #           id: lbl_temp_kmeter_bottom_value
+    #           text:
+    #             format: "%.1f"
+    #             args: [ 'x' ]
+    #       # Auto-calibrate the dynamic minimum
+    #       - globals.set:
+    #           id: tank_dynamic_min
+    #           value: !lambda return std::min(id(tank_dynamic_min), (int)round(x * 10.0));
+    #       # Update the bar graphic using the new dynamic globals
+    #       - lvgl.bar.update:
+    #           id: tank_graphic
+    #           mode: RANGE
+    #           # 1. Update the physical scale of the widget
+    #           min_value: !lambda return id(tank_dynamic_min);
+    #           max_value: !lambda return id(tank_dynamic_max);
+    #           # 2. Keep the red indicator anchored to the top of our new dynamic max
+    #           value: !lambda return id(tank_dynamic_max);
+    #           # 3. Calculate the inverted thermocline using the dynamic limits
+    #           start_value: !lambda |-
+    #             int current = (int)round(x * 10.0);
+    #             int min_val = id(tank_dynamic_min);
+    #             int max_val = id(tank_dynamic_max);
+    #             // Invert the reading
+    #             int mapped_start = max_val - (current - min_val);
+    #             // Safely constrain
+    #             return std::max(min_val, std::min(max_val, mapped_start));
 
   - platform: combination
     type: median
@@ -143,13 +143,40 @@ sensor:
     sources:
       - source: dual_kmeter_1_sensor
       - source: dual_kmeter_2_sensor
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_temp_kmeter_mix_value
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
+    # on_value:
+    #   - then:
+    #       - lvgl.label.update:
+    #           id: lbl_temp_kmeter_mix_value
+    #           text:
+    #             format: "%.1f"
+    #             args: [ 'x' ]
+
+script:
+  - id: update_tank_dynamic_min
+    parameters:
+      current_temp: float
+    then:
+      - globals.set:
+          id: tank_dynamic_min
+          value: !lambda |-
+            float current = current_temp;
+            float baseline = id(tank_dynamic_min);
+            float diff = current - baseline;
+            // Colder: snap immediately. Warmer: drift up by 1%
+            return (diff < 0) ? current : (baseline + (diff * 0.01));
+
+  - id: update_tank_dynamic_max
+    parameters:
+      current_temp: float
+    then:
+      - globals.set:
+          id: tank_dynamic_max
+          value: !lambda |-
+            float current = current_temp;
+            float baseline = id(tank_dynamic_max);
+            float diff = current - baseline;
+            // Hotter: snap immediately. Colder: drift down by 1%
+            return (diff > 0) ? current : (baseline + (diff * 0.01));
 
 # Same as in ../../gui/240x320.yaml
 .sizing:
@@ -192,4 +219,4 @@ lvgl:
         file: ../../gui/pages/dual_kmeter/page.yaml
         vars:
           <<: [*page_styles, *container_styles, *dual_kmeter_styles]
-          page_title: Temp Probe
+          page_title: VVB

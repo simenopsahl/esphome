@@ -1,5 +1,12 @@
 # for square 128x128 displays
 
+substitutions:
+  display:
+    home_page: page_analog_clock
+    page:
+      temperature:
+        area_label: "Rom"
+
 font: !include
   file: fonts/fonts.yaml
   vars:

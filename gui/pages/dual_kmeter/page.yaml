@@ -50,30 +50,26 @@
                       pad_all: 0
                       radius: ${tank_radius}
                       border_width: 2
-                      border_color: c_blue
-                      # Cold water background
-                      bg_color: c_blue 
+                      border_color: c_red
+                      # Hot water background
+                      bg_color: c_red
                       bg_opa: 90%
                       # Define the scale
-                      min_value: ${tank_temp_min}
-                      max_value: ${tank_temp_max}
-                      # Draw from the top (hot) down to the current value
-                      mode: RANGE
-                      start_value: ${tank_temp_min}
-                      value: ${tank_temp_max} # Default starting state
-                      # Hot water indicator
+                      min_value: ${tank_temp_min | round(32) * 10}
+                      max_value: ${tank_temp_max | round(53) * 10}
+                      # Cold water indicator
                       indicator:
                         border_width: 2
-                        border_color: c_red
-                        bg_color: c_red
+                        border_color: c_blue
+                        bg_color: c_blue
                         bg_opa: 90%
                         radius: 0
                 
                   # 2a. Top Temp Drop Shadow (Rendered first so it sits behind)
                   - label:
-                      id: lbl_temp_kmeter2_shadow
+                      id: lbl_temp_kmeter_top_shadow
                       text: "?"
-                      text_font: font_lg
+                      text_font: font_xl
                       text_color: c_black
                       align: TOP_MID
                       # Offset by 2 pixels
@@ -81,18 +77,18 @@
                       y: 17
                   # 2b. Top Temp (Probe 2) Main Text (Rendered second so it sits on top)
                   - label:
-                      id: lbl_temp_kmeter2_value
+                      id: lbl_temp_kmeter_top_value
                       text: "?"
-                      text_font: font_lg
+                      text_font: font_xl
                       text_color: c_text_p
                       align: TOP_MID
                       y: 15
 
                   # 3a. Bottom Temp Drop Shadow (Rendered first so it sits behind)
                   - label:
-                      id: lbl_temp_kmeter1_shadow
+                      id: lbl_temp_kmeter_bottom_shadow
                       text: "?"
-                      text_font: font_lg
+                      text_font: font_xl
                       text_color: c_black
                       align: BOTTOM_MID
                       # Offset by 2 pixels
@@ -100,9 +96,9 @@
                       y: -13
                   # 3b. Bottom Temp (Probe 1) Main Text (Rendered second so it sits on top)
                   - label:
-                      id: lbl_temp_kmeter1_value
+                      id: lbl_temp_kmeter_bottom_value
                       text: "?"
-                      text_font: font_lg
+                      text_font: font_xl
                       text_color: c_text_p
                       align: BOTTOM_MID
                       y: -15
@@ -122,8 +118,8 @@
                   pad_row: 10
                 widgets:
                   - label:
-                      text: "VVB:"
-                      text_font: font_md
+                      text: "Mix:"
+                      text_font: font_lg
                       text_color: c_text_s
                   - obj:
                       width: SIZE_CONTENT
@@ -139,9 +135,9 @@
                         - label:
                             id: lbl_temp_kmeter_mix_value
                             text: "?"
-                            text_font: font_xl
+                            text_font: font_xxl
                             text_color: c_text_p
                         - label:
                             text: "°C"
-                            text_font: font_lg
+                            text_font: font_xl
                             text_color: c_text_s
