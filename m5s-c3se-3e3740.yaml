@@ -194,7 +194,7 @@ sensor:
                 int final_val = std::max(min_val, std::min(max_val, mapped_value));
                 
                 // Print the variables to the log as a Warning
-                ESP_LOGW("tank_bar", "cur: %d | min: %d | max: %d | map: %d | final: %d", 
+                ESP_LOGI("tank_bar", "cur: %d | min: %d | max: %d | map: %d | final: %d", 
                          current, min_val, max_val, mapped_value, final_val);
                 
                 return final_val;
