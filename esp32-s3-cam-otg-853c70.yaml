@@ -3,7 +3,7 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-  board: !include board/esp32s3_usbotg.yaml
+  board: !include board/esp32s3_cam_n16r8_usbotg.yaml
 
 substitutions:
   common:
