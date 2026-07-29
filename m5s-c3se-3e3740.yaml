@@ -155,66 +155,19 @@ sensor:
     id: vvb_temperature_bottom
     on_value:
       - then:
-          # Update the shadow label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter_bottom_shadow
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Update the main foreground label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter_bottom_value
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Auto-calibrate the dynamic min/max
           - script.execute:
-              id: update_tank_dynamic_min
+              id: update_tank_bottom
               current_temp: !lambda "return x;"
-          - script.execute:
-              id: update_tank_dynamic_max
-              current_temp: !lambda "return x;"
-          # Update the bar graphic using the float globals
-          - lvgl.bar.update:
-              id: tank_graphic
-              # 1. Cast the float globals to integers for LVGL's limits
-              min_value: !lambda return (int)round(id(tank_dynamic_min) * 10.0);
-              max_value: !lambda return (int)round(id(tank_dynamic_max) * 10.0);
-              
-              # 2. Calculate the inverted height using integers
-              value: !lambda |-
-                int current = (int)round(x * 10.0);
-                int min_val = (int)round(id(tank_dynamic_min) * 10.0);
-                int max_val = (int)round(id(tank_dynamic_max) * 10.0);
-                
-                // Invert the reading
-                int mapped_value = max_val - (current - min_val);
-                
-                // Safely constrain
-                int final_val = std::max(min_val, std::min(max_val, mapped_value));
-                
-                // Print the variables to the log as a Warning
-                ESP_LOGI("tank_bar", "cur: %d | min: %d | max: %d | map: %d | final: %d", 
-                         current, min_val, max_val, mapped_value, final_val);
-                
-                return final_val;
+
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_top
     id: vvb_temperature_top
     on_value:
       - then:
-          # Update the shadow label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter_top_shadow
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
-          # Update the main foreground label
-          - lvgl.label.update:
-              id: lbl_temp_kmeter_top_value
-              text:
-                format: "%.1f"
-                args: [ 'x' ]
+          - script.execute:
+              id: update_tank_top
+              current_temp: !lambda "return x;"
+
   - platform: homeassistant
     entity_id: sensor.etg1_bad_vvb_temperature_mix
     id: vvb_temperature_mix
