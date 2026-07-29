@@ -20,7 +20,7 @@ esphome:
     version: "1.0.0"
 
 esp32:
-# ESP32-S3R8 (Dual-core, 240MHz)
+# ESP32-S3N16R8 (Dual-core, 240MHz)
 # PSRAM: 8MB Octal
   variant: esp32s3
   flash_size: 16MB

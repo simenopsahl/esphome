@@ -58,14 +58,14 @@ sensor:
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_1_sensor
     channel: KMETER_1
-    update_interval: 45s
+#    update_interval: 45s
     name: "Temperature DualKMeter 1" # Top probe
     device_class: "temperature"
     state_class: "measurement"
     filters:
       - sliding_window_moving_average:
           window_size: 2
-    #       send_every: 1
+          send_every: 1
     # on_value:
     #   - then:
     #       # Update the shadow label
@@ -89,7 +89,7 @@ sensor:
     i2c_id: ${module.kmeteriso_i2c_bus}
     id: dual_kmeter_2_sensor
     channel: KMETER_2
-    update_interval: 45s
+#    update_interval: 45s
     name: "Temperature DualKMeter 2" # Bottom probe
     device_class: "temperature"
     state_class: "measurement"

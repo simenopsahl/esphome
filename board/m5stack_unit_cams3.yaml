@@ -65,10 +65,14 @@ esp32:
       
       # Camera Specifics
       CONFIG_CAMERA_TASK_STACK_SIZE: "8192"
+    components:
+      - name: espressif/esp32-camera
+        source: https://github.com/simenopsahl/M5Stack-Unit-CamS3-5MP
+        path: components/esp32-camera
 
 psram:
   mode: octal
-  speed: 40MHz
+  speed: 80MHz
 
 wifi:
   power_save_mode: light
@@ -99,7 +103,7 @@ esp32_camera:
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}
-    frequency: 16MHz
+    frequency: 20MHz
   data_pins:
     - ${pin.cam.y2}
     - ${pin.cam.y3}
@@ -121,7 +125,7 @@ esp32_camera:
   jpeg_quality: ${module.camera.jpeg_quality}
   max_framerate: ${module.camera.max_framerate}
   idle_framerate: ${module.camera.idle_framerate}
-  frame_buffer_count: 1 # defaults to 1
+  frame_buffer_count: 2 # defaults to 1
 #  vertical_flip: true
 #  horizontal_mirror: true
   # Exposure
@@ -138,45 +142,45 @@ status_led:
     number: ${pin.light.led}
     inverted: true
 
-# i2s_audio:
-#   id: i2s_audio_bus
-#   i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+i2s_audio:
+  id: i2s_audio_bus
+  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
 
-# microphone:
-#   - platform: i2s_audio
-#     i2s_audio_id: i2s_audio_bus
-#     id: i2s_mic_pdm
-#     adc_type: external
-#     channel: left
-# #    sample_rate: 4000
-#     bits_per_sample: 16bit
-#     use_apll: true
-#     i2s_din_pin: ${pin.audio.mic}
-#     pdm: true
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_audio_bus
+    id: i2s_mic_pdm
+    adc_type: external
+    channel: left
+#    sample_rate: 4000
+    bits_per_sample: 16bit
+    use_apll: true
+    i2s_din_pin: ${pin.audio.mic}
+    pdm: true
 
-# switch:
-#   - platform: template
-#     id: mic_mute
-#     name: Microphone Mute
-#     icon: "mdi:microphone-off"
-#     optimistic: true
-#     restore_mode: RESTORE_DEFAULT_OFF
-#     entity_category: config
-#     on_turn_off:
-#         - microphone.unmute:
-#     on_turn_on:
-#         - microphone.mute:
+switch:
+  - platform: template
+    id: mic_mute
+    name: Microphone Mute
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+        - microphone.unmute:
+    on_turn_on:
+        - microphone.mute:
 
 sensor:
-  # - platform: sound_level
-  #   id: sound_level_sensor
-  #   passive: false
-  #   measurement_duration: 2000ms
-  #   rms:
-  #     name: "PDM Noise Level"
-  #     id: pdm_average_loudness
-  #     filters:
-  #       - multiply: -1
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 2000ms
+    rms:
+      name: "PDM Noise Level"
+      id: pdm_average_loudness
+      filters:
+        - multiply: -1
   - platform: internal_temperature
     name: "CPU Temperature"
     id: cpu_temperature
