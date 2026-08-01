@@ -70,7 +70,7 @@ time:
           - script.execute: lvgl_time_update
 
 lvgl:
-  buffer_size: 10%
+  buffer_size: 25%
 
 binary_sensor:
   # Call sensors from HA.
