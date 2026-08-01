@@ -1,14 +1,14 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_fire.yaml
   mbus_i2c: !include board/extension/mbus_i2c.yaml
 #  grove_i2c: !include board/extension/grove_i2c.yaml
   mbus_uart: !include board/extension/mbus_uart.yaml
-  cc1101: !include board/module/module_cc1101_wmbus.yaml
+  cc1101: !include board/module/module_cc1101_async.yaml
   air_quality: !include board/module/module_air_quality.yaml
   base_btc: !include board/module/base_btc.yaml
   env_iv: !include board/module/unit_env_iv.yaml
@@ -24,7 +24,7 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
-    entity_id: sensor.t22_temperature
+    entity_id: sensor.etg1_kjokken_temperature
   }}
 
 substitutions:
@@ -33,7 +33,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-fire-a70780
-    location: "Storage"
+    location: "Kjøkken"
     framework:
       type: esp-idf
   module:
@@ -42,10 +42,7 @@ substitutions:
     internal:
       i2c_bus: i2c_mbus
   display:
-    home_page: page_cc1101
-    page:
-      temperature:
-        area_label: T22
+    home_page: page_temperature
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -78,10 +75,10 @@ lvgl:
 binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: binary_sensor.etg2_simen_occupancy
+    entity_id: binary_sensor.etg1_kjokken_occupancy
     id: presence1
   - platform: homeassistant
-    entity_id: binary_sensor.etg2_gang_occupancy
+    entity_id: binary_sensor.etg1_stue_occupancy
     id: presence2
   # Turn on display while room is occupied
   - id: !extend presence_detected
