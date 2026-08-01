@@ -42,7 +42,7 @@ esphome:
             value: !lambda "return id(cc1101_symbol_rate).state;"
         - cc1101.set_output_power:
             # Safely converts the restored select string into a float
-            value: !lambda "return std::stof(id(cc1101_output_power).state);"
+            value: !lambda "return std::stof(id(cc1101_output_power).current_option());"
         - if:
             condition:
               select.is:
@@ -329,7 +329,7 @@ select:
               id: lbl_tx_power_value
               text:
                 format: "%s"
-                args: [ 'x' ]
+                args: [ 'x.c_str()' ]
 
   # Change modulation type from Home Assistant
   - platform: template
@@ -395,7 +395,7 @@ select:
               id: lbl_modulation_value
               text:
                 format: "%s"
-                args: [ 'x' ]
+                args: [ 'x.c_str()' ]
 
   # Change RX attenuation from Home Assistant
   - platform: template

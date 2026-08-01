@@ -37,8 +37,8 @@ font: !include
     screen_width: 240
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 320 - (2 * 32) - (2 * 2) = 252
-    usable_screen_height: 252
+    # 320 - (2 * 33) - (2 * 2) = 250
+    usable_screen_height: 250
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
     # 240 - (2 * 2) = 236

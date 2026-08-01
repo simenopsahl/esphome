@@ -23,6 +23,9 @@ logger:
   logs:
     sensor.dual_kmeter: DEBUG
 
+api:
+  reboot_timeout: 45m
+
 globals:
   # Stores the dynamic minimum (Coldest recorded temperature)
   - id: tank_dynamic_min
@@ -263,7 +266,7 @@ script:
     screen_width: 320
     # Calculate the usable height for the page content area
     # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 32) - (2 * 1) = 170
+    # 240 - (2 * 33) - (2 * 1) = 170
     usable_screen_height: 170
     # Calculate the usable width for the page content area
     # (screen_width - (2 * container_pad))
@@ -280,9 +283,9 @@ script:
   
   - &dual_kmeter_styles
     # Tank Graphic Dimensions
-    tank_width: 100
-    tank_height: 170
-    tank_radius: 34
+    tank_width: 110
+    tank_height: 166
+    tank_radius: 38
     # Bar widget limits (must be whole numbers)
     tank_temp_min: ${module.tank_temp_min}
     tank_temp_max: ${module.tank_temp_max}

@@ -42,7 +42,7 @@ select:
       - lambda: |-
           id(uart_mbus).flush();
           uint32_t new_baud_rate = stoi(x);
-          ESP_LOGD("change_baud_rate", "Changing baud rate from %i to %i",id(uart_mbus).get_baud_rate(), new_baud_rate);
+          ESP_LOGD("change_baud_rate", "Changing baud rate from %u to %u",id(uart_mbus).get_baud_rate(), new_baud_rate);
           if (id(uart_mbus).get_baud_rate() != new_baud_rate) {
             id(uart_mbus).set_baud_rate(new_baud_rate);
             id(uart_mbus).load_settings();

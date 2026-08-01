@@ -38,6 +38,7 @@
             - obj:
                 width: ${tank_width}
                 height: ${tank_height}
+                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 # By being a standard rigid obj, the parent's FLEX ROW will center this perfectly.
@@ -53,7 +54,7 @@
                       border_color: c_red
                       # Hot water background
                       bg_color: c_red
-                      bg_opa: 90%
+                      bg_opa: 100%
                       # Define the scale
                       min_value: ${tank_temp_min | round(32) * 10}
                       max_value: ${tank_temp_max | round(53) * 10}
@@ -62,7 +63,7 @@
                         border_width: 2
                         border_color: c_blue
                         bg_color: c_blue
-                        bg_opa: 90%
+                        bg_opa: 100%
                         radius: 0
                 
                   # 2a. Top Temp Drop Shadow (Rendered first so it sits behind)
@@ -70,17 +71,17 @@
                       id: lbl_temp_kmeter_top_shadow
                       text: "?"
                       text_font: font_xl
-                      text_color: c_black
+                      text_color: c_bg_p
                       align: TOP_MID
                       # Offset by 2 pixels
                       x: 2
                       y: 17
-                  # 2b. Top Temp (Probe 2) Main Text (Rendered second so it sits on top)
+                  # 2b. Top Temp (Probe 1) Main Text (Rendered second so it sits on top)
                   - label:
                       id: lbl_temp_kmeter_top_value
                       text: "?"
                       text_font: font_xl
-                      text_color: c_text_p
+                      text_color: c_black
                       align: TOP_MID
                       y: 15
 
@@ -89,17 +90,17 @@
                       id: lbl_temp_kmeter_bottom_shadow
                       text: "?"
                       text_font: font_xl
-                      text_color: c_black
+                      text_color: c_bg_p
                       align: BOTTOM_MID
                       # Offset by 2 pixels
                       x: 2
                       y: -13
-                  # 3b. Bottom Temp (Probe 1) Main Text (Rendered second so it sits on top)
+                  # 3b. Bottom Temp (Probe 2) Main Text (Rendered second so it sits on top)
                   - label:
                       id: lbl_temp_kmeter_bottom_value
                       text: "?"
                       text_font: font_xl
-                      text_color: c_text_p
+                      text_color: c_black
                       align: BOTTOM_MID
                       y: -15
 
@@ -119,7 +120,7 @@
                 widgets:
                   - label:
                       text: "Mix:"
-                      text_font: font_lg
+                      text_font: font_xxl
                       text_color: c_text_s
                   - obj:
                       width: SIZE_CONTENT
@@ -135,7 +136,7 @@
                         - label:
                             id: lbl_temp_kmeter_mix_value
                             text: "?"
-                            text_font: font_xxl
+                            text_font: font_hg
                             text_color: c_text_p
                         - label:
                             text: "°C"
