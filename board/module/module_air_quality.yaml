@@ -68,6 +68,13 @@ sensor:
                   format: "%.1f"
                   args: [ 'x' ]
 
+  - platform: aqi
+    name: "Air Quality Index"
+    pm_2_5: pm_25_pmsa003
+    pm_10_0: pm_10_pmsa003
+    calculation_type: AQI
+    entity_category: diagnostic
+
 .sizing:
   - &page_styles
     <<: !include ../../gui/styles/page_styles.yaml

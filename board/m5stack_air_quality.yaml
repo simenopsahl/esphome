@@ -347,6 +347,13 @@ sensor:
     address: 0x69
     update_interval: 10s
 
+  - platform: aqi
+    name: "Air Quality Index"
+    pm_2_5: pm2_5_sen55
+    pm_10_0: pm10_0_sen55
+    calculation_type: AQI
+    entity_category: diagnostic
+
 # Doens't support ADC on pin14 when WIFI is configured
   # Battery voltage
 #  - platform: adc

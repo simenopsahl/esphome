@@ -108,7 +108,7 @@ sensor:
     type: min
     id: combined_iaq_bme688
     name: "Combined IAQ BME688"
-    device_class: "aqi"
+    device_class: aqi
     state_class: "measurement"
     entity_category: diagnostic
     sources:
