@@ -29,7 +29,7 @@ packages:
 
 substitutions:
   common:
-#    log_level: DEBUG
+    log_level: WARN
 #    log_baud_rate: "115200"
   device:
     name: m5s-fire-a70780
@@ -61,6 +61,7 @@ wifi:
 logger:
   logs:
     pmsx003: DEBUG
+    sensor.pmsx003: DEBUG
 
 uart:
   - id: !extend uart_mbus
