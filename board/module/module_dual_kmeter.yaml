@@ -13,10 +13,10 @@ substitutions:
     # As the bottom probe cools, the red indicator shrinks upwards to reveal cold water (blue).
     
     # tank_temp_min: The coldest the bottom probe gets
-    tank_temp_min: "32.0" # Heavy usage dip
+    tank_temp_min: "25.0" # Heavy usage dip
     
     # tank_temp_max: The hottest the bottom probe gets
-    tank_temp_max: "53.0" # Normal resting temp
+    tank_temp_max: "58.0" # Normal resting temp
 
 # Enable logging for this component
 logger:
@@ -30,11 +30,11 @@ globals:
   # Stores the dynamic minimum (Coldest recorded temperature)
   - id: tank_dynamic_min
     type: float
-    initial_value: "32.0"
+    initial_value: "25.0"
   # Stores the dynamic maximum (Hottest recorded temperature)
   - id: tank_dynamic_max
     type: float
-    initial_value: "53.0"
+    initial_value: "58.0"
 
 external_components:
   - source: github://m5stack/esphome-yaml/components
@@ -154,6 +154,28 @@ sensor:
     #             format: "%.1f"
     #             args: [ 'x' ]
 
+# A template sensor so you can actually see the baseline on a graph in Home Assistant
+  - platform: template
+    id: sensor_tank_dynamic_max
+    name: "Tank Dynamic Max"
+    device_class: "temperature"
+    state_class: "measurement"
+    unit_of_measurement: "°C"
+    entity_category: "diagnostic"
+    disabled_by_default: true
+    lambda: |-
+      return id(tank_dynamic_max);
+  - platform: template
+    id: sensor_tank_dynamic_min
+    name: "Tank Dynamic Min"
+    device_class: "temperature"
+    state_class: "measurement"
+    unit_of_measurement: "°C"
+    entity_category: "diagnostic"
+    disabled_by_default: true
+    lambda: |-
+      return id(tank_dynamic_min);
+
 script:
   - id: update_tank_dynamic_min
     parameters:
@@ -170,8 +192,11 @@ script:
             float current = current_temp;
             float baseline = id(tank_dynamic_min);
             float diff = current - baseline;
-            // Colder: snap immediately. Warmer: drift up by 1%
-            return (diff < 0) ? current : (baseline + (diff * 0.01));
+            // Colder: snap immediately. Warmer: drift up by 0.1%
+            return (diff < 0) ? current : (baseline + (diff * 0.001));
+      - sensor.template.publish:
+          id: sensor_tank_dynamic_min
+          state: !lambda "return id(tank_dynamic_min);"
 
   - id: update_tank_dynamic_max
     parameters:
@@ -188,8 +213,11 @@ script:
             float current = current_temp;
             float baseline = id(tank_dynamic_max);
             float diff = current - baseline;
-            // Hotter: snap immediately. Colder: drift down by 1%
-            return (diff > 0) ? current : (baseline + (diff * 0.01));
+            // Hotter: snap immediately. Colder: drift down by 0.1%
+            return (diff > 0) ? current : (baseline + (diff * 0.001));
+      - sensor.template.publish:
+          id: sensor_tank_dynamic_max
+          state: !lambda "return id(tank_dynamic_max);"
 
   - id: update_tank_top
     parameters:

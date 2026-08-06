@@ -104,7 +104,7 @@ cc1101:
   # Hardware settings
   cs_pin: ${pin.ext.mbus.p21}
   gdo0_pin:
-    number: ${pin.ext.mbus.p22}
+    number: ${pin.ext.mbus.p20}
     allow_other_uses: true
 #  gdo2_pin: ${pin.ext.mbus.p2}
   # General settings
@@ -124,7 +124,7 @@ cc1101:
 remote_transmitter:
   id: rf_tx
   pin:
-    number: ${pin.ext.mbus.p22}  # Must match GDO0
+    number: ${pin.ext.mbus.p20}  # Must match GDO0
     allow_other_uses: true
   carrier_duty_percent: 100%
   on_transmit:

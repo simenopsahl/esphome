@@ -21,7 +21,7 @@ uart:
 
 select:
   - id: uart_mbus_baud_rate
-    name: Baud rate
+    name: mBUS Baud rate
     platform: template
     options:
       - "2400"

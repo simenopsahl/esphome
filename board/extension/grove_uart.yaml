@@ -12,7 +12,7 @@ uart:
 
 select:
   - id: uart_grove_baud_rate
-    name: Baud rate
+    name: Grove Baud rate
     platform: template
     options:
       - "2400"

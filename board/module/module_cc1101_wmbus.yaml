@@ -50,7 +50,7 @@ wmbus_radio:
 # cs_pin: SPI chip select pin
   cs_pin: ${pin.ext.mbus.p21}
 # irq_pin: Interrupt pin (GDO0)
-  irq_pin: ${pin.ext.mbus.p22}
+  irq_pin: ${pin.ext.mbus.p20}
 # frequency (Optional): Operating frequency, 300–928 MHz. Defaults to 868.950 MHz
   frequency: ${module.cc1101.frequency}
   on_frame:

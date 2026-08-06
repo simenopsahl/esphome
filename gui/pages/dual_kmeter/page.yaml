@@ -32,6 +32,7 @@
             flex_flow: ROW
             flex_align_main: SPACE_EVENLY
             flex_align_cross: CENTER
+            flex_align_track: CENTER
           widgets:
             # --- The Water Tank Graphic ---
             # Wrapped in a transparent obj to isolate the layout engine
@@ -119,7 +120,7 @@
                   pad_row: 10
                 widgets:
                   - label:
-                      text: "Mix:"
+                      text: "Mix"
                       text_font: font_xxl
                       text_color: c_text_s
                   - obj:
