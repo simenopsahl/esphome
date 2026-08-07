@@ -70,20 +70,10 @@ display:
     dimensions: 16x2
     update_interval: 5s
     lambda: |-
-      // Print 0 at the top left
-      it.print("0");
-
-      // Print 1 at the second row and second column.
-      it.print(1, 1, "1");
-
-      // Let's write a sensor value (let's assume it's 42.1)
-      it.printf("%.1f", id(cpu_temperature).state);
-      // Result: "42.1" (the dot will appear on the segment showing "2")
-
-      // Print a right-padded sensor value with 0 digits after the decimal
-      it.printf("Sensor value: %8.0f", id(cpu_temperature).state);
-      // Result: "Sensor value:       42"
+      // Print a right-padded sensor value with 1 digits after the decimal
+      it.printf(0, 0, "CPU: %8.1f", id(cpu_temperature).state);
+      // Result: "CPU:       42.6"
 
       // Print the current time
-      it.strftime("It is %H:%M on %d.%m.%Y", id(time_homeassistant).now());
-      // Result for 10:06 on august 21st 2018 -> "It is 10:06 on 21.08.2018"
+      it.strftime(0, 1, "%H:%M - %d.%m.%Y", id(time_homeassistant).now());
+      // Result for 10:06 on august 21st 2018 -> "10:06 - 21.08.2018"
