@@ -42,6 +42,8 @@ output:
   - platform: ledc
     id: flash_led_output
     pin: ${pin.ext.h2.p17}
+    min_power: 0.15
+    zero_means_zero: true
 
 fan:
   - platform: speed
@@ -64,6 +66,7 @@ light:
 display:
   - platform: lcd_pcf8574
     id: display_lcd
+    address: 0x27
     dimensions: 16x2
     update_interval: 5s
     lambda: |-
