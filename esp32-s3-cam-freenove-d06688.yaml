@@ -39,6 +39,8 @@ output:
     id: fan_output
     pin: ${pin.ext.h2.p5}
     max_power: 0.75
+    min_power: 0.1
+    zero_means_zero: true
   # led output
   - platform: ledc
     id: flash_led_output
