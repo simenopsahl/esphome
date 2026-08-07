@@ -58,11 +58,11 @@ sensor:
   - platform: pulse_counter
     id: fan_rpm
     pin: ${pin.ext.h2.p6}
-#    filters:
-#      - multiply: 0.5
+    filters:
+      - multiply: 0.36
 #      - lambda: |-
 #          if (x <= 9900) return x;
-#          else return 0;
+#          else return 9900;
 #      - lambda: |-
 #          if (x >= 8500) return x;
 #          else return 0;
