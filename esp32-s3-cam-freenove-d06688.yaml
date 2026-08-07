@@ -81,7 +81,7 @@ light:
     output: flash_led_output
     id: flash_led_light
     name: "Flash LED"
-    default_transition_length: 200ms
+    default_transition_length: 500ms
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
 
