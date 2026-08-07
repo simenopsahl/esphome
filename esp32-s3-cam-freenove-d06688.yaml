@@ -60,12 +60,12 @@ sensor:
     pin: ${pin.ext.h2.p6}
     filters:
       - multiply: 0.5
-      - lambda: |-
-          if (x <= 9900) return x;
-          else return 0;
-      - lambda: |-
-          if (x >= 8500) return x;
-          else return 0;
+#      - lambda: |-
+#          if (x <= 9900) return x;
+#          else return 0;
+#      - lambda: |-
+#          if (x >= 8500) return x;
+#          else return 0;
     count_mode:
       rising_edge: INCREMENT
       falling_edge: DISABLE
@@ -92,8 +92,8 @@ display:
       // Result: "CPU:42"
       
       // Print a sensor value with 0 digits after the decimal
-      it.printf(0, 0, "  FAN:%4.0f", id(fan_rpm).state);
-      // Result: "FAN:8500"
+      it.printf(5, 0, "  FAN:%4.0f", id(fan_rpm).state);
+      // Result: "  FAN:8500"
       
       // Result: "CPU:42  FAN:8500"
 
