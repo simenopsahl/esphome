@@ -92,7 +92,7 @@ display:
       // Result: "CPU:42"
       
       // Print a sensor value with 0 digits after the decimal
-      it.printf(5, 0, "  FAN:%4.0f", id(fan_rpm).state);
+      it.printf(6, 0, "  FAN:%4.0f", id(fan_rpm).state);
       // Result: "  FAN:8500"
       
       // Result: "CPU:42  FAN:8500"
