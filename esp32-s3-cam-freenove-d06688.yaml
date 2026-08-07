@@ -87,10 +87,16 @@ display:
     dimensions: 16x2
     update_interval: 5s
     lambda: |-
-      // Print a right-padded sensor value with 1 digits after the decimal
-      it.printf(0, 0, "CPU: %8.1f", id(cpu_temperature).state);
-      // Result: "CPU:       42.6"
+      // Print a sensor value with 0 digits after the decimal
+      it.printf(0, 0, "CPU:%.0f", id(cpu_temperature).state);
+      // Result: "CPU:42"
+      
+      // Print a sensor value with 0 digits after the decimal
+      it.printf(0, 0, "  FAN:%4.0f", id(fan_rpm).state);
+      // Result: "FAN:8500"
+      
+      // Result: "CPU:42  FAN:8500"
 
       // Print the current time
-      it.strftime(0, 1, "%H:%M - %d.%m", id(time_homeassistant).now());
-      // Result for 10:06 on august 21st -> "10:06 - 21.08"
+      it.strftime(0, 1, " %H:%M    %d.%m ", id(time_homeassistant).now());
+      // Result for 10:06 on august 21st -> " 10:06  21.08 "
