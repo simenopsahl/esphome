@@ -75,5 +75,5 @@ display:
       // Result: "CPU:       42.6"
 
       // Print the current time
-      it.strftime(0, 1, "%H:%M - %d.%m.%Y", id(time_homeassistant).now());
-      // Result for 10:06 on august 21st 2018 -> "10:06 - 21.08.2018"
+      it.strftime(0, 1, "%H:%M - %d.%m", id(time_homeassistant).now());
+      // Result for 10:06 on august 21st -> "10:06 - 21.08"
