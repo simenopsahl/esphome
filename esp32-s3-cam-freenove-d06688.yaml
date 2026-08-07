@@ -65,6 +65,7 @@ display:
   - platform: lcd_pcf8574
     id: display_lcd
     dimensions: 16x2
+    update_interval: 5s
     lambda: |-
       // Print 0 at the top left
       it.print("0");
