@@ -41,7 +41,7 @@ output:
   # led output
   - platform: ledc
     id: flash_led_output
-    pin: ${pin.ext.h2.p14}
+    pin: ${pin.ext.h2.p17}
 
 fan:
   - platform: speed
