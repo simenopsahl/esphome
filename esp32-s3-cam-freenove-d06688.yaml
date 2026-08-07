@@ -53,6 +53,21 @@ fan:
     speed_count: 5
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
+
+sensor:
+  - platform: pulse_counter
+    id: fan_rpm
+    pin: ${pin.ext.h2.p6}
+    filters:
+      - multiply: 0.5
+      - lambda: |-
+          if (x <= 9900) return x;
+      - lambda: |-
+          if (x >= 8500) return x;
+    count_mode:
+      rising_edge: INCREMENT
+      falling_edge: DISABLE
+    update_interval: 30s
     
 light:
   - platform: monochromatic
