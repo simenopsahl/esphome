@@ -51,7 +51,7 @@ fan:
     output: fan_output
     id: fan_speed
     name: "Cooling Fan"
-    speed_count: 5
+#    speed_count: 5
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
 
