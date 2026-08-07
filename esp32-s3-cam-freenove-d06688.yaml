@@ -62,8 +62,10 @@ sensor:
       - multiply: 0.5
       - lambda: |-
           if (x <= 9900) return x;
+          else return 0;
       - lambda: |-
           if (x >= 8500) return x;
+          else return 0;
     count_mode:
       rising_edge: INCREMENT
       falling_edge: DISABLE
