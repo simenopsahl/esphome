@@ -38,6 +38,7 @@ output:
   - platform: ledc
     id: fan_output
     pin: ${pin.ext.h2.p5}
+    max_power: 0.75
   # led output
   - platform: ledc
     id: flash_led_output
