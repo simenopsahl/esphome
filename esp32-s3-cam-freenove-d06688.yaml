@@ -10,7 +10,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: freenove-esp32s3-cam-74f5d4
+    name: esp32-s3-cam-freenove-74f5d4
     location: "Storage"
     framework:
       type: esp-idf
