@@ -76,9 +76,16 @@ display:
       it.printf(0, 0, "CPU:%.0f", id(cpu_temperature).state);
       // Result: "CPU:42"
       
-      // Print a sensor value with 0 digits after the decimal
-      it.printf(6, 0, "   FAN:%3.0f", id(fan_speed).speed);
-      // Result: "   FAN:100"
+      if (id(fan_speed).state) {
+        // Fan is ON, do something here
+        // Print a sensor value with 0 digits after the decimal
+        it.printf(6, 0, "   FAN:%3.0f", id(fan_speed).speed);
+        // Result: "   FAN:100"
+      } else {
+        // Fan is OFF, do something else here
+        // Print static text.
+        it.print(6, 0, "   FAN:Off");
+      }
       
       // Result: "CPU:42  FAN:8500"
 
