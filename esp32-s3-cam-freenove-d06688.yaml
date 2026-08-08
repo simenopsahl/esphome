@@ -45,7 +45,7 @@ output:
   - platform: ledc
     id: flash_led_output
     pin: ${pin.ext.h2.p17}
-    frequency: 4882Hz
+    frequency: 1220Hz
     min_power: 0.05
     zero_means_zero: true
 
