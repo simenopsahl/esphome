@@ -54,7 +54,7 @@ fan:
     output: fan_output
     id: fan_speed
     name: "Cooling Fan"
-#    speed_count: 10
+    speed_count: 10
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
     
@@ -81,7 +81,7 @@ display:
       if (id(fan_speed).state) {
         // Fan is ON, do something here
         // Print a sensor value with 0 digits after the decimal
-        it.printf(6, 0, "   FAN:%3.0f", id(fan_speed).speed);
+        it.printf(6, 0, "   FAN:%3d", id(fan_speed).speed);
         // Result: "   FAN:100"
       } else {
         // Fan is OFF, do something else here
