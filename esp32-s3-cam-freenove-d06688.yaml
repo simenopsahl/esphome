@@ -81,12 +81,12 @@ display:
       if (id(fan_speed).state) {
         // Fan is ON, do something here
         // Print a sensor value with 0 digits after the decimal
-        it.printf(6, 0, "   FAN:%3d", id(fan_speed).speed);
-        // Result: "   FAN:100"
+        it.printf(6, 0, "    FAN:%2d", id(fan_speed).speed);
+        // Result: "    FAN:10"
       } else {
         // Fan is OFF, do something else here
         // Print static text.
-        it.print(6, 0, "   FAN:Off");
+        it.print(6, 0, "    FAN:Av");
       }
       
       // Result: "CPU:42  FAN:8500"
