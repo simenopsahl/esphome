@@ -38,9 +38,7 @@ output:
   - platform: ledc
     id: fan_output
     pin: ${pin.ext.h2.p5}
-    max_power: 0.75
-    min_power: 0.15
-    zero_means_zero: true
+    frequency: 1220Hz
   # led output
   - platform: ledc
     id: flash_led_output
@@ -54,29 +52,9 @@ fan:
     output: fan_output
     id: fan_speed
     name: "Cooling Fan"
-    speed_count: 10
+#    speed_count: 10
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
-
-sensor:
-  - platform: pulse_counter
-    id: fan_rpm
-    pin:
-      number: ${pin.ext.h2.p6}
-      mode: INPUT_PULLUP
-    count_mode:
-      rising_edge: INCREMENT
-      falling_edge: DISABLE
-    filters:
-      - multiply: 0.5
-#      - lambda: |-
-#          if (x <= 9900) return x;
-#          else return 9900;
-#      - lambda: |-
-#          if (x >= 8500) return x;
-#          else return 0;
-    unit_of_measurement: RPM
-    update_interval: 10s
     
 light:
   - platform: monochromatic
@@ -99,8 +77,8 @@ display:
       // Result: "CPU:42"
       
       // Print a sensor value with 0 digits after the decimal
-      it.printf(6, 0, "  FAN:%4.0f", id(fan_rpm).state);
-      // Result: "  FAN:8500"
+      it.printf(6, 0, "   FAN:%3.0f", id(fan_speed).speed);
+      // Result: "   FAN:100"
       
       // Result: "CPU:42  FAN:8500"
 
