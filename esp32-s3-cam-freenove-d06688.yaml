@@ -91,9 +91,9 @@ display:
       it.set_intensity(id(brightness_7segment).state);
       
       // Print the current time
-      it.print("    ");
-      it.strftime("%H.%M", id(time_homeassistant).now());
-      // Result for 10:06 -> "10.06"
+      it.print("        ");
+      it.strftime(1, "%H.%M.%S", id(time_homeassistant).now());
+      // Result for 10:06:36 -> " 10.06.36 "
   
   - platform: lcd_pcf8574
     id: display_lcd
