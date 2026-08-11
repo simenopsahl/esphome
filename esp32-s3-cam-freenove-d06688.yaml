@@ -81,7 +81,7 @@ number:
 display:
   - platform: max7219
     id: display_7segment
-    cs_pin: ${pin.ext.h1.p19}
+    cs_pin: ${pin.ext.h2.p12}
     num_chips: 2
     update_interval: 1s
     lambda: |-
