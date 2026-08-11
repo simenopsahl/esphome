@@ -92,7 +92,7 @@ display:
 
       // Change the display intnsity based on another id.
       // Value should be from 0-15.
-      it.set_intensity(id(brightness_7segment));
+      it.set_intensity(id(brightness_7segment).state);
   
   - platform: lcd_pcf8574
     id: display_lcd
