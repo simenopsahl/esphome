@@ -83,7 +83,7 @@ display:
     id: display_7segment
     cs_pin: ${pin.ext.h2.p7}
     intensity: 5
-    num_chips: 2
+    num_chips: 1
     update_interval: 1s
     lambda: |-
       // Change the display intnsity based on another id.
@@ -91,9 +91,9 @@ display:
       it.set_intensity(id(brightness_7segment).state);
       
       // Print the current time
-      it.print("        ");
-      it.strftime(1, "%H.%M.%S", id(time_homeassistant).now());
-      // Result for 10:06:42 -> " 10.06.42 "
+      it.print("    ");
+      it.strftime("%H.%M", id(time_homeassistant).now());
+      // Result for 10:06 -> "10.06"
   
   - platform: lcd_pcf8574
     id: display_lcd
