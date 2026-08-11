@@ -74,7 +74,7 @@ number:
     min_value: 0
     max_value: 15
     optimistic: true
-    initial_value: 15
+    initial_value: 5
     name: "7-segment brightness"
     entity_category: config
 
@@ -82,6 +82,7 @@ display:
   - platform: max7219
     id: display_7segment
     cs_pin: ${pin.ext.h2.p16}
+    intensity: 5
     num_chips: 2
     update_interval: 1s
     lambda: |-
