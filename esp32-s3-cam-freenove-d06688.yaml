@@ -67,7 +67,33 @@ light:
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
 
+number:
+  - platform: template
+    id: brightness_7segment
+    step: 1
+    min_value: 0
+    max_value: 15
+    optimistic: true
+    initial_value: 15
+    name: "7-segment brightness"
+    entity_category: config
+
 display:
+  - platform: max7219
+    id: display_7segment
+    cs_pin: ${pin.ext.h2.p10}
+    num_chips: 2
+    update_interval: 1s
+    lambda: |-
+      // Print the current time
+      it.print("        ");
+      it.strftime(1, "%H.%M.%S", id(time_homeassistant).now());
+      // Result for 10:06:42 -> " 10.06.42 "
+
+      // Change the display intnsity based on another id.
+      // Value should be from 0-15.
+      it.set_intensity(id(brightness_7segment));
+  
   - platform: lcd_pcf8574
     id: display_lcd
     address: 0x27
