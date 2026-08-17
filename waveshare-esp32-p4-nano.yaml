@@ -53,6 +53,8 @@ esp32:
       execute_from_psram: true
       enable_idf_experimental_features: true
     type: ${device.framework.type}
+    sdkconfig_options:
+      CONFIG_ESP32P4_REV_MIN_301: "y"
 
 logger:
   hardware_uart: UART0
