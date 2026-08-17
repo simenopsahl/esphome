@@ -71,6 +71,18 @@ preferences:
 http_request:  # Needed by esp32_hosted-update and any JSON stuff
   buffer_size_rx: 2048
 
+esp_ldo:
+  - id: ldo_flash_power
+    channel: 1
+    voltage: passthrough
+    allow_internal_channel: true
+  - id: ldo_dsi_power
+    channel: 3
+    voltage: 2.5V
+  - id: ldo_sd_power
+    channel: 4
+    voltage: 2.7V
+
 # Network hardware
 esp32_hosted:
   active_high: true
