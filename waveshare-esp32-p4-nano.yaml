@@ -1,0 +1,53 @@
+# Board: Waveshare ESP32-P4-Nano (Waveshare)
+# Definition: definitions/boards/waveshare_esp32_p4_nano/manifest.yaml
+
+esphome:
+  name: waveshare-esp32-p4-nano
+  friendly_name: waveshare-esp32-p4-nano
+
+esp32:
+  variant: esp32p4
+  engineering_sample: true
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: UART0
+
+api:
+  encryption:
+    key: "f44tFBUGD0ZOnfDZhWBeBPTD+qjMRs3GN2N2TSjUsHU="
+
+ota:
+  - platform: esphome
+
+esp32_hosted:
+  active_high: true
+  clk_pin: GPIO18
+  cmd_pin: GPIO19
+  d0_pin: GPIO14
+  d1_pin: GPIO15
+  d2_pin: GPIO16
+  d3_pin: GPIO17
+  reset_pin: GPIO54
+  type: sdio
+  variant: ESP32C6
+
+ethernet:
+  clk:
+    mode: CLK_EXT_IN
+    pin: GPIO50
+  mdc_pin: GPIO31
+  mdio_pin: GPIO52
+  phy_addr: 1
+  power_pin: GPIO51
+  type: IP101
+
+http_request:
+
+update:
+  - platform: esp32_hosted
+    type: http
+    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
+    name: C6 Firmware
