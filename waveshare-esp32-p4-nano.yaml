@@ -67,10 +67,16 @@ http_request:  # Needed by esp32_hosted-update and any JSON stuff
   buffer_size_rx: 2048
 
 esp_ldo:
-#  - id: ldo_flash_power
-#    channel: 1
-#    voltage: passthrough
-#    allow_internal_channel: true
+  # Force stable 3.3V to the Main Flash Memory
+  - id: ldo_flash_power
+    channel: 1
+    voltage: passthrough
+    allow_internal_channel: true
+  # Force stable 3.3V to the High-Speed PSRAM
+  - id: ldo_psram_power
+    channel: 2
+    voltage: passthrough
+    allow_internal_channel: true
   - id: ldo_dsi_power
     channel: 3
     voltage: 2.5V
