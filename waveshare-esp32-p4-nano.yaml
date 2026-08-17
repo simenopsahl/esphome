@@ -52,10 +52,6 @@ esp32:
       compiler_optimization: PERF
       execute_from_psram: true
       enable_idf_experimental_features: true
-    sdkconfig_options:
-      # Memory allocation for large RGB graphics buffers
-      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
-      CONFIG_SPIRAM_USE_MALLOC: y
     type: ${device.framework.type}
 
 logger:
