@@ -62,7 +62,6 @@ logger:
   hardware_uart: UART0
 
 psram:
-  mode: hex
   speed: 200MHz
 
 preferences:
