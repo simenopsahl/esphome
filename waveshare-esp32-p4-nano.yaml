@@ -59,6 +59,10 @@ esp32:
 logger:
   hardware_uart: UART0
 
+ota:
+  - platform: esphome
+    allow_partition_access: true
+
 psram:
   speed: 200MHz
 
