@@ -49,7 +49,7 @@ esp32:
 
   toolchain: platformio
   variant: esp32p4
-#  engineering_sample: false
+  engineering_sample: false
 
   flash_size: 16MB
   cpu_frequency: 400MHz
