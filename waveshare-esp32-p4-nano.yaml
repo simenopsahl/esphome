@@ -50,7 +50,7 @@ esp32:
     type: esp-idf
 
 logger:
-  hardware_uart: USB_SERIAL_JTAG
+  hardware_uart: UART0
 
 psram:
   speed: 200MHz
