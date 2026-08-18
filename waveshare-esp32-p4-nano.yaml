@@ -53,8 +53,10 @@ esp32:
 
   flash_size: 16MB
 #  cpu_frequency: 400MHz
-#  framework:
-#    type: ${device.framework.type}
+  framework:
+    type: ${device.framework.type}
+    sdkconfig_options:
+      CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "y"
 
 #logger:
 #  hardware_uart: UART0
