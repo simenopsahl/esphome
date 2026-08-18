@@ -61,6 +61,12 @@ psram:
   speed: 200MHz
 
 wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.102
+
   use_psram: true
   enable_btm: true
   enable_rrm: true
