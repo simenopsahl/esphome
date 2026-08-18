@@ -47,7 +47,7 @@ esp32:
 #  board: esp32-p4-evboard  
 #  board: esp32-p4_r3-evboard
 
-  toolchain: platformio
+#  toolchain: platformio
   variant: esp32p4
   engineering_sample: false
 
