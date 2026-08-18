@@ -11,11 +11,24 @@ substitutions:
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
-  device:
+  device2:
     name: waveshare-p4-nano
     location: "Storage"
     framework:
       type: esp-idf
+
+      
+  extension:
+    i2c:
+      internal:
+        frequency: 400kHz
+  device:
+    model: 'Waveshare P4-Nano'
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+    name: waveshare-p4-nano
+    location: "Storage"
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -47,7 +60,7 @@ esp32:
       compiler_optimization: PERF
       execute_from_psram: true
       enable_idf_experimental_features: true
-    type: esp-idf
+    type: ${device.framework.type}
 
 logger:
   hardware_uart: UART0
