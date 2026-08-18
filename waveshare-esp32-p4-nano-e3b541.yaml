@@ -1,64 +1,30 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
-#  board: !include board/waveshare_esp32p4_nano.yaml
-  pins: !include board/pins/waveshare_esp32p4_nano.yaml
+  board: !include board/waveshare_esp32p4_nano.yaml
 
 substitutions:
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
-  device2:
+  device:
     name: waveshare-p4-nano-e3b541
     location: "Storage"
     framework:
       type: esp-idf
-
-      
-  extension:
-    i2c:
-      internal:
-        frequency: 400kHz
-  device:
-    model: 'Waveshare P4-Nano'
-    rmt_symbols_block: 48
-    framework:
-      type: esp-idf
-    name: waveshare-p4-nano
-    location: "Storage"
 
 esphome:
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
-  
-  project:
-    name: 'Waveshare.ESP32-P4-Nano'
-    version: "3.1"
 
 esp32:
-  variant: esp32p4
-  flash_size: 16MB
-  cpu_frequency: 360MHz
   framework:
     type: ${device.framework.type}
-    sdkconfig_options:
-      CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "n"
-      CONFIG_ESP32P4_REV_MIN_301: "y"
-
-logger:
-  hardware_uart: UART0
-
-ota:
-  - platform: esphome
-    allow_partition_access: true
-
-psram:
-  speed: 200MHz
 
 wifi:
   use_address: ${device.name}.local
@@ -66,26 +32,3 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.102
-
-  use_psram: true
-  enable_btm: true
-  enable_rrm: true
-
-preferences:
-  flash_write_interval: 5min
-
-http_request:  # Needed by esp32_hosted-update and any JSON stuff
-  buffer_size_rx: 2048
-
-# Network hardware
-esp32_hosted:
-  active_high: true
-  variant: ESP32C6
-  reset_pin: ${pin.int.c6_hosted.rst}
-  clk_pin: ${pin.int.c6_hosted.clk}
-  cmd_pin: ${pin.int.c6_hosted.cmd}
-  d0_pin: ${pin.int.c6_hosted.d0}
-  d1_pin: ${pin.int.c6_hosted.d1}
-  d2_pin: ${pin.int.c6_hosted.d2}
-  d3_pin: ${pin.int.c6_hosted.d3}
-  use_psram: true
