@@ -56,5 +56,5 @@ esp32:
 #  framework:
 #    type: ${device.framework.type}
 
-logger:
-  hardware_uart: UART0
+#logger:
+#  hardware_uart: UART0
