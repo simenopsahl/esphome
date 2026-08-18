@@ -12,7 +12,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device2:
-    name: waveshare-p4-nano
+    name: waveshare-p4-nano-e3b541
     location: "Storage"
     framework:
       type: esp-idf
