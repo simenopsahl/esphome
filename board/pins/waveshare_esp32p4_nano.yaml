@@ -1,0 +1,160 @@
+---
+# PINs for Waveshare ESP32-P4-NANO
+# Model:  esp32-p4 n16r32 + esp32c6
+# FLASH:  16MB
+# PSRAM:  32MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO36
+      disp_bl: GPIO23
+    int:
+      i2c:
+        sda: GPIO7
+        scl: GPIO8
+      spi:
+        clk: GPIO43
+        dat1: nc
+        dat2: nc
+        dat3: nc
+        dat4: nc
+        disp:
+          cs: nc
+        card:
+          clk: GPIO43
+          cmd: GPIO44
+          cs: GPIO42
+          d0: GPIO39
+          d1: GPIO40
+          d2: GPIO41
+          d3: GPIO42
+      c6_hosted:
+        rst: GPIO54
+        cmd: GPIO19
+        clk: GPIO18
+        d0: GPIO14
+        d1: GPIO15
+        d2: GPIO16
+        d3: GPIO17
+    
+    btn:
+      boot: GPIO35
+    
+    audio:
+      i2s_lrclk: GPIO10
+      i2s_bclk: GPIO12
+      i2s_mclk: GPIO13
+      i2s_dout: GPIO11
+      i2s_din: GPIO9
+      mic: GPIO9
+      spk: GPIO11
+      amp: GPIO53
+    
+    ext:
+      h1:
+        p1: 3v
+        p2: 5v
+        p3: GPIO7 # SDA
+        p4: 5v
+        p5: GPIO8 # SCL
+        p6: GND
+        p7: GPIO23
+        p8: GPIO37
+        p9: GND
+        p10: GPIO38
+        p11: GPIO5
+        p12: GPIO4
+        p13: GPIO20
+        p14: GND
+        P15: GPIO21
+        p16: GPIO22
+        p17: GND
+        p18: GPIO24
+        p19: GPIO25
+        p20: GND
+        p21: GPIO26
+        p22: GPIO27
+        p23: GPIO32
+        p24: GPIO33
+        p25: GND
+        p26: GPIO36
+      h2:
+        p1: 5v
+        p2: ESP_LDO
+        p3: GND
+        p4: GND
+        p5: 3v
+        p6: GPIO0
+        p7: GND
+        p8: GPIO1
+        p9: GPIO3
+        p10: GND
+        p11: GPIO2
+        p12: GPIO6
+        p13: GPIO54
+        p14: GPIO53
+        p15: GPIO47
+        p16: GPIO48
+        p17: GPIO46
+        p18: GND
+        p19: GPIO45
+        p20: C6_u0rxd
+        p21: C6_io12
+        p22: C6_u0txd
+        p23: C6_io13
+        p24: C6_io9
+        p25: GND
+        p26: GND
+
+      ethernet:
+        mdc: GPIO31
+        mdio: GPIO52
+        pwr: GPIO51
+        clk: GPIO50
+      p_out1: # Yellow straight needle 1*2 (2.54mm)
+        p1: 5v
+        p2: GND
+      p4: # Yellow straight needle 1*4 (2.54mm)
+        p1: rj12
+        p2: rj36
+        p3: rj45
+        p4: rj78
+
+      dsi:
+        p1: GND
+        p2: dsi_d1_n
+        p3: dsi_d1_p
+        p4: GND
+        p5: dsi_clk_n
+        p6: dsi_clk_p
+        p7: GND
+        p8: dsi_d0_n
+        p9: dsi_d0_p
+        p10: GND
+        p11: GPIO8 # SCL
+        p12: GPIO7 # SDA
+        p13: GND
+        p14: 3v
+        p15: 3v
+      csi:
+        p1: GND
+        p2: csi_d0_n
+        p3: csi_d0_p
+        p4: GND
+        p5: csi_d1_n
+        p6: csi_d1_p
+        p7: GND
+        p8: csi_clk_n
+        p9: csi_clk_p
+        p10: GND
+        p11: csi_io0
+        p12: csi_io1
+        p13: GPIO8 # SCL
+        p14: GPIO7 # SDA
+        p15: 3v
+
+      usb:
+        uart:
+          rx: GPIO37
+          tx: GPIO38

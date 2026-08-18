@@ -1,0 +1,90 @@
+---
+# PINs for Waveshare ESP32-S3-CAM
+# Model:  esp32-s3r8
+# FLASH:  16MB
+# PSRAM:  8MB
+# https://docs.waveshare.com/ESP32-S3-CAM-OVxxxx
+
+substitutions:
+  pin:
+    light:
+      led: 6 #EXTIO_6
+      disp_bl: EXTIO_PWM
+    int:
+      spi:
+        clk: GPIO16
+        disp:
+          clk: GPIO5
+          mosi: GPIO1
+          miso: GPIO2
+          cs: GPIO6
+          dc: GPIO3
+          quad:
+            sda0: GPIO1
+            sda1: GPIO2
+            sda2: GPIO3
+            sda3: GPIO4
+        card:
+          clk: GPIO16
+          cs: 2 # EXTIO_2
+          cmd: GPIO43
+          data: GPIO44
+      i2c:
+        sda: GPIO8
+        scl: GPIO7
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIO45
+      y3: GPIO47
+      y4: GPIO48
+      y5: GPIO46
+      y6: GPIO42
+      y7: GPIO40
+      y8: GPIO39
+      y9: GPIO21
+      vs: GPIO17
+      hs: GPIO18
+      p_clk: GPIO41
+      m_clk: GPIO38
+      rst: -1
+      pwr: 3 # EXTIO_3
+    card:
+      d0: GPIO44
+      cs: 2 # EXTIO_2
+      cmd: GPIO43
+      clk: GPIO16
+    audio:
+      i2s_lrclk: GPIO12
+      i2s_bclk: GPIO11
+      i2s_mclk: GPIO10
+      i2s_din: GPIO14
+      i2s_dati: GPIO14
+      mic: GPIO14
+      i2s_dout: GPIO13
+      i2s_dato: GPIO13
+      spk: GPIO13
+      amp: 4 # EXTIO_4
+    
+    ext:
+      i2c:
+        sda: GPIO8
+        scl: GPIO7
+      uart:
+        tx: GPIO43
+        rx: GPIO44
+      bat:
+        adc: EXTIO_ADC
+        chg: EXTIO_7
+        en: 5 # EXTIO_5
+        pwr: GPIO15
+      display:
+        rst: GPIO3
+        dc: GPIO2
+        cs: GPIO1
+      touch:
+        sda: GPIO8
+        scl: GPIO7
+        int: GPIO9
+        rst: 0 # EXTIO_0
+      spk: GPIO13

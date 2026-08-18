@@ -8,6 +8,7 @@
 # https://esphome.io/components/binary_sensor/status.html
 binary_sensor:
   - platform: status
+    id: sensor_status
     name: "Status"
     device_class: "connectivity"
     entity_category: diagnostic

@@ -1,14 +1,14 @@
-labels: [esp32s3, psram, camera]
+labels: [esp32s3, psram]
 ---
 
 # Pins for this model
 packages:
-  pins: !include pins/esp32s3_cam_n16r8_freenove.yaml
+  pins: !include pins/seeed_xiao_esp32s3.yaml
   i2c: !include extension/internal_i2c.yaml
 
 substitutions:
   device:
-    model: "Freenove S3-Cam"
+    model: "Seeed XIAO ESP32S3"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -29,7 +29,7 @@ substitutions:
 esp32:
 # ESP32-S3 WROOM N16R8
   variant: esp32s3
-  flash_size: 16MB
+  flash_size: 8MB
   cpu_frequency: 240MHz
   watchdog_timeout: 10s
   framework: 
@@ -60,11 +60,8 @@ esp32:
 
 esphome:
   project:
-    name: "Freenove.ESP32-S3-CAM"
+    name: "Seeed.XIAO ESP32-S3"
     version: "1.0.0"
-
-logger:
-  hardware_uart: UART0
 
 psram:
   mode: octal
@@ -81,44 +78,17 @@ spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
 
-light:
-  - platform: esp32_rmt_led_strip
-    id: rgb_led
-    rgb_order: GRB
-    pin: ${pin.light.rgb}
-    num_leds: 1
-    rmt_symbols: ${device.rmt_symbols_block}
-    chipset: ws2812
-    color_correct: [75%, 75%, 75%]
-    effects:
-      - pulse:
-      - strobe:
-      - strobe:
-          name: "Slow Blink" # 200ms on, 1500ms off
-          colors:
-            - state: true
-              brightness: 25%
-              red: 100%
-              green: 0%
-              blue: 0%
-              duration: 500ms
-              transition_length: 500ms
-            - state: false
-              duration: 2000ms
-              transition_length: 1000ms
-    default_transition_length: 100ms
-    initial_state:
-      state: true
-      brightness: 50%
-      color_brightness: 100%
-      red: 100%
-      green: 0%
-      blue: 0%
-    name: "RGB LED"
-    entity_category: config
+i2c:
+# Cam
+  - id: i2c_cam
+    sda: ${pin.cam.sda}
+    scl: ${pin.cam.scl}
+    frequency: ${extension.i2c.internal.frequency}
+#    timeout: 5ms
+    scan: true
 
 esp32_camera:
-  i2c_id: i2c_internal
+  i2c_id: i2c_cam
   # PINS
   external_clock:
     pin: ${pin.cam.m_clk}

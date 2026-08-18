@@ -1,0 +1,38 @@
+---
+# https://www.wemos.cc/en/latest/d1/d1_mini.html
+# PINs for ESP8266 Lolin D1 Mini
+# Model:  ESP8266EX
+# Flash:  4MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO2
+    int:
+      i2c:
+        sda: GPIO4
+        scl: GPIO5
+      spi:
+        clk: GPIO14
+        miso: GPIO12
+        mosi: GPIO13
+
+    ext:
+      h1:
+        p1: rst
+        p2: a0
+        p3: GPIO16
+        p4: GPIO14
+        p5: GPIO12
+        p6: GPIO13
+        p7: GPIO15
+        p8: 3v
+      h2:
+        p1: tx
+        p2: rx
+        p3: GPIO5 # SCL
+        p4: GPIO4 # SDA
+        p5: GPIO0
+        p6: GPIO2
+        p7: GND
+        p8: 5v

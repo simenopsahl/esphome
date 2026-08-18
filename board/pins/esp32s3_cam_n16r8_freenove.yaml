@@ -40,9 +40,6 @@ substitutions:
       pwr: -1
     card:
       d0: GPIO40
-      d1: GPIO41
-      d2: GPIO14
-      d3: GPIO47
       cs: GPIO38
       cmd: GPIO38
       clk: GPIO39
@@ -79,9 +76,9 @@ substitutions:
         p7: GPIO40
         p8: GPIO39
         p9: GPIO38
-        p10: GPIO37
-        p11: GPIO36
-        p12: GPIO35
+        p10: GPIO37 # PSRAM
+        p11: GPIO36 # PSRAM
+        p12: GPIO35 # PSRAM
         p13: GPIO0
         p14: GPIO45
         p15: GPIO48

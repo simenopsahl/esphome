@@ -1,13 +1,14 @@
-labels: [esp32p4, psram, JC4880P443, display, i2c]
+labels: [esp32p4, psram, i2c, ethernet, mipi_csi, mipi_dsi]
 ---
-# https://github.com/agillis/esphome-modular-lvgl-buttons/blob/main/example_code/guition-esp32-p4-jc4880p443-display_modular.yaml
+# https://docs.waveshare.com/ESP32-P4-NANO
+# https://www.waveshare.com/wiki/ESP32-P4-Nano-StartPage
 # Base functions for:
-# Guition module ESP32-P4 & ESP32-C6 with 4.3" display and camera (JC4880P443C_I_W_Y)
+# Waveshare ESP32-P4-NANO
 #
   
 # Pins for this model
 packages:
-  pins: !include pins/jc4880p443ciwy.yaml
+  pins: !include pins/waveshare_esp32p4_nano.yaml
   i2c_int: !include extension/internal_i2c.yaml
 
 substitutions:
@@ -16,21 +17,21 @@ substitutions:
       internal:
         frequency: 400kHz
   device:
-    model: 'Guition 4,3"'
+    model: 'Waveshare P4-Nano'
     rmt_symbols_block: 48
     framework:
       type: esp-idf
 
 esphome:
   project:
-    name: 'Guition.4,3" 480x800'
-    version: "1.0.0"
+    name: 'Waveshare.ESP32-P4-Nano'
+    version: "3.1"
 
 esp32:
-# ESP32-P4R32 (Dual-core, 360MHz)
+# ESP32-P4R32
 # PSRAM: 32MB
   variant: esp32p4
-  engineering_sample: true
+#  engineering_sample: false
   flash_size: 16MB
   cpu_frequency: 360MHz
   framework:
@@ -39,17 +40,19 @@ esp32:
       execute_from_psram: true
       enable_idf_experimental_features: true
     sdkconfig_options:
-      # Memory allocation for large RGB graphics buffers
-      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
-      CONFIG_SPIRAM_USE_MALLOC: y
+      CONFIG_ESP32P4_REV_MIN_301: "y"
+      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"
+      CONFIG_SDMMC_HOST_DEFAULT: "y"
     type: ${device.framework.type}
 
-esp_ldo:
-  - channel: 3
-    voltage: 2.5V
+logger:
+  hardware_uart: UART0
+
+ota:
+  - platform: esphome
+    allow_partition_access: true
 
 psram:
-  mode: hex
   speed: 200MHz
 
 wifi:
@@ -62,6 +65,27 @@ preferences:
 
 http_request:  # Needed by esp32_hosted-update and any JSON stuff
   buffer_size_rx: 2048
+
+esp_ldo:
+# Tried with and without these settings
+  # Force stable 3.3V to the Main Flash Memory
+  - id: ldo_flash_power
+    channel: 1
+    voltage: passthrough
+    allow_internal_channel: true
+  # Force stable 3.3V to the High-Speed PSRAM
+  - id: ldo_psram_power
+    channel: 2
+    voltage: passthrough
+    allow_internal_channel: true
+
+# Display not connected, SD card not used
+#  - id: ldo_dsi_power
+#    channel: 3
+#    voltage: 2.5V
+#  - id: ldo_sd_power
+#    channel: 4
+#    voltage: 2.7V
 
 # Network hardware
 esp32_hosted:
@@ -76,6 +100,17 @@ esp32_hosted:
   d3_pin: ${pin.int.c6_hosted.d3}
   use_psram: true
 
+# Not usable alongside WiFI
+#ethernet:
+#  type: IP101
+#  mdc_pin: ${pin.ext.ethernet.mdc}
+#  mdio_pin: ${pin.ext.ethernet.mdio}
+#  power_pin: ${pin.ext.ethernet.pwr}
+#  clk:
+#    mode: CLK_EXT_IN
+#    pin: ${pin.ext.ethernet.clk}
+#  phy_addr: 1
+
 # Firmware update for esp32_hosted ESP32-C6
 update:
   - platform: esp32_hosted
@@ -84,85 +119,6 @@ update:
     type: http
     source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
     update_interval: 6h
-
-# Internal outputs
-output:
-  # Backlight LED
-  - platform: ledc
-    id: backlight_output
-    pin: ${pin.disp.bl}
-    frequency: 100Hz
-    inverted: false
-
-light:
-  - platform: monochromatic
-    id: backlight_light
-    output: backlight_output
-    default_transition_length: 100ms
-    restore_mode: RESTORE_AND_ON
-    initial_state:
-      state: on
-      brightness: 25%
-    name: "Backlight"
-    entity_category: config
-
-display:
-  - platform: mipi_dsi
-    id: display_lcd
-    model: JC4880P443
-    dimensions:
-      height: 800
-      width: 480
-    auto_clear_enabled: false
-    update_interval: 10s
-
-# Touchscreen
-touchscreen:
-  - platform: gt911
-    i2c_id: i2c_internal
-    id: touchscreen_gt911
-    display: display_lcd
-    reset_pin: ${pin.touch.rst}
-    transform:
-      swap_xy: false
-      mirror_x: false
-      mirror_y: false
-    on_touch:
-      - logger.log:
-          tag: "Touch"
-          level: INFO
-          format: Touch %d at (%d, %d)
-          args: [ 'touch.id', 'touch.x', 'touch.y' ]
-
-# esp32_camera:
-#   i2c_id: i2c_internal
-#   id: espcam
-#   # PINS
-#   external_clock:
-#     pin: ${pin.cam.m_clk}
-#     frequency: 20MHz
-#   data_pins:
-#     - ${pin.cam.y2}
-#     - ${pin.cam.y3}
-#     - ${pin.cam.y4}
-#     - ${pin.cam.y5}
-#     - ${pin.cam.y6}
-#     - ${pin.cam.y7}
-#     - ${pin.cam.y8}
-#     - ${pin.cam.y9}
-#   vsync_pin: ${pin.cam.vs}
-#   href_pin: ${pin.cam.hs}
-#   pixel_clock_pin: ${pin.cam.p_clk}
-#   power_down_pin: ${pin.cam.pwr}
-#   # Metadata
-#   name: "Camera OV02C10"
-#   # Image settings
-#   resolution: 640x480
-#   jpeg_quality: 20
-#   max_framerate: 5 fps
-#   frame_buffer_count: 2 # defaults to 1
-# #  vertical_flip: true
-# #  horizontal_mirror: true
 
 # Audio - speaker/mic
 i2s_audio:
@@ -234,7 +190,7 @@ switch:
   - platform: gpio
     id: speaker_enable
     pin: ${pin.audio.amp}
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ALWAYS_ON
     name: "Speaker Enable"
     icon: "mdi:volume-high"
     entity_category: config
@@ -271,12 +227,3 @@ sensor:
     icon: "mdi:thermometer"
     update_interval: 5s
     entity_category: diagnostic
-
-# Special LVGL settings required for this display
-lvgl:
-  byte_order: little_endian
-# Some screens need little_endian byte order and some need big_endian
-# this sets the byte order for all the images loaded in this file and the packages as well
-image:
-  defaults:
-    byte_order: little_endian

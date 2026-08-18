@@ -1,0 +1,101 @@
+---
+# https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/
+# PINs for Seeed Xiao ESP32S3
+# Model:  ESP32-S3R8
+# Flash:  16MB
+# PSRAM:  8MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO21
+    int:
+      i2c:
+        sda: GPIO5
+        scl: GPIO6
+      spi:
+        clk: GPIO7
+        miso: GPIO8
+        mosi: GPIO9
+      uart:
+        tx: GPIO43
+        rx: GPIO44
+    cam:
+      sda: GPIO40
+      scl: GPIO39
+      y0: nc
+      y1: nc
+      y2: GPIO15
+      y3: GPIO17
+      y4: GPIO18
+      y5: GPIO16
+      y6: GPIO14
+      y7: GPIO12
+      y8: GPIO11
+      y9: GPIO48
+      vs: GPIO38
+      hs: GPIO47
+      p_clk: GPIO13
+      m_clk: GPIO10
+      rst: -1
+      pwr: -1
+    card:
+      cs: GPIO3
+      clk: GPIO7
+    audio:
+      i2s_lrclk: GPIO40
+      i2s_bclk: GPIO39
+      i2s_mclk: GPIO42
+      i2s_din: GPIO41
+      mic: GPIO41
+
+    ext:
+      header:
+        d0: GPIO1
+        d1: GPIO2
+        d2: GPIO3
+        d3: GPIO4
+        d4: GPIO5 # SDA
+        d5: GPIO6 # SCL
+        d6: GPIO43 # uart0_tx
+        d7: GPIO44 # uart0_rx
+        d8: GPIO7 # spi0_clk
+        d9: GPIO8 # spi0_miso
+        d10: GPIO9 # spi0_mosi
+        d11: GPIO38 # i2s_sd
+        d12: GPIO39 # i2s_sck mtck
+        d13: GPIO40 # i2s_ws mtdo
+        d14: GPIO41 # pdm_data mtdi
+        d15: GPIO42 # pdm_clk mtms
+        d16: GPIO10
+        d17: GPIO13 # spi1_clk
+        d18: GPIO12 # spi1_miso
+        d19: GPIO11 # spi1_mosi
+      h1:
+        p1: GPIO1
+        p2: GPIO2
+        p3: GPIO3
+        p4: GPIO4
+        p5: GPIO5 # SDA
+        p6: GPIO6 # SCL
+        p7: GPIO43 # uart0_tx
+        p8: GPIO38 # i2s_sd
+        p9: GPIO39 # i2s_sck mtck
+        p10: GPIO40 # i2s_ws mtdo
+        p11: GPIO41 # pdm_data mtdi
+        p12: GPIO42 # pdm_clk mtms
+        p13: GPIO10
+      h2:
+        p1: 5v
+        p2: GND
+        p3: 3v
+        p4: GPIO9 # spi0_mosi
+        p5: GPIO8 # spi0_miso
+        p6: GPIO7 # spi0_clk
+        p7: GPIO44 # uart0_rx
+        p8: GPIO13 # spi1_clk
+        p9: GPIO12 # spi1_miso
+        p10: GPIO11 # spi1_mosi
+      sense:
+        p1: GPIO41 # jtag_mtdi
+        p2: GPIO42 # jtag_mtms

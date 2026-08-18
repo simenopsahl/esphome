@@ -21,7 +21,7 @@ sensor:
       name: "TMOS Presence Detected"
       device_class: occupancy
       filters:
-        - delayed_on_off: 1s
+        - delayed_on_off: 500ms
         - delayed_off: !lambda 'return id(tmos_off_latency).state * 1000;'
     mot_flag:
       id: sths34pf80_motion
@@ -31,7 +31,7 @@ sensor:
     motion_threshold: 200
     presence_hysteresis: 50
     motion_hysteresis: 50
-    odr: 8
+    odr: 7
     update_interval: 1s
 
 # Adjustable off delay

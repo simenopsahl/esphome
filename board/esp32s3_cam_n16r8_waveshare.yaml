@@ -1,14 +1,17 @@
 labels: [esp32s3, psram, camera]
 ---
+# https://docs.waveshare.com/ESP32-S3-CAM-OVxxxx
+# Base functions for Waveshare ESP32-S3 camera board
+#
 
 # Pins for this model
 packages:
-  pins: !include pins/esp32s3_cam_n16r8_freenove.yaml
+  pins: !include pins/esp32s3_cam_n16r8_waveshare.yaml
   i2c: !include extension/internal_i2c.yaml
 
 substitutions:
   device:
-    model: "Freenove S3-Cam"
+    model: "Waveshare S3-Cam"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -27,7 +30,7 @@ substitutions:
       wb_mode: auto
 
 esp32:
-# ESP32-S3 WROOM N16R8
+# ESP32-S3R8
   variant: esp32s3
   flash_size: 16MB
   cpu_frequency: 240MHz
@@ -60,11 +63,8 @@ esp32:
 
 esphome:
   project:
-    name: "Freenove.ESP32-S3-CAM"
+    name: "Waveshare.ESP32-S3-CAM"
     version: "1.0.0"
-
-logger:
-  hardware_uart: UART0
 
 psram:
   mode: octal
@@ -78,44 +78,23 @@ wifi:
   enable_rrm: true
 
 spi:
-  clk_pin: ${pin.int.spi.clk}
-  mosi_pin: ${pin.int.spi.mosi}
+  - id: spi_mmc
+    clk_pin: ${pin.int.spi.card.clk}
+    mosi_pin: ${pin.int.spi.card.cmd}
+    miso_pin: ${pin.int.spi.card.data}
+  - id: spi_quad
+    type: quad
+    clk_pin: ${pin.int.spi.disp.clk}
+    data_pins:
+      - ${pin.int.spi.disp.quad.sda0}
+      - ${pin.int.spi.disp.quad.sda1}
+      - ${pin.int.spi.disp.quad.sda2}
+      - ${pin.int.spi.disp.quad.sda3}
 
-light:
-  - platform: esp32_rmt_led_strip
-    id: rgb_led
-    rgb_order: GRB
-    pin: ${pin.light.rgb}
-    num_leds: 1
-    rmt_symbols: ${device.rmt_symbols_block}
-    chipset: ws2812
-    color_correct: [75%, 75%, 75%]
-    effects:
-      - pulse:
-      - strobe:
-      - strobe:
-          name: "Slow Blink" # 200ms on, 1500ms off
-          colors:
-            - state: true
-              brightness: 25%
-              red: 100%
-              green: 0%
-              blue: 0%
-              duration: 500ms
-              transition_length: 500ms
-            - state: false
-              duration: 2000ms
-              transition_length: 1000ms
-    default_transition_length: 100ms
-    initial_state:
-      state: true
-      brightness: 50%
-      color_brightness: 100%
-      red: 100%
-      green: 0%
-      blue: 0%
-    name: "RGB LED"
-    entity_category: config
+# Waveshare IO Expander
+waveshare_io_ch32v003:
+  - id: hub_ch32v003
+    i2c_id: i2c_internal
 
 esp32_camera:
   i2c_id: i2c_internal
@@ -135,6 +114,11 @@ esp32_camera:
   vsync_pin: ${pin.cam.vs}
   href_pin: ${pin.cam.hs}
   pixel_clock_pin: ${pin.cam.p_clk}
+# This variable only supports pin numbers, not full pin schemas (with inverted and mode).
+#  power_down_pin:
+#    waveshare_io_ch32v003: hub_ch32v003
+#    number: ${pin.cam.pwr}
+#    mode: OUTPUT
   # Metadata
   id: espcam
   name: "Camera"
@@ -162,10 +146,59 @@ esp32_camera:
 #  buffer_size: 524288
 #  buffer_expand_size: 2097152
 
+output:
+  # backlight output
+  - platform: waveshare_io_ch32v003
+    waveshare_io_ch32v003_id: hub_ch32v003
+    id: backlight_output
+    inverted: true  # Example: PWM is inverted on ESP32S3-Touch-LCD-7B board
+    safe_pwm_levels:
+      min_value: 1 # Example: safe level for power_supply component to work
+      max_value: 247 # Example: safe level for ESP32S3-Touch-LCD-7B board
+
+light:
+  - platform: monochromatic # backlight
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: ALWAYS_OFF
+    name: "Backlight"
+    entity_category: config
+
+switch:
+  - platform: gpio
+    id: camera_power
+    name: "Camera Power"
+    pin:
+      waveshare_io_ch32v003: hub_ch32v003
+      number: ${pin.cam.pwr}
+      mode: OUTPUT
+    restore_mode: ALWAYS_ON
+    entity_category: config
+  - platform: gpio
+    id: amp_power
+    name: "Amplifier Power"
+    pin:
+      waveshare_io_ch32v003: hub_ch32v003
+      number: ${pin.audio.amp}
+      mode: OUTPUT
+    restore_mode: DISABLED
+    entity_category: config
+
 status_led:
-  pin: ${pin.light.led}
+  pin:
+    waveshare_io_ch32v003: hub_ch32v003
+    number: ${pin.light.led}
+    mode: OUTPUT
 
 sensor:
+  - platform: waveshare_io_ch32v003
+    waveshare_io_ch32v003_id: hub_ch32v003
+    id: wave_adc
+    reference_voltage: 9.9
+    name: "Battery level"
+    entity_category: diagnostic
+
   - platform: internal_temperature
     name: "CPU Temperature"
     id: cpu_temperature

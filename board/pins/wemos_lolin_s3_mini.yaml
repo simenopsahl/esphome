@@ -1,0 +1,55 @@
+---
+# https://www.wemos.cc/en/latest/s3/s3_mini.html
+# PINs for ESP32S3 Lolin S3 Mini
+# Model:  ESP32-S3FHR2
+# Flash: 4MB
+# PSRAM: 2MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO2
+    int:
+      i2c:
+        sda: GPIO35
+        scl: GPIO36
+      spi:
+        clk: GPIO12
+        miso: GPIO13
+        mosi: GPIO11
+
+    ext:
+      h1:
+        p1: en
+        p2: GPIO1
+        p3: GPIO2
+        p4: GPIO3
+        p5: GPIO4
+        p6: GPIO5
+        p7: GPIO12
+        p8: GPIO6
+        p9: GPIO13
+        p10: GPIO7
+        p11: GPIO11
+        p12: GPIO8
+        p13: GPIO10
+        p14: GPIO9
+        p15: 3v
+        p16: GPIO14
+      h2:
+        p1: GPIO33
+        p2: GPIO43 # tx
+        p3: GPIO37
+        p4: GPIO44 # rx
+        p5: GPIO38
+        p6: GPIO36 # SCL
+        p7: GPIO34
+        p8: GPIO35 # SDA
+        p9: GPIO21
+        p10: GPIO18
+        p11: GPIO17
+        p12: GPIO16
+        p13: GND
+        p14: GND
+        p15: GPIO15
+        p16: 5v

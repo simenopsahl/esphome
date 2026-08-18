@@ -1,0 +1,54 @@
+---
+# https://www.wemos.cc/en/latest/d32/d32.html
+# PINs for ESP32 Lolin D32
+# Model:  ESP32-WROOM-32
+# Flash:  4MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO5
+    int:
+      i2c:
+        sda: GPIO21
+        scl: GPIO22
+      spi:
+        clk: GPIO18
+        miso: GPIO19
+        mosi: GPIO23
+
+    ext:
+      h1:
+        p1: 3v
+        p2: rst
+        p3: GPIO36
+        p4: GPIO39
+        p5: GPIO34
+        p6: GPIO32
+        p7: GPIO33
+        p8: GPIO25
+        p9: GPIO26
+        p10: GPIO27
+        p11: GPIO14
+        p12: GPIO12
+        p13: GPIO13
+        p14: en
+        p15: 5v
+        p16: vbat
+      h2:
+        p1: GND
+        p2: GPIO23
+        p3: GPIO22 # SCL
+        p4: GPIO1
+        p5: GPIO3
+        p6: GPIO21 # SDA
+        p7: GPIO19
+        p8: GPIO18
+        p9: GPIO5
+        p10: GPIO17
+        p11: GPIO16
+        p12: GPIO4
+        p13: GPIO0
+        p14: GPIO2
+        p15: GPIO15
+        p16: GND
