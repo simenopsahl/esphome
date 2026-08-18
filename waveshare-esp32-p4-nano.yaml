@@ -55,8 +55,6 @@ esp32:
   cpu_frequency: 400MHz
   framework:
     type: ${device.framework.type}
-    advanced:
-      enable_idf_experimental_features: true
 
 logger:
   hardware_uart: UART0
