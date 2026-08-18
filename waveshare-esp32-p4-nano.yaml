@@ -1,6 +1,6 @@
 packages:
   # --- COMMON PACKAGES ---
-#  <<: !include_dir_named common
+  <<: !include_dir_named common
 #  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
@@ -41,16 +41,7 @@ esphome:
     version: "3.1"
 
 esp32:
-#  framework:
-#    type: ${device.framework.type}
-
-#  board: esp32-p4-evboard  
-#  board: esp32-p4_r3-evboard
-
-#  toolchain: platformio
   variant: esp32p4
-#  engineering_sample: false
-
   flash_size: 16MB
   cpu_frequency: 360MHz
   framework:
@@ -59,5 +50,36 @@ esp32:
       CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "n"
       CONFIG_ESP32P4_REV_MIN_301: "y"
 
-#logger:
-#  hardware_uart: UART0
+logger:
+  hardware_uart: UART0
+
+ota:
+  - platform: esphome
+    allow_partition_access: true
+
+psram:
+  speed: 200MHz
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+preferences:
+  flash_write_interval: 5min
+
+http_request:  # Needed by esp32_hosted-update and any JSON stuff
+  buffer_size_rx: 2048
+
+# Network hardware
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  reset_pin: ${pin.int.c6_hosted.rst}
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  use_psram: true
