@@ -112,7 +112,7 @@ esp32_hosted:
   d2_pin: ${pin.int.c6_hosted.d2}
   d3_pin: ${pin.int.c6_hosted.d3}
   reset_pin: ${pin.int.c6_hosted.rst}
-  
+
 # Firmware update for esp32_hosted ESP32-C6
 update:
   - platform: esp32_hosted
