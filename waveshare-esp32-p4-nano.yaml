@@ -1,9 +1,11 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
-  board: !include board/waveshare_esp32p4_nano.yaml
+#  board: !include board/waveshare_esp32p4_nano.yaml
+  pins: !include board/pins/waveshare_esp32p4_nano.yaml
 
 substitutions:
   common:
@@ -21,6 +23,10 @@ esphome:
   friendly_name: ${device.name}
   area: ${device.location}
   
+  project:
+    name: 'Waveshare.ESP32-P4-Nano'
+    version: "1.0.0"
+  
 wifi:
   use_address: ${device.name}.local
   manual_ip: 
@@ -29,5 +35,35 @@ wifi:
     static_ip: 192.168.71.102
 
 esp32:
+#  framework:
+#    type: ${device.framework.type}
+    
+  variant: esp32p4
+#  engineering_sample: false
+  flash_size: 16MB
+  cpu_frequency: 360MHz
   framework:
-    type: ${device.framework.type}
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+      enable_idf_experimental_features: true
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+psram:
+  speed: 200MHz
+
+# Network hardware
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  reset_pin: ${pin.int.c6_hosted.rst}
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  use_psram: true
