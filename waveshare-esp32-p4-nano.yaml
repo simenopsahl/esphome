@@ -45,6 +45,7 @@ esp32:
 #    type: ${device.framework.type}
     
   board: esp32-p4-evboard
+#  variant: esp32p4
 #  engineering_sample: false
   flash_size: 16MB
   cpu_frequency: 360MHz
