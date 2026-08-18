@@ -56,10 +56,6 @@ esp32:
   flash_size: 16MB
   cpu_frequency: 360MHz
   framework:
-    advanced:
-      compiler_optimization: PERF
-      execute_from_psram: true
-      enable_idf_experimental_features: true
     type: ${device.framework.type}
 
 logger:
