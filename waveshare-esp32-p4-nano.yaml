@@ -52,7 +52,7 @@ esp32:
   engineering_sample: false
 
   flash_size: 16MB
-  cpu_frequency: 400MHz
+#  cpu_frequency: 400MHz
   framework:
     type: ${device.framework.type}
 
