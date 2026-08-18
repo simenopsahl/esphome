@@ -38,7 +38,7 @@ esphome:
   
   project:
     name: 'Waveshare.ESP32-P4-Nano'
-    version: "1.0.0"
+    version: "3.1"
 
 esp32:
 #  framework:
