@@ -55,6 +55,16 @@ esp32:
     type: ${device.framework.type}
     sdkconfig_options:
       CONFIG_ESP32P4_REV_MIN_301: "y"
+      
+      # Match Waveshare's exact factory flash parameters!
+      CONFIG_ESPTOOLPY_FLASHMODE_DIO: "y"
+      CONFIG_ESPTOOLPY_FLASHFREQ_80M: "y"
+      
+      CONFIG_ESPTOOLPY_FLASHSIZE_16MB: "y"
+      CONFIG_CACHE_L2_CACHE_256KB: "y"
+      CONFIG_CACHE_L2_CACHE_LINE_128B: "y"
+      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"
+      CONFIG_ESP_MAIN_TASK_STACK_SIZE: "10240"
 
 logger:
   hardware_uart: UART0
