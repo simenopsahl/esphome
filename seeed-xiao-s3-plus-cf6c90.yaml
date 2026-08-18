@@ -10,7 +10,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: seeed-xiao-s3-plus-74f5d4
+    name: seeed-xiao-s3-plus-cf6c90
     location: "Storage"
     framework:
       type: esp-idf
