@@ -1,6 +1,6 @@
 packages:
   # --- COMMON PACKAGES ---
-  <<: !include_dir_named common
+#  <<: !include_dir_named common
 #  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
@@ -39,13 +39,6 @@ esphome:
   project:
     name: 'Waveshare.ESP32-P4-Nano'
     version: "1.0.0"
-  
-wifi:
-  use_address: ${device.name}.local
-  manual_ip: 
-    gateway: 192.168.68.1
-    subnet: 255.255.252.0
-    static_ip: 192.168.71.102
 
 esp32:
 #  framework:
@@ -60,19 +53,3 @@ esp32:
 
 logger:
   hardware_uart: UART0
-
-psram:
-  speed: 200MHz
-
-# Network hardware
-esp32_hosted:
-  active_high: true
-  variant: ESP32C6
-  reset_pin: ${pin.int.c6_hosted.rst}
-  clk_pin: ${pin.int.c6_hosted.clk}
-  cmd_pin: ${pin.int.c6_hosted.cmd}
-  d0_pin: ${pin.int.c6_hosted.d0}
-  d1_pin: ${pin.int.c6_hosted.d1}
-  d2_pin: ${pin.int.c6_hosted.d2}
-  d3_pin: ${pin.int.c6_hosted.d3}
-  use_psram: true
