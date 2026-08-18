@@ -53,8 +53,8 @@ esp32:
 
   flash_size: 16MB
 #  cpu_frequency: 400MHz
-  framework:
-    type: ${device.framework.type}
+#  framework:
+#    type: ${device.framework.type}
 
 logger:
   hardware_uart: UART0
