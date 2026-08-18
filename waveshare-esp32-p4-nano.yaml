@@ -3,22 +3,13 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-#  board: !include board/waveshare_esp32p4_nano.yaml
-  pins: !include board/pins/waveshare_esp32p4_nano.yaml
-  i2c_int: !include board/extension/internal_i2c.yaml
+  board: !include board/waveshare_esp32p4_nano.yaml
 
 substitutions:
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
-  extension:
-    i2c:
-      internal:
-        frequency: 200kHz
   device:
-    model: 'Waveshare P4-Nano'
-    rmt_symbols_block: 48
-    
     name: waveshare-p4-nano
     location: "Storage"
     framework:
@@ -36,88 +27,7 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.102
-  
-  use_psram: true
-  enable_btm: true
-  enable_rrm: true
-
 
 esp32:
-# ESP32-P4R32 (Dual-core, 360MHz)
-# PSRAM: 32MB
-  variant: esp32p4
-  flash_size: 16MB
-  cpu_frequency: 360MHz
   framework:
-    advanced:
-      compiler_optimization: PERF
-      execute_from_psram: true
-      enable_idf_experimental_features: true
     type: ${device.framework.type}
-    sdkconfig_options:
-      CONFIG_ESP32P4_REV_MIN_301: "y"
-      
-      # Match Waveshare's exact factory flash parameters!
-      CONFIG_ESPTOOLPY_FLASHMODE_DIO: "y"
-      CONFIG_ESPTOOLPY_FLASHFREQ_80M: "y"
-      
-      CONFIG_ESPTOOLPY_FLASHSIZE_16MB: "y"
-      CONFIG_CACHE_L2_CACHE_256KB: "y"
-      CONFIG_CACHE_L2_CACHE_LINE_128B: "y"
-      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"
-      CONFIG_ESP_MAIN_TASK_STACK_SIZE: "10240"
-
-logger:
-  hardware_uart: UART0
-
-ota:
-  - platform: esphome
-    allow_partition_access: true
-
-psram:
-  speed: 200MHz
-
-preferences:
-  flash_write_interval: 5min
-
-http_request: # Needed by esp32_hosted-update and any JSON stuff
-  buffer_size_rx: 2048
-
-esp_ldo:
-  # Force stable 3.3V to the Main Flash Memory
-  - id: ldo_flash_power
-    channel: 1
-    voltage: passthrough
-    allow_internal_channel: true
-  # Force stable 3.3V to the High-Speed PSRAM
-  - id: ldo_psram_power
-    channel: 2
-    voltage: passthrough
-    allow_internal_channel: true
-  - id: ldo_dsi_power
-    channel: 3
-    voltage: 2.5V
-  - id: ldo_sd_power
-    channel: 4
-    voltage: 2.7V
-
-# Network hardware
-esp32_hosted:
-  active_high: true
-  variant: ESP32C6
-  clk_pin: ${pin.int.c6_hosted.clk}
-  cmd_pin: ${pin.int.c6_hosted.cmd}
-  d0_pin: ${pin.int.c6_hosted.d0}
-  d1_pin: ${pin.int.c6_hosted.d1}
-  d2_pin: ${pin.int.c6_hosted.d2}
-  d3_pin: ${pin.int.c6_hosted.d3}
-  reset_pin: ${pin.int.c6_hosted.rst}
-
-# Firmware update for esp32_hosted ESP32-C6
-update:
-  - platform: esp32_hosted
-    name: "C6 CoProcessor Update"
-    icon: mdi:chip
-    type: http
-    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
-    update_interval: 6h
