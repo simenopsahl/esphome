@@ -30,27 +30,17 @@ esphome:
   friendly_name: ${device.name}
   area: ${device.location}
   
-wifi: !remove
-#  use_address: ${device.name}.local
-#  manual_ip: 
-#    gateway: 192.168.68.1
-#    subnet: 255.255.252.0
-#    static_ip: 192.168.71.102
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.102
   
-#  use_psram: true
-#  enable_btm: true
-#  enable_rrm: true
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
 
-sensor:
-  - id: !remove sensor_wifi_signal
-  - id: !remove sensor_uptime
-text_sensor:
-  - id: !remove sensor_wifi_info
-binary_sensor:
-  - id: !remove sensor_status
-api: !remove
-time:
-  - id: !remove time_homeassistant
 
 esp32:
 # ESP32-P4R32 (Dual-core, 360MHz)
@@ -80,7 +70,7 @@ esp32:
 logger:
   hardware_uart: UART0
 
-ota: !remove
+ota:
   - platform: esphome
     allow_partition_access: true
 
@@ -90,7 +80,7 @@ psram:
 preferences:
   flash_write_interval: 5min
 
-http_request: !remove  # Needed by esp32_hosted-update and any JSON stuff
+http_request: # Needed by esp32_hosted-update and any JSON stuff
   buffer_size_rx: 2048
 
 esp_ldo:
@@ -112,22 +102,22 @@ esp_ldo:
     voltage: 2.7V
 
 # Network hardware
-#esp32_hosted:
-#  active_high: true
-#  variant: ESP32C6
-#  clk_pin: ${pin.int.c6_hosted.clk}
-#  cmd_pin: ${pin.int.c6_hosted.cmd}
-#  d0_pin: ${pin.int.c6_hosted.d0}
-#  d1_pin: ${pin.int.c6_hosted.d1}
-#  d2_pin: ${pin.int.c6_hosted.d2}
-#  d3_pin: ${pin.int.c6_hosted.d3}
-#  reset_pin: ${pin.int.c6_hosted.rst}
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  reset_pin: ${pin.int.c6_hosted.rst}
   
 # Firmware update for esp32_hosted ESP32-C6
-#update:
-#  - platform: esp32_hosted
-#    name: "C6 CoProcessor Update"
-#    icon: mdi:chip
-#    type: http
-#    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
-#    update_interval: 6h
+update:
+  - platform: esp32_hosted
+    name: "C6 CoProcessor Update"
+    icon: mdi:chip
+    type: http
+    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
+    update_interval: 6h
