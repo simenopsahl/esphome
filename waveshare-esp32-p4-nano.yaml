@@ -52,11 +52,12 @@ esp32:
 #  engineering_sample: false
 
   flash_size: 16MB
-#  cpu_frequency: 400MHz
+  cpu_frequency: 360MHz
   framework:
     type: ${device.framework.type}
     sdkconfig_options:
       CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "y"
+      CONFIG_ESP32P4_REV_MIN_301: "y"
 
 #logger:
 #  hardware_uart: UART0
