@@ -44,12 +44,14 @@ esp32:
 #  framework:
 #    type: ${device.framework.type}
     
-  variant: esp32p4
+  board: esp32-p4-evboard
 #  engineering_sample: false
   flash_size: 16MB
   cpu_frequency: 360MHz
   framework:
     type: ${device.framework.type}
+    advanced:
+      enable_idf_experimental_features: true
 
 logger:
   hardware_uart: UART0
