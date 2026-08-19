@@ -62,14 +62,11 @@ media_player:
     codec_support_enabled: true
     task_stack_in_psram: true
     volume_initial: 50%
+    buffer_size: 500000
     media_pipeline:
       speaker: media_resampling_speaker
-      sample_rate: 48000
-      format: FLAC
     announcement_pipeline:
       speaker: announcement_resampling_speaker
-      format: FLAC
-      sample_rate: 48000
       num_channels: 1
     files:
       - id: wake_sound_file
