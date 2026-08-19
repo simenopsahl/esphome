@@ -163,7 +163,7 @@ interval:
               id(current_note) = 0; // Loop
             }
           }
-          
+
 button:
   - platform: template
     name: "Play Test WAV"
