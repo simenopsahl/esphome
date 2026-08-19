@@ -4,7 +4,7 @@ packages:
   <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
-  board: !include board/waveshare_esp32p4_nano.yaml
+  board: !include board/waveshare_p4_nano.yaml
 
 substitutions:
   common:
