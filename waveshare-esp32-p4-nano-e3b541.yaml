@@ -34,6 +34,14 @@ wifi:
     static_ip: 192.168.71.102
 
 globals:
+  - id: init_in_progress
+    type: bool
+    restore_value: no
+    initial_value: "true"
+  - id: voice_assistant_phase
+    type: int
+    restore_value: no
+    initial_value: '10'
   - id: current_tempo
     type: int
     initial_value: '150'
@@ -50,7 +58,7 @@ globals:
 media_player:
   - platform: speaker
     name: "Speaker Media Player"
-    id: speaker_media_player_id
+    id: media_player_speaker
     codec_support_enabled: true
     task_stack_in_psram: true
     volume_initial: 50%
@@ -65,13 +73,194 @@ media_player:
       num_channels: 1
     files:
       - id: wake_sound_file
-        file: sounds/timer_finished.wav
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
+      - id: timer_sound_file
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
+      - id: error_cloud_sound_file
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
     on_announcement:
       - audio_dac.set_volume:
           id: dac_es8311
           volume: 80%
+      - if:
+          condition:
+            voice_assistant.is_running:
+          then:
+            - lambda: id(voice_assistant_phase) = 4;
+    on_pause:
+      - media_player.stop:
+      - delay: 200ms
+      - lambda: id(voice_assistant_phase) = 1;
 
+micro_wake_word:
+  id: mww
+  microphone: i2s_mic
+  stop_after_detection: false
+  models:
+    - model: https://github.com/kahrendt/microWakeWord/releases/download/okay_nabu_20241226.3/okay_nabu.json
+      id: okay_nabu
+    - model: hey_jarvis
+      id: hey_jarvis
+    - model: hey_mycroft
+      id: hey_mycroft
+  vad:
+  on_wake_word_detected:
+    - media_player.speaker.play_on_device_media_file:
+        id: media_player_speaker
+        media_file: wake_sound_file
+        announcement: true
+    - delay: 100ms
+    - voice_assistant.start:
+        wake_word: !lambda return wake_word;
+
+voice_assistant:
+  id: va
+  microphone:
+    microphone: i2s_mic
+    channels: 0
+    gain_factor: 4
+  media_player: media_player_speaker
+  micro_wake_word: mww
+  use_wake_word: false
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  on_listening:
+    - lambda: id(voice_assistant_phase) = 2;
+  on_stt_vad_end:
+    - lambda: id(voice_assistant_phase) = 3;
+  on_tts_start:
+    - lambda: id(voice_assistant_phase) = 4;
+  on_end:
+    - wait_until:
+        not:
+          voice_assistant.is_running:
+    - if:
+        condition:
+          lambda: return id(voice_assistant_phase) == 11;
+        then:
+          - delay: 1s
+    - lambda: id(voice_assistant_phase) = 1;
+    - script.execute: restart_mww
+  on_error:
+    - if:
+        condition:
+          and:
+            - lambda: return !id(init_in_progress);
+            - lambda: return code != "duplicate_wake_up_detected";
+            - lambda: return code != "stt-no-text-recognized";
+        then:
+          - lambda: id(voice_assistant_phase) = 11;
+          - delay: 1s
+          - if:
+              condition:
+                switch.is_off: mic_mute
+              then:
+                - lambda: id(voice_assistant_phase) = 1;
+              else:
+                - lambda: id(voice_assistant_phase) = 12;
+        # If the error code is cloud-auth-failed, serve a local audio file guiding the user.
+    - if:
+        condition:
+          - lambda: return code == "cloud-auth-failed";
+        then:
+          - media_player.speaker.play_on_device_media_file:
+              id: media_player_speaker
+              media_file: error_cloud_sound_file
+              announcement: true
+    - script.execute: restart_mww
+  on_client_connected:
+    - lambda: id(init_in_progress) = false;
+    - script.execute: set_idle_or_mute_phase
+    - micro_wake_word.start:
+  on_client_disconnected:
+    - lambda: id(voice_assistant_phase) = 10;
+    - micro_wake_word.stop:
+
+select:
+  - platform: template
+    entity_category: config
+    name: Wake word engine location
+    id: wake_word_engine_location
+    icon: "mdi:account-voice"
+    optimistic: true
+    restore_value: true
+    options:
+      - In Home Assistant
+      - On device
+    initial_option: On device
+    on_value:
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - wait_until:
+                lambda: return id(voice_assistant_phase) == 12 || id(voice_assistant_phase) == 1;
+            - if:
+                condition:
+                  lambda: return x == "In Home Assistant";
+                then:
+                  - micro_wake_word.stop
+                  - delay: 500ms
+                  - if:
+                      condition:
+                        switch.is_off: mic_mute
+                      then:
+                        - lambda: id(va).set_use_wake_word(true);
+                        - voice_assistant.start_continuous:
+            - if:
+                condition:
+                  lambda: return x == "On device";
+                then:
+                  - lambda: id(va).set_use_wake_word(false);
+                  - voice_assistant.stop
+                  - delay: 500ms
+                  - if:
+                      condition:
+                        switch.is_off: mic_mute
+                      then:
+                        - micro_wake_word.start
+        
+switch:
+  - platform: template
+    name: "Use Wake Word"
+    id: use_wake_word_switch
+    icon: mdi:chat-processing
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - if:
+          condition:
+            not:
+              switch.is_on: mic_mute
+          then:
+            - micro_wake_word.start:
+    on_turn_off:
+      - micro_wake_word.stop:
+      
 script:
+  - id: restart_mww
+    then:
+      - delay: 500ms
+      - wait_until:
+          not:
+            media_player.is_announcing:
+      - wait_until:
+          not:
+            speaker.is_playing:
+              id: i2s_speaker
+      - delay: 200ms
+      - micro_wake_word.start:
+
+  - id: set_idle_or_mute_phase
+    then:
+      - if:
+          condition:
+            switch.is_off: mic_mute
+          then:
+            - lambda: id(voice_assistant_phase) = 1;
+          else:
+            - lambda: id(voice_assistant_phase) = 12;
+
   - id: play_sound_effect
     parameters:
       sound: string
@@ -170,7 +359,7 @@ button:
     icon: mdi:file-music
     on_press:
       - media_player.speaker.play_on_device_media_file:
-          id: speaker_media_player_id
+          id: media_player_speaker
           media_file: wake_sound_file
   - platform: template
     name: "Coin Sound"
