@@ -1,54 +1,34 @@
-# Board: Waveshare ESP32-P4-WIFI6 (Waveshare)
-# Definition: definitions/boards/waveshare_esp32_p4_wifi6/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/waveshare_p4_wifi6.yaml
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: waveshare-p4-wifi6-xx
+    location: "Storage"
+    framework:
+      type: esp-idf
 
 esphome:
-  name: waveshare-p4-wifi6-xx
-  friendly_name: waveshare-p4-wifi6-xx
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 esp32:
-  variant: esp32p4
-  engineering_sample: true
-  flash_size: 32MB
   framework:
-    type: esp-idf
-    advanced:
-      enable_idf_experimental_features: true
-
-logger:
-  hardware_uart: UART0
-
-api:
-  encryption:
-    key: "H4UnmlDiBfjVI07+kMCQ4/Xuy8qhj6PG++AWuaLgphw="
-
-ota:
-  - platform: esphome
+    type: ${device.framework.type}
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: waveshare-p4-wi Fallback Hotspot
-    password: "onFpdfV6UDJF"
-
-captive_portal:
-
-esp32_hosted:
-  active_high: true
-  clk_pin: GPIO18
-  cmd_pin: GPIO19
-  d0_pin: GPIO14
-  d1_pin: GPIO15
-  d2_pin: GPIO16
-  d3_pin: GPIO17
-  reset_pin: GPIO54
-  type: sdio
-  variant: ESP32C6
-
-http_request:
-
-update:
-  - platform: esp32_hosted
-    type: http
-    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
-    name: C6 Firmware
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.107
