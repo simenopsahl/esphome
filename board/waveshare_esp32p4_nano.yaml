@@ -4,8 +4,10 @@ labels: [esp32p4, psram, i2c, ethernet, mipi_csi, mipi_dsi]
 # https://www.waveshare.com/wiki/ESP32-P4-Nano-StartPage
 # Base functions for:
 # Waveshare ESP32-P4-NANO
-#
-  
+# --
+# For REVISION 3.1
+# --
+
 # Pins for this model
 packages:
   pins: !include pins/waveshare_esp32p4_nano.yaml
@@ -31,7 +33,6 @@ esp32:
 # ESP32-P4R32
 # PSRAM: 32MB
   variant: esp32p4
-#  engineering_sample: false
   flash_size: 16MB
   cpu_frequency: 360MHz
   framework:
@@ -40,9 +41,8 @@ esp32:
       execute_from_psram: true
       enable_idf_experimental_features: true
     sdkconfig_options:
+      CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "n"
       CONFIG_ESP32P4_REV_MIN_301: "y"
-      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"
-      CONFIG_SDMMC_HOST_DEFAULT: "y"
     type: ${device.framework.type}
 
 logger:
@@ -67,48 +67,48 @@ http_request:  # Needed by esp32_hosted-update and any JSON stuff
   buffer_size_rx: 2048
 
 esp_ldo:
-# Tried with and without these settings
   # Force stable 3.3V to the Main Flash Memory
-  - id: ldo_flash_power
-    channel: 1
-    voltage: passthrough
-    allow_internal_channel: true
+#  - id: ldo_flash_power
+#    channel: 1
+#    voltage: passthrough
+#    allow_internal_channel: true
   # Force stable 3.3V to the High-Speed PSRAM
-  - id: ldo_psram_power
-    channel: 2
-    voltage: passthrough
-    allow_internal_channel: true
+#  - id: ldo_psram_power
+#    channel: 2
+#    voltage: passthrough
+#    allow_internal_channel: true
 
-# Display not connected, SD card not used
-#  - id: ldo_dsi_power
-#    channel: 3
-#    voltage: 2.5V
-#  - id: ldo_sd_power
-#    channel: 4
-#    voltage: 2.7V
+  # For display
+  - id: ldo_dsi_power
+    channel: 3
+    voltage: 2.5V
+  # For SD card
+  - id: ldo_sd_power
+    channel: 4
+    voltage: 2.7V
 
 # Network hardware
 esp32_hosted:
   active_high: true
   variant: ESP32C6
-  reset_pin: ${pin.int.c6_hosted.rst}
-  clk_pin: ${pin.int.c6_hosted.clk}
-  cmd_pin: ${pin.int.c6_hosted.cmd}
-  d0_pin: ${pin.int.c6_hosted.d0}
-  d1_pin: ${pin.int.c6_hosted.d1}
-  d2_pin: ${pin.int.c6_hosted.d2}
-  d3_pin: ${pin.int.c6_hosted.d3}
+  reset_pin: ${pin.int.c6_hosted.rst} # GPIO54
+  clk_pin: ${pin.int.c6_hosted.clk} # GPIO18
+  cmd_pin: ${pin.int.c6_hosted.cmd} # GPIO19
+  d0_pin: ${pin.int.c6_hosted.d0} # GPIO14
+  d1_pin: ${pin.int.c6_hosted.d1} # GPIO15
+  d2_pin: ${pin.int.c6_hosted.d2} # GPIO16
+  d3_pin: ${pin.int.c6_hosted.d3} # GPIO17
   use_psram: true
 
 # Not usable alongside WiFI
 #ethernet:
 #  type: IP101
-#  mdc_pin: ${pin.ext.ethernet.mdc}
-#  mdio_pin: ${pin.ext.ethernet.mdio}
-#  power_pin: ${pin.ext.ethernet.pwr}
+#  mdc_pin: ${pin.ext.ethernet.mdc} # GPIO31
+#  mdio_pin: ${pin.ext.ethernet.mdio} # GPIO52
+#  power_pin: ${pin.ext.ethernet.pwr} # GPIO51
 #  clk:
 #    mode: CLK_EXT_IN
-#    pin: ${pin.ext.ethernet.clk}
+#    pin: ${pin.ext.ethernet.clk} # GPIO50
 #  phy_addr: 1
 
 # Firmware update for esp32_hosted ESP32-C6
@@ -120,12 +120,16 @@ update:
     source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
     update_interval: 6h
 
+usb_host:
+  id: usb_port
+  max_packet_size: 256
+
 # Audio - speaker/mic
 i2s_audio:
   - id: i2s_audio_bus
-    i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
-    i2s_bclk_pin: ${pin.audio.i2s_bclk}
-    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_lrclk_pin: ${pin.audio.i2s_lrclk} # GPIO10
+    i2s_bclk_pin: ${pin.audio.i2s_bclk} # GPIO12
+    i2s_mclk_pin: ${pin.audio.i2s_mclk} # GPIO13
 
 audio_dac:
   - platform: es8311
@@ -133,17 +137,17 @@ audio_dac:
     id: dac_es8311
     address: 0x18
 
-audio_adc:
-  - platform: es7210
-    i2c_id: i2c_internal
-    id: adc_es7210
-    address: 0x36
+#audio_adc:
+#  - platform: es7210
+#    i2c_id: i2c_internal
+#    id: adc_es7210
+#    address: 0x36
 
 microphone:
   - platform: i2s_audio
     id: i2s_mic
     i2s_audio_id: i2s_audio_bus
-    i2s_din_pin: ${pin.audio.mic}
+    i2s_din_pin: ${pin.audio.mic} # GPIO9
     sample_rate: 16000
     bits_per_sample: 16bit
     adc_type: external
@@ -153,11 +157,11 @@ speaker:
   - platform: i2s_audio
     id: i2s_speaker
     i2s_audio_id: i2s_audio_bus
-    i2s_dout_pin: ${pin.audio.spk}
+    i2s_dout_pin: ${pin.audio.spk} # GPIO11
     audio_dac: dac_es8311
     dac_type: external
     channel: mono
-    buffer_duration: 750ms
+    buffer_duration: 1000ms
     bits_per_sample: 16bit
     sample_rate: 48000
 
@@ -189,7 +193,7 @@ switch:
   # Speaker Amplifier Enable
   - platform: gpio
     id: speaker_enable
-    pin: ${pin.audio.amp}
+    pin: ${pin.audio.amp} # GPIO53
     restore_mode: ALWAYS_ON
     name: "Speaker Enable"
     icon: "mdi:volume-high"

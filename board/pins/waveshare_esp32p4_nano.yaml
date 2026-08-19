@@ -45,10 +45,10 @@ substitutions:
       i2s_lrclk: GPIO10
       i2s_bclk: GPIO12
       i2s_mclk: GPIO13
-      i2s_dout: GPIO11
-      i2s_din: GPIO9
-      mic: GPIO9
-      spk: GPIO11
+      i2s_dout: GPIO9
+      i2s_din: GPIO11
+      mic: GPIO11
+      spk: GPIO9
       amp: GPIO53
     
     ext:
