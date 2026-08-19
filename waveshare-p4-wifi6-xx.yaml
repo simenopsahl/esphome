@@ -11,7 +11,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: waveshare-p4-wifi6-xx
+    name: waveshare-p4-wifi6-e36bcb
     location: "Storage"
     framework:
       type: esp-idf
