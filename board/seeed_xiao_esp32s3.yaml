@@ -16,15 +16,6 @@ substitutions:
     i2c:
       internal:
         frequency: 200kHz
-  module:
-    camera:
-      pixel_format: JPEG
-      resolution: 800x600
-      jpeg_quality: 20
-      max_framerate: 2fps
-      idle_framerate: 0.1fps
-      agc_gain_ceiling: 64x
-      wb_mode: auto
 
 esp32:
 # ESP32-S3 WROOM N16R8
@@ -77,60 +68,6 @@ wifi:
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
-
-i2c:
-# Cam
-  - id: i2c_cam
-    sda: ${pin.cam.sda}
-    scl: ${pin.cam.scl}
-    frequency: ${extension.i2c.internal.frequency}
-#    timeout: 5ms
-    scan: true
-
-esp32_camera:
-  i2c_id: i2c_cam
-  # PINS
-  external_clock:
-    pin: ${pin.cam.m_clk}
-    frequency: 20MHz
-  data_pins:
-    - ${pin.cam.y2}
-    - ${pin.cam.y3}
-    - ${pin.cam.y4}
-    - ${pin.cam.y5}
-    - ${pin.cam.y6}
-    - ${pin.cam.y7}
-    - ${pin.cam.y8}
-    - ${pin.cam.y9}
-  vsync_pin: ${pin.cam.vs}
-  href_pin: ${pin.cam.hs}
-  pixel_clock_pin: ${pin.cam.p_clk}
-  # Metadata
-  id: espcam
-  name: "Camera"
-  # Image settings
-  resolution: ${module.camera.resolution}
-  pixel_format: ${module.camera.pixel_format}
-  jpeg_quality: ${module.camera.jpeg_quality}
-  vertical_flip: false
-  horizontal_mirror: false
-  max_framerate: ${module.camera.max_framerate}
-  idle_framerate: ${module.camera.idle_framerate}
-  frame_buffer_count: 2 # defaults to 1
-  # Exposure
-  aec_mode: auto
-  aec2: true # defaults to false
-  ae_level: 2
-  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
-  # White balance
-  wb_mode: ${module.camera.wb_mode}
-
-# If NOT JPEG pixel_format
-#camera_encoder:
-#  type: esp32_camera
-#  quality: 70
-#  buffer_size: 524288
-#  buffer_expand_size: 2097152
 
 status_led:
   pin: ${pin.light.led}

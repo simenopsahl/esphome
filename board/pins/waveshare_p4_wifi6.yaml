@@ -1,0 +1,148 @@
+---
+# PINs for Waveshare ESP32-P4-WIFI6
+# Model:  esp32-p4 n16r32 + esp32c6
+# FLASH:  16MB
+# PSRAM:  32MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO36
+      disp_bl: GPIO23
+    int:
+      i2c:
+        sda: GPIO7
+        scl: GPIO8
+      spi:
+        clk: GPIO43
+        dat1: nc
+        dat2: nc
+        dat3: nc
+        dat4: nc
+        disp:
+          cs: nc
+        card:
+          clk: GPIO43
+          cmd: GPIO44
+          cs: GPIO42
+          d0: GPIO39
+          d1: GPIO40
+          d2: GPIO41
+          d3: GPIO42
+      c6_hosted:
+        rst: GPIO54
+        cmd: GPIO19
+        clk: GPIO18
+        d0: GPIO14
+        d1: GPIO15
+        d2: GPIO16
+        d3: GPIO17
+    
+    btn:
+      boot: GPIO35
+    
+    audio:
+      i2s_lrclk: GPIO10
+      i2s_bclk: GPIO12
+      i2s_mclk: GPIO13
+      i2s_dout: GPIO9
+      i2s_din: GPIO11
+      mic: GPIO11
+      spk: GPIO9
+      amp: GPIO53
+    
+    ext:
+      h1:
+        p1: GPIO52
+        p2: GPIO51
+        p3: GND
+        p4: GPIO31
+        p5: GPIO30
+        p6: GPIO29
+        p7: GPIO28
+        p8: GND
+        p9: GPIO50
+        p10: GPIO49
+        p11: GPIO5
+        p12: GPIO4
+        p13: GND
+        p14: GPIO3
+        P15: GPIO2
+        p16: GPIO8 # SCL
+        p17: GPIO7 # SDA
+        p18: GND
+        p19: GPIO24 # usb_d1_n
+        p20: GPIO25 # usb_d1_p
+      h2:
+        p1: 5v # USB 5v
+        p2: 5v # VCC 5v
+        p3: GND
+        p4: en
+        p5: 3v
+        p6: GPIO20
+        p7: GPIO21
+        p8: GND
+        p9: GPIO22
+        p10: GPIO23
+        p11: run
+        p12: GPIO26
+        p13: GND
+        p14: GPIO27
+        p15: GPIO32
+        p16: GPIO33
+        p17: GPIO46
+        p18: GND
+        p19: GPIO47
+        p20: GPIO48
+
+      dsi:
+        p1: 3v
+        p2: GPIO7 # SDA
+        p3: GPIO8 # SCL
+        p4: GND
+        p5: nc
+        p6: nc
+        p7: GND
+        p8: nc
+        p9: nc
+        p10: GND
+        p11: nc
+        p12: nc
+        p13: GND
+        p14: dsi_clk_p
+        p15: dsi_clk_n
+        p16: GND
+        p17: dsi_d1_p
+        p18: dsi_d1_n
+        p19: GND
+        p20: dsi_d0_p
+        p21: dsi_d0_n
+        p22: GND
+      csi:
+        p1: 3v
+        p2: GPIO7 # SDA
+        p3: GPIO8 # SCL
+        p4: GND
+        p5: csi_io1
+        p6: csi_io0
+        p7: GND
+        p8: nc
+        p9: nc
+        p10: GND
+        p11: nc
+        p12: nc
+        p13: GND
+        p14: csi_clk_p
+        p15: csi_clk_n
+        p16: GND
+        p17: csi_d1_p
+        p18: csi_d1_n
+        p19: GND
+        p20: csi_d0_p
+        p21: csi_d0_n
+        p22: GND
+
+      usb:
+        uart:
+          rx: GPIO37
+          tx: GPIO38

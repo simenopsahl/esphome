@@ -1,16 +1,15 @@
-labels: [esp32p4, psram, i2c, ethernet, mipi_csi, mipi_dsi]
+labels: [esp32p4, psram, i2c, mipi_csi, mipi_dsi]
 ---
-# https://docs.waveshare.com/ESP32-P4-NANO
-# https://www.waveshare.com/wiki/ESP32-P4-Nano-StartPage
+# https://docs.waveshare.com/ESP32-P4-WIFI6
 # Base functions for:
-# Waveshare ESP32-P4-NANO
+# Waveshare ESP32-P4-Wifi6
 # --
-# For REVISION 3.1
+# For REVISION 1.3
 # --
 
 # Pins for this model
 packages:
-  pins: !include pins/waveshare_esp32p4_nano.yaml
+  pins: !include pins/waveshare_p4_wifi6.yaml
   i2c_int: !include extension/internal_i2c.yaml
 
 substitutions:
@@ -19,15 +18,15 @@ substitutions:
       internal:
         frequency: 400kHz
   device:
-    model: 'Waveshare P4-Nano'
+    model: 'Waveshare P4-Wifi6'
     rmt_symbols_block: 48
     framework:
       type: esp-idf
 
 esphome:
   project:
-    name: 'Waveshare.ESP32-P4-Nano'
-    version: "3.1"
+    name: 'Waveshare.ESP32-P4-Wifi6'
+    version: "1.3"
 
 esp32:
 # ESP32-P4R32
@@ -40,9 +39,6 @@ esp32:
       compiler_optimization: PERF
       execute_from_psram: true
       enable_idf_experimental_features: true
-    sdkconfig_options:
-      CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "n"
-      CONFIG_ESP32P4_REV_MIN_301: "y"
     type: ${device.framework.type}
 
 logger:
@@ -83,33 +79,22 @@ esp_ldo:
     channel: 3
     voltage: 2.5V
   # For SD card
-  - id: ldo_sd_power
-    channel: 4
-    voltage: 2.7V
+#  - id: ldo_sd_power
+#    channel: 4
+#    voltage: 2.7V
 
 # Network hardware
 esp32_hosted:
   active_high: true
   variant: ESP32C6
-  reset_pin: ${pin.int.c6_hosted.rst} # GPIO54
-  clk_pin: ${pin.int.c6_hosted.clk} # GPIO18
-  cmd_pin: ${pin.int.c6_hosted.cmd} # GPIO19
-  d0_pin: ${pin.int.c6_hosted.d0} # GPIO14
-  d1_pin: ${pin.int.c6_hosted.d1} # GPIO15
-  d2_pin: ${pin.int.c6_hosted.d2} # GPIO16
-  d3_pin: ${pin.int.c6_hosted.d3} # GPIO17
+  reset_pin: ${pin.int.c6_hosted.rst}
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
   use_psram: true
-
-# Not usable alongside WiFI
-#ethernet:
-#  type: IP101
-#  mdc_pin: ${pin.ext.ethernet.mdc} # GPIO31
-#  mdio_pin: ${pin.ext.ethernet.mdio} # GPIO52
-#  power_pin: ${pin.ext.ethernet.pwr} # GPIO51
-#  clk:
-#    mode: CLK_EXT_IN
-#    pin: ${pin.ext.ethernet.clk} # GPIO50
-#  phy_addr: 1
 
 # Firmware update for esp32_hosted ESP32-C6
 update:
@@ -120,16 +105,12 @@ update:
     source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
     update_interval: 6h
 
-usb_host:
-  id: usb_port
-  max_packet_size: 256
-
 # Audio - speaker/mic
 i2s_audio:
   - id: i2s_audio_bus
-    i2s_lrclk_pin: ${pin.audio.i2s_lrclk} # GPIO10
-    i2s_bclk_pin: ${pin.audio.i2s_bclk} # GPIO12
-    i2s_mclk_pin: ${pin.audio.i2s_mclk} # GPIO13
+    i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+    i2s_bclk_pin: ${pin.audio.i2s_bclk}
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
 
 audio_dac:
   - platform: es8311
@@ -147,7 +128,7 @@ microphone:
   - platform: i2s_audio
     id: i2s_mic
     i2s_audio_id: i2s_audio_bus
-    i2s_din_pin: ${pin.audio.mic} # GPIO9
+    i2s_din_pin: ${pin.audio.mic}
     sample_rate: 16000
     bits_per_sample: 16bit
     adc_type: external
@@ -157,13 +138,14 @@ speaker:
   - platform: i2s_audio
     id: i2s_speaker
     i2s_audio_id: i2s_audio_bus
-    i2s_dout_pin: ${pin.audio.spk} # GPIO11
-    audio_dac: dac_es8311
+    i2s_dout_pin: ${pin.audio.spk}
     dac_type: external
+    audio_dac: dac_es8311
     channel: mono
+    num_channels: 1
     buffer_duration: 1000ms
     bits_per_sample: 16bit
-    sample_rate: 48000
+    sample_rate: 16000
 
   - platform: mixer
     id: mixing_speaker
@@ -171,29 +153,23 @@ speaker:
     task_stack_in_psram: true
     source_speakers:
       - id: announcement_mixing_input
-        timeout: never
       - id: media_mixing_input
-        timeout: never
 
   - platform: resampler
     id: announcement_resampling_speaker
     output_speaker: announcement_mixing_input
-    sample_rate: 48000
-    bits_per_sample: 16
     task_stack_in_psram: true
 
   - platform: resampler
     id: media_resampling_speaker
     output_speaker: media_mixing_input
-    sample_rate: 48000
-    bits_per_sample: 16
     task_stack_in_psram: true
 
 switch:
   # Speaker Amplifier Enable
   - platform: gpio
     id: speaker_enable
-    pin: ${pin.audio.amp} # GPIO53
+    pin: ${pin.audio.amp}
     restore_mode: ALWAYS_ON
     name: "Speaker Enable"
     icon: "mdi:volume-high"

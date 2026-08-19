@@ -9,7 +9,7 @@ labels: [esp32s3, psram, st7789t3, display, cst816d, touch, camera, qmi8658, imu
 
 # Pins for this model
 packages:
-  pins: !include pins/waveshare_esp32s3_touch_2in_cam.yaml
+  pins: !include pins/waveshare_s3_touch_2in_cam.yaml
   i2c: !include extension/internal_i2c.yaml
 
 substitutions:
