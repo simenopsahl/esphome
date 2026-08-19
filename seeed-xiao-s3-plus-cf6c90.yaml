@@ -4,6 +4,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/seeed_xiao_esp32s3_plus.yaml
+  camera: !include board/module/seeed_xiao_sense.yaml
 
 substitutions:
   common:
