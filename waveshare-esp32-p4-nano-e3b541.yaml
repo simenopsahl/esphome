@@ -32,3 +32,247 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.102
+
+globals:
+  - id: current_tempo
+    type: int
+    initial_value: '150'
+  - id: music_playing
+    type: bool
+    initial_value: 'false'
+  - id: current_note
+    type: int
+    initial_value: '0'
+  - id: note_timer
+    type: unsigned long
+    initial_value: '0'
+  
+media_player:
+  - platform: speaker
+    name: "Speaker Media Player"
+    id: speaker_media_player_id
+    codec_support_enabled: true
+    task_stack_in_psram: true
+    volume_initial: 50%
+    media_pipeline:
+      speaker: media_resampling_speaker
+      sample_rate: 48000
+      format: FLAC
+    announcement_pipeline:
+      speaker: announcement_resampling_speaker
+      format: FLAC
+      sample_rate: 48000
+      num_channels: 1
+    files:
+      - id: wake_sound_file
+        file: sounds/timer_finished.wav
+    on_announcement:
+      - audio_dac.set_volume:
+          id: dac_es8311
+          volume: 80%
+
+script:
+  - id: play_sound_effect
+    parameters:
+      sound: string
+    then:
+      - lambda: |-
+          const int sample_rate = 48000;
+          std::vector<int16_t> audio_data;
+          
+          if (strcmp(sound.c_str(), "melody") == 0) {
+            // Mario theme: E-E-E-C-E-G (1.5 seconds)
+            const int notes[] = {659, 659, 0, 659, 0, 523, 659, 0, 784};
+            const int note_duration_ms = 150;
+            const int note_samples = (sample_rate * note_duration_ms) / 1000;
+            
+            for (int n = 0; n < 9; n++) {
+              float freq = notes[n];
+              for (int i = 0; i < note_samples; i++) {
+                float t = (n * note_samples + i) / (float)sample_rate;
+                int16_t sample = (freq > 0) ? 8000 * sin(2 * M_PI * freq * t) : 0;
+                audio_data.push_back(sample);
+              }
+            }
+          } else {
+            // Simple 2-note sound
+            const int notes[] = {659, 784};
+            const int note_duration_ms = 150;
+            const int note_samples = (sample_rate * note_duration_ms) / 1000;
+            
+            for (int n = 0; n < 2; n++) {
+              float freq = notes[n];
+              for (int i = 0; i < note_samples; i++) {
+                float t = (n * note_samples + i) / (float)sample_rate;
+                int16_t sample = 8000 * sin(2 * M_PI * freq * t);
+                audio_data.push_back(sample);
+              }
+            }
+          }
+          
+          ESP_LOGI("audio", "Playing sound: %s (%d samples)", sound, audio_data.size());
+          if (audio_data.size() > 0) {
+            id(announcement_resampling_speaker).play((uint8_t*)audio_data.data(), audio_data.size() * sizeof(int16_t));
+          }
+  - id: play_music_track
+    parameters:
+      track: string
+    then:
+      - lambda: |-
+          id(music_playing) = true;
+          id(current_note) = 0;
+          id(note_timer) = millis();
+          ESP_LOGI("audio", "Starting music: %s at tempo %d", track, id(current_tempo));
+
+interval:
+  - interval: 50ms
+    then:
+      - lambda: |-
+          if (!id(music_playing)) return;
+          
+          unsigned long now = millis();
+          int note_duration = (60000 / id(current_tempo)) / 4; // 16th notes
+          
+          if (now - id(note_timer) >= note_duration) {
+            id(note_timer) = now;
+            
+            // Super Mario Bros main theme (simplified)
+            // Notes: C D E F G A B
+            const int melody[] = {
+              659, 659, 0, 659, 0, 523, 659, 0, 784, 0, 0, 0, 392, 0, 0, 0,
+              523, 0, 0, 392, 0, 0, 330, 0, 0, 440, 0, 494, 0, 466, 440, 0,
+              392, 659, 784, 880, 0, 698, 784, 0, 659, 0, 523, 587, 494, 0, 0,
+              523, 0, 0, 392, 0, 0, 330, 0, 0, 440, 0, 494, 0, 466, 440, 0,
+              392, 659, 784, 880, 0, 698, 784, 0, 659, 0, 523, 587, 494, 0, 0
+            };
+            const int melody_length = sizeof(melody) / sizeof(melody[0]);
+            
+            int freq = melody[id(current_note) % melody_length];
+            
+            if (freq > 0) {
+              // Generate square wave for chiptune sound
+              const int sample_rate = 16000;
+              const int samples = (sample_rate * note_duration) / 1000;
+              
+              // In real implementation, this would generate and queue audio samples
+              ESP_LOGV("audio", "Note %d: %d Hz", id(current_note), freq);
+            }
+            
+            id(current_note)++;
+            if (id(current_note) >= melody_length) {
+              id(current_note) = 0; // Loop
+            }
+          }
+          
+button:
+  - platform: template
+    name: "Play Test WAV"
+    icon: mdi:file-music
+    on_press:
+      - media_player.speaker.play_on_device_media_file:
+          id: speaker_media_player_id
+          media_file: wake_sound_file
+  - platform: template
+    name: "Coin Sound"
+    icon: mdi:music-note
+    on_press:
+      - if:
+          condition:
+            lambda: return !id(announcement_resampling_speaker)->is_running();
+          then:
+            - lambda: id(announcement_resampling_speaker)->start();
+            - delay: 50ms
+      - lambda: |-
+          static std::vector<int16_t> buffer;
+          const int duration_ms = 100;
+          const int samples = (16000 * duration_ms) / 1000;
+          buffer.resize(samples);
+          float phase = 0;
+          for (int i = 0; i < samples; i++) {
+            float progress = i / (float)samples;
+            float freq = (progress < 0.5) ? 988 : 1319;
+            float envelope = 1.0 - (progress * 0.7);
+            phase += (freq * 2 * M_PI) / 16000;
+            float square = (sin(phase) > 0) ? 1.0 : -1.0;
+            buffer[i] = (int16_t)(2048 * square * envelope);
+          }
+          id(announcement_resampling_speaker)->play((uint8_t*)buffer.data(), buffer.size() * 2);
+          id(announcement_resampling_speaker)->finish();
+  - platform: template
+    name: "Jump Sound"
+    icon: mdi:arrow-up-bold
+    on_press:
+      - if:
+          condition:
+            lambda: return !id(announcement_resampling_speaker)->is_running();
+          then:
+            - lambda: id(announcement_resampling_speaker)->start();
+            - delay: 50ms
+      - lambda: |-
+          static std::vector<int16_t> buffer;
+          const int duration_ms = 300;
+          const int samples = (16000 * duration_ms) / 1000;
+          buffer.resize(samples);
+          for (int i = 0; i < samples; i++) {
+            float progress = i / (float)samples;
+            float bounce = sin(progress * M_PI * 3) * 0.3;
+            float pitch_freq = 400 + (600 * progress) + (bounce * 200);
+            float envelope = exp(-progress * 4);
+            float phase = (i * pitch_freq * 2 * M_PI) / 16000;
+            buffer[i] = (int16_t)(1024 * sin(phase) * envelope);
+          }
+          id(announcement_resampling_speaker)->play((uint8_t*)buffer.data(), buffer.size() * 2);
+          id(announcement_resampling_speaker)->finish();
+  - platform: template
+    name: "Powerup Sound"
+    icon: mdi:mushroom
+    on_press:
+      - if:
+          condition:
+            lambda: return !id(announcement_resampling_speaker)->is_running();
+          then:
+            - lambda: id(announcement_resampling_speaker)->start();
+            - delay: 50ms
+      - lambda: |-
+          static std::vector<int16_t> buffer;
+          const int notes[] = {523, 659, 784, 1047};
+          const int note_dur = 100;
+          const int total_ms = note_dur * 4;
+          const int samples = (16000 * total_ms) / 1000;
+          buffer.resize(samples);
+          float phase = 0;
+          for (int i = 0; i < samples; i++) {
+            int note_idx = (i * 4) / samples;
+            float freq = notes[note_idx];
+            float progress = (i % (samples / 4)) / (float)(samples / 4);
+            float envelope = 0.8 - (progress * 0.3);
+            phase += (freq * 2 * M_PI) / 16000;
+            buffer[i] = (int16_t)(1536 * sin(phase) * envelope);
+          }
+          id(announcement_resampling_speaker)->play((uint8_t*)buffer.data(), buffer.size() * 2);
+          id(announcement_resampling_speaker)->finish();
+  - platform: template
+    name: "Fireball Sound"
+    icon: mdi:fire-circle
+    on_press:
+      - if:
+          condition:
+            lambda: return !id(announcement_resampling_speaker)->is_running();
+          then:
+            - lambda: id(announcement_resampling_speaker)->start();
+            - delay: 50ms
+      - lambda: |-
+          static std::vector<int16_t> buffer;
+          const int duration_ms = 300;
+          const int samples = (16000 * duration_ms) / 1000;
+          buffer.resize(samples);
+          for (int i = 0; i < samples; i++) {
+            float progress = i / (float)samples;
+            float pitch_freq = 800 * exp(-progress * 3);
+            float noise = (rand() % 100) / 100.0 * 0.3;
+            float envelope = exp(-progress * 2);
+            float phase = (i * pitch_freq * 2 * M_PI) / 16000;
+            buffer[i] = (int16_t)(1024 * (sin(phase) * 0.7 + noise) * envelope);
+          }
+          id(announcement_resampling_speaker)->play((uint8_t*)buffer.data(), buffer.size() * 2);
+          id(announcement_resampling_speaker)->finish();
