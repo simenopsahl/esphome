@@ -17,6 +17,7 @@ substitutions:
       type: esp-idf
   module:
     camera:
+      model: OV2640
       resolution: 800x600
       jpeg_quality: 20
       agc_gain_ceiling: 16x
