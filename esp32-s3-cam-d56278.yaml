@@ -16,6 +16,7 @@ substitutions:
       type: esp-idf
   module:
     camera:
+      model: OV3640
       resolution: 1024x768
       jpeg_quality: 20
       agc_gain_ceiling: 64x
