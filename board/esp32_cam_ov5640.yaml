@@ -5,6 +5,7 @@ labels: [esp32, psram, ov5640, camera]
 packages:
   pins: !include pins/esp32_cam_ov5640.yaml
   i2c: !include extension/internal_i2c.yaml
+  camera: !include module/esp32_camera.yaml
 
 substitutions:
   device:
@@ -100,24 +101,10 @@ esp32_camera:
   reset_pin:
     number: ${pin.cam.rst}
     ignore_strapping_warning: true
-  # Metadata
-  id: espcam
-  name: "Camera"
   # Image settings
-  resolution: ${module.camera.resolution}
-  pixel_format: ${module.camera.pixel_format}
-  jpeg_quality: ${module.camera.jpeg_quality}
-  max_framerate: ${module.camera.max_framerate}
-  idle_framerate: ${module.camera.idle_framerate}
   frame_buffer_count: 2 # defaults to 1 (1-2)
-  vertical_flip: true
-  horizontal_mirror: true
   # Exposure
-  aec_mode: auto
   aec2: true # defaults to false
-  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
-  # White balance
-  wb_mode: ${module.camera.wb_mode}
 
 status_led:
   pin: ${pin.light.led}

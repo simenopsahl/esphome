@@ -8,6 +8,7 @@ labels: [camera, i2c]
 packages:
   pins: !include pins/m5stack_unit_cams3.yaml
   i2c: !include extension/internal_i2c.yaml
+  camera: !include module/esp32_camera.yaml
 
 substitutions:
   device:
@@ -117,24 +118,14 @@ esp32_camera:
   href_pin: ${pin.cam.hs}
   pixel_clock_pin: ${pin.cam.p_clk}
   reset_pin: ${pin.cam.reset}
-  # Metadata
-  name: "Camera PY260"
   # Image settings
-  resolution: ${module.camera.resolution}
   pixel_format: JPEG
-  jpeg_quality: ${module.camera.jpeg_quality}
-  max_framerate: ${module.camera.max_framerate}
-  idle_framerate: ${module.camera.idle_framerate}
   frame_buffer_count: 2 # defaults to 1
 #  vertical_flip: true
 #  horizontal_mirror: true
   # Exposure
-  aec_mode: auto
   aec2: true # defaults to false
   ae_level: 2
-  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
-  # White balance
-  wb_mode: ${module.camera.wb_mode}
 
 # Enable status LED
 status_led:

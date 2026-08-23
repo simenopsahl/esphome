@@ -1,0 +1,62 @@
+labels: [esp32s3]
+---
+# https://www.tinytronics.nl/en/development-boards/microcontroller-boards/with-wi-fi/universal-air-conditioning-controller-esp32-s3
+# https://github.com/hberntsen/mhi-ac-ctrl-esp32
+# https://github.com/Astute4185/MHI-AC-Ctrl-ESPHome_ESP-IDF
+# Base functions for:
+# LEOTRO Universal Air Conditioning Controller Rev1.4
+
+# Pins for this model
+packages:
+  pins: !include pins/esp32s3_universal_airco.yaml
+
+substitutions:
+  device:
+    model: 'Universal AirCo'
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+esphome:
+  project:
+    name: 'LEOTRO.Universal AirCo'
+    version: "1.4"
+
+esp32:
+# ESP32-S3
+  variant: esp32s3
+  flash_size: 4MB
+  cpu_frequency: 160MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      enable_idf_experimental_features: true
+    type: ${device.framework.type}
+
+external_components:
+  - source: github://hberntsen/mhi-ac-ctrl-esp32@master
+
+wifi:
+  enable_btm: true
+  enable_rrm: true
+
+ota:
+  - platform: esphome
+    allow_partition_access: true
+
+# Enable status LED
+status_led:
+  id: status_light
+  pin: ${pin.light.led}
+
+sensor:
+  # CPU Temperature
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic

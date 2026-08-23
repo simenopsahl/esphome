@@ -1,0 +1,66 @@
+---
+# https://www.tinytronics.nl/en/development-boards/microcontroller-boards/with-wi-fi/universal-air-conditioning-controller-esp32-s3
+# PINs for LEOTRO Universal Air Conditioning Controller ESP32-S3
+# Model:  ESP32-S3
+# Flash:  4MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO14
+      ir: GPIO15
+    int:
+      spi:
+        clk: GPIO21
+        miso: GPIO34 # txL
+        mosi: GPIO48 # rxL
+
+    ext:
+      h1:
+        p1: 5v
+        p2: 3v
+        p3: GPIO11
+        p4: GND
+        p5: GPIO38
+        p6: GPIO41
+        p7: GPIO39
+        p8: GPIO40
+      h2:
+        p1: boot
+        p2: 3v
+        p3: GPIO43 # uart0_tx
+        p4: GND
+        p5: GPIO44 # uart0_rx
+        p6: en
+      h3:
+        p1: vin
+        p2: GPIO21 # spi_clk
+        p3: GPIO48 # spi_mosi txH
+        p4: GPIO34 # spi_miso rxH
+        p5: GND
+      usb1_am90:
+        p1: vin
+        p2: GPIO48 # txH
+        p3: GPIO34 # rxH
+        p4: GND
+      hc_gh_4pwt:
+        p1: vin
+        p2: GND
+        p3: GPIO34 # spi_miso rxH
+        p4: GPIO48 # spi_mosi txH
+        p5: GND
+        p6: GND
+
+# SB1:
+# Connects an additional pull-up resistor to GPIO 34 (RX/MISO).
+# Some Mitsubishi air conditioners have a built-in pull-down resistor that pulls
+# the signal voltage down too far. The pull-up resistor compensates for this.
+
+# SB2:
+# Connects VIN directly to 5V.
+# This solder bridge will almost never need to be used.
+# Only in very exceptional cases where the supply voltage is 5V,
+# the extra voltage drop caused by the built-in buck converter might result in the signal
+# voltage no longer being high enough.
+# In that case, the solder bridge can be connected to bypass the buck converter
+# and prevent the voltage drop.

@@ -100,16 +100,20 @@ esp32_hosted:
   d3_pin: ${pin.int.c6_hosted.d3}
   use_psram: true
 
-# Not usable alongside WiFI
-#ethernet:
-#  type: IP101
-#  mdc_pin: ${pin.ext.ethernet.mdc}
-#  mdio_pin: ${pin.ext.ethernet.mdio}
-#  power_pin: ${pin.ext.ethernet.pwr}
-#  clk:
-#    mode: CLK_EXT_IN
-#    pin: ${pin.ext.ethernet.clk}
-#  phy_addr: 1
+network:
+  priority:
+    - wifi
+    - ethernet
+
+ethernet:
+  type: IP101
+  mdc_pin: ${pin.ext.ethernet.mdc}
+  mdio_pin: ${pin.ext.ethernet.mdio}
+  power_pin: ${pin.ext.ethernet.pwr}
+  clk:
+    mode: CLK_EXT_IN
+    pin: ${pin.ext.ethernet.clk}
+  phy_addr: 1
 
 # Firmware update for esp32_hosted ESP32-C6
 update:

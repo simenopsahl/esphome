@@ -13,6 +13,7 @@ packages:
 # Include internal IMU or Grove/HAT i2c in top level device config
 #  i2c_int: !include extension/internal_i2c.yaml
 #  imu: !include module/chip_imu_bmi270.yaml
+  camera: !include module/esp32_camera.yaml
 
 substitutions:
   time_timezone: "Europe/Oslo"
@@ -141,24 +142,12 @@ esp32_camera:
   vsync_pin: ${pin.cam.vs}
   href_pin: ${pin.cam.hs}
   pixel_clock_pin: ${pin.cam.p_clk}
-  # Metadata
-  id: espcam
-  name: "Camera OV3640"
   # Image settings
-  resolution: ${module.camera.resolution}
-  pixel_format: ${module.camera.pixel_format}
-  jpeg_quality: ${module.camera.jpeg_quality}
   vertical_flip: false
-  max_framerate: ${module.camera.max_framerate}
-  idle_framerate: ${module.camera.idle_framerate}
   frame_buffer_count: 2 # defaults to 1
   # Exposure
-  aec_mode: auto
   aec2: true # defaults to false
   ae_level: 2
-  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
-  # White balance
-  wb_mode: ${module.camera.wb_mode}
 
 # If NOT JPEG pixel_format
 #camera_encoder:

@@ -1,0 +1,25 @@
+---
+# https://esphome.io/components/esp32_camera/
+
+substitutions:
+  module:
+    camera:
+      model: ""
+      pixel_format: JPEG
+      resolution: 640x480
+      jpeg_quality: 20
+      max_framerate: 2fps
+      idle_framerate: 0.1fps
+      agc_gain_ceiling: 16x
+      wb_mode: auto
+
+esp32_camera:
+  id: espcam
+  name: Camera ${module.camera.model}
+  resolution: ${module.camera.resolution}
+  jpeg_quality: ${module.camera.jpeg_quality}
+  max_framerate: ${module.camera.max_framerate}
+  idle_framerate: ${module.camera.idle_framerate}
+  pixel_format: ${module.camera.pixel_format}
+  agc_gain_ceiling: ${module.camera.agc_gain_ceiling}
+  wb_mode: ${module.camera.wb_mode}
