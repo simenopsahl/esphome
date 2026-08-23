@@ -3,7 +3,7 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-  board: !include board/waveshare_esp32s3_touch_2in_cam.yaml
+  board: !include board/waveshare_s3_touch_2in_cam.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -26,6 +26,7 @@ substitutions:
       type: esp-idf
   module:
     camera:
+      model: OV2640
       resolution: 1024x768
       jpeg_quality: 20
       agc_gain_ceiling: 64x
