@@ -6,6 +6,9 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/waveshare_p4_wifi6.yaml
 
+  # --- FEATURE PACKAGES ---
+  voice_assist: !include features/voice_assistant.yaml
+
 substitutions:
   common:
     log_level: DEBUG
