@@ -155,6 +155,13 @@ font:
       'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
       'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
       'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - id: font_lg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_lg}
+    bpp: 4
+    glyphs: *norwegian-glyphs
   - id: font_xl
     file:
       type: gfonts
