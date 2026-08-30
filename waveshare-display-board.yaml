@@ -214,6 +214,13 @@ font:
     size: ${display.font.text_lg}
     bpp: 4
     glyphs: *norwegian-glyphs
+  - id: font_xl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_xl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
   - id: font_xxl
     file:
       type: gfonts
@@ -238,6 +245,11 @@ font:
   - id: mdi_xl
     file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
     size: ${display.font.icons_xl}
+    bpp: 4
+    glyphs: !include gui/fonts/glyphs.yaml
+  - id: mdi_xxl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xxl}
     bpp: 4
     glyphs: !include gui/fonts/glyphs.yaml
 
