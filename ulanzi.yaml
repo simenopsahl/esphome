@@ -5,6 +5,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/ulanzi_tc001.yaml
