@@ -185,6 +185,11 @@ font:
     bpp: 4
     glyphs: *norwegian-glyphs
 
+  - id: mdi_md
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_md}
+    bpp: 4
+    glyphs: !include gui/fonts/glyphs.yaml
   - id: mdi_xxl
     file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
     size: ${display.font.icons_xxl}
