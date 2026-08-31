@@ -1,7 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_fire.yaml
@@ -70,7 +70,7 @@ time:
           - script.execute: lvgl_time_update
 
 lvgl:
-  buffer_size: 25%
+  buffer_size: 10%
 
 binary_sensor:
   # Call sensors from HA.
