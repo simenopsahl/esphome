@@ -15,6 +15,7 @@ sensor:
     name: "Unit Illuminance"
     device_class: "illuminance"
     state_class: "measurement"
+    accuracy_decimals: 1
     filters:
       - sliding_window_moving_average:
           window_size: 6

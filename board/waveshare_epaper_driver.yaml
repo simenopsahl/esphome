@@ -7,7 +7,7 @@ labels: [esp32, ePaper, display]
 # Pins for this model
 packages:
   pins: !include pins/waveshare_epaper_driver.yaml
-  epaper: !include module/epaper.yaml
+  epaper: !include ../features/epaper.yaml
 
 substitutions:
   home_page: page_content
@@ -44,7 +44,6 @@ esp32:
   framework:
     type: ${device.framework.type}
     advanced:
-      compiler_optimization: PERF
       sram1_as_iram: true
 
 # Pins for Waveshare ePaper ESP Board

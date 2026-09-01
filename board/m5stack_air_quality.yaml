@@ -10,7 +10,7 @@ labels: [esp32s3, BM8563, RTC, SCD40, CO2, temperature, humidity, SEN55, particu
 packages:
   pins: !include pins/m5stack_air_quality.yaml
   i2c_int: !include extension/internal_i2c.yaml
-  epaper: !include module/epaper.yaml
+  epaper: !include ../features/epaper.yaml
   status_led: !include ../features/system_status_led.yaml
 
 substitutions:
@@ -250,6 +250,7 @@ sensor:
       id: co2_scd40_aq
       name: "AirQuality SCD40 CO2"
       device_class: "carbon_dioxide"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 6
@@ -259,6 +260,7 @@ sensor:
       name: "AirQuality SCD40 Temperature"
       disabled_by_default: true
       device_class: "temperature"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 12
@@ -268,6 +270,7 @@ sensor:
       name: "AirQuality SCD40 Humidity"
       disabled_by_default: true
       device_class: "humidity"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 12
@@ -284,6 +287,7 @@ sensor:
       id: pm1_0_sen55
       name: "PM 1"
       device_class: "pm1"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -292,6 +296,7 @@ sensor:
       id: pm2_5_sen55
       name: "PM 2.5"
       device_class: "pm25"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -299,6 +304,7 @@ sensor:
     pm_4_0:
       id: pm4_0_sen55
       name: "PM 4"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -307,6 +313,7 @@ sensor:
       id: pm10_0_sen55
       name: "PM 10"
       device_class: "pm10"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -316,6 +323,7 @@ sensor:
       name: "Temperature SEN55"
       disabled_by_default: true
       device_class: "temperature"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 6
@@ -325,6 +333,7 @@ sensor:
       name: "Humidity SEN55"
       disabled_by_default: true
       device_class: "humidity"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 6

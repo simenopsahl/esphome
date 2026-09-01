@@ -19,6 +19,7 @@ sensor:
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 6
@@ -30,6 +31,7 @@ sensor:
       disabled_by_default: true
       device_class: "atmospheric_pressure"
       state_class: "measurement"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 6
@@ -48,6 +50,7 @@ sensor:
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 6
@@ -58,6 +61,7 @@ sensor:
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 6

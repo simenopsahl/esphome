@@ -9,7 +9,7 @@ labels: [esp32, ePaper, display]
 # Pins for this model
 packages:
   pins: !include pins/m5stack_coreink.yaml
-  epaper: !include module/epaper.yaml
+  epaper: !include ../features/epaper.yaml
 
 substitutions:
   time_timezone: "Europe/Oslo"
@@ -129,7 +129,7 @@ display:
     busy_pin:
       number: ${pin.int.spi.disp.busy}
       inverted: false
-    full_update_every: 1
+    full_update_every: 5
 #    reset_duration: 2ms
     update_interval: never
     pages:

@@ -1,5 +1,11 @@
 # Display navigation from Home Assistant
 
+esphome:
+  on_boot:
+    - priority: -500
+      then:
+        - script.execute: go_home
+
 button:
   # Previous page button
   - platform: template

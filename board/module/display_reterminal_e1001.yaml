@@ -1,0 +1,37 @@
+labels: [SPI, display, ePaper]
+---
+# https://wiki.seeedstudio.com/reterminal_e10xx_with_esphome/#basic-for-drawing-in-esphome
+# https://esphome.io/components/display/waveshare_epaper/
+
+display:
+  # 800 x 480 resolution
+  # Monochrome (4-level grayscale)
+  - platform: waveshare_epaper
+    id: display_eink
+    model: 7.50inv2 # You can use 7.50inv2alt when you draw complex info and it display not good.
+    cs_pin: ${pins.display.e1001.cs} # GPIO10
+    dc_pin: ${pins.display.e1001.dc} # GPIO11
+    reset_pin:
+      number: ${pins.display.e1001.rst} # GPIO12
+      inverted: false
+    busy_pin:
+      number: ${pins.display.e1001.busy} # GPIO13
+      inverted: true
+    update_interval: never
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill( COLOR_ON );
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill( COLOR_OFF );
+
+#    lambda: |-
+#      it.rectangle(10, 10, 100, 50);
+#      it.rectangle(150, 10, 50, 50);
+#      it.circle(250, 35, 25);
+#      it.filled_rectangle(10, 80, 100, 50);
+#      it.filled_rectangle(150, 80, 50, 50);
+#      it.filled_circle(250, 105, 25);

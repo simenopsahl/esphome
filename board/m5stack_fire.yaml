@@ -36,6 +36,7 @@ esp32:
       compiler_optimization: PERF
       minimum_chip_revision: 3.1
       sram1_as_iram: true
+      loop_task_stack_size: 16384
 
 # PSRAM is shared with UART bus tx17/rx16
 #psram:

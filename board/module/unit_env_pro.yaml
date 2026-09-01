@@ -27,6 +27,7 @@ sensor:
       disabled_by_default: true
       device_class: "temperature"
       state_class: "measurement"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 20
@@ -37,6 +38,7 @@ sensor:
       disabled_by_default: true
       device_class: "atmospheric_pressure"
       state_class: "measurement"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 20
@@ -47,6 +49,7 @@ sensor:
       disabled_by_default: true
       device_class: "humidity"
       state_class: "measurement"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 20
@@ -82,6 +85,7 @@ sensor:
       name: "CO2 equivalent BME688"
       device_class: "carbon_dioxide"
       state_class: "measurement"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 10
@@ -90,6 +94,7 @@ sensor:
       id: evoc_bme688
       name: "VOC equivalent BME688"
       device_class: "volatile_organic_compounds_parts"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 10

@@ -1,0 +1,62 @@
+---
+# https://github.com/itopinion/zectrix-note4-epd-demo/blob/main/components/zectrix_board/include/zectrix_board_config.h-
+# https://wiki.zectrix.com/en/hardware/note4c/quick-start
+# PINs for Zectrix Note4 ESP32S3
+# Model:  ESP32-S3N16R8
+# Flash:  16MB
+# PSRAM:  8MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO3
+    int:
+      i2c:
+        sda: GPIO47
+        scl: GPIO48
+      spi:
+        clk: GPIO12
+        mosi: GPIO13
+      uart:
+        tx: GPIO43
+        rx: GPIO44
+      pwr_mos: GPIO17
+      bat_feedback: GPIO2
+      bat_full: GPIO1
+      bat_latch: GPIO17
+      rtc_wakeup: GPIO5
+    btn:
+      ok: GPIO0
+      up: GPIO39
+      down: GPIO18
+    audio:
+      i2s_lrclk: GPIO38
+      i2s_bclk: GPIO15
+      i2s_mclk: GPIO14
+      i2s_din: GPIO16
+      mic: GPIO16
+      i2s_dout: GPIO45
+      spk: GPIO45
+      amp: GPIO46
+      pwr: GPIO42
+    display:
+      clk: GPIO12
+      mosi: GPIO13
+      cs: GPIO11
+      dc: GPIO10
+      rst: GPIO9
+      reset: GPIO9
+      busy: GPIO8
+      pwr: GPIO6
+    nfc:
+      sda: GPIO4
+      scl: GPIO5
+      irq: GPIO7
+      pwr: GPIO21
+    
+    ext:
+      usb:
+        uart:
+          d_p: GPIO19
+          d_n: GPIO20
+

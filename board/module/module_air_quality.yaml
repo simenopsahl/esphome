@@ -24,6 +24,7 @@ sensor:
       name: "PM1 PMSA003"
       device_class: "pm1"
       state_class: "measurement"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 2
@@ -40,6 +41,7 @@ sensor:
       name: "PM2.5 PMSA003"
       device_class: "pm25"
       state_class: "measurement"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 2
@@ -56,6 +58,7 @@ sensor:
       name: "PM10 PMSA003"
       device_class: "pm10"
       state_class: "measurement"
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 2

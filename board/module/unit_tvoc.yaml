@@ -17,6 +17,7 @@ sensor:
       name: "eCO2 SGP30"
       device_class: "carbon_dioxide"
       state_class: "measurement"
+      accuracy_decimals: 1
       filters:
         - sliding_window_moving_average:
             window_size: 30
@@ -27,6 +28,7 @@ sensor:
       device_class: "volatile_organic_compounds_parts"
       state_class: "measurement"
       unit_of_measurement: "ppm"
+      accuracy_decimals: 2
       filters:
         # PPB to PPM
         - multiply: 0.001

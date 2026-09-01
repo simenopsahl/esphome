@@ -1,0 +1,146 @@
+---
+# https://docs.m5stack.com/en/core/Stamp-P4
+# PINs for m5stack Stamp-P4
+# Model:  esp32-p4nrw32
+# FLASH:  16MB
+# PSRAM:  32MB
+
+substitutions:
+  pin:
+    light:
+      led: xx
+      disp_bl: xx
+    int:
+      i2c:
+        sda: GPIO11
+        scl: GPIO9
+      spi:
+        clk: xx
+        dat1: nc
+        dat2: nc
+        dat3: nc
+        dat4: nc
+        disp:
+          cs: nc
+        card:
+          clk: xx
+          cmd: xx
+          cs: xx
+          d0: xx
+          d1: xx
+          d2: xx
+          d3: xx
+      c6_hosted:
+        rst: GPIO42
+        cmd: GPIO44
+        clk: GPIO43
+        d0: GPIO45
+        d1: GPIO46
+        d2: GPIO47
+        d3: GPIO48
+    
+    btn:
+      boot: GPIO35
+    
+    audio:
+      i2s_lrclk: xx
+      i2s_bclk: xx
+      i2s_mclk: xx
+      i2s_dout: xx
+      i2s_din: xx
+      mic: xx
+      spk: xx
+      amp: xx
+    
+    ext:
+      h1:
+        p1: GPIO15 # LPG15
+        p2: GPIO14 # LPG14
+        p3: GPIO12 # LPG12
+        p4: GPIO11 # LPG11 # SDA
+        p5: GPIO10 # LPG10
+        p6: GPIO9 # LPG9 # SCL
+        p7: GPIO8 # LPG8
+        p8: GPIO7 # LPG7
+        p9: GPIO1 # LPG1
+        p10: GPIO50
+        p11: GPIO0 # LPG0
+        p12: GPIO49
+        p13: GND
+        p14: 5vin
+        P15: vbus
+        p16: GPIO4 # LPG4
+        p17: GPIO27 # usb1_d_p
+        p18: GPIO6 # LPG6
+        p19: GPIO26 # usb1_d_n
+      h2:
+        p1: GPIO23
+        p2: GPIO22
+        p3: GPIO21
+        p4: GPIO20
+        p5: GPIO19
+        p6: GPIO18
+        p7: GPIO17
+        p8: GPIO16
+        p9: 3v
+        p10: GPIO13 # LPG13
+        p11: GPIO37 # uart0_tx
+        p12: GPIO39
+        p13: GPIO38 # uart0_rx
+        p14: GPIO34
+        p15: en
+        p16: GPIO5 # LPG5
+        p17: GPIO35 # boot
+        p18: GPIO2 # LPG2
+        p19: GND
+      h3:
+        p1: 5v
+        p2: host_dp # usb2
+        p3: host_dm # usb2
+        p4: GPIO24 # usbC_d_n
+        p5: GPIO25 # usbC_d_p
+        p6: GPIO3 # LPG3
+
+      rmii:
+        p1: GPIO32 # clk
+        p2: GPIO36 # mdio
+        p3: GPIO35 # d1_tx boot
+        p4: GPIO41 # d0_tx
+        p5: GPIO33 # txen
+        p6: GPIO31 # mdc
+        p7: GPIO28 # dv_rx
+        p8: GPIO30 # d1_rx
+        p9: GPIO29 # d0_rx
+        p10: GPIO52 # rst
+      dsi:
+        p1: GND
+        p2: dsi_d0_n
+        p3: dsi_d0_p
+        p4: GND
+        p5: dsi_clk_p
+        p6: dsi_clk_n
+        p7: GND
+        p8: dsi_d1_n
+        p9: dsi_d1_p
+        p10: GND
+      csi:
+        p1: GND
+        p2: GND
+        p3: GPIO11 # LPG11 # SDA
+        p4: GPIO9 # LPG9 # SCL
+        p5: csi_d1_p
+        p6: 3v
+        p7: GND
+        p8: csi_d1_n
+        p9: csi_clk_p
+        p10: GND
+        p11: GND
+        p12: csi_clk_n
+        p13: csi_d0_n
+        p14: csi_d0_p
+        p15: GPIO53 # mclk
+        p16: GND
+        p17: GND
+        p18: GPIO4 # csi_rst
+        p19: GND
+        p20: GND

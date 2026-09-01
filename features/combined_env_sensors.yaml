@@ -8,6 +8,7 @@ sensor:
     name: "Temperature"
     device_class: "temperature"
     state_class: "measurement"
+    accuracy_decimals: 2
 #    sources:
       # Base BTC
 #      - source: temperature_sht30_base_btc
@@ -40,6 +41,7 @@ sensor:
     name: "Humidity"
     device_class: "humidity"
     state_class: "measurement"
+    accuracy_decimals: 1
 #    sources:
       # Base BTC
 #      - source: humidity_sht30_base_btc
@@ -67,6 +69,7 @@ sensor:
     name: "Pressure"
     device_class: "atmospheric_pressure"
     state_class: "measurement"
+    accuracy_decimals: 1
 #    sources:
       # HAT ENV III
 #      - source: pressure_qmp6988_hat_env

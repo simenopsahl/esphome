@@ -48,6 +48,13 @@ substitutions:
       i2s_mclk: GPIO42
       i2s_din: GPIO41
       mic: GPIO41
+    display:
+      e1001:
+        cs: GPIO10
+        dc: GPIO11
+        rst: GPIO12
+        reset: GPIO12
+        busy: GPIO13
 
     ext:
       header:

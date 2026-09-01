@@ -18,6 +18,9 @@ sensor:
     timeout: 10ms
     timing_budget: 33000us
     name: "ToF Distance"
+    device_class: "distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 0
     update_interval: 500ms
     filters:
       - filter_out: nan
@@ -27,6 +30,8 @@ sensor:
           } else {
           return x;   // This passes the reading through
           }
+      # m to cm
+      - multiply: 100
       - sliding_window_moving_average:
           window_size: 3
           send_every: 4

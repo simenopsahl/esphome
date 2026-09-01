@@ -31,6 +31,7 @@ esphome:
 esp32:
 # ESP32-P4R32
 # PSRAM: 32MB
+  board: esp32-p4-evboard
   variant: esp32p4
   flash_size: 16MB
   cpu_frequency: 360MHz
@@ -132,7 +133,7 @@ microphone:
     sample_rate: 16000
     bits_per_sample: 16bit
     adc_type: external
-    channel: left
+#    channel: left
 
 speaker:
   - platform: i2s_audio
@@ -141,29 +142,30 @@ speaker:
     i2s_dout_pin: ${pin.audio.spk}
     dac_type: external
     audio_dac: dac_es8311
-    channel: mono
-    num_channels: 1
+    channel: stereo
+#    num_channels: 1
     buffer_duration: 1000ms
     bits_per_sample: 16bit
     sample_rate: 16000
 
-  - platform: mixer
-    id: mixing_speaker
-    output_speaker: i2s_speaker
-    task_stack_in_psram: true
-    source_speakers:
-      - id: announcement_mixing_input
-      - id: media_mixing_input
-
-  - platform: resampler
-    id: announcement_resampling_speaker
-    output_speaker: announcement_mixing_input
-    task_stack_in_psram: true
-
-  - platform: resampler
-    id: media_resampling_speaker
-    output_speaker: media_mixing_input
-    task_stack_in_psram: true
+# media player and voice assist in features/voice_assistant.yaml
+# media_player:
+#   - platform: speaker
+#     name: "Speaker Media Player"
+#     id: speaker_media_player
+#     task_stack_in_psram: True
+#     buffer_size: 1000000
+#     volume_initial: 50%
+#     volume_max: 80%
+#     media_pipeline:
+#         speaker: media_resampling_speaker
+#         num_channels: 2
+#     announcement_pipeline:
+#         speaker: announcement_resampling_speaker
+#         num_channels: 1
+#     files:
+#       - id: wake_word_triggered_sound
+#         file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
 
 switch:
   # Speaker Amplifier Enable
@@ -171,26 +173,41 @@ switch:
     id: speaker_enable
     pin: ${pin.audio.amp}
     restore_mode: ALWAYS_ON
-    name: "Speaker Enable"
+    name: "Amplifier"
     icon: "mdi:volume-high"
     entity_category: config
 
   - platform: template
     id: mic_mute
-    name: Microphone Mute
-    icon: "mdi:microphone-off"
+    name: Microphone
+    icon: "mdi:microphone"
     optimistic: true
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ALWAYS_ON
     entity_category: config
     on_turn_off:
-        - microphone.unmute:
-    on_turn_on:
         - microphone.mute:
+    on_turn_on:
+        - microphone.unmute:
+
+  - platform: template
+    id: sound_level_mute
+    name: Sound Level
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    entity_category: config
+    on_turn_off:
+      sound_level.stop: sound_level_sensor
+    on_turn_on:
+      sound_level.start: sound_level_sensor
 
 sensor:
   - platform: sound_level
     id: sound_level_sensor
-    passive: false
+    passive: true
+    microphone:
+      microphone: i2s_mic
+      channels: 1
     measurement_duration: 2000ms
     rms:
       name: "Noise Level"

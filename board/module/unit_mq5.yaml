@@ -39,6 +39,7 @@ sensor:
       state_class: "measurement"
       entity_category: "diagnostic"
       disabled_by_default: true
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 2
@@ -58,6 +59,7 @@ sensor:
       state_class: "measurement"
       entity_category: "diagnostic"
       disabled_by_default: true
+      accuracy_decimals: 1
       on_value:
         - globals.set:
             id: mq5_dynamic_baseline
@@ -123,6 +125,7 @@ sensor:
     entity_category: "diagnostic"
     disabled_by_default: true
     update_interval: 5s
+    accuracy_decimals: 1
     lambda: |-
       return id(mq5_dynamic_baseline);
 

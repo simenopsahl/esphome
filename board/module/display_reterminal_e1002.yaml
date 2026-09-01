@@ -1,0 +1,68 @@
+labels: [SPI, display, ePaper]
+---
+# https://wiki.seeedstudio.com/reterminal_e10xx_with_esphome/#basic-for-drawing-in-esphome
+# https://esphome.io/components/display/waveshare_epaper/
+
+color:
+  - id: color_black
+    red_int: 0
+    green_int: 0
+    blue_int: 0
+    white_int: 0
+  - id: color_white
+    red_int: 255
+    green_int: 255
+    blue_int: 255
+    white_int: 0
+  - id: color_red
+    red_int: 255
+    green_int: 0
+    blue_int: 0
+    white_int: 0
+  - id: color_green
+    red_int: 0
+    green_int: 255
+    blue_int: 0
+    white_int: 0
+  - id: color_blue
+    red_int: 0
+    green_int: 0
+    blue_int: 255
+    white_int: 0
+  - id: color_yellow
+    red_int: 255
+    green_int: 255
+    blue_int: 0
+    white_int: 0
+
+display:
+  # 800 x 480 resolution
+  # Full Color (E Ink® Spectra™ 6)
+  - platform: epaper_spi
+    id: display_eink
+    model: Seeed-reTerminal-E1002
+    update_interval: never
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill( id(color_black) );
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill( id(color_white) );
+
+#    lambda: |-
+#      const auto BLACK   = Color(0,   0,   0,   0);
+#      const auto WHITE   = Color(255, 255, 255, 0);
+#      const auto RED     = Color(255, 0,   0,   0);
+#      const auto GREEN   = Color(0,   255, 0,   0);
+#      const auto BLUE    = Color(0,   0,   255, 0);
+#      const auto YELLOW  = Color(255, 255, 0,   0);
+
+#      it.rectangle(10, 10, 100, 50, id(color_black));
+#      it.rectangle(150, 10, 50, 50, id(color_red));
+#      it.circle(250, 35, 25, id(color_green));
+#      it.filled_rectangle(10, 80, 100, 50, id(color_blue));
+#      it.filled_rectangle(150, 80, 50, 50, id(color_yellow));
+#      it.filled_circle(250, 105, 25, id(color_white));

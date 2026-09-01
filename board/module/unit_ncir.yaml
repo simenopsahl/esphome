@@ -19,7 +19,7 @@ sensor:
       name: "NCIR Ambient Temperature"
       device_class: temperature
       unit_of_measurement: "°C"
-      accuracy_decimals: 1
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 3
@@ -30,7 +30,7 @@ sensor:
       name: "NCIR Object Temperature"
       device_class: temperature
       unit_of_measurement: "°C"
-      accuracy_decimals: 1
+      accuracy_decimals: 2
       filters:
         - sliding_window_moving_average:
             window_size: 2
