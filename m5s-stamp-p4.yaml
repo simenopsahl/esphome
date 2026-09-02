@@ -1,21 +1,37 @@
-# Board: Generic ESP32-P4 Board (pre-rev3) (Generic)
-# Definition: definitions/boards/generic-esp32p4/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_stamp_p4.yaml
+
+  # --- FEATURE PACKAGES ---
+#  voice_assist: !include features/voice_assistant.yaml
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: m5stack-stamp-p4-e36bcb
+    location: "Storage"
+    framework:
+      type: esp-idf
 
 esphome:
-  name: m5s-stamp-p4
-  friendly_name: m5s-stamp-p4
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 esp32:
-  variant: esp32p4
-  engineering_sample: true
-  flash_size: 16MB
   framework:
-    type: esp-idf
+    type: ${device.framework.type}
 
-logger:
-
-# This board has no native Wi-Fi. ESPHome's ``api:`` and
-# ``ota:`` components both require a ``network``
-# component — configure ``openthread:`` / ``ethernet:`` /
-# ``esp32_hosted:`` to suit your setup, then add ``api:``
-# and ``ota:`` blocks once the network is ready.
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.78
