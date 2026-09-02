@@ -5,6 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/waveshare_p4_nano.yaml
+  display: !include board/module/dsi_43_800x480.yaml
 
   # --- FEATURE PACKAGES ---
   voice_assist: !include features/voice_assistant.yaml
