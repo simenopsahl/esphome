@@ -8,7 +8,7 @@ packages:
   display: !include board/module/dsi_43_800x480.yaml
 
   # --- FEATURE PACKAGES ---
-  voice_assist: !include features/voice_assistant.yaml
+#  voice_assist: !include features/voice_assistant.yaml
 
 substitutions:
   common:
