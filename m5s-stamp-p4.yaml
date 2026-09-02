@@ -6,9 +6,6 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_stamp_p4.yaml
 
-  # --- FEATURE PACKAGES ---
-#  voice_assist: !include features/voice_assistant.yaml
-
 substitutions:
   common:
     log_level: DEBUG
