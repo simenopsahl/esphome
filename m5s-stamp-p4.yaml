@@ -14,7 +14,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: m5stack-stamp-p4-e36bcb
+    name: m5stack-stamp-p4
     location: "Storage"
     framework:
       type: esp-idf
