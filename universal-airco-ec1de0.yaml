@@ -3,14 +3,14 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-  board: !include board/esp32s3_universal_airco.yaml
+  board: !include board/universal_airco.yaml
 
 substitutions:
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: universal-airco-ec1de0
+    name: universal-airco
     location: "Storage"
     framework:
       type: esp-idf
