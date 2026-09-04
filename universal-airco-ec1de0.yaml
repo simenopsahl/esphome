@@ -4,6 +4,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/universal_airco.yaml
+  norgespumpa_12: !include board/module/fujitsu_ac.yaml
 
 substitutions:
   common:
