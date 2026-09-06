@@ -10,6 +10,12 @@ packages:
   # --- FEATURE PACKAGES ---
 #  voice_assist: !include features/voice_assistant.yaml
 
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.etg2_simen_temperature
+  }}
+
 substitutions:
   common:
     log_level: DEBUG
@@ -48,7 +54,7 @@ time:
 
 lvgl:
   buffer_size: 40%
-  rotation: 180
+  rotation: 90
 
 binary_sensor:
   # Call sensors from HA.
