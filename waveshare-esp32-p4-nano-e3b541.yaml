@@ -11,10 +11,10 @@ packages:
 #  voice_assist: !include features/voice_assistant.yaml
 
   # --- LVGL WIDGET PACKAGES ---
-  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
-    uid: room_temp_value,
-    entity_id: sensor.etg2_simen_temperature
-  }}
+#  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+#    uid: room_temp_value,
+#    entity_id: sensor.etg2_simen_temperature
+#  }}
 
 substitutions:
   common:
@@ -46,31 +46,31 @@ wifi:
     static_ip: 192.168.71.102
 
 # --- LVGL CLOCKS ---
-time:
-  - id: !extend time_homeassistant
-    on_time:
-      - minutes: '*'
-        seconds: 0
-        then:
-          - script.execute: lvgl_time_update
+#time:
+#  - id: !extend time_homeassistant
+#    on_time:
+#      - minutes: '*'
+#        seconds: 0
+#        then:
+#          - script.execute: lvgl_time_update
 
-lvgl:
-  buffer_size: 40%
-  rotation: 180
+#lvgl:
+#  buffer_size: 40%
+#  rotation: 180
 
-binary_sensor:
+#binary_sensor:
   # Call sensors from HA.
-  - platform: homeassistant
-    entity_id: binary_sensor.etg2_simen_occupancy
-    id: presence1
-  - platform: homeassistant
-    entity_id: binary_sensor.etg2_gang_occupancy
-    id: presence2
+#  - platform: homeassistant
+#    entity_id: binary_sensor.etg2_simen_occupancy
+#    id: presence1
+#  - platform: homeassistant
+#    entity_id: binary_sensor.etg2_gang_occupancy
+#    id: presence2
   # Turn on display while room is occupied
-  - id: !extend presence_detected
-    lambda: !lambda |-
-      if ( (id(presence1).state) or (id(presence2).state) ) {
-        return true;
-      } else {
-        return false;
-      }
+#  - id: !extend presence_detected
+#    lambda: !lambda |-
+#      if ( (id(presence1).state) or (id(presence2).state) ) {
+#        return true;
+#      } else {
+#        return false;
+#      }
