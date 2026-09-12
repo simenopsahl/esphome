@@ -77,17 +77,18 @@ display:
           it.print( (it.get_width()/16)*4, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
 
           it.line(20, 36, 780, 36, id(epaper_accent1_color));
+
           
-          // BATTERY
           it.filled_rectangle(20, 46, 380, 194, id(epaper_accent3_color));
-          it.print( it.get_width()/16)*1, 60, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
-          it.printf( it.get_width() - 15, 55, id(font_lg), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "%.2f", id(battery_voltage).state );
+          // NAME
+          it.printf( 30, 56, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", App.get_name().c_str() );
+          // BATTERY
+          it.print( 30, 96, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
           if (id(battery_level).has_state()) {
-            it.printf(30, 260, id(font_lg), id(color_yellow), "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
+            it.printf(100, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
           } else {
-            it.printf(30, 260, id(font_md), id(color_yellow), "--");
+            it.printf(100, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
           }
-          it.print( it.get_width(), 57, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "V" );
           
 
           // DEVICE
