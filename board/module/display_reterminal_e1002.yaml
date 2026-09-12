@@ -1,40 +1,117 @@
 labels: [SPI, display, ePaper]
 ---
 # https://wiki.seeedstudio.com/reterminal_e10xx_with_esphome/#basic-for-drawing-in-esphome
-# https://esphome.io/components/display/waveshare_epaper/
+# https://esphome.io/components/display/epaper_spi/
 
-color:
-  - id: color_black
-    red_int: 0
-    green_int: 0
-    blue_int: 0
-    white_int: 0
-  - id: color_white
-    red_int: 255
-    green_int: 255
-    blue_int: 255
-    white_int: 0
-  - id: color_red
-    red_int: 255
-    green_int: 0
-    blue_int: 0
-    white_int: 0
-  - id: color_green
-    red_int: 0
-    green_int: 255
-    blue_int: 0
-    white_int: 0
-  - id: color_blue
-    red_int: 0
-    green_int: 0
-    blue_int: 255
-    white_int: 0
-  - id: color_yellow
-    red_int: 255
-    green_int: 255
-    blue_int: 0
-    white_int: 0
+# =============================================================================
+# reTerminal E1002 — ESPHome Full Hardware Example
+# All onboard peripherals enabled in the most basic way
+# =============================================================================
+#
+# Hardware list:
+#   1. 7.5" COLOR ePaper display (800x480, SPI)
+#      Supported colors: BLACK, RED, GREEN, BLUE, YELLOW
+#   2. 3x buttons (GPIO3, GPIO4, GPIO5)
+#   3. Buzzer (GPIO45, PWM)
+#   4. Onboard LED (GPIO6)
+#   5. Battery voltage (GPIO1 ADC + GPIO21 EN)
+#   6. SHT4x temp & humidity sensor (I2C)
+#   7. PCF8563 RTC (I2C addr 0x51, CR1220 backup)
+#   8. PDM Microphone (CLK=42, DATA=41, EN=38)
+#   9. MicroSD card slot (SPI + DET=15, EN=16)
+#  10. Deep sleep with button wake-up
+#
+# NOTE: Requires ESPHome >= 2025.11.1 for epaper_spi platform
+#
+# Serial debug: UART0 via CH340K USB bridge
+# =============================================================================
 
+packages:
+  epaper: !include ../../features/epaper.yaml
+
+substitutions:
+  device:
+    model: "Seeed reTerminal E1002"
+  display:
+    home_page: page_tutorial
+    font:
+      text_sm: 18
+      text_md: 22
+      text_lg: 26
+      text_xl: 30
+      text_xxl: 36
+      text_hg: 44
+      text_fl: 54
+      icons_sm: 28
+      icons_md: 40
+      icons_lg: 50
+      icons_xl: 64
+      icons_xxl: 90
+  pin:
+    light:
+      led: GPIO6
+    int:
+      i2c:
+        sda: GPIO19
+        scl: GPIO20
+    audio:
+      i2s_lrclk: GPIO42
+      i2s_din: GPIO41
+      mic: GPIO41
+    ext:
+      j2:
+        p1: 3v
+        p2: gnd
+        p3: gpio46 # ADC
+        p4: gpio2 # ADC
+        p5: gpio17 # u1_tx
+        p6: gpio18 # u1_rx
+        p7: gpio20 # SCL
+        p8: gpio19 # SDA
+
+esphome:
+  project:
+    name: "Seeed.reTerminal E1002"
+    version: "1.0.0"
+  on_boot:
+    - priority: 600
+      then:
+        # Turn on SD card power rail
+        - output.turn_on: sd_enable
+        # Turn on battery measurement circuit
+        - output.turn_on: battery_enable
+        # Turn on microphone power
+        - output.turn_on: mic_power_enable
+        # Wait for voltages to stabilize
+        - delay: 200ms
+        # Take first battery reading
+        - component.update: battery_voltage
+        - component.update: battery_level
+        # Read RTC time on boot
+        - pcf8563.read_time:
+    - priority: 200.0
+      then:
+        - component.update: display_eink
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) == true;'
+        # Wait a bit longer so all the items are received
+        - delay: 5s
+        - logger.log: "Initial sensor data received: Refreshing display..."
+        - lambda: 'id(initial_data_received) = true;'
+        - display.page.show: ${display.home_page}
+        - script.execute: update_screen
+
+globals:
+  - id: !extend epaper_bg_color
+    initial_value: 'Color(255, 255, 255, 0)' # Default to white background
+  - id: !extend epaper_text_color
+    initial_value: 'Color(0, 0, 0, 0)' # Default to black text
+
+# =============================================================================
+# [1] ePaper display (7.5" COLOR, 800x480)
+# Requires ESPHome >= 2025.11.1
+# =============================================================================
 display:
   # 800 x 480 resolution
   # Full Color (E Ink® Spectra™ 6)
@@ -51,6 +128,78 @@ display:
         lambda: |-
           // Fill background.
           it.fill( id(color_white) );
+      - id: page_tutorial
+        lambda: |-
+          // Fill background.
+          it.fill( id(color_white) );
+          // ---- Log all sensor values ----
+          ESP_LOGD("display", "=== ePaper display refresh ===");
+
+          // ---- Title (BLUE) ----
+          it.printf(400, 15, id(font_md), id(color_blue), TextAlign::TOP_CENTER,
+                    "reTerminal E1002 Dashboard");
+          it.line(20, 55, 780, 55, id(color_black));
+
+          // ---- RTC Time (BLACK) ----
+          auto now = id(time_rtc).now();
+          if (now.is_valid()) {
+            it.strftime(400, 65, id(font_md), id(color_black), TextAlign::TOP_CENTER,
+                        "%Y-%m-%d  %H:%M", now);
+            ESP_LOGD("display", "RTC time: %04d-%02d-%02d %02d:%02d",
+                    now.year, now.month, now.day_of_month, now.hour, now.minute);
+          } else {
+            it.printf(400, 65, id(font_md), id(color_black), TextAlign::TOP_CENTER,
+                      "RTC: waiting for sync...");
+            ESP_LOGW("display", "RTC: not synced yet");
+          }
+
+          // ---- Temperature (RED) ----
+          if (id(temperature_sht40).has_state()) {
+            ESP_LOGD("display", "Temperature: %.1f C", id(temperature_sht40).state);
+            it.printf(30, 120, id(font_lg), id(color_red), "Temp: %.1f C", id(temperature_sht40).state);
+          } else {
+            ESP_LOGW("display", "Temperature: NO DATA");
+            it.printf(30, 120, id(font_lg), id(color_red), "Temp: -- C");
+          }
+
+          // ---- Humidity (GREEN) ----
+          if (id(humidity_sht40).has_state()) {
+            ESP_LOGD("display", "Humidity: %.1f %%", id(humidity_sht40).state);
+            it.printf(30, 185, id(font_lg), id(color_green), "Hum:  %.1f %%", id(humidity_sht40).state);
+          } else {
+            ESP_LOGW("display", "Humidity: NO DATA");
+            it.printf(30, 185, id(font_lg), id(color_green), "Hum:  -- %%");
+          }
+
+          // ---- Battery (YELLOW) ----
+          if (id(battery_level).has_state()) {
+            ESP_LOGD("display", "Battery: %.0f%%  Voltage: %.2fV",
+                    id(battery_level).state, id(battery_voltage).state);
+            it.printf(30, 260, id(font_md), id(color_yellow), "Battery: %.0f%%  (%.2fV)",
+                      id(battery_level).state, id(battery_voltage).state);
+          } else {
+            it.printf(30, 260, id(font_md), id(color_yellow), "Battery: --");
+          }
+
+          // ---- SD card status (BLACK) ----
+          if (id(sd_card_detect).state) {
+            it.printf(30, 305, id(font_sm), id(color_black), "SD Card: inserted");
+          } else {
+            it.printf(30, 305, id(font_sm), id(color_black), "SD Card: not detected");
+          }
+
+          // ---- Microphone status (BLACK) ----
+          it.printf(30, 335, id(font_sm), id(color_black), "PDM Microphone: enabled (GPIO41/42)");
+
+          // ---- Button hints (BLACK) ----
+          it.line(20, 370, 780, 370, id(color_blue));
+          it.printf(30, 380, id(font_sm), id(color_green), "KEY0 GPIO3: Green button");
+          it.printf(30, 405, id(font_sm), id(color_black), "KEY1 GPIO4: Right button");
+          it.printf(30, 430, id(font_sm), id(color_black), "KEY2 GPIO5: Left button");
+
+          // ---- Footer (BLUE) ----
+          it.printf(400, 458, id(font_sm), id(color_blue), TextAlign::TOP_CENTER,
+                    "Selected reTerminal hardware features enabled");
 
 #    lambda: |-
 #      const auto BLACK   = Color(0,   0,   0,   0);
@@ -60,9 +209,355 @@ display:
 #      const auto BLUE    = Color(0,   0,   255, 0);
 #      const auto YELLOW  = Color(255, 255, 0,   0);
 
-#      it.rectangle(10, 10, 100, 50, id(color_black));
-#      it.rectangle(150, 10, 50, 50, id(color_red));
-#      it.circle(250, 35, 25, id(color_green));
-#      it.filled_rectangle(10, 80, 100, 50, id(color_blue));
-#      it.filled_rectangle(150, 80, 50, 50, id(color_yellow));
-#      it.filled_circle(250, 105, 25, id(color_white));
+#      it.rectangle(10, 10, 100, 50, BLACK);
+#      it.rectangle(150, 10, 50, 50, RED);
+#      it.circle(250, 35, 25, GREEN);
+#      it.filled_rectangle(10, 80, 100, 50, BLUE);
+#      it.filled_rectangle(150, 80, 50, 50, YELLOW);
+#      it.filled_circle(250, 105, 25, WHITE);
+
+font:
+  - id: font_sm
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_sm}
+    bpp: 4
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', '!', '#', '$', '&', '(', ')',
+      '*', '+', '=', '<', '>', '[', ']', '\', '|', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - id: font_md
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_md}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+  - id: font_lg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_lg}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+  - id: font_xl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_xl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+  - id: font_xxl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_xxl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+  - id: font_hg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    size: ${display.font.text_hg}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: mdi_sm
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xl}
+    bpp: 4
+    glyphs: !include ../../gui/fonts/glyphs.yaml
+  - id: mdi_md
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xxl}
+    bpp: 4
+    glyphs: !include ../../gui/fonts/glyphs.yaml
+  - id: mdi_lg
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_lg}
+    bpp: 4
+    glyphs: !include ../../gui/fonts/glyphs.yaml
+  - id: mdi_xl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xl}
+    bpp: 4
+    glyphs: !include ../../gui/fonts/glyphs.yaml
+  - id: mdi_xxl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xxl}
+    bpp: 4
+    glyphs: !include ../../gui/fonts/glyphs.yaml
+
+# Enable serial logging
+# The reTerminal E series has a CH340K USB-to-UART bridge on UART0.
+# Default ESP32-S3 logger uses USB_CDC — won't produce output on the physical port.
+logger:
+  hardware_uart: UART0
+
+# I2S audio bus — for the onboard PDM microphone
+# i2s_lrclk_pin serves as the PDM clock output in PDM mode
+i2s_audio:
+  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+
+output:
+  # [9] SD card power enable
+  - platform: gpio
+    pin: ${pin.reTerminal.e1002.card.sd_power}
+    id: sd_enable
+
+  # [5] Battery measurement enable
+  - platform: gpio
+    pin: ${pin.reTerminal.e1002.battery.enable}
+    id: battery_enable
+
+  # [3] Buzzer PWM output
+  # 'ledc' is ESP32 hardware PWM
+  - platform: ledc
+    pin: ${pin.reTerminal.e1002.audio.buzzer}
+    id: buzzer
+
+  # [8] Microphone power enable (TPS22916 load switch)
+  # Must be HIGH before recording
+  - platform: gpio
+    pin: ${pin.reTerminal.e1002.audio.mic_power}
+    id: mic_power_enable
+
+sensor:
+  # --- Battery voltage (ADC on GPIO1) ---
+  - platform: adc
+    pin: ${pin.reTerminal.e1002.battery.adc}
+    name: "Battery Voltage"
+    id: battery_voltage
+    update_interval: 60s
+    attenuation: 12db
+    entity_category: diagnostic
+    disabled_by_default: true
+    filters:
+      # Compensate for onboard voltage divider (1:2)
+      - multiply: 2.0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  # --- Battery level (percentage) ---
+  - platform: template
+    name: "Battery Level"
+    id: battery_level
+    unit_of_measurement: "%"
+    icon: "mdi:battery"
+    device_class: battery
+    state_class: measurement
+    entity_category: diagnostic
+    lambda: 'return id(battery_voltage).state;'
+    filters:
+      - calibrate_linear:
+          - 4.15 -> 100.0
+          - 3.96 -> 90.0
+          - 3.91 -> 80.0
+          - 3.85 -> 70.0
+          - 3.80 -> 60.0
+          - 3.75 -> 50.0
+          - 3.68 -> 40.0
+          - 3.58 -> 30.0
+          - 3.49 -> 20.0
+          - 3.41 -> 10.0
+          - 3.30 -> 5.0
+          - 3.27 -> 0.0
+      - clamp:
+          min_value: 0
+          max_value: 100
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  # --- SHT4x temperature & humidity (I2C) ---
+  - platform: sht4x
+    i2c_id: ${module.internal.i2c_bus}
+    id: sht40_sensor
+    temperature:
+      id: temperature_sht40
+      name: "SHT40 Temperature"
+      disabled_by_default: true
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
+      on_value:
+        then:
+          - lambda: 'id(data_updated) = true;'
+    humidity:
+      id: humidity_sht40
+      name: "SHT40 Humidity"
+      disabled_by_default: true
+      device_class: "humidity"
+      state_class: "measurement"
+      accuracy_decimals: 1
+      filters:
+        - sliding_window_moving_average:
+            window_size: 6
+            send_every: 3
+      on_value:
+        then:
+          - lambda: 'id(data_updated) = true;'
+    heater_power: Low
+    heater_time: Short
+    update_interval: 10s
+
+  - id: !extend recorded_display_refresh_sensor
+    # Alternate epaper colors
+    on_value:
+      - then:
+          - lambda: |-
+              // This C++ logic updates the color globals
+              if (((int)x) % 5 == 0) {
+                // On refreshes 0, 5, 10, etc., set Black background, White text
+                id(epaper_bg_color) = Color(0, 0, 0, 0);
+                id(epaper_text_color) = Color(255, 255, 255, 0);
+                id(epaper_accent1_color) = Color(255, 0, 0, 0);
+                id(epaper_accent2_color) = Color(255, 255, 0, 0);
+                id(epaper_accent3_color) = Color(0, 255, 0, 0);
+                id(epaper_accent4_color) = Color(255, 255, 0, 0);
+              } else {
+                // On all other refreshes, set White background, Black text
+                id(epaper_bg_color) = Color(255, 255, 255, 0);
+                id(epaper_text_color) = Color(0, 0, 0, 0);
+                id(epaper_accent1_color) = Color(0, 255, 0, 0);
+                id(epaper_accent2_color) = Color(0, 0, 255, 0);
+                id(epaper_accent3_color) = Color(255, 0, 0, 0);
+                id(epaper_accent4_color) = Color(0, 0, 255, 0);
+              }
+
+binary_sensor:
+  # KEY0 (GPIO3)
+  - platform: gpio
+    pin:
+      number: ${pin.reTerminal.e1002.btn.green}
+      mode: INPUT
+      inverted: true
+    id: button_green
+    name: "Green Button"
+    entity_category: diagnostic
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: "KEY0 (GPIO3) pressed"
+      - script.execute: buzzer_beep
+    on_release:
+      - output.turn_off: buzzer
+
+  # KEY1 (GPIO4)
+  - platform: gpio
+    pin:
+      number: ${pin.reTerminal.e1002.btn.right}
+      mode: INPUT
+      inverted: true
+    id: button_right
+    name: "Right Button"
+    entity_category: diagnostic
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: "KEY1 (GPIO4) pressed"
+      - script.execute: buzzer_beep
+    on_release:
+      - output.turn_off: buzzer
+
+  # KEY2 (GPIO5)
+  - platform: gpio
+    pin:
+      number: ${pin.reTerminal.e1002.btn.left}
+      mode: INPUT
+      inverted: true
+    id: button_left
+    name: "Left Button"
+    entity_category: diagnostic
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: "KEY2 (GPIO5) pressed"
+      - script.execute: buzzer_beep
+    on_release:
+      - output.turn_off: buzzer
+
+  # [9] SD card detect (LOW = card present)
+  #
+  # NOTE on SD card in ESPHome:
+  # ESPHome cannot directly access the SD card file system (read/write files,
+  # create directories, etc.) the way Arduino can. In ESPHome, the SD card is
+  # used indirectly by specific components:
+  #   - online_image: caches downloaded images to SD card
+  #   - media_player: plays audio files stored on the card
+  #   - Works with PSRAM for large buffer allocation
+  # For direct file operations (e.g. recording WAV files), use the Arduino framework.
+  - platform: gpio
+    pin:
+      number: ${pin.reTerminal.e1002.card.detect}
+      mode: INPUT_PULLUP
+      inverted: true
+    id: sd_card_detect
+    name: "SD Card Detected"
+    entity_category: diagnostic
+    disabled_by_default: true
+    on_state:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+
+time:
+  # PCF8563 is at I2C address 0x51 with a CR1220 coin cell backup.
+  # On boot we read the RTC; when HA syncs, we write back to the RTC.
+  - platform: pcf8563
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    address: 0x51
+    # No periodic re-reads needed; HA sync handles it
+    update_interval: never
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - pcf8563.write_time:
+
+# =============================================================================
+# [8] PDM Microphone / PDM 麦克风
+# =============================================================================
+# The onboard PDM mic outputs a 1-bit sigma-delta stream.
+# ESP32-S3 built-in PDM peripheral decodes it — no external codec needed.
+#
+# In HA, this microphone can be used with Voice Assistant / Assist Pipeline.
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    adc_type: external
+    pdm: true
+    i2s_din_pin: ${pin.audio.mic}
+
+# Script for buzzer beep
+script:
+  - id: buzzer_on
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+  - id: buzzer_beep
+    then:
+      - output.turn_on: buzzer
+      - output.ledc.set_frequency:
+          id: buzzer
+          frequency: "500Hz"
+      - output.set_level:
+          id: buzzer
+          level: "1%"
+      - delay: 30ms
+      - output.turn_off: buzzer

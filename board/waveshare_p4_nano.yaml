@@ -40,10 +40,19 @@ esp32:
       compiler_optimization: PERF
       execute_from_psram: true
       enable_idf_experimental_features: true
+      
+      ringbuf_in_iram: True
     sdkconfig_options:
       CONFIG_ESP32P4_SELECTS_REV_LESS_V3: "n"
       CONFIG_ESP32P4_REV_MIN_301: "y"
+
+      CONFIG_ESP_MAIN_TASK_STACK_SIZE: "8192"
+      CONFIG_ESP_MAIN_TASK_AFFINITY_CPU1: "y"
+      CONFIG_LWIP_SO_RCVBUF: "y"
+      CONFIG_LWIP_MAX_SOCKETS: "32"
+      CONFIG_ESP_TASK_WDT_TIMEOUT_S: "60"
     type: ${device.framework.type}
+    version: 6.1.0
 
 logger:
   hardware_uart: UART0
@@ -67,17 +76,6 @@ http_request:  # Needed by esp32_hosted-update and any JSON stuff
   buffer_size_rx: 2048
 
 esp_ldo:
-  # Force stable 3.3V to the Main Flash Memory
-#  - id: ldo_flash_power
-#    channel: 1
-#    voltage: passthrough
-#    allow_internal_channel: true
-  # Force stable 3.3V to the High-Speed PSRAM
-#  - id: ldo_psram_power
-#    channel: 2
-#    voltage: passthrough
-#    allow_internal_channel: true
-
   # For display
   - id: ldo_dsi_power
     channel: 3
@@ -100,20 +98,20 @@ esp32_hosted:
   d3_pin: ${pin.int.c6_hosted.d3}
   use_psram: true
 
-network:
-  priority:
-    - wifi
-    - ethernet
+# network:
+#   priority:
+#     - wifi
+#     - ethernet
 
-ethernet:
-  type: IP101
-  mdc_pin: ${pin.ext.ethernet.mdc}
-  mdio_pin: ${pin.ext.ethernet.mdio}
-  power_pin: ${pin.ext.ethernet.pwr}
-  clk:
-    mode: CLK_EXT_IN
-    pin: ${pin.ext.ethernet.clk}
-  phy_addr: 1
+# ethernet:
+#   type: IP101
+#   mdc_pin: ${pin.ext.ethernet.mdc}
+#   mdio_pin: ${pin.ext.ethernet.mdio}
+#   power_pin: ${pin.ext.ethernet.pwr}
+#   clk:
+#     mode: CLK_EXT_IN
+#     pin: ${pin.ext.ethernet.clk}
+#   phy_addr: 1
 
 # Firmware update for esp32_hosted ESP32-C6
 update:
@@ -170,23 +168,16 @@ speaker:
     sample_rate: 16000
 
 # media player and voice assist in features/voice_assistant.yaml
-# media_player:
-#   - platform: speaker
-#     name: "Speaker Media Player"
-#     id: speaker_media_player
-#     task_stack_in_psram: True
-#     buffer_size: 1000000
-#     volume_initial: 50%
-#     volume_max: 80%
-#     media_pipeline:
-#         speaker: media_resampling_speaker
-#         num_channels: 2
-#     announcement_pipeline:
-#         speaker: announcement_resampling_speaker
-#         num_channels: 1
-#     files:
-#       - id: wake_word_triggered_sound
-#         file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
+media_player:
+  - platform: speaker
+    name: "Speaker Media Player"
+    id: speaker_media_player
+    task_stack_in_psram: True
+    buffer_size: 1000000
+    volume_initial: 50%
+    volume_max: 80%
+    announcement_pipeline:
+        speaker: i2s_speaker
 
 switch:
   # Speaker Amplifier Enable

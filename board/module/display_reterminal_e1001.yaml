@@ -3,6 +3,49 @@ labels: [SPI, display, ePaper]
 # https://wiki.seeedstudio.com/reterminal_e10xx_with_esphome/#basic-for-drawing-in-esphome
 # https://esphome.io/components/display/waveshare_epaper/
 
+packages:
+  epaper: !include ../../features/epaper.yaml
+
+substitutions:
+  device:
+    model: "Seeed reTerminal E1001"
+  display:
+    home_page: page_tutorial
+    font:
+      text_sm: 18
+      text_md: 22
+      text_lg: 26
+      text_xl: 30
+      text_xxl: 36
+      text_hg: 44
+      text_fl: 54
+      icons_sm: 28
+      icons_md: 40
+      icons_lg: 50
+      icons_xl: 64
+      icons_xxl: 90
+  pin:
+    light:
+      led: GPIO6
+    int:
+      i2c:
+        sda: GPIO19
+        scl: GPIO20
+    audio:
+      i2s_lrclk: GPIO42
+      i2s_din: GPIO41
+      mic: GPIO41
+    ext:
+      j2:
+        p1: 3v
+        p2: gnd
+        p3: gpio46 # ADC
+        p4: gpio2 # ADC
+        p5: gpio17 # u1_tx
+        p6: gpio18 # u1_rx
+        p7: gpio20 # SCL
+        p8: gpio19 # SDA
+
 display:
   # 800 x 480 resolution
   # Monochrome (4-level grayscale)

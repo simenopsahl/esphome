@@ -1,0 +1,128 @@
+labels: [uart, temperature, climate]
+---
+# https://github.com/plains203/fujitsuac_esphome
+
+# WIP
+
+# JST-type Wiring
+#  AC Socket       CN3903                 ESP32c3               ESP32s3
+# 1 (+12V) ------> V in+ ---> V out+ ---> 5V -----------------> 5V
+# 2 (GND)  ------> V in- ---> V out- ---> GND ----------------> GND
+# 3 (DATA) -----------(AC -> ESP)-------> RX/5 ---------------> RX/34
+# 4 (DATA) -----------(AC <- ESP)-------> TX/6 ---------------> TX/48
+
+# USB-type wiring
+# Pin 1 - 12v
+# Pin 2 - AC_TX - ESP_RX 5 pin / 34 pin
+# Pin 3 - AC_RX - ESP_TX 5 pin / 48 pin
+# Pin 4 - GND
+
+substitutions:
+  module:
+    fujitsu_ac:
+      esp32c3: false
+      esp32s3: true
+
+# Make heat pump always appear as a separate device in the hallway area
+esphome:
+  areas:
+    - id: area_hallway
+      name: Gang
+  # Define devices
+  devices:
+    - id: sub_device_ac
+      name: norgespumpa 12
+      area_id: area_hallway
+
+external_components:
+  - source: github://plains203/fujitsuac_esphome
+
+uart:
+  id: uart_ac
+  baud_rate: 9600
+  # CRITICAL: the Fujitsu bus is inverted-logic UART. Without inverted: true
+  # on BOTH pins the handshake will never complete.
+  rx_pin:
+    number: ${pin.ext.usb1_am90.p3 if module.fujitsu_ac.esp32s3 else pin.ext.h.d5}
+    inverted: true
+  tx_pin:
+    number: ${pin.ext.usb1_am90.p2 if module.fujitsu_ac.esp32s3 else pin.ext.h.d6}
+    inverted: true
+
+fujitsu_ac:
+  id: norgespumpa_12
+  uart_id: uart_ac
+  # Upstream has never tested writing the minimum-heat register; state is
+  # always readable, but writes are refused unless you opt in:
+  # enable_minimum_heat_control: true
+
+climate:
+  - platform: fujitsu_ac
+    fujitsu_ac_id: norgespumpa_12
+    device_id: sub_device_ac
+    name: "Norgespumpa 12"
+
+sensor:
+  - platform: fujitsu_ac
+    fujitsu_ac_id: norgespumpa_12
+    id: fujitsu_ac_sensor
+    outdoor_temperature:
+      id: temperature_outdoor_fujitsu_ac
+      device_id: sub_device_ac
+      name: Temperature Outdoor
+      device_class: "temperature"
+      state_class: "measurement"
+      entity_category: "diagnostic"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+    indoor_temperature:
+      id: temperature_indoor_fujitsu_ac
+      device_id: sub_device_ac
+      name: Temperature Indoor
+      device_class: "temperature"
+      state_class: "measurement"
+      entity_category: "diagnostic"
+      accuracy_decimals: 2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 3
+            send_every: 2
+
+select:
+  - platform: fujitsu_ac
+    fujitsu_ac_id: norgespumpa_12
+    vertical_airflow:
+      device_id: sub_device_ac
+      name: Vertical Airflow
+    horizontal_airflow:
+      device_id: sub_device_ac
+      name: Horizontal Airflow
+
+switch:
+  - platform: fujitsu_ac
+    fujitsu_ac_id: norgespumpa_12
+    powerful:
+      device_id: sub_device_ac
+      name: Powerful
+    economy:
+      device_id: sub_device_ac
+      name: Economy
+    energy_saving_fan:
+      device_id: sub_device_ac
+      name: Energy Saving Fan
+    outdoor_unit_low_noise:
+      device_id: sub_device_ac
+      name: Outdoor Unit Low Noise
+    coil_dry:
+      device_id: sub_device_ac
+      name: Coil Dry
+      entity_category: "config"
+    human_sensor:
+      device_id: sub_device_ac
+      name: Human Sensor
+#    minimum_heat:
+#      device_id: sub_device_ac
+#      name: Minimum Heat

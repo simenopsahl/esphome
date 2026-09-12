@@ -1,0 +1,60 @@
+---
+# https://github.com/Xinyuan-LilyGO/LilyGo-T-OI-PLUS
+# PINs for LilyGo T-OI Plus v1.3
+# Model:  ESP32C3
+# Flash:  4MB
+
+substitutions:
+  pin:
+    light:
+      led: GPIO3
+    int:
+      i2c:
+        sda: GPIO18
+        scl: GPIO19
+      spi:
+        clk: GPIO6
+        miso: GPIO5
+        mosi: GPIO7
+      uart:
+        rx: GPIO20
+        tx: GPIO21
+      bat_feedback: GPIO2
+    btn:
+      boot: GPIO8
+
+
+    ext:
+      h1:
+        p1: rst
+        p2: GPIO2 # a0 FSPI_Q ADC1_CH2
+        p3: GPIO4 # d0 MTMS FSPI_HD ADC1_CH4
+        p4: GPIO5 # d5 MTDI FSPI_WP ADC2_CH0
+        p5: GPIO6 # d6 MTCK FSPI_CLK
+        p6: GPIO7 # d7 MTDO FSPI_D
+        p7: GPIO10 # d8 10 FSPI_CSO
+        p8: 3v
+      h2:
+        p1: GPIO21 # tx0
+        p2: GPIO20 # rx0
+        p3: GPIO19 # d1 SCL
+        p4: GPIO18 # d2 SDA
+        p5: GPIO9 # d3
+        p6: GPIO8 # d4 boot
+        p7: GND
+        p8: 5v
+      h:
+        d0: GPIO4
+        d1: GPIO19
+        d2: GPIO18
+        d3: GPIO9
+        d4: GPIO8
+        d5: GPIO5
+        d6: GPIO6
+        d7: GPIO7
+        d8: GPIO10
+      grove:
+        p1: GPIO19 # SDC
+        p2: GPIO18 # SCA
+        p3: 3v
+        p4: GND

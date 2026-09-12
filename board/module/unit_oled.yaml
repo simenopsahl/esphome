@@ -17,7 +17,7 @@ display:
     id: display_oled
     model: SH1107 128x64
     contrast: 75%
-    update_interval: 5s
+    update_interval: 10s
     rotation: 90
     offset_y: 96
     pages:

@@ -17,6 +17,8 @@ substitutions:
       internal:
         frequency: 200kHz
   module:
+    internal:
+      i2c_bus: i2c_internal
     camera:
       pixel_format: JPEG
       resolution: 800x600
@@ -77,9 +79,12 @@ wifi:
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: ${pin.int.spi.miso}
 
 status_led:
-  pin: ${pin.light.led}
+  pin:
+    number: ${pin.light.led}
+    inverted: true
 
 sensor:
   - platform: internal_temperature

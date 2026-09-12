@@ -56,6 +56,59 @@ globals:
     restore_value: yes
     max_restore_data_length: 16
     initial_value: 'COLOR_ON' # Default to black text
+  
+  - id: epaper_accent1_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'Color(0, 255, 0, 0)' # Default to green (Complementary to red)
+  - id: epaper_accent2_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'Color(0, 0, 255, 0)' # Default to blue (Complementary to yellow)
+  - id: epaper_accent3_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'Color(255, 0, 0, 0)' # Default to red (Complementary to green)
+  - id: epaper_accent4_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'Color(255, 255, 0, 0)' # Default to yellow (Complementary to blue)
+
+color:
+  - id: color_black
+    red_int: 0
+    green_int: 0
+    blue_int: 0
+    white_int: 0
+  - id: color_white
+    red_int: 255
+    green_int: 255
+    blue_int: 255
+    white_int: 0
+  - id: color_red
+    red_int: 255
+    green_int: 0
+    blue_int: 0
+    white_int: 0
+  - id: color_green
+    red_int: 0
+    green_int: 255
+    blue_int: 0
+    white_int: 0
+  - id: color_blue
+    red_int: 0
+    green_int: 0
+    blue_int: 255
+    white_int: 0
+  - id: color_yellow
+    red_int: 255
+    green_int: 255
+    blue_int: 0
+    white_int: 0
 
 sensor:
   # Create sensors for monitoring remotely.
@@ -65,6 +118,7 @@ sensor:
     entity_category: "diagnostic"
     id: display_last_update
   - platform: template
+    id: recorded_display_refresh_sensor
     name: "Recorded Display Refresh"
     accuracy_decimals: 0
     unit_of_measurement: "Refreshes"
@@ -80,10 +134,18 @@ sensor:
                 // On refreshes 0, 5, 10, etc., set Black background, White text
                 id(epaper_bg_color) = COLOR_ON;
                 id(epaper_text_color) = COLOR_OFF;
+                id(epaper_accent1_color) = Color(255, 0, 0, 0);
+                id(epaper_accent2_color) = Color(255, 255, 0, 0);
+                id(epaper_accent3_color) = Color(0, 255, 0, 0);
+                id(epaper_accent4_color) = Color(255, 255, 0, 0);
               } else {
                 // On all other refreshes, set White background, Black text
                 id(epaper_bg_color) = COLOR_OFF;
                 id(epaper_text_color) = COLOR_ON;
+                id(epaper_accent1_color) = Color(0, 255, 0, 0);
+                id(epaper_accent2_color) = Color(0, 0, 255, 0);
+                id(epaper_accent3_color) = Color(255, 0, 0, 0);
+                id(epaper_accent4_color) = Color(0, 0, 255, 0);
               }
 
 # Buttons in Home Assistant

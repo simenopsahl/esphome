@@ -8,7 +8,7 @@ labels: [esp32s3]
 
 # Pins for this model
 packages:
-  pins: !include pins/esp32s3_universal_airco.yaml
+  pins: !include pins/universal_airco.yaml
 
 substitutions:
   device:
@@ -32,9 +32,6 @@ esp32:
       compiler_optimization: PERF
       enable_idf_experimental_features: true
     type: ${device.framework.type}
-
-external_components:
-  - source: github://hberntsen/mhi-ac-ctrl-esp32@master
 
 wifi:
   enable_btm: true

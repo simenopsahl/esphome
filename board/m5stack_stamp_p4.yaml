@@ -1,0 +1,96 @@
+labels: [esp32p4, psram]
+---
+# https://docs.m5stack.com/en/core/Stamp-P4
+# https://docs.m5stack.com/en/stamp/Stamp-AddOn_C6_For_P4
+# Base functions for:
+# M5Stack Stamp-P4 /w Stamp-AddOn C6
+# --
+
+# Pins for this model
+packages:
+  pins: !include pins/m5stack_stamp_p4.yaml
+
+substitutions:
+  extension:
+    i2c:
+      internal:
+        frequency: 400kHz
+  device:
+    model: 'M5Stack Stamp-P4'
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+esphome:
+  project:
+    name: 'M5Stack.Stamp-P4'
+    version: "1.0"
+
+esp32:
+# ESP32-P4R32
+# PSRAM: 32MB
+  variant: esp32p4
+  engineering_sample: true
+  flash_size: 16MB
+  cpu_frequency: 360MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+      enable_idf_experimental_features: true
+    type: ${device.framework.type}
+
+logger:
+  hardware_uart: UART0
+
+ota:
+  - platform: esphome
+    allow_partition_access: true
+
+psram:
+  speed: 200MHz
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+preferences:
+  flash_write_interval: 5min
+
+http_request:  # Needed by esp32_hosted-update and any JSON stuff
+  buffer_size_rx: 2048
+
+# Network hardware
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  reset_pin: ${pin.int.c6_hosted.rst}
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  use_psram: true
+
+# Firmware update for esp32_hosted ESP32-C6
+update:
+  - platform: esp32_hosted
+    name: "C6 CoProcessor Update"
+    icon: mdi:chip
+    type: http
+    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
+    update_interval: 6h
+
+sensor:
+  # CPU Temperature
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic

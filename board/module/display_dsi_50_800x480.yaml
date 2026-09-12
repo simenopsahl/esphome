@@ -1,0 +1,188 @@
+labels: [dsi, display, i2c]
+---
+# https://docs.freenove.com/projects/fnk0078/en/latest/fnk0078/codes/tutorial/5_7_inch.html
+# https://www.waveshare.com/wiki/5inch_DSI_LCD
+# https://github.com/waveshareteam/Waveshare-ESP32-components/blob/bfeb6e6d5737178cdde78b630c8118074da0a657/display/lcd/esp_lcd_hx8394/README.md
+# 5" 800x480 mipi dsi Touch LCD
+
+# WIP
+
+packages:
+  # --- GUI PACKAGES ---
+  colors: !include ../../gui/themes/colors_night_owl.yaml
+  lvgl: !include ../../gui/480x800.yaml
+
+substitutions:
+  module:
+    touch_i2c_bus: i2c_internal
+  display:
+    home_page: page_analog_clock
+
+esphome:
+  on_boot:
+    - priority: 600
+      then:
+        - lambda: |-
+            const char* TAG = "Display Init";
+            ESP_LOGI(TAG, "Booting Atmel Controller & ICN6211...");
+            
+            // 1. Power On & set PWM to 0
+            id(atmel_i2c).write_byte(0x85, 0x00);
+            delay(30);
+            id(atmel_i2c).write_byte(0x86, 0x00);
+            delay(5);
+            // 2. Set Port C (All resets active low) to 0
+            id(atmel_i2c).write_byte(0x83, 0x00);
+            delay(10);
+            // 3. Set Port A (LCD Orientation LR)
+            id(atmel_i2c).write_byte(0x81, 0x04);
+            delay(10);
+            // 4. Set Port B (LCD Main Power)
+            id(atmel_i2c).write_byte(0x82, 0x80);
+            delay(10);
+            // 5. Release Resets & Enable LED on Port C
+            id(atmel_i2c).write_byte(0x83, 0x0F);
+            delay(80);
+            ESP_LOGI(TAG, "Initializing ICN6211 Bridge...");
+            
+            // Config Mode
+            id(icn6211_i2c).write_byte(0x7A, 0x3E); 
+            
+            // Resolution Timings
+            id(icn6211_i2c).write_byte(0x20, 0x20); // 800 (0x320) LSB
+            id(icn6211_i2c).write_byte(0x21, 0xE0); // 480 (0x1E0) LSB
+            id(icn6211_i2c).write_byte(0x22, 0x13); // MSB combine
+            // Set Resolution Timings for 800x480
+            // id(icn6211_i2c).write_byte(0x20, 0xE0); // 480 (0x01E0) LSB
+            // id(icn6211_i2c).write_byte(0x21, 0x20); // 800 (0x0320) LSB
+            // id(icn6211_i2c).write_byte(0x22, 0x31); // MSBs combined (V:0x03, H:0x01)
+            id(icn6211_i2c).write_byte(0x23, 0x3B);   // HFP
+            id(icn6211_i2c).write_byte(0x24, 2);    // HSYNC
+            id(icn6211_i2c).write_byte(0x25, 45);   // HBP
+            id(icn6211_i2c).write_byte(0x26, 0x00); // H_HI
+            id(icn6211_i2c).write_byte(0x27, 7);    // VFP
+            id(icn6211_i2c).write_byte(0x28, 2);    // VSYNC
+            id(icn6211_i2c).write_byte(0x29, 22);   // VBP
+            
+            // DSI Sequence
+            id(icn6211_i2c).write_byte(0x34, 0x80); 
+            id(icn6211_i2c).write_byte(0x36, 55);   // HFP_MIN
+            id(icn6211_i2c).write_byte(0x86, 0x28); // 1 Lane Config
+            // id(icn6211_i2c).write_byte(0x86, 0x29); // 2 Lane Config
+            id(icn6211_i2c).write_byte(0x0B, 0xA0); // MIPI_PD_CK_LANE
+            id(icn6211_i2c).write_byte(0x5C, 0xFF); // PLL_CTRL(12)
+            id(icn6211_i2c).write_byte(0x87, 0x00); // MIPI_PN_SWAP
+            id(icn6211_i2c).write_byte(0x2A, 0x00); // BIST_POL
+            
+            // Calculated PLL Settings for 27.77MHz from ESP32-P4 MIPI Bitrate
+            // FIX: Calculated PLL Settings for 500Mbps
+            id(icn6211_i2c).write_byte(0x56, 0x92); 
+            id(icn6211_i2c).write_byte(0x6B, 0x09); 
+            id(icn6211_i2c).write_byte(0x69, 0x04);
+            
+            // Final System Config
+            id(icn6211_i2c).write_byte(0x10, 0x40); 
+            id(icn6211_i2c).write_byte(0x11, 0x88); 
+            id(icn6211_i2c).write_byte(0xB6, 0x20); 
+            id(icn6211_i2c).write_byte(0x51, 0x20); 
+            id(icn6211_i2c).write_byte(0x09, 0x10); 
+            delay(11);
+            // Switch to DSI Interface Mode
+            id(icn6211_i2c).write_byte(0x7A, 0xC1); 
+            return;
+        - globals.set:
+            id: display_init_done
+            value: "true"
+
+globals:
+  - id: display_init_done
+    restore_value: 'false'
+    type: bool
+    initial_value: 'false'
+
+display:
+  - platform: mipi_dsi
+    id: display_lcd
+    model: WAVESHARE-7-DSI-TOUCH-A # or CUSTOM
+    dimensions: # Overridden for 5" 800x480 display (WAVESHARE-7-DSI-TOUCH-A is 720x1280)
+      height: 480
+      width: 800
+    auto_clear_enabled: false
+    update_interval: 10s
+
+    # Copied from a WAVESHARE-P4-NANO-10.1 configuration
+    color_depth: 16
+    pixel_mode: 24
+    byte_order: little_endian
+    color_order: RGB
+
+    # From Waveshare4.3DSI.txt
+    pclk_frequency: 27.77MHz
+    lanes: 1
+    hsync_front_porch: 55
+    hsync_pulse_width: 2
+    hsync_back_porch: 45
+    vsync_front_porch: 7
+    vsync_pulse_width: 2
+    vsync_back_porch: 22
+
+i2c_device:
+  - id: atmel_i2c
+    address: 0x45
+  - id: icn6211_i2c
+    address: 0x2C
+
+output:
+  - platform: template
+    id: backlight_output
+    type: float
+    write_action:
+      - lambda: |-
+          id(atmel_i2c).write_byte(0x86, static_cast<uint8_t>(state * 255));
+          return;
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    name: "Backlight"
+    output: backlight_output
+    default_transition_length: 100ms
+    gamma_correct: 1.0
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    on_turn_on:
+      - lambda: |-
+          // Simply push the current requested brightness to the Atmel PWM register
+          uint8_t brightness = id(backlight_light).current_values.get_brightness() * 255;
+          id(atmel_i2c).write_byte(0x86, brightness);
+          return;
+    on_turn_off:
+      - lambda: |-
+          // Drop PWM to 0, but leave the bridge chip and screen actively running
+          id(atmel_i2c).write_byte(0x86, 0x00);
+          return;
+
+touchscreen:
+  - platform: ft5x06
+    i2c_id: ${module.touch_i2c_bus}
+    address: 0x38
+    id: touchscreen_ft5x06
+    display: display_lcd
+    transform:
+      swap_xy: false
+      mirror_y: false
+      mirror_x: false
+    on_touch:
+      - then:
+          - logger.log:
+              tag: "Touch"
+              level: INFO
+              format: Touch %d at (%d, %d)
+              args: [ 'touch.id', 'touch.x', 'touch.y' ]
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
