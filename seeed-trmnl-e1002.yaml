@@ -97,6 +97,137 @@ display:
           time_t currTime = id(time_rtc).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
           it.printf( it.get_width()/2, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
+      - id: page_content
+        lambda: |-
+          // Map weather states to MDI characters.
+          std::map<std::string, std::string> weather_icon_map
+            {
+              {"clear-night", "\U000F0594"},
+              {"cloudy", "\U000F0590"},
+              {"cloudy-alert", "\U000F0F2F"},
+              {"cloudy-arrow-right", "\U000F0E6E"},
+              {"fog", "\U000F0591"},
+              {"hail", "\U000F0592"},
+              {"hazy", "\U000F0F30"},
+              {"hurricane", "\U000F0898"},
+              {"lightning", "\U000F0593"},
+              {"lightning-rainy", "\U000F067E"},
+              {"night", "\U000F0594"},
+              {"night-partly-cloudy", "\U000F0F31"},
+              {"partlycloudy", "\U000F0595"},
+              {"partly-lightning", "\U000F0F32"},
+              {"partly-rainy", "\U000F0F33"},
+              {"partly-snowy", "\U000F0F34"},
+              {"partly-snowy-rainy", "\U000F0F35"},
+              {"pouring", "\U000F0596"},
+              {"rainy", "\U000F0597"},
+              {"snowy", "\U000F0598"},
+              {"snowy-heavy", "\U000F0F36"},
+              {"snowy-rainy", "\U000F067F"},
+              {"sunny", "\U000F0599"},
+              {"sunny-alert", "\U000F0F37"},
+              {"sunny-off", "\U000F14E4"},
+              {"sunset", "\U000F059A"},
+              {"sunset-down", "\U000F059B"},
+              {"sunset-up", "\U000F059C"},
+              {"tornado", "\U000F0F38"},
+              {"windy", "\U000F059D"},
+              {"windy-variant", "\U000F059E"},
+            };
+
+          // Set graph color
+          id(trace_nordpool)->set_line_color( id(epaper_accent2_color) );
+
+          // Fill background.
+          it.fill(id(epaper_bg_color));
+
+          // Show loading screen before data is received.
+          if (id(initial_data_received) == false) {
+            it.print(it.get_width()/2, 390, id(font_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
+          } else {
+
+            // Weather Section
+            // Now mid
+            //it.printf(124, 0, id(mdi_xxl), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+            //it.printf(224, 31, id(font_xl), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature).state);
+            // Now Measured and forecasted
+            it.printf(100, 0, id(mdi_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+            it.print(200, 13, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Målt:");
+            it.printf(200, 37, id(font_hg), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
+            it.print(300, 13, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Meldt:");
+            it.printf(300, 37, id(font_hg), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_forecast).state);
+            
+            it.printf(55, 100, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
+            it.printf(55, 121, id(mdi_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
+            it.printf(55, 185, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
+            
+            it.printf(147, 100, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
+            it.printf(147, 121, id(mdi_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
+            it.printf(147, 185, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
+            
+            it.printf(236, 100, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
+            it.printf(236, 121, id(mdi_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
+            it.printf(236, 185, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
+            
+            it.printf(330, 100, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
+            it.printf(330, 121, id(mdi_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
+            it.printf(330, 185, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
+            
+            it.printf(425, 100, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_4).state.c_str());
+            it.printf(425, 121, id(mdi_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_4).state.c_str()].c_str());
+            it.printf(425, 185, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_4).state);
+
+
+            // FolloRen Section
+            it.print(4, 250, id(mdi_lg), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
+            it.print(55, 247, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
+            it.printf(55, 269, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
+            
+            it.print(350, 240, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
+            it.printf(350, 285, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
+
+            it.print(435, 240, id(mdi_lg), id(epaper_accent4_color), TextAlign::TOP_CENTER, "\U000F0395");
+            it.printf(435, 285, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
+
+
+            // NordPool Section
+            it.graph(10, 360, id(graph_nordpool), id(epaper_accent4_color));
+            it.printf(10, 360, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "%s", id(nordpool_time_0).state.c_str());
+            it.printf(10, 528, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state);
+            it.printf(it.get_width()/2, 360, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(nordpool_time_4).state.c_str());
+            it.printf(it.get_width()/2, 528, id(font_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state);
+            it.printf(470, 360, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "%s", id(nordpool_time_8).state.c_str());
+            it.printf(470, 528, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state);
+
+
+            // Bus Section
+            it.print(320, 580, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "Bregnefaret");
+            it.print(330, 607, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
+            it.printf(330, 626, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_0).state.c_str());
+            it.printf(310, 614, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_0).state.c_str());
+
+            it.print(330, 656, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
+            it.printf(330, 675, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_1).state.c_str());
+            it.printf(310, 663, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_1).state.c_str());
+
+            it.print(330, 705, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
+            it.printf(330, 724, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_2).state.c_str());
+            it.printf(310, 712, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_2).state.c_str());
+
+
+            // Car Section
+            it.print(15, 615, id(mdi_lg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F010B");
+            it.printf(17, 658, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f km", id(car_battery_range).state);
+            it.printf(17, 685, id(font_hg), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f%%", id(car_battery_percent).state);
+
+
+            // Refresh Timestamp
+            // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+            char str[17];
+            time_t currTime = id(time_homeassistant).now().timestamp;
+            strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+            it.printf(it.get_width()/2, it.get_height()-8, id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Oppdatert kl %s", str);
+          }
     
 # Check if person is home
 binary_sensor:
@@ -164,3 +295,278 @@ image:
     id: i_selma
     file: gui/img/selma_480x800.jpg
     type: RGB
+
+sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: car_battery_percent
+    id: car_battery_percent
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: car_battery_range
+    id: car_battery_range
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_forecast
+    id: weather_temperature_forecast
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_measured
+    id: weather_temperature_actual
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_0
+    id: weather_temperature_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_1
+    id: weather_temperature_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_2
+    id: weather_temperature_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_3
+    id: weather_temperature_3
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_4
+    id: weather_temperature_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    id: nordpool_sensor
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    id: nordpool_price_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    id: nordpool_price_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price8
+    id: nordpool_price_8
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+graph:
+  - id: graph_nordpool
+    duration: 9h
+    border: false
+    x_grid: 1h
+    y_grid: 10.0
+    width: 470
+    height: 170
+    traces:
+      - id: trace_nordpool
+        sensor: nordpool_sensor
+        line_thickness: 8
+
+# Strings from Home Assistant
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_time_0
+    id: bus_bregnefaret_due_at_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_line_0
+    id: bus_bregnefaret_line_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_time_1
+    id: bus_bregnefaret_due_at_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_line_1
+    id: bus_bregnefaret_line_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_line_2
+    id: bus_bregnefaret_line_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_time_2
+    id: bus_bregnefaret_due_at_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: folloren_next
+    id: folloren_next
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: folloren_restavfall
+    id: folloren_restavfall
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: folloren_papir
+    id: folloren_papir
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_now
+    id: weather_condition_now
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_0
+    id: weather_condition_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_0
+    id: weather_timestamp_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_1
+    id: weather_condition_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_1
+    id: weather_timestamp_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_2
+    id: weather_condition_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_2
+    id: weather_timestamp_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_3
+    id: weather_condition_3
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_3
+    id: weather_timestamp_3
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_4
+    id: weather_condition_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_4
+    id: weather_timestamp_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time0
+    id: nordpool_time_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time4
+    id: nordpool_time_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time8
+    id: nordpool_time_8
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
