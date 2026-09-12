@@ -154,12 +154,37 @@ display:
               {"windy", "\U000F059D"},
               {"windy-variant", "\U000F059E"},
             };
-
           // Set graph color
           id(trace_nordpool)->set_line_color( id(epaper_accent2_color) );
 
           // Fill background.
           it.fill(id(epaper_bg_color));
+          
+          // Fill background.
+          it.fill( id(epaper_bg_color) );
+
+          // NAV
+            // Home
+          it.print( (it.get_width()/16)*11 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
+            // Next
+          it.print( (it.get_width()/16)*10 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
+            // Back
+          it.print( (it.get_width()/16)*9 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0141");
+          
+          // Show wifi icon.
+          if ( id(component_wifi).is_connected() ) {
+            it.print( 0 , 0, id(mdi_sm), id(epaper_accent2_color), TextAlign::TOP_LEFT, "\U000F05A9");
+          }
+          // Show HA icon.
+          if ( id(component_api).is_connected() ) {
+            it.print( it.get_width() , 0, id(mdi_sm), id(epaper_accent2_color), TextAlign::TOP_RIGHT, "\U000F07D0");
+          }
+          
+          // PAGE
+          it.print( (it.get_width()/16)*3 , 0, id(mdi_sm), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F02DC");
+          it.print( (it.get_width()/16)*4, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "T22");
+
+          it.line(20, 40, 780, 36, id(epaper_accent1_color));
 
           // Show loading screen before data is received.
           if (id(initial_data_received) == false) {
