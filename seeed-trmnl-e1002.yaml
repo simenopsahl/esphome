@@ -79,9 +79,16 @@ display:
           it.line(20, 36, 780, 36, id(epaper_accent1_color));
           
           // BATTERY
-          it.print( 0, 57, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "Batteri: " );
+          it.filled_rectangle(20, 46, 380, 194, id(epaper_accent3_color));
+          it.print( it.get_width()/16)*1, 60, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
           it.printf( it.get_width() - 15, 55, id(font_lg), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "%.2f", id(battery_voltage).state );
+          if (id(battery_level).has_state()) {
+            it.printf(30, 260, id(font_lg), id(color_yellow), "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
+          } else {
+            it.printf(30, 260, id(font_md), id(color_yellow), "--");
+          }
           it.print( it.get_width(), 57, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "V" );
+          
 
           // DEVICE
           //it.print( it.get_width()/2, 70, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "ESPHome" );
