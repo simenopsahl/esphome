@@ -60,7 +60,8 @@ display:
           it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
           it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
           // PAGE
-          it.image( it.get_width(), 0, id(i_info), ImageAlign::TOP_RIGHT, id(epaper_accent1_color), id(epaper_bg_color) );
+          it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_accent1_color), id(epaper_bg_color) );
+          it.print(30, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
           
           // BATTERY
           it.print( 0, 57, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "Batteri: " );
