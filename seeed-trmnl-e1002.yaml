@@ -307,7 +307,7 @@ image:
 
   - platform: file
     id: i_selma
-    file: gui/img/selma_480x800.jpg
+    file: gui/img/spectra_selma_480x800.png
     type: RGB
 
 sensor:
