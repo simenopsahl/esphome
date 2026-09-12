@@ -75,6 +75,8 @@ display:
           // PAGE
           it.print( (it.get_width()/16)*3 , 0, id(mdi_sm), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F02FC");
           it.print( (it.get_width()/16)*4, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
+
+          it.line(20, 36, 780, 36, id(epaper_accent1_color));
           
           // BATTERY
           it.print( 0, 57, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "Batteri: " );
