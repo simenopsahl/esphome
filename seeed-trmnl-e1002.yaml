@@ -11,10 +11,25 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: seeed-trmnl-e1002
+    name: seeed-trmnl-e1002-ec2478
     location: "Storage"
     framework:
       type: esp-idf
+  display:
+    home_page: page_tutorial
+    font:
+      text_sm: 16
+      text_md: 20
+      text_lg: 24
+      text_xl: 28
+      text_xxl: 34
+      text_hg: 42
+      text_fl: 52
+      icons_sm: 38
+      icons_md: 46
+      icons_lg: 50
+      icons_xl: 64
+      icons_xxl: 90
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -28,4 +43,3 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.37
-    
