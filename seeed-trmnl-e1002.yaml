@@ -18,15 +18,15 @@ substitutions:
   display:
     home_page: page_info
     font:
-      text_sm: 16
-      text_md: 20
-      text_lg: 24
-      text_xl: 28
-      text_xxl: 34
-      text_hg: 42
-      text_fl: 52
-      icons_sm: 38
-      icons_md: 46
+      text_sm: 18
+      text_md: 22
+      text_lg: 26
+      text_xl: 30
+      text_xxl: 36
+      text_hg: 44
+      text_fl: 54
+      icons_sm: 28
+      icons_md: 40
       icons_lg: 50
       icons_xl: 64
       icons_xxl: 90
