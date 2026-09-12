@@ -1,27 +1,31 @@
-# Board: Seeed Studio XIAO ESP32S3 Plus
-# Definition: definitions/boards/seeed_xiao_esp32_s3_plus/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
+  board: !include board/seeed_xiao_esp32s3_plus.yaml
+  e1002: !include board/module/display_reterminal_e1002.yaml
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: seeed-trmnl-e1002
+    location: "Storage"
+    framework:
+      type: esp-idf
 
 esphome:
-  name: seeed-trmnl-e1002
-  friendly_name: seeed-trmnl-e1002
-
-esp32:
-  variant: esp32s3
-
-logger:
-
-api:
-  encryption:
-    key: "x4YppBI6PIymwxvlYRSe1CirQmbx8v6p9QT7juDrV0c="
-
-ota:
-  - platform: esphome
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: seeed-trmnl-e10 Fallback Hotspot
-    password: "HHvtz8KoPjNm"
-
-captive_portal:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.37
+    
