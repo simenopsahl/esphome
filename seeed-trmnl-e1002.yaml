@@ -6,9 +6,6 @@ packages:
   board: !include board/seeed_xiao_esp32s3_plus.yaml
   e1002: !include board/module/display_reterminal_e1002.yaml
 
-  # --- FEATURE PACKAGES ---
-  combined_env_sensors: !include features/epaper.yaml
-
 substitutions:
   common:
     log_level: DEBUG
