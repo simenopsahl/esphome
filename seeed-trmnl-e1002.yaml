@@ -56,12 +56,25 @@ display:
           it.fill( id(epaper_bg_color) );
 
           // NAV
-          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
+            // Home
+          it.print( (it.get_width()/16)*11 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
+            // Next
+          it.print( (it.get_width()/16)*10 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
+            // Back
+          it.print( (it.get_width()/16)*9 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0141");
+          
+          // Show wifi icon.
+          if ( id(component_wifi).is_connected() ) {
+            it.print( 0 , 0, id(mdi_sm), id(epaper_accent2_color), TextAlign::TOP_LEFT, "\U000F05A9");
+          }
+          // Show HA icon.
+          if ( id(component_api).is_connected() ) {
+            it.print( it.get_width() , 0, id(mdi_sm), id(epaper_accent2_color), TextAlign::TOP_RIGHT, "\U000F07D0");
+          }
+          
           // PAGE
-          it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_accent1_color), id(epaper_bg_color) );
-          it.print(30, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
+          it.print( (it.get_width()/16)*3 , 0, id(mdi_sm), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F02FC");
+          it.print( (it.get_width()/16)*4, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
           
           // BATTERY
           it.print( 0, 57, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "Batteri: " );
@@ -82,21 +95,12 @@ display:
           // MAC
           it.printf( it.get_width()/2, 169, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
-          // Show wifi icon.
-          if ( id(component_wifi).is_connected() ) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_accent2_color), id(epaper_bg_color) );
-          }
-          // Show HA icon.
-          if ( id(component_api).is_connected() ) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_accent2_color), id(epaper_bg_color) );
-          }
-
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
           char str[17];
           time_t currTime = id(time_rtc).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
+          it.printf( 0, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "@ %s", str );
       - id: page_content
         lambda: |-
           // Map weather states to MDI characters.
