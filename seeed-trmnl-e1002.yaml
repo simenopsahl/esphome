@@ -94,7 +94,7 @@ display:
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
           char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
+          time_t currTime = id(time_rtc).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
           it.printf( it.get_width()/2, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
     
