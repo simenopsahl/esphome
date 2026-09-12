@@ -25,11 +25,11 @@ substitutions:
       text_xxl: 36
       text_hg: 44
       text_fl: 54
-      icons_sm: 28
-      icons_md: 40
-      icons_lg: 50
-      icons_xl: 64
-      icons_xxl: 90
+      icons_sm: 20
+      icons_md: 28
+      icons_lg: 38
+      icons_xl: 50
+      icons_xxl: 64
 
 esphome:
   comment: ${device.model} @ ${device.location}
