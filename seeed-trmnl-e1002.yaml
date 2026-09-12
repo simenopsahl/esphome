@@ -76,24 +76,24 @@ display:
           it.print( (it.get_width()/16)*3 , 0, id(mdi_sm), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F02FC");
           it.print( (it.get_width()/16)*4, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
 
-          it.line(20, 36, 780, 36, id(epaper_accent1_color));
+          it.line(20, 40, 780, 36, id(epaper_accent1_color));
 
           
           // DEVICE
-          it.filled_rectangle(20, 46, 380, 194, id(epaper_accent3_color));
+          it.filled_rectangle(20, 60, 380, 194, id(epaper_accent3_color));
           // NAME
-          it.printf( 40, 56, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", App.get_name().c_str() );
+          it.printf( 40, 80, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", App.get_name().c_str() );
           // BATTERY
-          it.print( 40, 96, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
+          it.print( 40, 120, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
           if (id(battery_level).has_state()) {
-            it.printf(120, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
+            it.printf(120, 120, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
           } else {
-            it.printf(120, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
+            it.printf(120, 120, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
           }
-          it.line(40, 116, 360, 116, id(epaper_accent4_color));
-          it.printf(40, 136, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
-          it.printf(40, 166, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
-          it.printf(40, 196, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
+          it.line(40, 130, 360, 116, id(epaper_accent4_color));
+          it.printf(40, 140, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
+          it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
+          it.printf(40, 200, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
 
           // NETWORK
