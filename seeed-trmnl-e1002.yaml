@@ -82,21 +82,22 @@ display:
           // DEVICE
           it.filled_rectangle(20, 46, 380, 194, id(epaper_accent3_color));
           // NAME
-          it.printf( 30, 56, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", App.get_name().c_str() );
+          it.printf( 40, 56, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", App.get_name().c_str() );
           // BATTERY
-          it.print( 30, 96, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
+          it.print( 40, 96, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
           if (id(battery_level).has_state()) {
-            it.printf(100, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
+            it.printf(120, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
           } else {
-            it.printf(100, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
+            it.printf(120, 96, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
           }
-          it.line(40, 360, 116, 360, id(epaper_accent4_color));
-          it.printf(30, 136, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Green button");
-          it.printf(30, 176, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Right button");
-          it.printf(30, 216, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Left button");
+          it.line(40, 116, 360, 116, id(epaper_accent4_color));
+          it.printf(40, 136, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
+          it.printf(40, 166, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
+          it.printf(40, 196, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
 
           // NETWORK
+          it.filled_rectangle(420, 46, 780, 194, id(epaper_accent1_color));
           //it.print( it.get_width()/2, 110, id(font_lg), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Nettverk" );
           // SSID
           it.printf( it.get_width()/2, 117, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
