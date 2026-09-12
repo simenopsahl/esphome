@@ -80,32 +80,37 @@ display:
 
           
           // DEVICE
-          it.filled_rectangle(20, 60, 380, 194, id(epaper_accent3_color));
+          it.filled_rectangle(20, 60, 390, 250, id(epaper_accent1_color));
           // NAME
-          it.printf( 40, 80, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", App.get_name().c_str() );
+          it.printf( 40, 90, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", App.get_name().c_str() );
           // BATTERY
-          it.print( 40, 120, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
+          it.print( 40, 130, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Batteri: " );
           if (id(battery_level).has_state()) {
-            it.printf(120, 120, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
+            it.printf(120, 130, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%.0f%%  (%.2fV)", id(battery_level).state, id(battery_voltage).state);
           } else {
-            it.printf(120, 120, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
+            it.printf(120, 130, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "--");
           }
-          it.line(40, 130, 360, 116, id(epaper_accent4_color));
-          it.printf(40, 140, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
-          it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
-          it.printf(40, 200, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
+          it.line(40, 160, 370, 116, id(epaper_accent4_color));
+          it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
+          it.printf(40, 200, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
+          it.printf(40, 230, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
 
           // NETWORK
-          it.filled_rectangle(420, 46, 780, 194, id(epaper_accent1_color));
-          //it.print( it.get_width()/2, 110, id(font_lg), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Nettverk" );
+          it.filled_rectangle(410, 60, 780, 250, id(epaper_accent2_color));
+          //it.print( 430, 90, id(font_lg), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Nettverk" );
           // SSID
-          it.printf( it.get_width()/2, 117, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( 430, 130, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( it.get_width()/2, 143, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( 430, 170, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( it.get_width()/2, 169, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( 430, 210, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
+          
+          it.filled_rectangle(20, 270, 390, 460, id(epaper_accent3_color));
+          
+          it.filled_rectangle(410, 270, 780, 460, id(epaper_accent4_color));
+          
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
           char str[17];
