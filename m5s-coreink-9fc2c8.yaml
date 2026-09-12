@@ -224,34 +224,41 @@ font:
     glyphs: *norwegian-glyphs
 
 image:
-  - id: i_wifi
+  - platform: file
+    id: i_wifi
     file: mdi:wifi
     type: binary
     resize: 28x28
-  - id: i_api
+  - platform: file
+    id: i_api
     file: mdi:home-assistant
     type: binary
     resize: 28x28
 
-  - id: i_refresh
+  - platform: file
+    id: i_refresh
     file: mdi:refresh
     type: binary
     resize: 28x28
-  - id: i_next
+  - platform: file
+    id: i_next
     file: mdi:arrow-right-thick
     type: binary
     resize: 28x28
-  - id: i_home
+  - platform: file
+    id: i_home
     file: mdi:home
     type: binary
     resize: 28x28
 
-  - id: i_info
+  - platform: file
+    id: i_info
     file: mdi:information
     type: binary
     resize: 28x28
 
-  - id: i_temp
+  - platform: file
+    id: i_temp
     file: mdi:thermometer
     type: binary
     resize: 28x28
