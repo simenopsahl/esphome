@@ -16,7 +16,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_tutorial
+    home_page: page_info
     font:
       text_sm: 16
       text_md: 20
@@ -47,6 +47,9 @@ wifi:
 display:
   - id: !extend display_eink
     pages:
+      - id: page_image
+        lambda: |-
+          it.image(0, 0, id(i_selma));
       - id: page_info
         lambda: |-
           // Fill background.
@@ -155,3 +158,8 @@ image:
     file: mdi:thermometer
     type: binary
     resize: 28x28
+
+  - platform: file
+    id: i_selma
+    file: gui/img/selma_480x800.jpg
+    type: RGB
