@@ -109,7 +109,7 @@ display:
             it.print(600, 80, id(font_md), id(epaper_text_color), "--%");
           }
           // VOLTAGE
-          it.print( 430, 160, id(font_md), id(epaper_text_color), "Batteriladning: " );
+          it.print( 430, 160, id(font_md), id(epaper_text_color), "Batterispenning: " );
           if (id(battery_voltage).has_state()) {
             it.printf(600, 160, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
           } else {
