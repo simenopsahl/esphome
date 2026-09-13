@@ -241,14 +241,14 @@ display:
 
             // FolloRen Section
             it.print(5, 280, id(mdi_xl), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
-            it.print(55, 275, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
-            it.printf(55, 297, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
+            it.print(57, 275, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
+            it.printf(57, 297, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
             
-            it.print(325, 290, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
-            it.printf(325, 330, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
+            it.print(330, 290, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
+            it.printf(330, 330, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
 
-            it.print(325, 380, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0395");
-            it.printf(325, 420, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
+            it.print(330, 380, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0395");
+            it.printf(330, 420, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
 
             
             // Car Section
