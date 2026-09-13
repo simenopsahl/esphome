@@ -75,70 +75,70 @@ display:
           }
           // PAGE
           it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02FC");
-          it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_text_color), "Info");
+          it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_text_color), "Enhet");
           it.line(10, 50, 790, 50, id(epaper_text_color));
 
           
           // DEVICE
-          it.filled_rectangle(20, 70, 15, 185, id(epaper_accent1_color));
-          it.line(35, 160, 370, 160, id(epaper_accent1_color));
+          it.filled_rectangle(20, 70, 15, 180, id(epaper_accent1_color));
+          it.line(35, 250, 370, 250, id(epaper_accent1_color));
           // NAME
-          it.printf( 40, 100, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
-          it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
-          it.printf(40, 195, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
-          it.printf(40, 220, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
+          it.printf( 40, 90, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
+          it.printf(40, 140, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
+          it.printf(40, 175, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
+          it.printf(40, 210, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
           // NETWORK
-          it.filled_rectangle(410, 70, 15, 185, id(epaper_accent2_color));
-          it.line(425, 160, 760, 160, id(epaper_accent2_color));
+          it.filled_rectangle(410, 70, 15, 180, id(epaper_accent2_color));
+          it.line(425, 250, 760, 250, id(epaper_accent2_color));
           //it.print( 430, 90, id(font_lg), id(epaper_text_color), "Nettverk" );
           // SSID
           it.printf( 430, 90, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( 430, 130, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( 430, 140, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( 430, 200, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( 430, 190, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
 
           // BATTERY
-          it.filled_rectangle(20, 275, 15, 185, id(epaper_accent3_color));
-          it.line(35, 365, 370, 365, id(epaper_accent3_color));
+          it.filled_rectangle(20, 270, 15, 180, id(epaper_accent3_color));
+          it.line(35, 365, 450, 450, id(epaper_accent3_color));
           // PERCENT
-          it.print( 40, 300, id(font_md), id(epaper_text_color), "Batteriprosent: " );
+          it.print( 40, 290, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
-            it.printf(200, 300, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
+            it.printf(200, 290, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
           } else {
-            it.print(200, 300, id(font_md), id(epaper_text_color), "--%");
+            it.print(200, 290, id(font_md), id(epaper_text_color), "--%");
           }
           // VOLTAGE
-          it.print( 40, 350, id(font_md), id(epaper_text_color), "Batteriladning: " );
+          it.print( 40, 340, id(font_md), id(epaper_text_color), "Batteriladning: " );
           if (id(battery_voltage).has_state()) {
-            it.printf(200, 350, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
+            it.printf(200, 340, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
           } else {
-            it.print(200, 350, id(font_md), id(epaper_text_color), "--V");
+            it.print(200, 340, id(font_md), id(epaper_text_color), "--V");
           }
           
           // SENSORS
-          it.filled_rectangle(410, 275, 15, 185, id(epaper_accent4_color));
-          it.line(425, 365, 760, 365, id(epaper_accent4_color));
+          it.filled_rectangle(410, 270, 15, 180, id(epaper_accent4_color));
+          it.line(425, 450, 760, 450, id(epaper_accent4_color));
           // TEMPERATURE
-          it.print( 430, 300, id(font_md), id(epaper_text_color), "Temperatur: " );
+          it.print( 430, 290, id(font_md), id(epaper_text_color), "Temperatur: " );
           if (id(temperature_sht40).has_state()) {
-            it.printf(600, 300, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
+            it.printf(600, 290, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
           } else {
-            it.print(600, 300, id(font_md), id(epaper_text_color), "-- C");
+            it.print(600, 290, id(font_md), id(epaper_text_color), "-- C");
           }
           // HUMIDITY
-          it.print( 430, 350, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
+          it.print( 430, 340, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
           if (id(humidity_sht40).has_state()) {
-            it.printf(600, 350, id(font_md), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
+            it.printf(600, 340, id(font_md), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
           } else {
-            it.print(600, 350, id(font_md), id(epaper_text_color), "-- %");
+            it.print(600, 340, id(font_md), id(epaper_text_color), "-- %");
           }
           // SD card
           if (id(sd_card_detect).state) {
-            it.printf(430, 400, id(font_sm), id(epaper_text_color), "SD Card: inserted");
+            it.printf(430, 390, id(font_sm), id(epaper_text_color), "SD Card: inserted");
           } else {
-            it.printf(430, 400, id(font_sm), id(epaper_text_color), "SD Card: not detected");
+            it.printf(430, 390, id(font_sm), id(epaper_text_color), "SD Card: not detected");
           }
           
           // Refresh Timestamp
@@ -208,7 +208,7 @@ display:
             it.print( it.get_width() , 0, id(mdi_sm), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
           }
           // PAGE
-          it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02FC");
+          it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02DC");
           it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_text_color), "Info");
           it.line(10, 50, 790, 50, id(epaper_text_color));
 
