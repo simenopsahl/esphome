@@ -50,7 +50,17 @@ display:
       - id: page_image
         lambda: |-
           ESP_LOGI("display", "Page: Image");
-          it.image(0, 0, id(i_selma));
+          // esp_random() generates a random 32-bit integer.
+          // Using modulo 3 (% 3) strictly limits the result to 0, 1, or 2.
+          uint8_t random_choice = esp_random() % 3;
+          
+          if (random_choice == 0) {
+            it.image(0, 0, id(i_selma_1));
+          } else if (random_choice == 1) {
+            it.image(0, 0, id(i_selma_2));
+          } else {
+            it.image(0, 0, id(i_selma_3));
+          }
       - id: page_content
         lambda: |-
           ESP_LOGI("display", "Page: Content");
@@ -226,9 +236,15 @@ binary_sensor:
 
 image:
   - platform: file
-    id: i_selma
-    file: gui/img/spectra_selma_480x800.png
-    type: RGB
+    defaults:
+      type: RGB
+    files:
+      - id: i_selma_1
+        file: gui/img/spectra_selma_1_480x800.png
+      - id: i_selma_2
+        file: gui/img/spectra_selma_3_480x800.png
+      - id: i_selma_3
+        file: gui/img/spectra_selma_3_480x800.png
 
 sensor:
   # Call sensors from HA.
