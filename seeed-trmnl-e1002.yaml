@@ -25,11 +25,11 @@ substitutions:
       text_xxl: 36
       text_hg: 44
       text_fl: 54
-      icons_sm: 16
-      icons_md: 22
-      icons_lg: 30
-      icons_xl: 40
-      icons_xxl: 52
+      icons_sm: 30
+      icons_md: 36
+      icons_lg: 44
+      icons_xl: 54
+      icons_xxl: 66
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -131,9 +131,9 @@ display:
           }
           // SD card
           if (id(sd_card_detect).state) {
-            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Card: inserted");
+            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Kort: oppdaget");
           } else {
-            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Card: not detected");
+            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Kort: ikke oppdaget");
           }
           
           // Refresh Timestamp
