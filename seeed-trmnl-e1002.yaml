@@ -26,9 +26,9 @@ substitutions:
       text_hg: 44
       text_fl: 54
       icons_sm: 30
-      icons_md: 36
-      icons_lg: 44
-      icons_xl: 54
+      icons_md: 38
+      icons_lg: 46
+      icons_xl: 56
       icons_xxl: 66
 
 esphome:
@@ -67,14 +67,14 @@ display:
           
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
-            it.print( 0 , 0, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
+            it.print( 0 , 0, id(mdi_md), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.print( it.get_width() , 0, id(mdi_sm), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
+            it.print( it.get_width() , 0, id(mdi_md), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
           }
           // PAGE
-          it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02FC");
+          it.print( (it.get_width()/40)*5 , 0, id(mdi_md), id(epaper_text_color), "\U000F02FC");
           it.print( (it.get_width()/40)*8, 4, id(font_md), id(epaper_text_color), "Enhet");
           it.line(10, 45, 790, 45, id(epaper_text_color));
 
@@ -196,14 +196,14 @@ display:
           
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
-            it.print( 0 , 0, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
+            it.print( 0 , 0, id(mdi_md), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.print( it.get_width() , 0, id(mdi_sm), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
+            it.print( it.get_width() , 0, id(mdi_md), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
           }
           // PAGE
-          it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02DC");
+          it.print( (it.get_width()/40)*5 , 0, id(mdi_md), id(epaper_text_color), "\U000F02DC");
           it.print( (it.get_width()/40)*8, 4, id(font_md), id(epaper_text_color), "Info");
           it.line(10, 45, 790, 45, id(epaper_text_color));
 
