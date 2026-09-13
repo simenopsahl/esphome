@@ -240,9 +240,9 @@ display:
             it.line(10, 265, 390, 265, id(epaper_accent2_color));
 
             // FolloRen Section
-            it.print(5, 280, id(mdi_xl), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
-            it.print(57, 285, id(font_lg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "FolloRen");
-            it.printf(10, 330, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
+            it.print(15, 280, id(mdi_xl), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
+            it.print(67, 285, id(font_lg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "FolloRen");
+            it.printf(5, 320, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
             
             it.print(330, 290, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
             it.printf(330, 330, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
