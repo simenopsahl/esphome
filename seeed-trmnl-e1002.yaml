@@ -75,7 +75,7 @@ display:
           }
           // PAGE
           it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02FC");
-          it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_text_color), "Enhet");
+          it.print( (it.get_width()/40)*8, 4, id(font_md), id(epaper_text_color), "Enhet");
           it.line(10, 45, 790, 45, id(epaper_text_color));
 
           
