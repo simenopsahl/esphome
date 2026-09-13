@@ -215,10 +215,10 @@ display:
             // Weather Section
             // Now Measured and forecasted
             it.printf(15, 60, id(mdi_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
-            it.print(120, 60, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Målt:");
-            it.printf(120, 80, id(font_hg), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
-            it.print(240, 60, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Meldt:");
-            it.printf(240, 85, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_forecast).state);
+            it.print(120, 60, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Målt:");
+            it.printf(120, 80, id(font_hg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
+            it.print(240, 60, id(font_md), id(epaper_accent3_color), TextAlign::TOP_LEFT, "Meldt:");
+            it.printf(240, 85, id(font_xxl), id(epaper_accent3_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_forecast).state);
 
             // Forecast
             it.printf(55, 145, id(font_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
@@ -241,7 +241,7 @@ display:
 
             // FolloRen Section
             it.print(5, 280, id(mdi_xl), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
-            it.print(57, 275, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
+            it.print(57, 275, id(font_lg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "FolloRen");
             it.printf(57, 297, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
             
             it.print(330, 290, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
@@ -272,7 +272,7 @@ display:
             it.line(410, 280, 790, 280, id(epaper_accent3_color));
 
             // Bus Section
-            it.print(420, 290, id(font_lg), id(epaper_text_color), "Bregnefaret");
+            it.print(420, 290, id(font_lg), id(epaper_accent3_color), "Bregnefaret");
             it.print(430, 325, id(font_md), id(epaper_text_color), "510 Drøbak");
             it.printf(545, 325, id(font_lg), id(epaper_text_color), "%s", id(bus_bregnefaret_line_0).state.c_str());
             it.printf(785, 320, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_0).state.c_str());
