@@ -209,14 +209,15 @@ font:
     glyphs: *norwegian-glyphs
 
 image:
-  - id: i_wifi
-    file: mdi:wifi
-    type: binary
-    resize: 28x28
-  - id: i_api
-    file: mdi:home-assistant
-    type: binary
-    resize: 28x28
+  - platform: file
+    defaults:
+      type: binary
+      resize: 28x28
+    files:
+      - id: i_wifi
+        file: mdi:wifi
+      - id: i_api
+        file: mdi:home-assistant
 
 # Check if person is home
 binary_sensor:
