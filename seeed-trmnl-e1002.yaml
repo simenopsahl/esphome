@@ -252,7 +252,7 @@ display:
 
             
             // Car Section
-            it.print(5, 365, id(mdi_lg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F010B");
+            it.print(5, 365, id(mdi_lg), id(epaper_accent3_color), TextAlign::TOP_LEFT, "\U000F010B");
             it.printf(10, 405, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f km", id(car_battery_range).state);
             it.printf(50, 370, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f%%", id(car_battery_percent).state);
 
