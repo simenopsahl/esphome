@@ -49,9 +49,11 @@ display:
     pages:
       - id: page_image
         lambda: |-
+          ESP_LOGI("display", "Page: Image");
           it.image(0, 0, id(i_selma));
       - id: page_info
         lambda: |-
+          ESP_LOGI("display", "Page: Info");
           // Fill background.
           it.fill( id(epaper_bg_color) );
 
@@ -119,6 +121,7 @@ display:
           it.printf( 0, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "@ %s", str );
       - id: page_content
         lambda: |-
+          ESP_LOGI("display", "Page: Content");
           // Map weather states to MDI characters.
           std::map<std::string, std::string> weather_icon_map
             {
