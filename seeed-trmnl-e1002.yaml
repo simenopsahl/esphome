@@ -83,49 +83,49 @@ display:
           it.filled_rectangle(20, 65, 15, 180, id(epaper_accent1_color));
           it.line(35, 245, 370, 245, id(epaper_accent1_color));
           // NAME
-          it.printf( 40, 90, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
-          it.printf(40, 140, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
-          it.printf(40, 175, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
-          it.printf(40, 210, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
+          it.printf( 40, 85, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
+          it.printf(40, 135, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
+          it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
+          it.printf(40, 205, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
           // NETWORK
           it.filled_rectangle(410, 65, 15, 180, id(epaper_accent2_color));
           it.line(425, 245, 760, 245, id(epaper_accent2_color));
           //it.print( 430, 90, id(font_lg), id(epaper_text_color), "Nettverk" );
           // SSID
-          it.printf( 430, 90, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
+          it.printf( 430, 85, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
           // IP
           it.printf( 430, 140, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( 430, 190, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( 430, 195, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
 
           // BATTERY
           it.filled_rectangle(20, 265, 15, 180, id(epaper_accent3_color));
           it.line(35, 445, 370, 445, id(epaper_accent3_color));
           // PERCENT
-          it.print( 40, 290, id(font_md), id(epaper_text_color), "Batteriprosent: " );
+          it.print( 40, 285, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
-            it.printf(200, 290, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
+            it.printf(200, 285, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
           } else {
-            it.print(200, 290, id(font_md), id(epaper_text_color), "--%");
+            it.print(200, 285, id(font_md), id(epaper_text_color), "--%");
           }
           // VOLTAGE
-          it.print( 40, 340, id(font_md), id(epaper_text_color), "Batteriladning: " );
+          it.print( 40, 350, id(font_md), id(epaper_text_color), "Batteriladning: " );
           if (id(battery_voltage).has_state()) {
-            it.printf(200, 340, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
+            it.printf(200, 350, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
           } else {
-            it.print(200, 340, id(font_md), id(epaper_text_color), "--V");
+            it.print(200, 350, id(font_md), id(epaper_text_color), "--V");
           }
           
           // SENSORS
           it.filled_rectangle(410, 265, 15, 180, id(epaper_accent4_color));
           it.line(425, 445, 760, 445, id(epaper_accent4_color));
           // TEMPERATURE
-          it.print( 430, 290, id(font_md), id(epaper_text_color), "Temperatur: " );
+          it.print( 430, 285, id(font_md), id(epaper_text_color), "Temperatur: " );
           if (id(temperature_sht40).has_state()) {
-            it.printf(600, 290, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
+            it.printf(600, 285, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
           } else {
-            it.print(600, 290, id(font_md), id(epaper_text_color), "-- C");
+            it.print(600, 285, id(font_md), id(epaper_text_color), "-- C");
           }
           // HUMIDITY
           it.print( 430, 340, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
