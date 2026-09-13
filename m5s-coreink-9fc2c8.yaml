@@ -225,43 +225,27 @@ font:
 
 image:
   - platform: file
-    id: i_wifi
-    file: mdi:wifi
-    type: binary
-    resize: 28x28
-  - platform: file
-    id: i_api
-    file: mdi:home-assistant
-    type: binary
-    resize: 28x28
-
-  - platform: file
-    id: i_refresh
-    file: mdi:refresh
-    type: binary
-    resize: 28x28
-  - platform: file
-    id: i_next
-    file: mdi:arrow-right-thick
-    type: binary
-    resize: 28x28
-  - platform: file
-    id: i_home
-    file: mdi:home
-    type: binary
-    resize: 28x28
-
-  - platform: file
-    id: i_info
-    file: mdi:information
-    type: binary
-    resize: 28x28
-
-  - platform: file
-    id: i_temp
-    file: mdi:thermometer
-    type: binary
-    resize: 28x28
+    defaults:
+      type: binary
+      resize: 28x28
+    files:
+      - id: i_wifi
+        file: mdi:wifi
+      - id: i_api
+        file: mdi:home-assistant
+    
+      - id: i_refresh
+        file: mdi:refresh
+      - id: i_next
+        file: mdi:arrow-right-thick
+      - id: i_home
+        file: mdi:home
+    
+      - id: i_info
+        file: mdi:information
+    
+      - id: i_temp
+        file: mdi:thermometer
 
 #graph:
 #  - id: graph_temperature_room
