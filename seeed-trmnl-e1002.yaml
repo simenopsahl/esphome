@@ -76,12 +76,12 @@ display:
           // PAGE
           it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02FC");
           it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_text_color), "Enhet");
-          it.line(10, 50, 790, 50, id(epaper_text_color));
+          it.line(10, 45, 790, 45, id(epaper_text_color));
 
           
           // DEVICE
-          it.filled_rectangle(20, 70, 15, 180, id(epaper_accent1_color));
-          it.line(35, 250, 370, 250, id(epaper_accent1_color));
+          it.filled_rectangle(20, 65, 15, 180, id(epaper_accent1_color));
+          it.line(35, 245, 370, 245, id(epaper_accent1_color));
           // NAME
           it.printf( 40, 90, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
           it.printf(40, 140, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
@@ -89,8 +89,8 @@ display:
           it.printf(40, 210, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
           // NETWORK
-          it.filled_rectangle(410, 70, 15, 180, id(epaper_accent2_color));
-          it.line(425, 250, 760, 250, id(epaper_accent2_color));
+          it.filled_rectangle(410, 65, 15, 180, id(epaper_accent2_color));
+          it.line(425, 245, 760, 245, id(epaper_accent2_color));
           //it.print( 430, 90, id(font_lg), id(epaper_text_color), "Nettverk" );
           // SSID
           it.printf( 430, 90, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
@@ -100,8 +100,8 @@ display:
           it.printf( 430, 190, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
 
           // BATTERY
-          it.filled_rectangle(20, 270, 15, 180, id(epaper_accent3_color));
-          it.line(35, 365, 450, 450, id(epaper_accent3_color));
+          it.filled_rectangle(20, 265, 15, 180, id(epaper_accent3_color));
+          it.line(35, 445, 370, 445, id(epaper_accent3_color));
           // PERCENT
           it.print( 40, 290, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
@@ -118,8 +118,8 @@ display:
           }
           
           // SENSORS
-          it.filled_rectangle(410, 270, 15, 180, id(epaper_accent4_color));
-          it.line(425, 450, 760, 450, id(epaper_accent4_color));
+          it.filled_rectangle(410, 265, 15, 180, id(epaper_accent4_color));
+          it.line(425, 445, 760, 445, id(epaper_accent4_color));
           // TEMPERATURE
           it.print( 430, 290, id(font_md), id(epaper_text_color), "Temperatur: " );
           if (id(temperature_sht40).has_state()) {
