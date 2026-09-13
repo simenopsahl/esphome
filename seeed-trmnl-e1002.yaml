@@ -59,7 +59,7 @@ display:
 
           // NAV
             // Home
-          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
+          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F02DC");
             // Next
           it.print( (it.get_width()/40)*25 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
             // Back
@@ -83,7 +83,7 @@ display:
           it.filled_rectangle(20, 65, 15, 180, id(epaper_accent1_color));
           it.line(20, 245, 370, 245, id(epaper_accent1_color));
           // NAME
-          it.printf( 40, 85, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
+          it.printf( 40, 80, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
           it.printf(40, 135, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
           it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
           it.printf(40, 205, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
@@ -92,7 +92,7 @@ display:
           it.filled_rectangle(20, 265, 15, 180, id(epaper_accent2_color));
           it.line(20, 445, 370, 445, id(epaper_accent2_color));
           // SSID
-          it.printf( 40, 285, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
+          it.printf( 40, 280, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
           // IP
           it.printf( 40, 340, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
           // MAC
@@ -102,18 +102,18 @@ display:
           it.filled_rectangle(410, 65, 15, 380, id(epaper_accent3_color));
           it.line(410, 445, 760, 445, id(epaper_accent3_color));
           // PERCENT
-          it.print( 430, 85, id(font_md), id(epaper_text_color), "Batteriprosent: " );
+          it.print( 430, 80, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
-            it.printf(600, 85, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
+            it.printf(600, 80, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
           } else {
-            it.print(600, 85, id(font_md), id(epaper_text_color), "--%");
+            it.print(600, 80, id(font_md), id(epaper_text_color), "--%");
           }
           // VOLTAGE
           it.print( 430, 160, id(font_md), id(epaper_text_color), "Batteriladning: " );
           if (id(battery_voltage).has_state()) {
-            it.printf(200, 160, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
+            it.printf(600, 160, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
           } else {
-            it.print(200, 160, id(font_md), id(epaper_text_color), "--V");
+            it.print(600, 160, id(font_md), id(epaper_text_color), "--V");
           }
           // TEMPERATURE
           it.print( 430, 235, id(font_md), id(epaper_text_color), "Temperatur: " );
@@ -188,7 +188,7 @@ display:
 
           // NAV
             // Home
-          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
+          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F02DC");
             // Next
           it.print( (it.get_width()/40)*25 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
             // Back
