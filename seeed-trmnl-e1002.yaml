@@ -104,30 +104,30 @@ display:
           // PERCENT
           it.print( 430, 80, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
-            it.printf(600, 80, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
+            it.printf(640, 80, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
           } else {
-            it.print(600, 80, id(font_md), id(epaper_text_color), "--%");
+            it.print(640, 80, id(font_md), id(epaper_text_color), "--%");
           }
           // VOLTAGE
-          it.print( 430, 160, id(font_md), id(epaper_text_color), "Batterispenning: " );
+          it.print( 430, 150, id(font_md), id(epaper_text_color), "Batterispenning: " );
           if (id(battery_voltage).has_state()) {
-            it.printf(600, 160, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
+            it.printf(640, 150, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
           } else {
-            it.print(600, 160, id(font_md), id(epaper_text_color), "--V");
+            it.print(640, 150, id(font_md), id(epaper_text_color), "--V");
           }
           // TEMPERATURE
           it.print( 430, 235, id(font_md), id(epaper_text_color), "Temperatur: " );
           if (id(temperature_sht40).has_state()) {
-            it.printf(600, 235, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
+            it.printf(640, 235, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
           } else {
-            it.print(600, 235, id(font_md), id(epaper_text_color), "-- C");
+            it.print(640, 235, id(font_md), id(epaper_text_color), "-- C");
           }
           // HUMIDITY
-          it.print( 430, 310, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
+          it.print( 430, 300, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
           if (id(humidity_sht40).has_state()) {
-            it.printf(600, 310, id(font_md), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
+            it.printf(640, 300, id(font_md), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
           } else {
-            it.print(600, 310, id(font_md), id(epaper_text_color), "-- %");
+            it.print(640, 300, id(font_md), id(epaper_text_color), "-- %");
           }
           // SD card
           if (id(sd_card_detect).state) {
