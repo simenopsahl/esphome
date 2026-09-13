@@ -214,7 +214,7 @@ display:
 
           // Show loading screen before data is received.
           if (id(initial_data_received) == false) {
-            it.print(it.get_width()/2, 390, id(font_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
+            it.print(it.get_width()/2, it.get_height()/2, id(font_xxl), id(epaper_text_color), TextAlign::TOP_CENTER, "Venter på data...");
           } else {
 
             // Weather Section
