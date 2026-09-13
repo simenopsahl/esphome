@@ -216,7 +216,7 @@ display:
             // Now Measured and forecasted
             it.printf(10, 60, id(mdi_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
             it.print(110, 60, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Målt:");
-            it.printf(110, 85, id(font_hg), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
+            it.printf(110, 80, id(font_hg), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_actual).state);
             it.print(225, 60, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "Meldt:");
             it.printf(225, 85, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f°C", id(weather_temperature_forecast).state);
 
@@ -239,23 +239,26 @@ display:
 
 
             // FolloRen Section
-            it.print(5, 265, id(mdi_lg), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
-            it.print(55, 262, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
-            it.printf(55, 284, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
+            it.print(5, 275, id(mdi_lg), id(color_green), TextAlign::TOP_LEFT, "\U000F044C");
+            it.print(55, 272, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "FolloRen");
+            it.printf(55, 294, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(folloren_next).state.c_str());
             
-            it.print(325, 275, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
-            it.printf(325, 315, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
+            it.print(310, 285, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0A79");
+            it.printf(310, 325, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_restavfall).state.c_str());
 
-            it.print(325, 375, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0395");
-            it.printf(325, 415, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
+            it.print(310, 385, id(mdi_lg), id(epaper_accent2_color), TextAlign::TOP_CENTER, "\U000F0395");
+            it.printf(310, 425, id(font_md), id(epaper_text_color), TextAlign::TOP_CENTER, "%s", id(folloren_papir).state.c_str());
 
             
             // Car Section
             it.print(5, 350, id(mdi_lg), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F010B");
-            it.printf(10, 400, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f km", id(car_battery_range).state);
-            it.printf(10, 435, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f%%", id(car_battery_percent).state);
+            it.printf(10, 390, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f km", id(car_battery_range).state);
+            it.printf(50, 365, id(font_xxl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f%%", id(car_battery_percent).state);
 
+            
+            it.line(400, 55, 400, 470, id(epaper_accent1_color));
 
+            
             // NordPool Section
             it.graph(405, 70, id(graph_nordpool), id(epaper_accent3_color));
             it.printf(410, 70, id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "%s", id(nordpool_time_0).state.c_str());
@@ -267,18 +270,18 @@ display:
 
 
             // Bus Section
-            it.print(420, 290, id(font_lg), id(epaper_text_color), TextAlign::TOP_CENTER, "Bregnefaret");
-            it.print(430, 317, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
-            it.printf(430, 336, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_0).state.c_str());
-            it.printf(410, 324, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_0).state.c_str());
+            it.print(420, 290, id(font_lg), id(epaper_text_color), "Bregnefaret");
+            it.print(440, 320, id(font_md), id(epaper_text_color), "510 Drøbak");
+            it.printf(440, 340, id(font_lg), id(epaper_text_color), "%s", id(bus_bregnefaret_line_0).state.c_str());
+            it.printf(510, 330, id(font_xxl), id(epaper_text_color), "%s", id(bus_bregnefaret_due_at_0).state.c_str());
 
-            it.print(430, 366, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
-            it.printf(430, 385, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_1).state.c_str());
-            it.printf(410, 373, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_1).state.c_str());
+            it.print(440, 370, id(font_md), id(epaper_text_color), "510 Drøbak");
+            it.printf(440, 390, id(font_lg), id(epaper_text_color), "%s", id(bus_bregnefaret_line_1).state.c_str());
+            it.printf(510, 380, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_1).state.c_str());
 
-            it.print(430, 405, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "510 Drøbak");
-            it.printf(430, 424, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(bus_bregnefaret_line_2).state.c_str());
-            it.printf(410, 412, id(font_xxl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%s", id(bus_bregnefaret_due_at_2).state.c_str());
+            it.print(440, 420, id(font_md), id(epaper_text_color), "510 Drøbak");
+            it.printf(440, 440, id(font_lg), id(epaper_text_color), "%s", id(bus_bregnefaret_line_2).state.c_str());
+            it.printf(510, 430, id(font_xxl), id(epaper_text_color), "%s", id(bus_bregnefaret_due_at_2).state.c_str());
 
           }
           // Refresh Timestamp
