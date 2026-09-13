@@ -73,11 +73,9 @@ display:
           if ( id(component_api).is_connected() ) {
             it.print( it.get_width() , 0, id(mdi_sm), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
           }
-          
           // PAGE
           it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_text_color), "\U000F02FC");
           it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_text_color), "Info");
-
           it.line(10, 50, 790, 50, id(epaper_text_color));
 
           
