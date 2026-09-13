@@ -105,7 +105,7 @@ display:
           // PERCENT
           it.print( 40, 300, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
-            it.printf(200, 300, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state;
+            it.printf(200, 300, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
           } else {
             it.print(200, 300, id(font_md), id(epaper_text_color), "--%");
           }
@@ -123,7 +123,7 @@ display:
           // TEMPERATURE
           it.print( 430, 300, id(font_md), id(epaper_text_color), "Temperatur: " );
           if (id(temperature_sht40).has_state()) {
-            it.printf(600, 300, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state;
+            it.printf(600, 300, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
           } else {
             it.print(600, 300, id(font_md), id(epaper_text_color), "-- C");
           }
