@@ -25,11 +25,11 @@ substitutions:
       text_xxl: 36
       text_hg: 44
       text_fl: 54
-      icons_sm: 20
-      icons_md: 28
-      icons_lg: 38
-      icons_xl: 50
-      icons_xxl: 64
+      icons_sm: 16
+      icons_md: 22
+      icons_lg: 30
+      icons_xl: 40
+      icons_xxl: 52
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -59,11 +59,11 @@ display:
 
           // NAV
             // Home
-          it.print( (it.get_width()/16)*11 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
+          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
             // Next
-          it.print( (it.get_width()/16)*10 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
+          it.print( (it.get_width()/40)*25 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
             // Back
-          it.print( (it.get_width()/16)*9 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0141");
+          it.print( (it.get_width()/40)*23 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0141");
           
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
@@ -75,14 +75,14 @@ display:
           }
           
           // PAGE
-          it.print( (it.get_width()/16)*3 , 0, id(mdi_sm), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F02FC");
-          it.print( (it.get_width()/16)*4, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
+          it.print( (it.get_width()/40)*5 , 0, id(mdi_sm), id(epaper_accent1_color), TextAlign::TOP_LEFT, "\U000F02FC");
+          it.print( (it.get_width()/40)*10, 0, id(font_md), id(epaper_accent1_color), TextAlign::TOP_LEFT, "Info");
 
-          it.line(20, 40, 780, 36, id(epaper_accent1_color));
+          it.line(20, 50, 780, 36, id(epaper_accent1_color));
 
           
           // DEVICE
-          it.filled_rectangle(20, 60, 390, 250, id(epaper_accent1_color));
+          it.filled_rectangle(20, 70, 370, 190, id(epaper_accent1_color));
           // NAME
           it.printf( 40, 90, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", App.get_name().c_str() );
           // BATTERY
@@ -99,19 +99,19 @@ display:
           
 
           // NETWORK
-          it.filled_rectangle(410, 60, 780, 250, id(epaper_accent2_color));
-          //it.print( 430, 90, id(font_lg), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Nettverk" );
+          it.filled_rectangle(410, 70, 370, 190, id(epaper_accent2_color));
+          //it.print( 430, 90, id(font_lg), id(epaper_text_color), TextAlign::TOP_LEFT, "Nettverk" );
           // SSID
-          it.printf( 430, 130, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( 430, 130, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( 430, 170, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( 430, 170, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( 430, 210, id(font_md), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( 430, 210, id(font_md), id(epaper_text_color), TextAlign::TOP_LEFT, "%s", id(sensor_mac_address).state.c_str() );
 
           
-          it.filled_rectangle(20, 270, 390, 460, id(epaper_accent3_color));
+          it.filled_rectangle(20, 280, 370, 190, id(epaper_accent3_color));
           
-          it.filled_rectangle(410, 270, 780, 460, id(epaper_accent4_color));
+          it.filled_rectangle(410, 280, 370, 190, id(epaper_accent4_color));
           
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
