@@ -240,11 +240,11 @@ image:
       type: RGB
     files:
       - id: i_selma_1
-        file: gui/img/spectra_selma_1_480x800.png
+        file: gui/img/eink/spectra6/selma_1_480x800.png
       - id: i_selma_2
-        file: gui/img/spectra_selma_3_480x800.png
+        file: gui/img/eink/spectra6/selma_3_480x800.png
       - id: i_selma_3
-        file: gui/img/spectra_selma_3_480x800.png
+        file: gui/img/eink/spectra6/selma_3_480x800.png
 
 sensor:
   # Call sensors from HA.
