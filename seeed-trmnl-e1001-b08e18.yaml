@@ -4,7 +4,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/seeed_xiao_esp32s3_plus.yaml
-  e1002: !include board/module/display_reterminal_e1001.yaml
+  e1001: !include board/module/display_reterminal_e1001.yaml
 
 substitutions:
   common:
