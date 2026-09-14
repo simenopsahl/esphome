@@ -182,13 +182,13 @@ display:
             // NordPool Section
             it.graph(405, 70, id(graph_nordpool), id(epaper_accent3_color));
             it.printf(410, 72, id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "%s", id(nordpool_time_0).state.c_str());
-            it.printf(410, 237, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state);
+            it.printf(410, 227, id(font_xl), id(epaper_text_color), TextAlign::TOP_LEFT, "%2.0f Øre", id(nordpool_price_0).state);
             it.printf(600, 72, id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(nordpool_time_4).state.c_str());
-            it.printf(600, 237, id(font_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state);
+            it.printf(600, 227, id(font_xl), id(epaper_text_color), TextAlign::TOP_CENTER, "%2.0f Øre", id(nordpool_price_4).state);
             it.printf(790, 72, id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "%s", id(nordpool_time_8).state.c_str());
-            it.printf(790, 237, id(font_xl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state);
+            it.printf(790, 227, id(font_xl), id(epaper_text_color), TextAlign::TOP_RIGHT, "%2.0f Øre", id(nordpool_price_8).state);
 
-            it.line(410, 280, 790, 280, id(epaper_accent3_color));
+            it.line(410, 275, 790, 275, id(epaper_accent3_color));
 
             // Bus Section
             it.print(420, 290, id(font_lg), id(epaper_accent2_color), "Bregnefaret");
@@ -348,7 +348,7 @@ graph:
     x_grid: 1h
     y_grid: 10.0
     width: 390
-    height: 170
+    height: 160
     traces:
       - id: trace_nordpool
         sensor: nordpool_sensor
