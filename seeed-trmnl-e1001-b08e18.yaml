@@ -219,17 +219,17 @@ binary_sensor:
     id: presence_detected
 
   # Home
-  - id: !extend button_green
+  - id: !extend button_home
     on_press:
       - display.page.show: ${display.home_page}
       - script.execute: update_screen
   # Stick Press
-  - id: !extend button_left
+  - id: !extend button_prev
     on_press:
       - display.page.show_previous: display_eink
       - script.execute: update_screen
   # Stick Down
-  - id: !extend button_right
+  - id: !extend button_next
     on_press:
       - display.page.show_next: display_eink
       - script.execute: update_screen
