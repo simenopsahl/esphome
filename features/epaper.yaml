@@ -7,9 +7,23 @@ substitutions:
   display:
     home_page: page_content
 
+esphome:
+  on_boot:
+    - priority: -100.0
+      then:
+        - component.update: display_eink
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) == true;'
+        # Wait a bit longer so all the items are received
+        - delay: 10s
+        - logger.log: "Initial sensor data received: Refreshing display..."
+        - lambda: 'id(initial_data_received) = true;'
+        - display.page.show: ${display.home_page}
+        - script.execute: update_screen
+
 time:
-  - platform: homeassistant
-    id: !extend time_homeassistant
+  - id: !extend time_homeassistant
     on_time:
       - seconds: 0
         minutes: /5
@@ -72,11 +86,6 @@ globals:
     restore_value: yes
     max_restore_data_length: 16
     initial_value: 'Color(255, 0, 0, 0)' # Default to red (Complementary to green)
-  - id: epaper_accent4_color
-    type: Color
-    restore_value: yes
-    max_restore_data_length: 16
-    initial_value: 'Color(255, 255, 0, 0)' # Default to yellow (Complementary to blue)
 
 color:
   - id: color_black
@@ -137,7 +146,6 @@ sensor:
                 id(epaper_accent1_color) = Color(255, 0, 0, 0);
                 id(epaper_accent2_color) = Color(255, 255, 0, 0);
                 id(epaper_accent3_color) = Color(0, 255, 0, 0);
-                id(epaper_accent4_color) = Color(255, 255, 0, 0);
               } else {
                 // On all other refreshes, set White background, Black text
                 id(epaper_bg_color) = COLOR_OFF;
@@ -145,7 +153,6 @@ sensor:
                 id(epaper_accent1_color) = Color(0, 255, 0, 0);
                 id(epaper_accent2_color) = Color(0, 0, 255, 0);
                 id(epaper_accent3_color) = Color(255, 0, 0, 0);
-                id(epaper_accent4_color) = Color(0, 0, 255, 0);
               }
 
 # Buttons in Home Assistant

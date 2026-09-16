@@ -218,7 +218,6 @@ sensor:
     accuracy_decimals: 0
     filters:
       - calibrate_linear:
-          method: exact
           datapoints:
             - 0.00 -> 0.0
             - 3.3 -> 1.0
@@ -226,15 +225,9 @@ sensor:
             - 3.75 -> 50.0
             - 4.11 -> 90.0
             - 4.2 -> 100.0
-      - lambda: |-
-          if (x <= 100) {
-            return x;
-          } else {
-            return 100;
-          }
-          if (x <0) {
-            return 0;
-          }
+      - clamp:
+          min_value: 0
+          max_value: 100
     entity_category: diagnostic
     device_class: battery
     unit_of_measurement: "%"

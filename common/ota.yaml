@@ -8,4 +8,15 @@
 ota:
   platform: esphome
   id: component_ota
-  password: !secret ota_password
+
+# WARNING 'ota' password wastes significant flash and RAM
+# (about 3.5 KB and 60 bytes plus the password on the heap):
+# the device already offers encryption with the 'api' encryption key
+#  password: !secret ota_password
+
+# To disable the OTA password, set it to an empty string on boot.
+# Then comment out on_boot action and password entry from the YAML file.
+#esphome:
+#  on_boot:
+#    - then:
+#        - lambda: id(component_ota).set_auth_password("");

@@ -8,44 +8,6 @@ substitutions:
   device:
     model: "Everything Presence Pro"
 
-esphome:
-  on_boot: 
-    - priority: -100
-      then:
-        - button.press: get_mmwave_firmware
-        - binary_sensor.template.publish:
-            id: ld2450_zone1_occupancy
-            state: false 
-        - binary_sensor.template.publish:
-            id: ld2450_zone2_occupancy
-            state: false 
-        - binary_sensor.template.publish:
-            id: ld2450_zone3_occupancy
-            state: false 
-        - binary_sensor.template.publish:
-            id: ld2450_zone4_occupancy
-            state: false
-    - priority: -100
-      then:
-        - lambda: |-
-            if (std::string("${ device_config.bluetooth_enabled | lower }") == "true") {
-              id(firmware_ble).publish_state("Enabled");
-            } else {
-              id(firmware_ble).publish_state("Disabled");
-            }
-
-            if (std::string("${ device_config.co2_enabled | lower }") == "true") {
-              id(firmware_co2).publish_state("Enabled");
-            } else {
-              id(firmware_co2).publish_state("Disabled");
-            }
-
-            if (std::string("${ device_config.ethernet_enabled | lower }") == "true") {
-              id(firmware_network).publish_state("Ethernet");
-            } else {
-              id(firmware_network).publish_state("WiFi");
-            }
-
 esp32:
   framework:
     advanced:
@@ -137,7 +99,7 @@ esp32_ble:
 esp32_ble_tracker:
   scan_parameters:
     interval: 500ms
-    window: 10ms
+    window: 20ms
 
 binary_sensor:
   - id: !extend ld2450_zone2_occupancy

@@ -33,7 +33,7 @@ substitutions:
   device:
     model: "Seeed reTerminal E1002"
   display:
-    home_page: page_tutorial
+    home_page: page_info
     font:
       text_sm: 18
       text_md: 22
@@ -42,11 +42,11 @@ substitutions:
       text_xxl: 36
       text_hg: 44
       text_fl: 54
-      icons_sm: 28
-      icons_md: 40
-      icons_lg: 50
-      icons_xl: 64
-      icons_xxl: 90
+      icons_sm: 30
+      icons_md: 38
+      icons_lg: 46
+      icons_xl: 56
+      icons_xxl: 66
   pin:
     light:
       led: GPIO6
@@ -89,18 +89,6 @@ esphome:
         - component.update: battery_level
         # Read RTC time on boot
         - pcf8563.read_time:
-    - priority: 200.0
-      then:
-        - component.update: display_eink
-        - wait_until:
-            condition:
-              lambda: 'return id(data_updated) == true;'
-        # Wait a bit longer so all the items are received
-        - delay: 5s
-        - logger.log: "Initial sensor data received: Refreshing display..."
-        - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: ${display.home_page}
-        - script.execute: update_screen
 
 globals:
   - id: !extend epaper_bg_color
@@ -122,84 +110,105 @@ display:
     pages:
       - id: page_black
         lambda: |-
+          ESP_LOGI("display", "Page: Black");
           // Fill background.
           it.fill( id(color_black) );
       - id: page_white
         lambda: |-
+          ESP_LOGI("display", "Page: White");
           // Fill background.
           it.fill( id(color_white) );
-      - id: page_tutorial
+      - id: page_info
         lambda: |-
+          ESP_LOGI("display", "Page: Info");
           // Fill background.
-          it.fill( id(color_white) );
-          // ---- Log all sensor values ----
-          ESP_LOGD("display", "=== ePaper display refresh ===");
+          it.fill( id(epaper_bg_color) );
 
-          // ---- Title (BLUE) ----
-          it.printf(400, 15, id(font_md), id(color_blue), TextAlign::TOP_CENTER,
-                    "reTerminal E1002 Dashboard");
-          it.line(20, 55, 780, 55, id(color_black));
-
-          // ---- RTC Time (BLACK) ----
-          auto now = id(time_rtc).now();
-          if (now.is_valid()) {
-            it.strftime(400, 65, id(font_md), id(color_black), TextAlign::TOP_CENTER,
-                        "%Y-%m-%d  %H:%M", now);
-            ESP_LOGD("display", "RTC time: %04d-%02d-%02d %02d:%02d",
-                    now.year, now.month, now.day_of_month, now.hour, now.minute);
-          } else {
-            it.printf(400, 65, id(font_md), id(color_black), TextAlign::TOP_CENTER,
-                      "RTC: waiting for sync...");
-            ESP_LOGW("display", "RTC: not synced yet");
+          // NAV
+            // Home
+          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F02DC");
+            // Next
+          it.print( (it.get_width()/40)*25 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
+            // Back
+          it.print( (it.get_width()/40)*23 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0141");
+          
+          // Show wifi icon.
+          if ( id(component_wifi).is_connected() ) {
+            it.print( 0 , 0, id(mdi_md), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
           }
-
-          // ---- Temperature (RED) ----
-          if (id(temperature_sht40).has_state()) {
-            ESP_LOGD("display", "Temperature: %.1f C", id(temperature_sht40).state);
-            it.printf(30, 120, id(font_lg), id(color_red), "Temp: %.1f C", id(temperature_sht40).state);
-          } else {
-            ESP_LOGW("display", "Temperature: NO DATA");
-            it.printf(30, 120, id(font_lg), id(color_red), "Temp: -- C");
+          // Show HA icon.
+          if ( id(component_api).is_connected() ) {
+            it.print( it.get_width() , 0, id(mdi_md), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
           }
+          // PAGE
+          it.print( (it.get_width()/40)*5 , 0, id(mdi_md), id(epaper_text_color), "\U000F02FC");
+          it.print( (it.get_width()/40)*8, 4, id(font_md), id(epaper_text_color), "Enhet");
+          it.line(10, 45, 790, 45, id(epaper_text_color));
 
-          // ---- Humidity (GREEN) ----
-          if (id(humidity_sht40).has_state()) {
-            ESP_LOGD("display", "Humidity: %.1f %%", id(humidity_sht40).state);
-            it.printf(30, 185, id(font_lg), id(color_green), "Hum:  %.1f %%", id(humidity_sht40).state);
-          } else {
-            ESP_LOGW("display", "Humidity: NO DATA");
-            it.printf(30, 185, id(font_lg), id(color_green), "Hum:  -- %%");
-          }
+          
+          // DEVICE
+          it.filled_rectangle(20, 65, 15, 180, id(epaper_accent1_color));
+          it.line(20, 245, 370, 245, id(epaper_accent1_color));
+          // NAME
+          it.printf( 40, 80, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
+          it.printf(40, 135, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
+          it.printf(40, 170, id(font_sm), id(epaper_text_color), "KEY1 GPIO4: Høyre");
+          it.printf(40, 205, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
+          
+          // NETWORK
+          it.filled_rectangle(20, 265, 15, 180, id(epaper_accent2_color));
+          it.line(20, 445, 370, 445, id(epaper_accent2_color));
+          // SSID
+          it.printf( 40, 280, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
+          // IP
+          it.printf( 40, 340, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
+          // MAC
+          it.printf( 40, 395, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
 
-          // ---- Battery (YELLOW) ----
+          // SENSORS
+          it.filled_rectangle(410, 65, 15, 380, id(epaper_accent3_color));
+          it.line(410, 445, 760, 445, id(epaper_accent3_color));
+          // PERCENT
+          it.print( 430, 80, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
-            ESP_LOGD("display", "Battery: %.0f%%  Voltage: %.2fV",
-                    id(battery_level).state, id(battery_voltage).state);
-            it.printf(30, 260, id(font_md), id(color_yellow), "Battery: %.0f%%  (%.2fV)",
-                      id(battery_level).state, id(battery_voltage).state);
+            it.printf(640, 80, id(font_md), id(epaper_text_color), "%.0f%%", id(battery_level).state);
           } else {
-            it.printf(30, 260, id(font_md), id(color_yellow), "Battery: --");
+            it.print(640, 80, id(font_md), id(epaper_text_color), "--%");
           }
-
-          // ---- SD card status (BLACK) ----
+          // VOLTAGE
+          it.print( 430, 150, id(font_md), id(epaper_text_color), "Batterispenning: " );
+          if (id(battery_voltage).has_state()) {
+            it.printf(640, 150, id(font_md), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
+          } else {
+            it.print(640, 150, id(font_md), id(epaper_text_color), "--V");
+          }
+          // TEMPERATURE
+          it.print( 430, 235, id(font_md), id(epaper_text_color), "Temperatur: " );
+          if (id(temperature_sht40).has_state()) {
+            it.printf(640, 235, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
+          } else {
+            it.print(640, 235, id(font_md), id(epaper_text_color), "-- C");
+          }
+          // HUMIDITY
+          it.print( 430, 300, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
+          if (id(humidity_sht40).has_state()) {
+            it.printf(640, 300, id(font_md), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
+          } else {
+            it.print(640, 300, id(font_md), id(epaper_text_color), "-- %");
+          }
+          // SD card
           if (id(sd_card_detect).state) {
-            it.printf(30, 305, id(font_sm), id(color_black), "SD Card: inserted");
+            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Kort: oppdaget");
           } else {
-            it.printf(30, 305, id(font_sm), id(color_black), "SD Card: not detected");
+            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Kort: ikke oppdaget");
           }
-
-          // ---- Microphone status (BLACK) ----
-          it.printf(30, 335, id(font_sm), id(color_black), "PDM Microphone: enabled (GPIO41/42)");
-
-          // ---- Button hints (BLACK) ----
-          it.line(20, 370, 780, 370, id(color_blue));
-          it.printf(30, 380, id(font_sm), id(color_green), "KEY0 GPIO3: Green button");
-          it.printf(30, 405, id(font_sm), id(color_black), "KEY1 GPIO4: Right button");
-          it.printf(30, 430, id(font_sm), id(color_black), "KEY2 GPIO5: Left button");
-
-          // ---- Footer (BLUE) ----
-          it.printf(400, 458, id(font_sm), id(color_blue), TextAlign::TOP_CENTER,
-                    "Selected reTerminal hardware features enabled");
+          
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_rtc).now().timestamp;
+          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
+          it.printf( 0, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "@ %s", str );
 
 #    lambda: |-
 #      const auto BLACK   = Color(0,   0,   0,   0);
@@ -269,12 +278,12 @@ font:
 
   - id: mdi_sm
     file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_xl}
+    size: ${display.font.icons_sm}
     bpp: 4
     glyphs: !include ../../gui/fonts/glyphs.yaml
   - id: mdi_md
     file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_xxl}
+    size: ${display.font.icons_md}
     bpp: 4
     glyphs: !include ../../gui/fonts/glyphs.yaml
   - id: mdi_lg
@@ -340,19 +349,17 @@ sensor:
     filters:
       # Compensate for onboard voltage divider (1:2)
       - multiply: 2.0
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
 
   # --- Battery level (percentage) ---
   - platform: template
-    name: "Battery Level"
+    name: "Battery"
     id: battery_level
     unit_of_measurement: "%"
     icon: "mdi:battery"
     device_class: battery
     state_class: measurement
     entity_category: diagnostic
+    accuracy_decimals: 0
     lambda: 'return id(battery_voltage).state;'
     filters:
       - calibrate_linear:
@@ -371,9 +378,6 @@ sensor:
       - clamp:
           min_value: 0
           max_value: 100
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
 
   # --- SHT4x temperature & humidity (I2C) ---
   - platform: sht4x
@@ -421,18 +425,10 @@ sensor:
                 // On refreshes 0, 5, 10, etc., set Black background, White text
                 id(epaper_bg_color) = Color(0, 0, 0, 0);
                 id(epaper_text_color) = Color(255, 255, 255, 0);
-                id(epaper_accent1_color) = Color(255, 0, 0, 0);
-                id(epaper_accent2_color) = Color(255, 255, 0, 0);
-                id(epaper_accent3_color) = Color(0, 255, 0, 0);
-                id(epaper_accent4_color) = Color(255, 255, 0, 0);
               } else {
                 // On all other refreshes, set White background, Black text
                 id(epaper_bg_color) = Color(255, 255, 255, 0);
                 id(epaper_text_color) = Color(0, 0, 0, 0);
-                id(epaper_accent1_color) = Color(0, 255, 0, 0);
-                id(epaper_accent2_color) = Color(0, 0, 255, 0);
-                id(epaper_accent3_color) = Color(255, 0, 0, 0);
-                id(epaper_accent4_color) = Color(0, 0, 255, 0);
               }
 
 binary_sensor:

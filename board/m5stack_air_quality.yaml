@@ -47,18 +47,6 @@ esphome:
             gpio_set_level(GPIO_NUM_46, 1);
             gpio_hold_en(GPIO_NUM_46);
             gpio_deep_sleep_hold_en();
-    - priority: -100
-      then:
-        - component.update: display_eink
-        - wait_until:
-            condition:
-              lambda: 'return id(data_updated) == true;'
-        # Wait a bit longer so all the items are received
-        - delay: 5s
-        - logger.log: "Initial sensor data received: Refreshing display..."
-        - lambda: 'id(initial_data_received) = true;'
-        - display.page.show: ${display.home_page}
-        - script.execute: update_screen
 
 esp32:
 # ESP32S3FN8@Dual-core Xtensa LX7, 240MHz

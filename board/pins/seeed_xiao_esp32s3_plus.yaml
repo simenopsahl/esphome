@@ -52,27 +52,16 @@ substitutions:
       e1001:
         battery:
           adc: GPIO1
-          enable: GPIO21
+          enable: GPIO6
         btn:
-          green: GPIO3
-          right: GPIO4
-          left: GPIO5
-        audio:
-          i2s_lrclk: GPIO42
-          i2s_din: GPIO41
-          mic: GPIO41
-          mic_power: GPIO38
-          buzzer: GPIO45
-        light:
-          led: GPIO6
-        card:
-          detect: GPIO15
-          sd_power: GPIO16
-        cs: GPIO10
-        dc: GPIO11
-        rst: GPIO12
-        reset: GPIO12
-        busy: GPIO13
+          key1: GPIO2
+          key2: GPIO3
+          key3: GPIO5
+        cs: GPIO44
+        dc: GPIO10
+        rst: GPIO38
+        reset: GPIO38
+        busy: GPIO4
       e1002:
         battery:
           adc: GPIO1
@@ -92,11 +81,6 @@ substitutions:
         card:
           detect: GPIO15
           sd_power: GPIO16
-        cs: GPIO10
-        dc: GPIO11
-        rst: GPIO12
-        reset: GPIO12
-        busy: GPIO13
 
     ext:
       header:
