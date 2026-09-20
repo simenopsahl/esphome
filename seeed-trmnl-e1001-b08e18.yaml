@@ -13,8 +13,6 @@ substitutions:
   device:
     name: seeed-trmnl-diy-b08e18
     location: "Storage"
-    framework:
-      type: esp-idf
   display:
     home_page: page_content
     font:
