@@ -4,14 +4,14 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/seeed_xiao_esp32s3_plus.yaml
-  e1001: !include board/module/display_reterminal_e1001.yaml
+  e1001: !include board/module/display_trmnl_diy.yaml
 
 substitutions:
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: seeed-trmnl-e1001-b08e18
+    name: seeed-trmnl-diy-b08e18
     location: "Storage"
     framework:
       type: esp-idf
