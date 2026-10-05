@@ -1,10 +1,11 @@
 labels: [SPI, display, ePaper]
 ---
-# https://wiki.seeedstudio.com/reterminal_e10xx_with_esphome/#basic-for-drawing-in-esphome
+# https://wiki.seeedstudio.com/ogdiy_kit_works_with_esphome/#demo-3-comprehensive-example
+# https://github.com/unreal4u/esphome-devices/blob/main/config/trmnl--e-ink-display.yaml
 # https://esphome.io/components/display/waveshare_epaper/
 
 # =============================================================================
-# reTerminal E1001 — ESPHome Full Hardware Example
+# OG TRMNL DIY — ESPHome Full Hardware Example
 # All onboard peripherals enabled in the most basic way
 # =============================================================================
 #
@@ -20,7 +21,7 @@ packages:
 
 substitutions:
   device:
-    model: "Seeed reTerminal E1001"
+    model: "Seeed TRMNL DIY"
   display:
     home_page: page_info
     font:
@@ -39,18 +40,13 @@ substitutions:
 
 esphome:
   project:
-    name: "Seeed.reTerminal E1001"
+    name: "Seeed.TRMNL DIY"
     version: "1.0.0"
   on_boot:
+    # Enable the battery divider early so the first ADC sample is valid
     - priority: 600
       then:
-        # Turn on battery measurement circuit
-        - output.turn_on: battery_enable
-        # Wait for voltages to stabilize
-        - delay: 200ms
-        # Take first battery reading
-        - component.update: battery_voltage
-        - component.update: battery_level
+        - script.execute: sample_battery
 
 display:
   # 800 x 480 resolution
@@ -58,11 +54,11 @@ display:
   - platform: waveshare_epaper
     id: display_eink
     model: 7.50inV2p # You can use 7.50inv2alt when you draw complex info and it display not good.
-    cs_pin: ${pin.reTerminal.e1001.cs} # GPIO44
-    dc_pin: ${pin.reTerminal.e1001.dc} # GPIO10
-    reset_pin: ${pin.reTerminal.e1001.rst} # GPIO38
+    cs_pin: ${pin.reTerminal.diy.cs} # GPIO44
+    dc_pin: ${pin.reTerminal.diy.dc} # GPIO10
+    reset_pin: ${pin.reTerminal.diy.rst} # GPIO38
     busy_pin:
-      number: ${pin.reTerminal.e1001.busy} # GPIO4
+      number: ${pin.reTerminal.diy.busy} # GPIO4
       inverted: true
     update_interval: never
     pages:
@@ -239,13 +235,13 @@ font:
 output:
   # [5] Battery measurement enable
   - platform: gpio
-    pin: ${pin.reTerminal.e1001.battery.enable}
+    pin: ${pin.reTerminal.diy.battery.enable} # GPIO6
     id: battery_enable
 
 sensor:
   # --- Battery voltage (ADC on GPIO1) ---
   - platform: adc
-    pin: ${pin.reTerminal.e1001.battery.adc}
+    pin: ${pin.reTerminal.diy.battery.adc} # GPIO1
     name: "Battery Voltage"
     id: battery_voltage
     update_interval: 60s
@@ -294,7 +290,7 @@ sensor:
 binary_sensor:
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1001.btn.key1}
+      number: ${pin.reTerminal.diy.btn.key1} # GPIO2
       mode: INPUT_PULLUP
       inverted: true
     id: button_next
@@ -307,7 +303,7 @@ binary_sensor:
 
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1001.btn.key2}
+      number: ${pin.reTerminal.diy.btn.key2} # GPIO3
       mode: INPUT_PULLUP
       inverted: true
     id: button_prev
@@ -320,7 +316,7 @@ binary_sensor:
 
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1001.btn.key3}
+      number: ${pin.reTerminal.diy.btn.key3} # GPIO5
       mode: INPUT_PULLUP
       inverted: true
     id: button_home
@@ -330,3 +326,20 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: "KEY3 (GPIO5) pressed"
+
+script:
+  - id: sample_battery
+    mode: single
+    then:
+      - output.turn_on: battery_enable
+      - delay: 200ms
+      - component.update: battery_voltage
+      - component.update: battery_level
+      - output.turn_off: battery_enable
+
+interval:
+  - interval: 5min
+    then:
+      - script.execute: sample_battery
+
+status_led: !remove

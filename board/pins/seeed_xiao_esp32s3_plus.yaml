@@ -49,7 +49,7 @@ substitutions:
       i2s_din: GPIO41
       mic: GPIO41
     reTerminal:
-      e1001:
+      diy:
         battery:
           adc: GPIO1
           enable: GPIO6
