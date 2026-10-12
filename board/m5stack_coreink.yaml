@@ -117,7 +117,7 @@ display:
     busy_pin:
       number: ${pin.int.spi.disp.busy}
       inverted: false
-    full_update_every: 5
+    full_update_every: 2
 #    reset_duration: 2ms
     update_interval: never
     pages:
