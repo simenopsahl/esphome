@@ -1,0 +1,63 @@
+labels: [virtual, simulated, temperature, humidity, pressure]
+---
+# Simulated environment sensor for virtual (host) devices.
+#
+# Provides slowly drifting temperature / humidity / pressure readings so that
+# features/combined_env_sensors.yaml and GUI pages have local data to show.
+#
+# Use as a source in the device YAML:
+#   sensor:
+#     - id: !extend temperature_local
+#       sources:
+#         - source: temperature_simulated
+#
+
+sensor:
+  - platform: template
+    id: temperature_simulated
+    name: "Temperature Simulated"
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 15s
+    lambda: |-
+      static float value = 21.5f;
+      value += ((float) (random_uint32() % 21) - 10.0f) / 100.0f;
+      value = std::max(18.0f, std::min(26.0f, value));
+      return value;
+
+  - platform: template
+    id: humidity_simulated
+    name: "Humidity Simulated"
+    unit_of_measurement: "%"
+    device_class: "humidity"
+    state_class: "measurement"
+    accuracy_decimals: 1
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 15s
+    lambda: |-
+      static float value = 40.0f;
+      value += ((float) (random_uint32() % 21) - 10.0f) / 20.0f;
+      value = std::max(25.0f, std::min(60.0f, value));
+      return value;
+
+  - platform: template
+    id: pressure_simulated
+    name: "Pressure Simulated"
+    unit_of_measurement: "hPa"
+    device_class: "atmospheric_pressure"
+    state_class: "measurement"
+    accuracy_decimals: 1
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 15s
+    lambda: |-
+      static float value = 1013.0f;
+      value += ((float) (random_uint32() % 21) - 10.0f) / 10.0f;
+      value = std::max(980.0f, std::min(1040.0f, value));
+      return value;
+

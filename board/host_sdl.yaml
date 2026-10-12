@@ -1,0 +1,170 @@
+labels: [host, sdl, display, touchscreen, virtual]
+---
+# Virtual display board: ESPHome `host` platform rendering to an SDL2 window.
+#
+# Builds and runs on Linux only — on Windows use WSL2 + WSLg
+# (see tools/host_sdl/README.md). Never flashed to hardware.
+#
+# Exposes the same IDs that physical display boards provide, so the shared
+# gui/ packages compile unchanged:
+#   display_sdl, touchscreen_sdl, backlight_light, btn_a / btn_b / btn_c
+# plus template stand-ins for the Wi-Fi diagnostics used by the status page
+# (the wifi component does not exist on the host platform).
+#
+# https://esphome.io/components/host.html
+# https://esphome.io/components/display/sdl.html
+#
+
+substitutions:
+  device:
+    model: "Host SDL"
+    # Locally administered MAC; must be unique per virtual device
+    mac_address: "02:5D:1A:00:00:01"
+    # Shown on the status page only (host has no wifi_info sensor)
+    ip_address: "127.0.0.1"
+    ssid: "WSL (virtual)"
+    screen:
+      width: "320"
+      height: "240"
+    framework:
+      type: host
+  module:
+    screenshot_port: "8080"
+
+esphome:
+  project:
+    name: "ESPHome.HostSDL"
+    version: "1.0"
+
+host:
+  mac_address: ${device.mac_address}
+
+# Screenshot / page navigation HTTP endpoint for previewing without touching
+# the window:  GET /screenshot   GET /page/next | /page/prev | /page/<index>
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [lvgl_screenshot]
+
+lvgl_screenshot:
+  port: ${module.screenshot_port}
+
+display:
+  - platform: snapshot
+    id: display_snapshot
+    update_interval: never
+    auto_clear_enabled: false
+    dimensions:
+      width: ${device.screen.width}
+      height: ${device.screen.height}
+
+  - platform: sdl
+    id: display_sdl
+    snapshot_key: SDLK_F12
+    update_interval: never
+    auto_clear_enabled: false
+    dimensions:
+      width: ${device.screen.width}
+      height: ${device.screen.height}
+
+touchscreen:
+  platform: sdl
+  id: touchscreen_sdl
+  display: display_sdl
+
+api:
+  services:
+    - service: take_snapshot
+      then:
+        - snapshot.take: display_sdl
+
+lvgl:
+  id: !extend display_lvgl
+  displays:
+    - display_snapshot
+    - display_sdl
+
+# Virtual backlight so gui/functions/control_auto_display.yaml works as on hardware
+output:
+  - platform: template
+    id: backlight_output
+    type: float
+    write_action:
+      - logger.log:
+          level: DEBUG
+          format: "Virtual backlight level %.0f%%"
+          args: ["state * 100.0f"]
+
+light:
+  - platform: monochromatic # backlight
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 75%
+    name: "Backlight"
+    entity_category: config
+
+# Keyboard stands in for the three hardware buttons (window must have focus)
+binary_sensor:
+  # Button A: Left arrow
+  - platform: sdl
+    id: btn_a
+    name: "Button A"
+    entity_category: diagnostic
+    key: SDLK_LEFT
+    on_press:
+      - logger.log: Button A Pressed
+  # Button B: Down arrow
+  - platform: sdl
+    id: btn_b
+    name: "Button B"
+    entity_category: diagnostic
+    key: SDLK_DOWN
+    on_press:
+      - logger.log: Button B Pressed
+  # Button C: Right arrow
+  - platform: sdl
+    id: btn_c
+    name: "Button C"
+    entity_category: diagnostic
+    key: SDLK_RIGHT
+    on_press:
+      - logger.log: Button C Pressed
+
+button:
+  - platform: template
+    name: "Take Snapshot"
+    id: btn_take_snapshot
+    icon: "mdi:camera"
+    entity_category: diagnostic
+    on_press:
+      - snapshot.take: display_sdl
+
+# Stand-ins for common/wifi.yaml diagnostics used by gui/pages/status
+text_sensor:
+  - platform: template
+    id: sensor_ip_address
+    name: "IP Address"
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 60s
+    lambda: return {"${device.ip_address}"};
+  - platform: template
+    id: sensor_ssid
+    name: "Connected SSID"
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 60s
+    lambda: return {"${device.ssid}"};
+  - platform: template
+    id: sensor_mac_address
+    name: "Mac Address"
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 60s
+    lambda: return {"${device.mac_address}"};
+

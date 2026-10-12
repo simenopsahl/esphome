@@ -1,6 +1,5 @@
 
 ota:
-  id: !extend component_ota
   on_begin:
     - then:
         - lvgl.widget.show: ota_screen

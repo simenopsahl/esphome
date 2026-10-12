@@ -4,10 +4,8 @@
 /.esphome/
 /.cache/
 /archive/
-/components/
 /fonts/
 /img/
-/pinout/
 /trash/
 /secrets.yaml
 *.bak
