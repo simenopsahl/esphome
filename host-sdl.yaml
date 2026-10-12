@@ -67,6 +67,7 @@ esphome:
       then:
         # Network is always up on host; show the header Wi-Fi icon
         - lvgl.widget.show: lbl_wifi_status
+        - lvgl.widget.hide: boot_screen
         - script.execute: lvgl_time_update
 
 # The GUI header package hooks wifi events; there is no wifi on host
