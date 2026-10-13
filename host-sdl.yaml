@@ -58,9 +58,9 @@ substitutions:
     home_page: page_temperature
 
 esphome:
-  comment: ${device.model} @ ${device.location}
-  name: ${device.name}
-  friendly_name: ${device.name}
+  comment: Host SDL @ Virtual
+  name: host-sdl
+  friendly_name: host-sdl
   area: ${device.location}
   on_boot:
     - priority: -100
