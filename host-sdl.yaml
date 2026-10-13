@@ -41,9 +41,9 @@ substitutions:
   # GUI layout file in gui/ and its pixel size. The run script derives the
   # size from the layout file automatically when a layout is given:
   #   host-sdl.ps1 run 480x320  ->  -s gui_layout 480x320 -s screen_width .. -s screen_height ..
-  gui_layout: "240x320"
-  screen_width: "320"
-  screen_height: "240"
+  gui_layout: "480x800"
+  screen_width: "480"
+  screen_height: "800"
   common:
     log_level: DEBUG
   device:
