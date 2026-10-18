@@ -13,6 +13,12 @@ packages:
 #  lvgl: !include ../../gui/480x800.yaml
 
 substitutions:
+  screen_width: "800"
+  screen_height: "480"
+  device:
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   module:
     touch_i2c_bus: i2c_internal
   display:
@@ -44,8 +50,8 @@ display:
     id: display_lcd
     model: CUSTOM
     dimensions:
-      height: 480
-      width: 800
+      height: ${device.screen.height}
+      width: ${device.screen.width}
     auto_clear_enabled: false
     update_interval: 10s
 

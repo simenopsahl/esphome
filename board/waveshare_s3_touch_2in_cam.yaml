@@ -14,11 +14,16 @@ packages:
   camera: !include module/esp32_camera.yaml
 
 substitutions:
+  screen_width: "240"
+  screen_height: "320"
   device:
     model: "Waveshare 2in w Cam"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   module:
     internal:
       i2c_bus: i2c_internal
@@ -160,8 +165,8 @@ display:
     dc_pin: ${pin.disp.dc}
 #    reset_pin: ${pin.disp.rst}
     dimensions:
-      width: 240
-      height: 320
+      width: ${device.screen.width}
+      height: ${device.screen.height}
     data_rate: 40Mhz
     invert_colors: true
     auto_clear_enabled: false

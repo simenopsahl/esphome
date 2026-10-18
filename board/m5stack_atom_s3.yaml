@@ -10,11 +10,16 @@ packages:
   pins: !include pins/m5stack_atom_s3.yaml
 
 substitutions:
+  screen_width: "128"
+  screen_height: "128"
   device:
     model: "M5Stack Atom S3"
     rmt_symbols_block: 48 
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -74,8 +79,8 @@ display:
     dc_pin: ${pin.int.spi.disp.dc}
     reset_pin: ${pin.int.spi.disp.reset}
     dimensions:
-      height: 128
-      width: 128
+      height: ${device.screen.height}
+      width: ${device.screen.width}
       offset_width: 2     
       offset_height: 1
       pad_width: 2

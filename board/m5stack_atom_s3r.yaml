@@ -14,6 +14,8 @@ packages:
   imu: !include module/chip_imu_bmi270.yaml
 
 substitutions:
+  screen_width: "128"
+  screen_height: "128"
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
   module:
@@ -24,6 +26,9 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:

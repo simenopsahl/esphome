@@ -10,11 +10,16 @@ packages:
   pins: !include pins/geekmagic_smalltv_s3.yaml
 
 substitutions:
+  screen_width: "240"
+  screen_height: "240"
   device:
     model: "GeekMagic SmallTV S3"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -88,8 +93,8 @@ display:
     reset_pin: ${pin.spi.disp.reset}
     spi_mode: MODE3
     dimensions:
-      width: 240
-      height: 240
+      width: ${device.screen.width}
+      height: ${device.screen.height}
     data_rate: 40Mhz
     invert_colors: true
     auto_clear_enabled: false

@@ -8,11 +8,16 @@ packages:
   pins: !include pins/jc3248w535c.yaml
 
 substitutions:
+  screen_width: "320"
+  screen_height: "480"
   device:
     model: 'Sunton 3,5"'
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -89,8 +94,8 @@ display:
       number: ${pin.int.spi.disp.cs}
       ignore_strapping_warning: true
     dimensions:
-      height: 480
-      width: 320
+      height: ${device.screen.height}
+      width: ${device.screen.width}
     data_rate: 40MHz
     draw_from_origin: true
     auto_clear_enabled: false

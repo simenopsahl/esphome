@@ -11,6 +11,8 @@ packages:
   i2c_int: !include extension/internal_i2c.yaml
 
 substitutions:
+  screen_width: "480"
+  screen_height: "800"
   extension:
     i2c:
       internal:
@@ -20,6 +22,9 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -111,8 +116,8 @@ display:
     id: display_lcd
     model: JC4880P443
     dimensions:
-      height: 800
-      width: 480
+      height: ${device.screen.height}
+      width: ${device.screen.width}
     auto_clear_enabled: false
     update_interval: 10s
 

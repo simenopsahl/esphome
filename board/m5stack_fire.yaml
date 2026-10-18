@@ -10,11 +10,16 @@ packages:
   pins: !include pins/m5stack_fire.yaml
 
 substitutions:
+  screen_width: "320"
+  screen_height: "240"
   device:
     model: "M5Stack Fire"
     rmt_symbols_block: 64
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   module:
     internal:
       i2c_bus: i2c_internal
@@ -105,8 +110,8 @@ display:
     dc_pin: ${pin.int.spi.disp.dc}
     reset_pin: ${pin.int.spi.disp.reset}
     dimensions:
-      height: 240
-      width: 320
+      height: ${device.screen.height}
+      width: ${device.screen.width}
     transform:
       swap_xy: false
       mirror_x: false

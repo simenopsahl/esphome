@@ -12,6 +12,8 @@ packages:
   epaper: !include ../features/epaper.yaml
 
 substitutions:
+  screen_width: "200"
+  screen_height: "200"
   time_timezone: "Europe/Oslo"
   home_page: page_content
   module:
@@ -22,6 +24,9 @@ substitutions:
     rmt_symbols_block: 64
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:

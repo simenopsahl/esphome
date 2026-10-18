@@ -10,12 +10,17 @@ packages:
   epaper: !include ../features/epaper.yaml
 
 substitutions:
+  screen_width: "480"
+  screen_height: "800"
   home_page: page_content
   device:
     model: "Waveshare E-Paper"
     rmt_symbols_block: 64
     framework:
       type: arduino
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:

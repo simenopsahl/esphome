@@ -8,11 +8,16 @@ packages:
   pins: !include pins/sunton-8048s043c.yaml
 
 substitutions:
+  screen_width: "800"
+  screen_height: "480"
   device:
     model: 'Sunton 4.3"'
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -112,8 +117,8 @@ display:
         - ${pin.int.disp.blue.b4}
         - ${pin.int.disp.blue.b5}
     dimensions:
-      height: 480
-      width: 800
+      height: ${device.screen.height}
+      width: ${device.screen.width}
     color_order: RGB
     auto_clear_enabled: false
     update_interval: 10s

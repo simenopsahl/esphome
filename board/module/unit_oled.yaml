@@ -5,6 +5,12 @@ labels: [SH1107, display, i2c]
 # https://github.com/Chill-Division/M5Stack-ESPHome/issues/13
 
 substitutions:
+  screen_width: "128"
+  screen_height: "64"
+  device:
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   module:
     oled_i2c_bus: i2c_grove
   display:
@@ -12,6 +18,8 @@ substitutions:
 
 # Unit OLED
 display:
+  # 128 x 64 resolution
+  # Monochrome (1-bit)
   - platform: ssd1306_i2c
     i2c_id: ${module.oled_i2c_bus}
     id: display_oled

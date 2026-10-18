@@ -14,8 +14,8 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **Pre-Work** | ESPHome 2026.9.1 upgrade, `host-sdl` + `snapshot` + `touchscreen`, initial architecture analysis | ✅ **Done** | 2026-10-17 | WSL & Windows upgraded to `2026.9.1`; `board/host_sdl.yaml` supports dual `sdl` + `snapshot` display and `sdl` touchscreen. |
 | **Session 1** | Tooling (`-Size <WxH>`) & Baseline Screenshots | ✅ **Done** | 2026-10-18 | Added `-Size`, `-Modules`, `-Cc1101Mode` to `host-sdl.ps1`/`run.sh`; captured 35 baseline PNGs across 6 resolutions + 5 module pages. |
-| **Session 2** | Chrome (`header`/`footer`/`base`) & Theme Foundation | ⏳ **Next Up** | — | Ready to start. |
-| **Session 3** | Simple Pages (`temperature`, `status`) & M5Stack Core Module Pages Cleanup (`air_quality`, `cc1101`, `dual_kmeter`) | ⬜ Pending | — | Depends on Session 2. Module pages stay `320×240` (only `.sizing` anchors removed). |
+| **Session 2** | Chrome (`header`/`footer`/`base`) & Theme Foundation | ✅ **Done** | 2026-10-18 | Created `gui/chrome/{base,header,footer}.yaml` (`set_page_title` with icon/text mode, `page_style`, `container_style`) and 5-tier `gui/fonts/responsive.yaml`. |
+| **Session 3** | Simple Pages (`temperature`, `status`) & M5Stack Core Module Pages Cleanup (`air_quality`, `cc1101`, `dual_kmeter`) | ⏳ **Next Up** | — | Ready to start. Module pages stay `320×240` (only `.sizing` anchors removed). |
 | **Session 4** | Clock Page Migration (`page.yaml` & `page_narrow.yaml`) | ⬜ Pending | — | Depends on Session 2. |
 | **Session 5** | NordPool Graph Spike & Migration (Option B + Option A comparison) | ⬜ Pending | — | Depends on Session 2. |
 | **Session 6** | Weather Page Migration (`page.yaml` & `page_narrow.yaml`) | ⬜ Pending | — | Depends on Session 2. |
@@ -26,7 +26,6 @@
 ## Pre-Work — Host SDL Virtual Device & Planning (✅ Completed)
 
 ### Completed Tasks
-
 - [x] Upgraded ESPHome to **`2026.9.1`** in WSL (`~/.venvs/esphome`) and Windows Python.
 - [x] Updated default ESPHome version in [`tools/host_sdl/setup_wsl.sh`](file:///x:/esphome/tools/host_sdl/setup_wsl.sh).
 - [x] Reverted [`gui/weather/weather_icons.yaml`](file:///x:/esphome/gui/weather/weather_icons.yaml) and [`gui/widgets/boot_screen/sensors.yaml`](file:///x:/esphome/gui/widgets/boot_screen/sensors.yaml) to `image: - platform: file`.
@@ -39,25 +38,21 @@
 ## Session 1 — Tooling (`-Size <WxH>`) & Baseline Snapshots (✅ Completed)
 
 ### Goal
-
 Enhance `host-sdl` tooling so we can launch and screenshot any arbitrary screen resolution (`-Size 480x320`, `-Size 240x320`, etc.) and optionally include module pages (`cc1101`, `dual_kmeter`, `air_quality`) in `.host-sdl.yaml` for visual testing. Capture baseline ("before") PNG screenshots in `tools/gui_migration/baseline/`.
 
 ### Tasks
-
 - [x] **1.1** Update [`tools/host_sdl/run.sh`](file:///x:/esphome/tools/host_sdl/run.sh) and [`tools/host_sdl/host-sdl.ps1`](file:///x:/esphome/tools/host_sdl/host-sdl.ps1) to accept `-Size <WxH>` (e.g. `320x240`, `240x320`, `480x320`, `128x128`, `240x240`) via `-s screen_width <W> -s screen_height <H>` CLI substitutions, while still supporting existing layout names.
 - [x] **1.2** Add `-Modules` and `-Cc1101Mode {packet|async}` flags to `host-sdl.ps1` (`--modules` / `--cc1101-mode` in `run.sh`) backed by [`board/module/host_simulated_modules.yaml`](file:///x:/esphome/board/module/host_simulated_modules.yaml), [`board/module/host_simulated_modules_async.yaml`](file:///x:/esphome/board/module/host_simulated_modules_async.yaml), and [`board/module/host_simulated_modules_none.yaml`](file:///x:/esphome/board/module/host_simulated_modules_none.yaml) to preview the 5 module pages (`air_quality`, `dual_kmeter`, `cc1101` wmbus/packet/async) with realistic mock sensor states on `host-sdl`. Also added fallback seed data in [`board/module/host_simulated_env.yaml`](file:///x:/esphome/board/module/host_simulated_env.yaml) so NordPool, Weather, and Room Temp pages always render populated data even when offline.
 - [x] **1.3** Capture baseline screenshots of existing pages (`clock`, `temperature`, `status`, `nordpool`, `weather`, plus all 5 module pages) across representative layouts (`240x320`, `320x240`, `480x320`, `128x128`, `240r`, `240x135`) and save them under [`tools/gui_migration/baseline/`](file:///x:/esphome/tools/gui_migration/baseline/) via [`tools/gui_migration/capture_baseline.sh`](file:///x:/esphome/tools/gui_migration/capture_baseline.sh).
 - [x] **1.4** Record completion report below and update the Session Status Table.
 
 ### Verification
-
 ```powershell
 pwsh tools/host_sdl/host-sdl.ps1 config 240x320 -Modules
 pwsh tools/host_sdl/host-sdl.ps1 screenshot
 ```
 
 ### Session 1 Completion Report
-
 - **Date**: 2026-10-18
 - **Summary of Changes**:
   - Updated [`tools/host_sdl/run.sh`](file:///x:/esphome/tools/host_sdl/run.sh) and [`tools/host_sdl/host-sdl.ps1`](file:///x:/esphome/tools/host_sdl/host-sdl.ps1) with `-Size <WxH>`, `-Modules`, and `-Cc1101Mode <packet|async>`.
@@ -76,34 +71,36 @@ pwsh tools/host_sdl/host-sdl.ps1 screenshot
 
 ---
 
-## Session 2 — Chrome (`header`/`footer`/`base`) & Theme Foundation
+## Session 2 — Chrome (`header`/`footer`/`base`) & Theme Foundation (✅ Completed)
 
 ### Goal
-
-Build the resolution-independent foundation in `gui/chrome/` and `gui/themes/` without breaking any existing `gui/<W>x<H>.yaml` files.
+Build the resolution-independent foundation in `gui/chrome/` and `gui/fonts/` without breaking any existing `gui/<W>x<H>.yaml` files.
 
 ### Tasks
-
-- [ ] **2.1** Create `gui/chrome/base.yaml`:
-  - Define default substitutions (`chrome_header: "true"`, `chrome_footer: "true"`, `chrome_h: ${ [24, (device.screen.height|int // 8)] | max }`, `page_pad_top`, `page_pad_bottom`).
-  - Define `script: - id: set_page_title` (with parameter `title: string`) as a safe no-op when no header is loaded.
-- [ ] **2.2** Create `gui/chrome/header.yaml`:
+- [x] **2.1** Create [`gui/chrome/base.yaml`](file:///x:/esphome/gui/chrome/base.yaml):
+  - Define default substitutions (`chrome_header: "true"`, `chrome_footer`, `chrome_title_mode: "auto"`, `chrome_h`, `chrome_pad`, `chrome_use_icon_title`, `chrome_title_font`, `page_pad_top`, `page_pad_bottom`, `container_pad_*`).
+  - Define `script: - id: set_page_title` (with parameters `title: string` and `icon: string`) as a safe no-op when no header is loaded.
+  - Define shared `page_style` and `container_style` in `lvgl: style_definitions:`.
+- [x] **2.2** Create [`gui/chrome/header.yaml`](file:///x:/esphome/gui/chrome/header.yaml):
   - Contribute the top status/title bar to `lvgl: top_layer: widgets:` sized to `height: ${chrome_h}`.
-  - `!extend set_page_title` to update `lbl_page_title`.
+  - `!extend set_page_title` to update `lbl_page_title` with `icon` on narrow displays (`screen_width < 180` or `chrome_title_mode == "icon"`) and `title` on wider displays.
   - Include header status sensors (`gui/widgets/header/sensors.yaml`).
-- [ ] **2.3** Create `gui/chrome/footer.yaml`:
-  - Contribute the bottom navigation bar to `lvgl: top_layer: widgets:` sized to `height: ${chrome_h}`.
-- [ ] **2.4** Update `gui/themes/` & `gui/styles/`:
-  - Define shared `page_style` (`pad_top: ${page_pad_top}`, `pad_bottom: ${page_pad_bottom}`, `bg_color`, `border_width: 0`, `radius: 0`) and `container_style` in the LVGL theme/style definitions.
-  - Define 3 font size tiers (`small` for `<200px`, `medium` for `200..319px`, `large` for `>=320px`) or responsive font size substitutions.
-- [ ] **2.5** Verify with `esphome config host-sdl.yaml` and a test render in `host-sdl`.
+- [x] **2.3** Create [`gui/chrome/footer.yaml`](file:///x:/esphome/gui/chrome/footer.yaml):
+  - Contribute the bottom navigation bar to `lvgl: top_layer: widgets:` sized to `height: ${chrome_h}` (with automatic hide on boot when `chrome_footer == "false"`).
+- [x] **2.4** Create [`gui/fonts/responsive.yaml`](file:///x:/esphome/gui/fonts/responsive.yaml):
+  - Define 5 font & icon size tiers (`Tiny/Narrow <=160px`, `Compact Square <=240px`, `Standard <=320px`, `Medium-Large <=480px`, `Large HD >480px`) so `mdi_lg`, `mdi_md`, and `font_md` always fit inside the header/footer `chrome_h` and match existing layouts.
+- [x] **2.5** Wire [`gui/240x320.yaml`](file:///x:/esphome/gui/240x320.yaml) into the new `gui/chrome/*` and `gui/fonts/responsive.yaml` packages and verify with `host-sdl.ps1 config 240x320 -Modules`.
 
 ### Session 2 Completion Report
-
-- **Date**: _TBD_
-- **Summary of Changes**: _TBD_
-- **Verification Results**: _TBD_
-- **Notes for Session 3**: _TBD_
+- **Date**: 2026-10-18
+- **Summary of Changes**:
+  - Created [`gui/chrome/base.yaml`](file:///x:/esphome/gui/chrome/base.yaml), [`gui/chrome/header.yaml`](file:///x:/esphome/gui/chrome/header.yaml), [`gui/chrome/footer.yaml`](file:///x:/esphome/gui/chrome/footer.yaml), and [`gui/fonts/responsive.yaml`](file:///x:/esphome/gui/fonts/responsive.yaml).
+  - Updated [`gui/240x320.yaml`](file:///x:/esphome/gui/240x320.yaml) to include `fonts/responsive.yaml` and `chrome/{base,header,footer}.yaml`.
+- **Verification Results**:
+  - `pwsh tools/host_sdl/host-sdl.ps1 config 240x320 -Modules` exited with code `0`; verified in expanded output that `chrome_h: 32`, `page_pad_top: 32`, `page_pad_bottom: 32`, `chrome_pad: 12`, and all `font_*`/`mdi_*` sizes match `gui/240x320.yaml` pixel-for-pixel.
+- **Notes for Session 3**:
+  - In ESPHome's Jinja evaluator, nested dict substitutions like `device.screen.width|int` evaluate to `0` if `device.screen` is not defined in the same YAML file; always bind flat `screen_width: ${device.screen.width}` and `screen_height: ${device.screen.height}` in `substitutions:` before referencing them in Jinja expressions.
+  - `scrollable: false` is an object property (already set globally on `obj` in `gui/themes/main.yaml`), not a `style_definitions` property.
 
 ---
 

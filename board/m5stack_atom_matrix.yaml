@@ -10,11 +10,16 @@ packages:
   pins: !include pins/m5stack_atom_lite.yaml
 
 substitutions:
+  screen_width: "5"
+  screen_height: "5"
   device:
     model: "M5Stack Atom Matrix"
     rmt_symbols_block: 64
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -83,8 +88,8 @@ display:
   - platform: addressable_light
     addressable_light_id: rgb_led
     id: display_matrix
-    width: 5
-    height: 5
+    width: ${device.screen.width}
+    height: ${device.screen.height}
     # Display pixel map
     # 0,0 1,0 2,0 3,0 4,0
     # 0,1 1,1 2,1 3,1 4,1

@@ -12,6 +12,8 @@ packages:
   pins: !include pins/m5stack_core_s3se.yaml
 
 substitutions:
+  screen_width: "320"
+  screen_height: "240"
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
   module:
@@ -22,6 +24,9 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -189,8 +194,8 @@ display:
       aw9523b_id: aw9523b_hub
       number: 9
     dimensions:
-      height: 240
-      width: 320
+      height: ${device.screen.height}
+      width: ${device.screen.width}
     transform:
       swap_xy: false
       mirror_x: false

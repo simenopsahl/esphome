@@ -12,6 +12,8 @@ packages:
   pins: !include pins/m5stack_stickc_plus2.yaml
 
 substitutions:
+  screen_width: "135"
+  screen_height: "240"
   hat_shared: "false"
   grove_shared: "false"
   device:
@@ -19,6 +21,9 @@ substitutions:
     rmt_symbols_block: 64
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:
@@ -139,8 +144,8 @@ display:
       number: ${pin.int.spi.disp.reset}
       ignore_strapping_warning: true
     dimensions:
-      height: 240
-      width: 135
+      height: ${device.screen.height}
+      width: ${device.screen.width}
       offset_height: 40
       offset_width: 52
     invert_colors: true

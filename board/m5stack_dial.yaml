@@ -13,6 +13,8 @@ packages:
   i2c_int: !include extension/internal_i2c.yaml
 
 substitutions:
+  screen_width: "240"
+  screen_height: "240"
   time_timezone: "Europe/Oslo"
   display:
     home_page: page_tempoerature
@@ -24,6 +26,9 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:

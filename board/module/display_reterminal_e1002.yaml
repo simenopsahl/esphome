@@ -31,8 +31,13 @@ packages:
   epaper: !include ../../features/epaper.yaml
 
 substitutions:
+  screen_width: "800"
+  screen_height: "480"
   device:
     model: "Seeed reTerminal E1002"
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   display:
     home_page: page_info
     font:

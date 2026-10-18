@@ -14,6 +14,8 @@ packages:
   status_led: !include ../features/system_status_led.yaml
 
 substitutions:
+  screen_width: "200"
+  screen_height: "200"
   time_timezone: "Europe/Oslo"
   display:
     home_page: page_content
@@ -25,6 +27,9 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
 
 esphome:
   project:

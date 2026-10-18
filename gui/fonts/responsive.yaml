@@ -1,0 +1,81 @@
+# Responsive font size definitions derived from `${screen_width}` and `${screen_height}`.
+#
+# Uses 5 size tiers matched to the repository's physical display families so that:
+# - Header/footer status & navigation icons (`mdi_lg`, `mdi_md`, `font_md`) always fit within `chrome_h`
+# - Page typography (`font_sm` .. `font_fl`) matches existing screen layouts across:
+#     Tier 1 (Tiny / Narrow):  min(W,H) <= 160 (e.g. 128x128, 135x240)
+#     Tier 2 (Compact Square): max(W,H) <= 240 (e.g. 200x200, 240x240, 240r)
+#     Tier 3 (Standard):       max(W,H) <= 320 (e.g. 320x240, 240x320)
+#     Tier 4 (Medium-Large):   max(W,H) <= 480 (e.g. 320x480, 480x320)
+#     Tier 5 (Large HD):       max(W,H) >  480 (e.g. 480x800, 800x480, 720x1280)
+#
+# Any individual size can be overridden in a device YAML via `substitutions:`.
+
+substitutions:
+  screen_width: ${device.screen.width}
+  screen_height: ${device.screen.height}
+  text_sm: >-
+    ${ 12 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (16 if ([screen_width|int, screen_height|int]|max) <= 480 else 26)) }
+  text_md: >-
+    ${ 14 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (16 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 30))) }
+  text_lg: >-
+    ${ 18 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (22 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 480 else 34)) }
+  text_xl: >-
+    ${ 24 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (22 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (32 if ([screen_width|int, screen_height|int]|max) <= 480 else 48))) }
+  text_xxl: >-
+    ${ 32 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 64))) }
+  text_hg: >-
+    ${ 42 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (36 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (56 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (90 if ([screen_width|int, screen_height|int]|max) <= 480 else 120))) }
+  text_fl: >-
+    ${ 54 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (88 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (112 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (150 if ([screen_width|int, screen_height|int]|max) <= 480 else 200))) }
+
+  icons_sm: >-
+    ${ 16 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (18 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 26)))) }
+  icons_md: >-
+    ${ 18 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (20 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 480 else 32))) }
+  icons_lg: >-
+    ${ 22 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (24 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (28 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (34 if ([screen_width|int, screen_height|int]|max) <= 480 else 40)))) }
+  icons_xl: >-
+    ${ 28 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (30 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (38 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (42 if ([screen_width|int, screen_height|int]|max) <= 480 else 48)))) }
+  icons_xxl: >-
+    ${ 36 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (38 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (42 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (50 if ([screen_width|int, screen_height|int]|max) <= 480 else 56)))) }
+
+font: !include fonts.yaml

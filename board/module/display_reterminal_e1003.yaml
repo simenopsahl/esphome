@@ -30,8 +30,13 @@ packages:
   epaper: !include ../../features/epaper.yaml
 
 substitutions:
+  screen_width: "1872"
+  screen_height: "1404"
   device:
     model: "Seeed reTerminal E1003"
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   display:
     home_page: page_info
     font:
@@ -97,12 +102,12 @@ globals:
     initial_value: 'Color(0, 0, 0, 0)' # Default to black text
 
 # =============================================================================
-# [1] ePaper display (7.5" COLOR, 800x480)
+# [1] ePaper display (10.3" 16-level grayscale, 1872x1404)
 # Requires ESPHome >= 2025.11.1
 # =============================================================================
 display:
-  # 800 x 480 resolution
-  # Full Color (E Ink® Spectra™ 6)
+  # 1872 x 1404 resolution
+  # Monochrome (16-level grayscale)
   - platform: it8951
     id: display_eink
     model: Seeed-reTerminal-E1003
