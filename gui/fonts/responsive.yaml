@@ -12,8 +12,6 @@
 # Any individual size can be overridden in a device YAML via `substitutions:`.
 
 substitutions:
-  screen_width: ${device.screen.width}
-  screen_height: ${device.screen.height}
   text_sm: >-
     ${ 12 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (14 if ([screen_width|int, screen_height|int]|max) <= 320 else

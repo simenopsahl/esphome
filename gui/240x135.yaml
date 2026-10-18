@@ -7,22 +7,6 @@ substitutions:
       temperature:
         area_label: "Rom"
 
-font: !include
-  file: fonts/fonts.yaml
-  vars:
-    text_sm: 12
-    text_md: 14
-    text_lg: 18
-    text_xl: 24
-    text_xxl: 32
-    text_hg: 42
-    text_fl: 54
-    icons_sm: 18
-    icons_md: 20
-    icons_lg: 24
-    icons_xl: 30
-    icons_xxl: 38
-
 .sizing:
   - &nav_widget_styles
     height: 26
@@ -136,8 +120,6 @@ lvgl:
   bg_color: 0x000000
   top_layer:
     widgets:
-      - <<: !include { file: widgets/header/widget.yaml, vars: { <<: *nav_widget_styles } }
-#      - <<: !include { file: widgets/footer/widget.yaml, vars: { <<: *nav_widget_styles } }
       - <<: !include { file: widgets/boot_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
       - <<: !include { file: widgets/ota_screen/widget.yaml, vars: { <<: *boot_screen_styles } }
   pages:
@@ -158,8 +140,7 @@ lvgl:
     - <<: !include
         file: pages/temperature/page_narrow.yaml
         vars:
-          <<: [*page_styles, *container_styles]
-          page_title: "\U000F050F" # thermometer
+          page_title: "Temperatur"
 
     # nordpool prices
     - <<: !include
@@ -179,12 +160,14 @@ lvgl:
     - <<: !include
         file: pages/status/page_narrow.yaml
         vars:
-          <<: [*page_styles, *container_styles]
-          page_title: "\U000F02FC" # information
+          page_title: "Enhet"
 
 packages:
-  # header
-  header_sensors: !include { file: widgets/header/sensors.yaml }
+  # responsive fonts & chrome
+  fonts: !include { file: fonts/responsive.yaml }
+  chrome_base: !include { file: chrome/base.yaml }
+  chrome_header: !include { file: chrome/header.yaml }
+  chrome_footer: !include { file: chrome/footer.yaml }
   # boot screen
   boot_screen_sensors: !include { file: widgets/boot_screen/sensors.yaml, vars: { <<: *boot_screen_styles } }
   # ota screen

@@ -288,45 +288,10 @@ script:
             
             return final_val;
 
-# Same as in ../../gui/240x320.yaml
-.sizing:
-  - &page_styles
-    <<: !include ../../gui/styles/page_styles.yaml
-    page_pad_top: 32
-    page_pad_bottom: 32
-    screen_height: 240
-    screen_width: 320
-    # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 33) - (2 * 1) = 170
-    usable_screen_height: 170
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 320  (2 * 4) = 312
-    usable_screen_width: 312
-
-  - &container_styles
-    <<: !include ../../gui/styles/container_styles.yaml
-    container_pad_top: 1
-    container_pad_bottom: 1
-    container_pad_left: 4
-    container_pad_right: 4
-    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
-  
-  - &dual_kmeter_styles
-    # Tank Graphic Dimensions
-    tank_width: 110
-    tank_height: 166
-    tank_radius: 38
-    # Bar widget limits (must be whole numbers)
-    tank_temp_min: ${module.tank_temp_min}
-    tank_temp_max: ${module.tank_temp_max}
-
 # include lvgl page for dual kmeter
 lvgl:
   pages:
-    - <<: !include 
+    - <<: !include
         file: ../../gui/pages/dual_kmeter/page.yaml
         vars:
-          <<: [*page_styles, *container_styles, *dual_kmeter_styles]
           page_title: VVB

@@ -16,10 +16,8 @@
 #   chrome_title_mode: "auto" (default: icon if width < 180 else text) | "text" | "icon"
 
 substitutions:
-  screen_width: ${device.screen.width}
-  screen_height: ${device.screen.height}
   chrome_header: "true"
-  chrome_footer: ${ 'false' if (screen_height|int < 240 or screen_width|int < 200) else 'true' }
+  chrome_footer: ${ 'false' if ([screen_width|int, screen_height|int]|max) <= 240 else 'true' }
   chrome_title_mode: "auto"
 
   # Header & footer bar height scales with the smaller screen dimension:

@@ -15,8 +15,8 @@
 | **Pre-Work** | ESPHome 2026.9.1 upgrade, `host-sdl` + `snapshot` + `touchscreen`, initial architecture analysis | ✅ **Done** | 2026-10-17 | WSL & Windows upgraded to `2026.9.1`; `board/host_sdl.yaml` supports dual `sdl` + `snapshot` display and `sdl` touchscreen. |
 | **Session 1** | Tooling (`-Size <WxH>`) & Baseline Screenshots | ✅ **Done** | 2026-10-18 | Added `-Size`, `-Modules`, `-Cc1101Mode` to `host-sdl.ps1`/`run.sh`; captured 35 baseline PNGs across 6 resolutions + 5 module pages. |
 | **Session 2** | Chrome (`header`/`footer`/`base`) & Theme Foundation | ✅ **Done** | 2026-10-18 | Created `gui/chrome/{base,header,footer}.yaml` (`set_page_title` with icon/text mode, `page_style`, `container_style`) and 5-tier `gui/fonts/responsive.yaml`. |
-| **Session 3** | Simple Pages (`temperature`, `status`) & M5Stack Core Module Pages Cleanup (`air_quality`, `cc1101`, `dual_kmeter`) | ⏳ **Next Up** | — | Ready to start. Module pages stay `320×240` (only `.sizing` anchors removed). |
-| **Session 4** | Clock Page Migration (`page.yaml` & `page_narrow.yaml`) | ⬜ Pending | — | Depends on Session 2. |
+| **Session 3** | Simple Pages (`temperature`, `status`) & M5Stack Core Module Pages Cleanup (`air_quality`, `cc1101`, `dual_kmeter`) | ✅ **Done** | 2026-10-18 | Migrated `temperature`/`status` & all 5 module pages to `page_style` + `set_page_title`; removed `.sizing:` from all `board/module/module_*.yaml`; wired all 10 `gui/*.yaml` layouts into `chrome/*` + `fonts/responsive.yaml`. |
+| **Session 4** | Clock Page Migration (`page.yaml` & `page_narrow.yaml`) | ⏳ **Next Up** | — | Ready to start. |
 | **Session 5** | NordPool Graph Spike & Migration (Option B + Option A comparison) | ⬜ Pending | — | Depends on Session 2. |
 | **Session 6** | Weather Page Migration (`page.yaml` & `page_narrow.yaml`) | ⬜ Pending | — | Depends on Session 2. |
 | **Session 7** | Control Page, Unified `gui/main.yaml` & `gui/<W>x<H>.yaml` Stubs | ⬜ Pending | — | Depends on Sessions 3–6. |
@@ -104,7 +104,7 @@ Build the resolution-independent foundation in `gui/chrome/` and `gui/fonts/` wi
 
 ---
 
-## Session 3 — Simple Pages & M5Stack Core Module Pages Cleanup
+## Session 3 — Simple Pages & M5Stack Core Module Pages Cleanup (✅ Completed)
 
 ### Goal
 
@@ -112,22 +112,30 @@ Migrate `temperature` and `status` to `styles: page_style` and `set_page_title`,
 
 ### Tasks
 
-- [ ] **3.1** Migrate [`gui/pages/temperature/page.yaml`](file:///x:/esphome/gui/pages/temperature/page.yaml) and [`page_narrow.yaml`](file:///x:/esphome/gui/pages/temperature/page_narrow.yaml) (or unify if a single responsive layout covers both orientations).
-- [ ] **3.2** Migrate [`gui/pages/status/page.yaml`](file:///x:/esphome/gui/pages/status/page.yaml) and [`page_narrow.yaml`](file:///x:/esphome/gui/pages/status/page_narrow.yaml).
-- [ ] **3.3** Update [`gui/pages/air_quality/page.yaml`](file:///x:/esphome/gui/pages/air_quality/page.yaml) to use `styles: page_style` + `set_page_title` and remove the `.sizing:` block from [`board/module/module_air_quality.yaml`](file:///x:/esphome/board/module/module_air_quality.yaml).
-- [ ] **3.4** Update [`gui/pages/cc1101/async.yaml`](file:///x:/esphome/gui/pages/cc1101/async.yaml), [`packet.yaml`](file:///x:/esphome/gui/pages/cc1101/packet.yaml), and [`wmbus.yaml`](file:///x:/esphome/gui/pages/cc1101/wmbus.yaml) to use `styles: page_style` + `set_page_title` and remove the `.sizing:` blocks from:
+- [x] **3.1** Migrate [`gui/pages/temperature/page.yaml`](file:///x:/esphome/gui/pages/temperature/page.yaml) and [`page_narrow.yaml`](file:///x:/esphome/gui/pages/temperature/page_narrow.yaml) to `styles: page_style`, `styles: container_style`, `set_page_title`, and percentage width (`100%`).
+- [x] **3.2** Migrate [`gui/pages/status/page.yaml`](file:///x:/esphome/gui/pages/status/page.yaml) and [`page_narrow.yaml`](file:///x:/esphome/gui/pages/status/page_narrow.yaml) to `styles: page_style`, `styles: container_style`, and `set_page_title`.
+- [x] **3.3** Update [`gui/pages/air_quality/page.yaml`](file:///x:/esphome/gui/pages/air_quality/page.yaml) to use `styles: page_style` + `set_page_title` and remove the `.sizing:` block from [`board/module/module_air_quality.yaml`](file:///x:/esphome/board/module/module_air_quality.yaml).
+- [x] **3.4** Update [`gui/pages/cc1101/async.yaml`](file:///x:/esphome/gui/pages/cc1101/async.yaml), [`packet.yaml`](file:///x:/esphome/gui/pages/cc1101/packet.yaml), and [`wmbus.yaml`](file:///x:/esphome/gui/pages/cc1101/wmbus.yaml) to use `styles: page_style` + `set_page_title` and remove the `.sizing:` blocks from:
   - [`board/module/module_cc1101_async.yaml`](file:///x:/esphome/board/module/module_cc1101_async.yaml)
   - [`board/module/module_cc1101_packet.yaml`](file:///x:/esphome/board/module/module_cc1101_packet.yaml)
   - [`board/module/module_cc1101_wmbus.yaml`](file:///x:/esphome/board/module/module_cc1101_wmbus.yaml)
-- [ ] **3.5** Update [`gui/pages/dual_kmeter/page.yaml`](file:///x:/esphome/gui/pages/dual_kmeter/page.yaml) to use `styles: page_style` + `set_page_title` (keeping its `320×240` water tank dimensions `110×166`, radius `38`, and label offsets as-is, and reading `${module.tank_temp_min}` / `${module.tank_temp_max}` directly), and remove the `.sizing:` block from [`board/module/module_dual_kmeter.yaml`](file:///x:/esphome/board/module/module_dual_kmeter.yaml).
-- [ ] **3.6** Validate devices using these modules (`esphome config`) and verify in `host-sdl` at `240x320` ( plus `temperature` and `status` across `320x240`, `480x320`, `128x128`).
+- [x] **3.5** Update [`gui/pages/dual_kmeter/page.yaml`](file:///x:/esphome/gui/pages/dual_kmeter/page.yaml) to use `styles: page_style` + `set_page_title` (keeping its `320×240` water tank dimensions `110×166`, radius `38`, and label offsets as-is, and reading `${(module.tank_temp_min | float(32) * 10) | round | int}` / `${(module.tank_temp_max | float(53) * 10) | round | int}` directly), and remove the `.sizing:` block from [`board/module/module_dual_kmeter.yaml`](file:///x:/esphome/board/module/module_dual_kmeter.yaml) (and [`board/module/host_simulated_modules.yaml`](file:///x:/esphome/board/module/host_simulated_modules.yaml) / [`host_simulated_modules_async.yaml`](file:///x:/esphome/board/module/host_simulated_modules_async.yaml)).
+- [x] **3.6** Wire all remaining `gui/<W>x<H>.yaml` layout files (`128x128`, `200x200`, `240r`, `240x135`, `240x240`, `320x240`, `480x320`, `480x800`, `800x480`) into `gui/chrome/{base,header,footer}.yaml` + `gui/fonts/responsive.yaml` and validate virtual + physical device configurations.
 
 ### Session 3 Completion Report
 
-- **Date**: _TBD_
-- **Summary of Changes**: _TBD_
-- **Verification & Screenshots**: _TBD_
-- **Notes for Session 4**: _TBD_
+- **Date**: 2026-10-18
+- **Summary of Changes**:
+  - Migrated [`gui/pages/temperature/page.yaml`](file:///x:/esphome/gui/pages/temperature/page.yaml), [`gui/pages/temperature/page_narrow.yaml`](file:///x:/esphome/gui/pages/temperature/page_narrow.yaml), [`gui/pages/status/page.yaml`](file:///x:/esphome/gui/pages/status/page.yaml), and [`gui/pages/status/page_narrow.yaml`](file:///x:/esphome/gui/pages/status/page_narrow.yaml) to `styles: page_style`, `styles: container_style`, and `set_page_title`.
+  - Migrated [`gui/pages/air_quality/page.yaml`](file:///x:/esphome/gui/pages/air_quality/page.yaml), [`gui/pages/cc1101/async.yaml`](file:///x:/esphome/gui/pages/cc1101/async.yaml), [`gui/pages/cc1101/packet.yaml`](file:///x:/esphome/gui/pages/cc1101/packet.yaml), [`gui/pages/cc1101/wmbus.yaml`](file:///x:/esphome/gui/pages/cc1101/wmbus.yaml), and [`gui/pages/dual_kmeter/page.yaml`](file:///x:/esphome/gui/pages/dual_kmeter/page.yaml) to `styles: page_style`, `styles: container_style`, and `set_page_title`, deleting the `.sizing:` blocks from all 5 [`board/module/module_*.yaml`](file:///x:/esphome/board/module/) files as well as [`board/module/host_simulated_modules.yaml`](file:///x:/esphome/board/module/host_simulated_modules.yaml) and [`board/module/host_simulated_modules_async.yaml`](file:///x:/esphome/board/module/host_simulated_modules_async.yaml).
+  - Wired all 10 `gui/*.yaml` layout files into `gui/chrome/{base,header,footer}.yaml` and `gui/fonts/responsive.yaml`.
+  - Updated [`gui/chrome/base.yaml`](file:///x:/esphome/gui/chrome/base.yaml) and [`gui/fonts/responsive.yaml`](file:///x:/esphome/gui/fonts/responsive.yaml) to use the `screen_width` and `screen_height` substitutions declared by the board/display packages directly (avoiding circular reference when `board/` sets `device.screen.width: ${screen_width}`).
+  - Migrated custom root device LVGL pages (`page_temperature` in [`m5s-atom-s3-b5c828.yaml`](file:///x:/esphome/m5s-atom-s3-b5c828.yaml), `page_water_boiler` in [`m5s-stickc-plus2-9a09b0.yaml`](file:///x:/esphome/m5s-stickc-plus2-9a09b0.yaml), and `page_imu` in [`m5s-atom-s3r-0387f4.yaml`](file:///x:/esphome/m5s-atom-s3r-0387f4.yaml), [`m5s-atom-s3r-d5e2cc.yaml`](file:///x:/esphome/m5s-atom-s3r-d5e2cc.yaml), and [`m5s-sticks3-d55a84.yaml`](file:///x:/esphome/m5s-sticks3-d55a84.yaml)) to `styles: page_style`, `styles: container_style`, `set_page_title`, and percentage widths (`100%`).
+- **Verification**:
+  - Validated `host-sdl` across `240x320 -Modules` (`packet` & `async`), `320x240`, `480x320`, `128x128`, `240x135`, and `240r` (`exit 0`).
+  - Validated 10 physical device configs (`jc3248w535c-1f26fc.yaml`, `m5s-atom-s3-a35af0.yaml`, `m5s-atom-s3-b5c828.yaml`, `m5s-atom-s3r-0387f4.yaml`, `m5s-atom-s3r-d5e2cc.yaml`, `m5s-c3se-3e3740.yaml`, `m5s-c3se-e93464.yaml`, `m5s-fire-a70780.yaml`, `m5s-stickc-plus2-9a09b0.yaml`, `m5s-sticks3-d55a84.yaml`) with `esphome config` (`exit 0`).
+- **Notes for Session 4**:
+  - Since all 10 `gui/*.yaml` layout files now include `chrome/{base,header,footer}.yaml` and `fonts/responsive.yaml`, migrating `clock` in Session 4 only requires updating `gui/pages/clock/page.yaml` and `gui/pages/clock/page_narrow.yaml` and removing `*clock_page_styles` from the `gui/*.yaml` layout files.
 
 ---
 

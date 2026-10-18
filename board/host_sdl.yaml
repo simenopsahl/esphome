@@ -16,6 +16,8 @@ labels: [host, sdl, display, touchscreen, virtual]
 #
 
 substitutions:
+  screen_width: "320"
+  screen_height: "240"
   device:
     model: "Host SDL"
     # Locally administered MAC; must be unique per virtual device
@@ -24,8 +26,8 @@ substitutions:
     ip_address: "127.0.0.1"
     ssid: "WSL (virtual)"
     screen:
-      width: "320"
-      height: "240"
+      width: ${screen_width}
+      height: ${screen_height}
     framework:
       type: host
   module:

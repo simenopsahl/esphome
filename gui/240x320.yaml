@@ -141,7 +141,6 @@ lvgl:
     - <<: !include
         file: pages/temperature/page.yaml
         vars:
-          <<: [*page_styles, *container_styles]
           page_title: "Temperatur"
 
     # nordpool prices
@@ -162,7 +161,6 @@ lvgl:
     - <<: !include
         file: pages/status/page.yaml
         vars:
-          <<: [*page_styles, *container_styles]
           page_title: "Enhet"
 
 packages:

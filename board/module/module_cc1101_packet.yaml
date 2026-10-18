@@ -494,34 +494,9 @@ switch:
               id: led_cc1101_state
               color: c_red
 
-.sizing:
-  - &page_styles
-    <<: !include ../../gui/styles/page_styles.yaml
-    page_pad_top: 32
-    page_pad_bottom: 32
-    screen_height: 240
-    screen_width: 320
-    # Calculate the usable height for the page content area
-    # (screen_height - (2 * status_bar_height) - (2 * container_pad))
-    # 240 - (2 * 32) - (2 * 1) = 170
-    usable_screen_height: 170
-    # Calculate the usable width for the page content area
-    # (screen_width - (2 * container_pad))
-    # 320  (2 * 4) = 312
-    usable_screen_width: 312
-
-  - &container_styles
-    <<: !include ../../gui/styles/container_styles.yaml
-    container_pad_top: 1
-    container_pad_bottom: 1
-    container_pad_left: 4
-    container_pad_right: 4
-    container_scrollable: false # prevents scrollbars on pages where space is used up to the last
-
 lvgl:
   pages:
-    - <<: !include 
+    - <<: !include
         file: ../../gui/pages/cc1101/packet.yaml
         vars:
-          <<: [*page_styles, *container_styles]
           page_title: Radio

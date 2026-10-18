@@ -14,57 +14,27 @@ substitutions:
     cc1101:
       water_meter_serial: "12345678"
 
-# Temporary sizing anchors matching board/module/module_*.yaml (to be removed in Sessions 3 & 4)
-.sizing:
-  - &page_styles
-    <<: !include ../../gui/styles/page_styles.yaml
-    page_pad_top: 32
-    page_pad_bottom: 32
-    screen_height: ${device.screen.height}
-    screen_width: ${device.screen.width}
-    usable_screen_height: 170
-    usable_screen_width: 312
-
-  - &container_styles
-    <<: !include ../../gui/styles/container_styles.yaml
-    container_pad_top: 1
-    container_pad_bottom: 1
-    container_pad_left: 4
-    container_pad_right: 4
-    container_scrollable: false
-
-  - &dual_kmeter_styles
-    tank_width: 110
-    tank_height: 166
-    tank_radius: 38
-    tank_temp_min: ${module.tank_temp_min}
-    tank_temp_max: ${module.tank_temp_max}
-
 lvgl:
   pages:
     - <<: !include
         file: ../../gui/pages/air_quality/page.yaml
         vars:
-          <<: [*page_styles, *container_styles]
           page_title: "Luftkvalitet"
 
     - <<: !include
         file: ../../gui/pages/dual_kmeter/page.yaml
         vars:
-          <<: [*page_styles, *container_styles, *dual_kmeter_styles]
           page_title: "VVB"
 
     - <<: !include
         file: ../../gui/pages/cc1101/wmbus.yaml
         vars:
-          <<: [*page_styles, *container_styles]
           page_title: "Vannmåler"
       id: page_cc1101_wmbus
 
     - <<: !include
         file: ../../gui/pages/cc1101/packet.yaml
         vars:
-          <<: [*page_styles, *container_styles]
           page_title: "Radio"
 
 esphome:
