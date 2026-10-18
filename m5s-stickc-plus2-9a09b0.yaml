@@ -67,26 +67,17 @@ lvgl:
   buffer_size: 40%
   pages:
     - id: page_water_boiler
-      <<: !include gui/styles/page_styles.yaml
-      # REMOVED: `<<: *page_styles`
-      # ADDED: Use the variables passed from the parent file
-      pad_top: 26
-      pad_bottom: 0
+      styles: page_style
       on_load:
-        - lvgl.label.update:
-            id: lbl_page_title
-            text: "\U000F0F92" # water-boiler
+        - script.execute:
+            id: set_page_title
+            title: "VVB"
+            icon: "\U000F0F92" # water-boiler
       <<: !include
         file: gui/functions/swipe_navigation.yaml
       widgets:
         - obj:
-            <<: !include gui/styles/container_styles.yaml
-            # Use the passed-in variables for size
-            pad_top: 1
-            pad_bottom: 8
-            pad_left: 3
-            pad_right: 3
-            scrollable: false
+            styles: container_style
             align: CENTER
             layout:
               type: FLEX
@@ -99,7 +90,7 @@ lvgl:
             widgets:
               - obj:
                   pad_all: 0
-                  width: 135
+                  width: 100%
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
@@ -127,7 +118,7 @@ lvgl:
                         text_color: c_text_s
               - obj:
                   pad_all: 0
-                  width: 135
+                  width: 100%
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
@@ -155,7 +146,7 @@ lvgl:
                         text_color: c_text_s
               - obj:
                   pad_all: 0
-                  width: 135
+                  width: 100%
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
