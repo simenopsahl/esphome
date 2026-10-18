@@ -48,22 +48,6 @@ substitutions:
     pad_column: 5
     pad_row: 4
 
-  - &clock_page_styles
-    clock_meter_size: 186
-    clock_translate_x: 0
-    clock_translate_y: 114
-
-  - &nordpool_page_styles
-    # Proportions for the 3 rows in the grid layout (labels, graph, labels)
-    nordpool_row_1_height: 20 # text_md +2
-    nordpool_row_3_height: 16 # text_sm +2
-    # Calculate the usable graph area for the page
-    # (usable_height - row_1_height - row_3_height - (line_width / 2))
-    # 252 - 20 - 16 - (6/2) = 213
-    nordpool_row_2_height: 212
-    # -- GRAPH CONFIGURATION --
-    nordpool_line_width: 6
-
   - &weather_page_styles
     # Variables for the main layout grid
     # Calculation for this 320x240 screen:
@@ -133,7 +117,6 @@ lvgl:
     - <<: !include
         file: pages/clock/page.yaml
         vars:
-          <<: [*page_styles, *container_styles, *clock_page_styles]
           page_title: "Klokke"
 
     # room temperature
@@ -146,7 +129,6 @@ lvgl:
     - <<: !include
         file: pages/nordpool/page.yaml
         vars:
-          <<: [*page_styles, *container_styles, *nordpool_page_styles]
           page_title: "NordPool"
 
     # weather forecast
@@ -175,7 +157,7 @@ packages:
   # clock screen
   clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
   # nordpool screen
-  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml, vars: { <<: [*page_styles, *nordpool_page_styles] } }
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml }
   # device status screen
   device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
   # automatic screen control

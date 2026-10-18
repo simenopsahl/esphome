@@ -1,18 +1,24 @@
-# clock page lvgl sensors
+# clock page lvgl sensors & responsive sizing substitutions
 # https://esphome.io/cookbook/lvgl#an-analog-clock
-# LVGL analog clock
 
-# in widgets/header/sensors.yaml
-#time:
-# extend time component
-#  - id: !extend time_homeassistant
-#    on_time_sync:
-#      - script.execute: time_update
-#    on_time:
-#      - minutes: '*'
-#        seconds: 0
-#        then:
-#          - script.execute: time_update
+substitutions:
+  clock_meter_size: >-
+    ${ 120 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (135 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (190 if ([screen_width|int, screen_height|int]|max) <= 200 else
+       (226 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (186 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (320 if ([screen_width|int, screen_height|int]|max) <= 480 else 400))))) }
+
+  clock_label_offset: >-
+    ${ (24 if (screen_width|int) <= 128 else (34 if (screen_width|int) <= 200 else 38))
+       if (screen_width|int == screen_height|int) else
+       (80 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (114 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (170 if ([screen_width|int, screen_height|int]|max) <= 480 else 280))) }
+
+  clock_translate_x: ${ clock_label_offset if (screen_width|int > screen_height|int) else 0 }
+  clock_translate_y: ${ 0 if (screen_width|int > screen_height|int) else clock_label_offset }
 
 # clock update script
 script:

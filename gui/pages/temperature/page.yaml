@@ -15,6 +15,7 @@
     widgets:
       - obj:
           styles: container_style
+          scrollable: false
           align: CENTER
           layout:
             type: GRID

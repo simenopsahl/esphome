@@ -1,52 +1,40 @@
 # LVGL NordPool Electricity price page
 
 # required vars:
-# - *page_styles
-# - *container_styles
-# - *nordpool_page_styles
 # - page_title
 
 # NordPool page
 #lvgl:
 #  pages:
     id: page_nordpool
-    <<: !include ../../styles/page_styles.yaml
-    # REMOVED: `<<: *page_styles`
-    # ADDED: Use the variables passed from the parent file
-    pad_top: ${page_pad_top}
-    pad_bottom: ${page_pad_bottom}
+    styles: page_style
     on_load:
-      - lvgl.label.update:
-          id: lbl_page_title
-          text: ${page_title}
+      - script.execute:
+          id: set_page_title
+          title: ${page_title}
+          icon: "\U000F081F" # finance
       - script.execute:
           id: nordpool_update_chart
-          # Pass the variables to the script
-          graph_container_h: ${nordpool_row_2_height}
-          line_w: ${nordpool_line_width}
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
       - obj:
-          <<: !include ../../styles/container_styles.yaml
-          # Use the passed-in variables for size
-          pad_top: ${container_pad_top}
-          pad_bottom: ${container_pad_bottom}
-          pad_left: ${container_pad_left}
-          pad_right: ${container_pad_right}
-          scrollable: ${container_scrollable}
+          styles: container_style
+          scrollable: false
           align: CENTER
           layout:
-            type: FLEX
-            flex_flow: COLUMN
-            flex_align_main: SPACE_EVENLY
-            flex_align_cross: CENTER
-            flex_align_track: CENTER
+            type: GRID
+            grid_columns: [FR(1)]
+            grid_rows: [CONTENT, FR(1), CONTENT]
             pad_row: 0
             pad_column: 0
           widgets:
             # --- TOP ROW: Price Labels ---
             - obj:
+                grid_cell_column_pos: 0
+                grid_cell_row_pos: 0
+                grid_cell_x_align: STRETCH
+                grid_cell_y_align: START
                 height: SIZE_CONTENT
                 width: 100%
                 pad_all: 0
@@ -72,6 +60,7 @@
                       grid_cell_y_align: CENTER
                       id: lbl_nordpool_price_2
                       text: "???"
+                      hidden: ${"true" if (screen_width | int < 180) else "false"}
                       text_font: font_md
                       text_color: c_text_p
                       text_align: CENTER
@@ -88,6 +77,7 @@
                   - label:
                       id: lbl_nordpool_price_6
                       text: "???"
+                      hidden: ${"true" if (screen_width | int < 180) else "false"}
                       grid_cell_column_pos: 6
                       grid_cell_row_pos: 0
                       grid_cell_x_align: CENTER
@@ -108,14 +98,18 @@
 
             # --- MIDDLE ROW: Price Graph ---
             - obj:
-                width: 100%
-                height: SIZE_CONTENT
+                id: nordpool_graph_area
+                grid_cell_column_pos: 0
+                grid_cell_row_pos: 1
+                grid_cell_x_align: STRETCH
+                grid_cell_y_align: STRETCH
                 pad_all: 0
                 widgets:
                   - line:
                       id: lvgl_nordpool_line
                       width: 100%
-                      align: CENTER
+                      height: 100%
+                      align: TOP_LEFT
                       line_width: ${nordpool_line_width}
                       line_color: c_green
                       line_rounded: true
@@ -143,6 +137,10 @@
 
             # --- BOTTOM ROW: Time Labels ---
             - obj:
+                grid_cell_column_pos: 0
+                grid_cell_row_pos: 2
+                grid_cell_x_align: STRETCH
+                grid_cell_y_align: END
                 width: 100%
                 height: SIZE_CONTENT
                 pad_all: 0
@@ -168,6 +166,7 @@
                       grid_cell_y_align: CENTER
                       id: lbl_nordpool_time_2
                       text: "??:??"
+                      hidden: ${"true" if (screen_width | int < 180) else "false"}
                       text_font: font_sm
                       text_color: c_text_s
                       text_align: CENTER
@@ -184,6 +183,7 @@
                   - label:
                       id: lbl_nordpool_time_6
                       text: "??:??"
+                      hidden: ${"true" if (screen_width | int < 180) else "false"}
                       grid_cell_column_pos: 6
                       grid_cell_row_pos: 0
                       grid_cell_x_align: CENTER

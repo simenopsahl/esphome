@@ -1,5 +1,14 @@
 # Functions to update the NordPool LVGL page
 
+substitutions:
+  nordpool_line_width: >-
+    ${2 if ( [screen_width|int, screen_height|int]|min <= 128 )
+      else (4 if ( [screen_width|int, screen_height|int]|min <= 160 )
+      else (5 if ( [screen_width|int, screen_height|int]|min <= 200 )
+      else (6 if ( [screen_width|int, screen_height|int]|min <= 240 )
+      else (8 if ( [screen_width|int, screen_height|int]|min <= 320 )
+      else 10))))}
+
 globals:
   # These arrays will store the coordinates for the line graph's points.
   - id: nordpool_points_y
@@ -18,40 +27,52 @@ esphome:
       then:
         - script.execute:
             id: nordpool_initialize_graph_layout
-            # Pass the variables to the script
-            graph_container_w: ${usable_screen_width}
-            graph_container_h: ${nordpool_row_2_height}
-            line_w: ${nordpool_line_width}
 
 script:
   - id: nordpool_initialize_graph_layout
-    parameters:
-      graph_container_w: float
-      graph_container_h: float
-      line_w: float
     then:
       - lambda: |-
-          // This script runs on boot to set the initial X and Y coordinates.
+          // This script runs on boot to set the initial X and Y coordinates from the runtime container size.
+          if (id(nordpool_graph_area) == nullptr) { return; }
+          lv_obj_update_layout(id(nordpool_graph_area));
+          const float graph_container_w = lv_obj_get_content_width(id(nordpool_graph_area));
+          const float graph_container_h = lv_obj_get_content_height(id(nordpool_graph_area));
+          const float line_w = ${nordpool_line_width};
+          if (graph_container_w <= line_w || graph_container_h <= line_w) { return; }
+
           const float graph_drawable_h = graph_container_h - line_w;
           const float graph_drawable_w = graph_container_w - line_w;
-          const float inset = line_w / 2.0;
-          const int mid_y = (int)round(inset + graph_drawable_h / 2.0);
+          const float inset = line_w / 2.0f;
+          const int mid_y = (int)round(inset + graph_drawable_h / 2.0f);
 
           // Calculate and store initial X and Y points
           for (int i = 0; i < 9; ++i) {
-            float x_coord = i * (graph_drawable_w - 1) / 8.0;
+            float x_coord = i * (graph_drawable_w - 1.0f) / 8.0f;
             id(nordpool_points_x)[i] = (int)round(inset + x_coord);
             id(nordpool_points_y)[i] = mid_y;
           }
 
   - id: nordpool_update_chart
     mode: single
-    parameters:
-      graph_container_h: float
-      line_w: float
     then:
       - lambda: |-
-          // STEP 1: Calculate all Y coordinates and save them to the global array.
+          // STEP 1: Measure the graph container and calculate all X and Y coordinates.
+          if (id(nordpool_graph_area) == nullptr) { return; }
+          lv_obj_update_layout(id(nordpool_graph_area));
+          const float graph_container_w = lv_obj_get_content_width(id(nordpool_graph_area));
+          const float graph_container_h = lv_obj_get_content_height(id(nordpool_graph_area));
+          const float line_w = ${nordpool_line_width};
+          if (graph_container_w <= line_w || graph_container_h <= line_w) { return; }
+
+          const float inset = line_w / 2.0f;
+          const float graph_drawable_w = graph_container_w - line_w;
+          const float graph_drawable_h = graph_container_h - line_w;
+
+          for (int i = 0; i < 9; ++i) {
+            float x_coord = i * (graph_drawable_w - 1.0f) / 8.0f;
+            id(nordpool_points_x)[i] = (int)round(inset + x_coord);
+          }
+
           float prices[9];
           prices[0] = id(nordpool_price_0).state;
           prices[1] = id(nordpool_price_1).state;
@@ -71,23 +92,19 @@ script:
             if (isnan(prices[i])) { return; }
           }
 
-          const float inset = line_w / 2.0;
-          const float graph_drawable_h = graph_container_h - line_w;
-
           for (int i = 0; i < 9; ++i) {
             if (max_p == min_p) {
-              id(nordpool_points_y)[i] = (int)round(graph_container_h / 2.0);
+              id(nordpool_points_y)[i] = (int)round(graph_container_h / 2.0f);
             } else {
               float scaled_y = graph_drawable_h - ((prices[i] - min_p) / (max_p - min_p) * graph_drawable_h);
               id(nordpool_points_y)[i] = (int)round(inset + scaled_y);
             }
           }
-          // ADD THIS LINE FOR DEBUGGING
-          ESP_LOGD("update_chart", "Calculated Y-Points: %d, %d, %d, %d, %d, %d, %d, %d, %d",
+          ESP_LOGD("update_chart", "Graph area %.0fx%.0f, Y-Points: %d, %d, %d, %d, %d, %d, %d, %d, %d",
+                graph_container_w, graph_container_h,
                 id(nordpool_points_y)[0], id(nordpool_points_y)[1], id(nordpool_points_y)[2],
                 id(nordpool_points_y)[3], id(nordpool_points_y)[4], id(nordpool_points_y)[5],
                 id(nordpool_points_y)[6], id(nordpool_points_y)[7], id(nordpool_points_y)[8]);
-      - delay: 1s
       - lvgl.line.update:
           # STEP 2: Redraw the line using the new values from the global arrays.
           id: lvgl_nordpool_line
@@ -218,9 +235,6 @@ sensor:
           # When the max price changes (meaning any price has changed), run the update script.
           - script.execute:
               id: nordpool_update_chart
-              # Pass the variables to the script
-              graph_container_h: ${nordpool_row_2_height}
-              line_w: ${nordpool_line_width}
 
 text_sensor:
   # All your homeassistant text_sensors for the time labels go here

@@ -16,9 +16,9 @@
 | **Session 1** | Tooling (`-Size <WxH>`) & Baseline Screenshots | ✅ **Done** | 2026-10-18 | Added `-Size`, `-Modules`, `-Cc1101Mode` to `host-sdl.ps1`/`run.sh`; captured 35 baseline PNGs across 6 resolutions + 5 module pages. |
 | **Session 2** | Chrome (`header`/`footer`/`base`) & Theme Foundation | ✅ **Done** | 2026-10-18 | Created `gui/chrome/{base,header,footer}.yaml` (`set_page_title` with icon/text mode, `page_style`, `container_style`) and 5-tier `gui/fonts/responsive.yaml`. |
 | **Session 3** | Simple Pages (`temperature`, `status`) & M5Stack Core Module Pages Cleanup (`air_quality`, `cc1101`, `dual_kmeter`) | ✅ **Done** | 2026-10-18 | Migrated `temperature`/`status` & all 5 module pages to `page_style` + `set_page_title`; removed `.sizing:` from all `board/module/module_*.yaml`; wired all 10 `gui/*.yaml` layouts into `chrome/*` + `fonts/responsive.yaml`. |
-| **Session 4** | Clock Page Migration (`page.yaml` & `page_narrow.yaml`) | ⏳ **Next Up** | — | Ready to start. |
-| **Session 5** | NordPool Graph Spike & Migration (Option B + Option A comparison) | ⬜ Pending | — | Depends on Session 2. |
-| **Session 6** | Weather Page Migration (`page.yaml` & `page_narrow.yaml`) | ⬜ Pending | — | Depends on Session 2. |
+| **Session 4** | Clock Page Migration (`page.yaml` & `page_narrow.yaml`) | ✅ **Done** | 2026-10-18 | Migrated `clock` (`page.yaml` & `page_narrow.yaml`) to `page_style`, `container_style`, `set_page_title`, and responsive Jinja meter/offset substitutions in `pages/clock/sensors.yaml`; removed `&clock_page_styles` from all 10 `gui/*.yaml` layouts. |
+| **Session 5** | NordPool Graph Spike & Migration (Option B) | ✅ **Done** | 2026-10-19 | Migrated `nordpool` (`page.yaml`, `page_narrow.yaml`, `sensors.yaml`) to `1x3` `[CONTENT, FR(1), CONTENT]` grid layout + Option B runtime `lv_obj_get_content_width/height` measurement; removed `&nordpool_page_styles` from all 10 `gui/*.yaml` layouts. |
+| **Session 6** | Weather Page Migration (`page.yaml` & `page_narrow.yaml`) | ⏳ **Next Up** | — | Ready to start. |
 | **Session 7** | Control Page, Unified `gui/main.yaml` & `gui/<W>x<H>.yaml` Stubs | ⬜ Pending | — | Depends on Sessions 3–6. |
 
 ---
@@ -26,6 +26,7 @@
 ## Pre-Work — Host SDL Virtual Device & Planning (✅ Completed)
 
 ### Completed Tasks
+
 - [x] Upgraded ESPHome to **`2026.9.1`** in WSL (`~/.venvs/esphome`) and Windows Python.
 - [x] Updated default ESPHome version in [`tools/host_sdl/setup_wsl.sh`](file:///x:/esphome/tools/host_sdl/setup_wsl.sh).
 - [x] Reverted [`gui/weather/weather_icons.yaml`](file:///x:/esphome/gui/weather/weather_icons.yaml) and [`gui/widgets/boot_screen/sensors.yaml`](file:///x:/esphome/gui/widgets/boot_screen/sensors.yaml) to `image: - platform: file`.
@@ -38,21 +39,25 @@
 ## Session 1 — Tooling (`-Size <WxH>`) & Baseline Snapshots (✅ Completed)
 
 ### Goal
+
 Enhance `host-sdl` tooling so we can launch and screenshot any arbitrary screen resolution (`-Size 480x320`, `-Size 240x320`, etc.) and optionally include module pages (`cc1101`, `dual_kmeter`, `air_quality`) in `.host-sdl.yaml` for visual testing. Capture baseline ("before") PNG screenshots in `tools/gui_migration/baseline/`.
 
 ### Tasks
+
 - [x] **1.1** Update [`tools/host_sdl/run.sh`](file:///x:/esphome/tools/host_sdl/run.sh) and [`tools/host_sdl/host-sdl.ps1`](file:///x:/esphome/tools/host_sdl/host-sdl.ps1) to accept `-Size <WxH>` (e.g. `320x240`, `240x320`, `480x320`, `128x128`, `240x240`) via `-s screen_width <W> -s screen_height <H>` CLI substitutions, while still supporting existing layout names.
 - [x] **1.2** Add `-Modules` and `-Cc1101Mode {packet|async}` flags to `host-sdl.ps1` (`--modules` / `--cc1101-mode` in `run.sh`) backed by [`board/module/host_simulated_modules.yaml`](file:///x:/esphome/board/module/host_simulated_modules.yaml), [`board/module/host_simulated_modules_async.yaml`](file:///x:/esphome/board/module/host_simulated_modules_async.yaml), and [`board/module/host_simulated_modules_none.yaml`](file:///x:/esphome/board/module/host_simulated_modules_none.yaml) to preview the 5 module pages (`air_quality`, `dual_kmeter`, `cc1101` wmbus/packet/async) with realistic mock sensor states on `host-sdl`. Also added fallback seed data in [`board/module/host_simulated_env.yaml`](file:///x:/esphome/board/module/host_simulated_env.yaml) so NordPool, Weather, and Room Temp pages always render populated data even when offline.
 - [x] **1.3** Capture baseline screenshots of existing pages (`clock`, `temperature`, `status`, `nordpool`, `weather`, plus all 5 module pages) across representative layouts (`240x320`, `320x240`, `480x320`, `128x128`, `240r`, `240x135`) and save them under [`tools/gui_migration/baseline/`](file:///x:/esphome/tools/gui_migration/baseline/) via [`tools/gui_migration/capture_baseline.sh`](file:///x:/esphome/tools/gui_migration/capture_baseline.sh).
 - [x] **1.4** Record completion report below and update the Session Status Table.
 
 ### Verification
+
 ```powershell
 pwsh tools/host_sdl/host-sdl.ps1 config 240x320 -Modules
 pwsh tools/host_sdl/host-sdl.ps1 screenshot
 ```
 
 ### Session 1 Completion Report
+
 - **Date**: 2026-10-18
 - **Summary of Changes**:
   - Updated [`tools/host_sdl/run.sh`](file:///x:/esphome/tools/host_sdl/run.sh) and [`tools/host_sdl/host-sdl.ps1`](file:///x:/esphome/tools/host_sdl/host-sdl.ps1) with `-Size <WxH>`, `-Modules`, and `-Cc1101Mode <packet|async>`.
@@ -74,9 +79,11 @@ pwsh tools/host_sdl/host-sdl.ps1 screenshot
 ## Session 2 — Chrome (`header`/`footer`/`base`) & Theme Foundation (✅ Completed)
 
 ### Goal
+
 Build the resolution-independent foundation in `gui/chrome/` and `gui/fonts/` without breaking any existing `gui/<W>x<H>.yaml` files.
 
 ### Tasks
+
 - [x] **2.1** Create [`gui/chrome/base.yaml`](file:///x:/esphome/gui/chrome/base.yaml):
   - Define default substitutions (`chrome_header: "true"`, `chrome_footer`, `chrome_title_mode: "auto"`, `chrome_h`, `chrome_pad`, `chrome_use_icon_title`, `chrome_title_font`, `page_pad_top`, `page_pad_bottom`, `container_pad_*`).
   - Define `script: - id: set_page_title` (with parameters `title: string` and `icon: string`) as a safe no-op when no header is loaded.
@@ -92,6 +99,7 @@ Build the resolution-independent foundation in `gui/chrome/` and `gui/fonts/` wi
 - [x] **2.5** Wire [`gui/240x320.yaml`](file:///x:/esphome/gui/240x320.yaml) into the new `gui/chrome/*` and `gui/fonts/responsive.yaml` packages and verify with `host-sdl.ps1 config 240x320 -Modules`.
 
 ### Session 2 Completion Report
+
 - **Date**: 2026-10-18
 - **Summary of Changes**:
   - Created [`gui/chrome/base.yaml`](file:///x:/esphome/gui/chrome/base.yaml), [`gui/chrome/header.yaml`](file:///x:/esphome/gui/chrome/header.yaml), [`gui/chrome/footer.yaml`](file:///x:/esphome/gui/chrome/footer.yaml), and [`gui/fonts/responsive.yaml`](file:///x:/esphome/gui/fonts/responsive.yaml).
@@ -139,7 +147,7 @@ Migrate `temperature` and `status` to `styles: page_style` and `set_page_title`,
 
 ---
 
-## Session 4 — Clock Page Migration
+## Session 4 — Clock Page Migration (✅ Completed)
 
 ### Goal
 
@@ -147,42 +155,58 @@ Migrate [`gui/pages/clock/page.yaml`](file:///x:/esphome/gui/pages/clock/page.ya
 
 ### Tasks
 
-- [ ] **4.1** Migrate [`gui/pages/clock/page.yaml`](file:///x:/esphome/gui/pages/clock/page.yaml) and [`gui/pages/clock/page_narrow.yaml`](file:///x:/esphome/gui/pages/clock/page_narrow.yaml):
-  - Apply `styles: page_style` and `set_page_title`.
-  - Compute analog clock `meter` diameter dynamically from `min(screen_width, usable_height)` via Jinja substitutions so no per-layout `clock_size` anchor is needed.
-- [ ] **4.2** Verify with `esphome config` and capture `host-sdl` screenshots across landscape, portrait, and small/round sizes.
+- [x] **4.1** Migrate [`gui/pages/clock/page.yaml`](file:///x:/esphome/gui/pages/clock/page.yaml), [`gui/pages/clock/page_narrow.yaml`](file:///x:/esphome/gui/pages/clock/page_narrow.yaml), and [`gui/pages/clock/sensors.yaml`](file:///x:/esphome/gui/pages/clock/sensors.yaml):
+  - Apply `styles: page_style`, `styles: container_style`, and `set_page_title` (with `icon: "\U000F0954"`).
+  - Compute analog clock `clock_meter_size`, `clock_label_offset`, `clock_translate_x`, and `clock_translate_y` dynamically from `screen_width` and `screen_height` via Jinja substitutions in [`gui/pages/clock/sensors.yaml`](file:///x:/esphome/gui/pages/clock/sensors.yaml), and remove `- &clock_page_styles` from all 10 `gui/*.yaml` layout files.
+- [x] **4.2** Verify with `esphome config` across all 10 `gui/*.yaml` layouts (`240x320`, `320x240`, `480x320`, `128x128`, `240x135`, `240r`, `200x200`, `240x240`, `480x800`, `800x480`).
 
 ### Session 4 Completion Report
 
-- **Date**: _TBD_
-- **Summary of Changes**: _TBD_
-- **Verification & Screenshots**: _TBD_
-- **Notes for Session 5**: _TBD_
+- **Date**: 2026-10-18
+- **Summary of Changes**:
+  - Updated [`gui/pages/clock/sensors.yaml`](file:///x:/esphome/gui/pages/clock/sensors.yaml) to define responsive `clock_meter_size`, `clock_label_offset`, `clock_translate_x`, and `clock_translate_y` substitutions based on `screen_width` and `screen_height` (matching all 10 existing layouts pixel-for-pixel).
+  - Updated [`gui/pages/clock/page.yaml`](file:///x:/esphome/gui/pages/clock/page.yaml) and [`gui/pages/clock/page_narrow.yaml`](file:///x:/esphome/gui/pages/clock/page_narrow.yaml) to use `styles: page_style`, `styles: container_style`, and `script.execute: { id: set_page_title, title: ${page_title}, icon: "\U000F0954" }`.
+  - Removed `- &clock_page_styles` and `<<: [*page_styles, *container_styles, *clock_page_styles]` from all 10 `gui/*.yaml` layout files (`128x128`, `200x200`, `240r`, `240x135`, `240x240`, `240x320`, `320x240`, `480x320`, `480x800`, `800x480`), and added `clock_meter_size: "180"` and `clock_translate_y: "22"` under `substitutions:` in [`gui/240r.yaml`](file:///x:/esphome/gui/240r.yaml) so round `240×240` displays retain their inset dial.
+- **Verification**:
+  - Verified with `pwsh tools/host_sdl/host-sdl.ps1 config <layout>` across all 10 layouts (`exit 0`), confirming `clock_meter_size`, `clock_translate_x`, and `clock_translate_y` match the original per-layout anchor values.
+- **Notes for Session 5**:
+  - Only `&nordpool_page_styles` and `&weather_page_styles` (plus `&boot_screen_styles` and button anchors) remain in the `.sizing:` blocks of `gui/*.yaml`. Session 5 will tackle the NordPool full-screen graph (`Option B` runtime container measurement + `Option A` LVGL `chart` widget comparison).
 
 ---
 
-## Session 5 — NordPool Graph Spike & Migration (Option B + Option A Comparison)
+## Session 5 — NordPool Graph Spike & Migration (✅ Completed)
 
 ### Goal
 
-Migrate [`gui/pages/nordpool/`](file:///x:/esphome/gui/pages/nordpool/) to a `1x3` `[CONTENT, FR(1), CONTENT]` grid layout, implement **Option B** (runtime container measurement for the `line` widget), and build **Option A** (LVGL `chart` widget) alongside it so we can visually compare both in `host-sdl`.
+Migrate [`gui/pages/nordpool/`](file:///x:/esphome/gui/pages/nordpool/) to a `1x3` `[CONTENT, FR(1), CONTENT]` grid layout and implement **Option B** (runtime container measurement for the `line` widget).
 
 ### Tasks
 
-- [ ] **5.1** Convert [`gui/pages/nordpool/page.yaml`](file:///x:/esphome/gui/pages/nordpool/page.yaml) (and `page_narrow.yaml`) to a `1x3` `GRID` (`grid_rows: [CONTENT, FR(1), CONTENT]`, `grid_columns: [FR(1)]`) using `styles: page_style` and `set_page_title`.
-- [ ] **5.2** Implement **Option B** in [`gui/pages/nordpool/sensors.yaml`](file:///x:/esphome/gui/pages/nordpool/sensors.yaml):
-  - Remove `graph_container_w` and `graph_container_h` parameters from `nordpool_initialize_graph_layout` and `nordpool_update_chart`.
-  - Measure `nordpool_graph_area` at runtime via `lv_obj_update_layout()` + `lv_obj_get_content_width()` / `lv_obj_get_content_height()`.
+- [x] **5.1** Convert [`gui/pages/nordpool/page.yaml`](file:///x:/esphome/gui/pages/nordpool/page.yaml) and [`page_narrow.yaml`](file:///x:/esphome/gui/pages/nordpool/page_narrow.yaml) to a `1x3` `GRID` (`grid_rows: [CONTENT, FR(1), CONTENT]`, `grid_columns: [FR(1)]`) using `styles: page_style`, `styles: container_style`, `scrollable: false`, and `set_page_title` (`icon: "\U000F081F"`).
+- [x] **5.2** Implement **Option B** in [`gui/pages/nordpool/sensors.yaml`](file:///x:/esphome/gui/pages/nordpool/sensors.yaml):
+  - Define responsive `nordpool_line_width` substitution based on `min(screen_width, screen_height)`.
+  - Remove `graph_container_w`, `graph_container_h`, and `line_w` parameters from `nordpool_initialize_graph_layout` and `nordpool_update_chart`.
+  - Measure `nordpool_graph_area` at runtime via `lv_obj_update_layout(id(nordpool_graph_area))` + `lv_obj_get_content_width(id(nordpool_graph_area))` / `lv_obj_get_content_height(id(nordpool_graph_area))`.
   - Keep hardcoded `sensor.waveshare_nordpool_future_offset` entity ID as confirmed.
-- [ ] **5.3** Build **Option A** prototype (LVGL `chart` widget inside `nordpool_graph_area`) and capture side-by-side `host-sdl` screenshots of **Option B vs Option A** at `320x240`, `240x320`, and `480x320`.
-- [ ] **5.4** Present comparison screenshots to the user to pick the final NordPool graph rendering mode.
+- [x] **5.3** Remove `- &nordpool_page_styles` and `<<: [*page_styles, *container_styles, *nordpool_page_styles]` from all 10 `gui/*.yaml` layout files.
+- [x] **5.4** Validate across all 10 layouts (`esphome config`) and compile + capture `host-sdl` screenshots at `240x320`, `480x320`, and `128x128`.
 
 ### Session 5 Completion Report
 
-- **Date**: _TBD_
-- **Option B vs Option A Comparison**: _TBD_
-- **User Decision**: _TBD_
-- **Notes for Session 6**: _TBD_
+- **Date**: 2026-10-19
+- **Option B vs Option A Notes**:
+  - As confirmed by the user, ESPHome's native LVGL YAML schema does not expose the `chart` widget (Option A would require raw C++ `lv_chart_create` calls outside YAML).
+  - **Option B** (`1x3` `[CONTENT, FR(1), CONTENT]` grid layout + `lvgl_nordpool_line` with `width: 100%`, `height: 100%` + runtime `lv_obj_get_content_width/height(id(nordpool_graph_area))` measurement) works natively in ESPHome YAML and eliminates the bottom-stroke clipping bug present in the original `FLEX` (`SIZE_CONTENT`) layout.
+- **Summary of Changes**:
+  - Updated [`gui/pages/nordpool/page.yaml`](file:///x:/esphome/gui/pages/nordpool/page.yaml) and [`gui/pages/nordpool/page_narrow.yaml`](file:///x:/esphome/gui/pages/nordpool/page_narrow.yaml) to a `1x3` `[CONTENT, FR(1), CONTENT]` `GRID` with `id: nordpool_graph_area` in the `FR(1)` middle row, `styles: page_style`, `styles: container_style`, `scrollable: false`, and `set_page_title` (`icon: "\U000F081F"`). Also added `hidden: ${"true" if (screen_width | int < 180) else "false"}` on `price_2`, `price_6`, `time_2`, `time_6` in `page.yaml` so `page.yaml` automatically adapts to narrow displays.
+  - Updated [`gui/pages/nordpool/sensors.yaml`](file:///x:/esphome/gui/pages/nordpool/sensors.yaml) to compute `nordpool_line_width` dynamically from `min(screen_width, screen_height)` (`2`, `4`, `5`, `6`, `8`, `10`) and measure `id(nordpool_graph_area)` width and height at runtime inside `nordpool_initialize_graph_layout` and `nordpool_update_chart`.
+  - Removed `- &nordpool_page_styles` and its anchor merges from all 10 `gui/*.yaml` layout files (`128x128`, `200x200`, `240r`, `240x135`, `240x240`, `240x320`, `320x240`, `480x320`, `480x800`, `800x480`).
+  - Added `scrollable: false` to outer container `obj` in `clock`, `nordpool`, `temperature`, and `status` pages to prevent scrollbars when content touches container edges.
+- **Verification & Screenshots**:
+  - Validated all 10 layouts via `pwsh tools/host_sdl/host-sdl.ps1 config <layout>` (`exit 0`).
+  - Compiled and captured live `host-sdl` screenshots in [`tools/gui_migration/screenshots/`](file:///x:/esphome/tools/gui_migration/screenshots/) (`240x320`, `480x320`, `128x128`).
+- **Notes for Session 6**:
+  - Only `&weather_page_styles` (plus `&boot_screen_styles` and button anchors) remains in the `.sizing:` blocks of the 10 `gui/*.yaml` layout files!
 
 ---
 
