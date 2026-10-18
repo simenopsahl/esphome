@@ -7,6 +7,8 @@ packages:
   board: !include board/waveshare_epaper_driver.yaml
 
 substitutions:
+  screen_width: "400"
+  screen_height: "300"
   common:
     log_level: WARN
 #    log_baud_rate: "115200"
