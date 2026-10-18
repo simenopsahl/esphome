@@ -1,0 +1,89 @@
+---
+# https://docs.waveshare.com/ESP32-S3-AUDIO-Board
+# https://github.com/MichalZaniewicz/esphome-waveshare-esp32-s3-audio-va/blob/main/base/core.yaml
+# PINs for Waveshare ESP32S3 Audio Board
+# Model:  ESP32-S3R8
+# Flash:  16MB
+# PSRAM:  8MB
+
+substitutions:
+  pin:
+    light:
+      rgb: GPIO38
+    int:
+      i2c:
+        sda: GPIO11
+        scl: GPIO10
+      spi:
+        clk: GPIO4
+        miso: GPIO8
+        mosi: GPIO9
+    card:
+      cs: '3' # ExIO3
+      clk: GPIO40
+      cmd: GPIO42
+      dat: GPIO41
+    audio:
+      i2s_lrclk: GPIO14
+      i2s_bclk: GPIO13
+      i2s_mclk: GPIO12
+      i2s_din: GPIO16
+      i2s_dout: GPIO15
+      mic: GPIO16
+      spk: GPIO15
+      amp: '8' # ExIO8
+    btn:
+      boot: GPIO0
+      key1: '9' # ExIO9
+      key2: '10' # ExIO10
+      key3: '11' # ExIO11
+
+    ext:
+      header:
+        d1: '2' # ExIO2
+        d2: GPIO7
+        d3: '2' # ExIO2
+        d4: GPIO6
+        d5: '0' # ExIO0
+        d6: GPIO5
+        d7: GPIO9
+        d8: GPIO4
+        d9: GPIO8
+        d10: GPIO3
+        d11: GPIO11
+        d12: GPIO20
+        d13: GPIO10
+        d14: GPIO19
+        d15: GND
+        d16: GND
+        d17: 3v
+        d18: 5v
+      cam:
+        sda: GPIO11
+        scl: GPIO10
+        y0: nc
+        y1: nc
+        y2: GPIO2
+        y3: GPIO17
+        y4: GPIO18
+        y5: GPIO39
+        y6: GPIO45
+        y7: GPIO46
+        y8: GPIO47
+        y9: GPIO48
+        vs: GPIO21
+        hs: GPIO1
+        p_clk: GPIO44
+        m_clk: GPIOxx
+        rst: '6' # ExIO6
+        pwr: '5' # ExIO5
+      disp:
+        lcd_cs: GPIO3
+        lcd_clk: GPIO4
+        lcd_miso: GPIO8
+        lcd_mosi: GPIO9
+        lcd_dc: GPIO7
+        lcd_rst: '0' # ExIO0
+        bl: GPIO5
+        tp_rst: '1' # ExIO1
+        tp_int: '2' # ExIO2

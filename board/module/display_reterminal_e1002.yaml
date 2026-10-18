@@ -1,6 +1,7 @@
 labels: [SPI, display, ePaper]
 ---
 # https://wiki.seeedstudio.com/reterminal_e10xx_with_esphome/#basic-for-drawing-in-esphome
+# https://seeed-projects.github.io/OSHW-reTerminal-Series-E-D/?platform=esphome&device=E1002
 # https://esphome.io/components/display/epaper_spi/
 
 # =============================================================================

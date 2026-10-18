@@ -1,0 +1,125 @@
+# Virtual ESPHome display device: host platform + SDL2 window
+#
+# Previews the shared gui/ packages without flashing hardware, and can join
+# Home Assistant as a regular ESPHome device (native API on port 6053).
+#
+# Build & run inside WSL2 (see tools/host_sdl/README.md):
+#   pwsh tools/host_sdl/host-sdl.ps1 run              # default layout below
+#   pwsh tools/host_sdl/host-sdl.ps1 run 480x320      # any gui/<layout>.yaml
+#   pwsh tools/host_sdl/host-sdl.ps1 screenshot
+#
+# Not for the HA ESPHome dashboard "Install" button — host builds need SDL2
+# and a display, so build it from WSL instead.
+
+packages:
+  # --- COMMON PACKAGES (host subset: no wifi / debug on host platform) ---
+  api: !include common/api.yaml
+  logger: !include common/logger.yaml
+  ota: !include common/ota.yaml
+  restart: !include common/restart.yaml
+  status: !include common/status.yaml
+  time: !include common/time.yaml
+
+  # --- BOARD AND MODULES ---
+  board: !include board/host_sdl.yaml
+  sim_env: !include board/module/host_simulated_env.yaml
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/${gui_layout}.yaml
+
+  # --- FEATURE PACKAGES ---
+  combined_env_sensors: !include features/combined_env_sensors.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+  sim_modules: !include board/module/${sim_modules_pkg}.yaml
+
+substitutions:
+  # GUI layout file in gui/ and its pixel size. The run script derives the
+  # size from the layout file automatically when a layout is given:
+  #   host-sdl.ps1 run 480x320         -> -s gui_layout 480x320 -s screen_width 320 -s screen_height 480
+  #   host-sdl.ps1 run -Size 640x480   -> -s screen_width 640 -s screen_height 480
+  #   host-sdl.ps1 run 240x320 -Modules -> includes board/module/host_simulated_modules.yaml
+  gui_layout: "240x320"
+  screen_width: "320"
+  screen_height: "240"
+  sim_modules_pkg: "host_simulated_modules_none"
+  common:
+    log_level: DEBUG
+  device:
+    name: host-sdl
+    location: "Virtual"
+    # Windows LAN IP when WSL runs in mirrored networking mode (status page only)
+    ip_address: "192.168.68.61"
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
+  display:
+    home_page: page_temperature
+
+esphome:
+  comment: Host SDL @ Virtual
+  name: host-sdl
+  friendly_name: host-sdl
+  area: ${device.location}
+  on_boot:
+    - priority: -100
+      then:
+        # Network is always up on host; show the header Wi-Fi icon
+        - lvgl.widget.show: lbl_wifi_status
+        - lvgl.widget.hide: boot_screen
+        - script.execute: lvgl_time_update
+
+# The GUI header package hooks wifi events; there is no wifi on host
+wifi: !remove
+
+api:
+  # Keep running when no Home Assistant client is connected
+  reboot_timeout: 0s
+
+# --- LVGL CLOCKS ---
+# Replace the HA time source with the host system clock (same ID, so the GUI
+# clock scripts work without a Home Assistant connection)
+time:
+  - id: !remove time_homeassistant
+  - platform: host
+    id: time_homeassistant
+    timezone: "${time_timezone}"
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
+sensor:
+  # Combine sensors
+  - id: !extend temperature_local
+    sources:
+      - source: temperature_simulated
+  - id: !extend humidity_local
+    sources:
+      - source: humidity_simulated
+  - id: !extend pressure_local
+    sources:
+      - source: pressure_simulated
+
+binary_sensor:
+  # Button Left
+  - id: !extend btn_a
+    on_press:
+      - lvgl.page.previous
+  # Button Mid
+  - id: !extend btn_b
+    on_press:
+      - script.execute: go_home
+  # Button Right
+  - id: !extend btn_c
+    on_press:
+      - lvgl.page.next
+

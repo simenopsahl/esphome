@@ -1,0 +1,135 @@
+labels: [virtual, simulated, cc1101, kmeter, air_quality, lvgl]
+---
+# Simulated module GUI pages & mock sensor states for virtual (host-sdl) devices
+# using CC1101 async mode instead of packet mode.
+
+substitutions:
+  module:
+    tank_temp_min: "25.0"
+    tank_temp_max: "58.0"
+    cc1101:
+      water_meter_serial: "12345678"
+
+.sizing:
+  - &page_styles
+    <<: !include ../../gui/styles/page_styles.yaml
+    page_pad_top: 32
+    page_pad_bottom: 32
+    screen_height: ${device.screen.height}
+    screen_width: ${device.screen.width}
+    usable_screen_height: 170
+    usable_screen_width: 312
+
+  - &container_styles
+    <<: !include ../../gui/styles/container_styles.yaml
+    container_pad_top: 1
+    container_pad_bottom: 1
+    container_pad_left: 4
+    container_pad_right: 4
+    container_scrollable: false
+
+  - &dual_kmeter_styles
+    tank_width: 110
+    tank_height: 166
+    tank_radius: 38
+    tank_temp_min: ${module.tank_temp_min}
+    tank_temp_max: ${module.tank_temp_max}
+
+lvgl:
+  pages:
+    - <<: !include
+        file: ../../gui/pages/air_quality/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Luftkvalitet"
+
+    - <<: !include
+        file: ../../gui/pages/dual_kmeter/page.yaml
+        vars:
+          <<: [*page_styles, *container_styles, *dual_kmeter_styles]
+          page_title: "VVB"
+
+    - <<: !include
+        file: ../../gui/pages/cc1101/wmbus.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Vannmåler"
+      id: page_cc1101_wmbus
+
+    - <<: !include
+        file: ../../gui/pages/cc1101/async.yaml
+        vars:
+          <<: [*page_styles, *container_styles]
+          page_title: "Radio"
+
+esphome:
+  on_boot:
+    - priority: -200
+      then:
+        # --- Air Quality Mock Values ---
+        - lvgl.label.update:
+            id: lbl_temp_local_value
+            text: "21.8"
+        - lvgl.label.update:
+            id: lbl_co2_value
+            text: "542"
+        - lvgl.label.update:
+            id: lbl_pm1_value
+            text: "2"
+        - lvgl.label.update:
+            id: lbl_pm25_value
+            text: "4"
+        - lvgl.label.update:
+            id: lbl_pm10_value
+            text: "7"
+
+        # --- Dual KMeter (VVB Water Tank) Mock Values ---
+        - lvgl.label.update:
+            id: lbl_temp_kmeter_top_shadow
+            text: "68.5"
+        - lvgl.label.update:
+            id: lbl_temp_kmeter_top_value
+            text: "68.5"
+        - lvgl.label.update:
+            id: lbl_temp_kmeter_bottom_shadow
+            text: "41.2"
+        - lvgl.label.update:
+            id: lbl_temp_kmeter_bottom_value
+            text: "41.2"
+        - lvgl.label.update:
+            id: lbl_temp_kmeter_mix_value
+            text: "54.8"
+        - lvgl.bar.update:
+            id: tank_graphic
+            min_value: 250
+            max_value: 580
+            value: 418
+
+        # --- CC1101 wMBus Water Meter Mock Values ---
+        - lvgl.label.update:
+            id: lbl_water_consumption_value
+            text: "248.63"
+        - lvgl.label.update:
+            id: lbl_water_meter_alarms_value
+            text: "Ingen"
+        - lvgl.label.update:
+            id: lbl_water_meter_status_value
+            text: "OK"
+        - lvgl.label.update:
+            id: lbl_water_meter_rssi_value
+            text: "-67"
+
+        # --- CC1101 Radio (Async) Mock Values ---
+        - lvgl.label.update:
+            id: lbl_frequency_value
+            text: "433.92"
+        - lvgl.label.update:
+            id: lbl_modulation_value
+            text: "ASK/OOK"
+        - lvgl.label.update:
+            id: lbl_tx_power_value
+            text: "10"
+        - lvgl.label.update:
+            id: lbl_cc1101_packet
+            text: "RX OK"
+

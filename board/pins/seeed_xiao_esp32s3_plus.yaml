@@ -62,6 +62,25 @@ substitutions:
         rst: GPIO38
         reset: GPIO38
         busy: GPIO4
+      e1001:
+        battery:
+          adc: GPIO1
+          enable: GPIO21
+        btn:
+          green: GPIO3
+          right: GPIO4
+          left: GPIO5
+        audio:
+          i2s_lrclk: GPIO42
+          i2s_din: GPIO41
+          mic: GPIO41
+          mic_power: GPIO38
+          buzzer: GPIO45
+        light:
+          led: GPIO6
+        card:
+          detect: GPIO15
+          sd_power: GPIO16
       e1002:
         battery:
           adc: GPIO1
@@ -81,6 +100,28 @@ substitutions:
         card:
           detect: GPIO15
           sd_power: GPIO16
+      e1003:
+        battery:
+          adc: GPIO1
+          enable: GPIO40
+        btn:
+          green: GPIO3
+          right: GPIO4
+          left: GPIO5
+        audio:
+          i2s_lrclk: GPIO42
+          i2s_din: GPIO41
+          mic: GPIO41
+          mic_power: GPIO38
+          buzzer: GPIO45
+        light:
+          led: GPIO16
+        card:
+          detect: GPIO15
+          sd_power: GPIO39
+        touch:
+          int: GPIO2
+          rst: GPIO48
 
     ext:
       header:

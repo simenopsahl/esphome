@@ -37,6 +37,10 @@ sensor:
             send_every: 30
     address: 0x58
     update_interval: 1s
+    baseline:
+      # Unsure about values, calibrate outdoors before use
+      eco2_baseline: 0x1f4 # 500
+      tvoc_baseline: 0x1770 # 6000
     compensation:
       temperature_source: temperature_local
       humidity_source: humidity_local

@@ -9,13 +9,15 @@
   The SDL window opens on the Windows desktop through WSLg.
 
 .EXAMPLE
-  pwsh tools/host_sdl/host-sdl.ps1 run              # build + run default layout
-  pwsh tools/host_sdl/host-sdl.ps1 run 480x320      # build + run gui/480x320.yaml
-  pwsh tools/host_sdl/host-sdl.ps1 config 128x128   # validate only
-  pwsh tools/host_sdl/host-sdl.ps1 screenshot       # save PNG of the running UI
-  pwsh tools/host_sdl/host-sdl.ps1 page next        # navigate (next|prev|<index>)
-  pwsh tools/host_sdl/host-sdl.ps1 setup            # one-time WSL toolchain install
-  pwsh tools/host_sdl/host-sdl.ps1 stop             # kill a running instance
+  pwsh tools/host_sdl/host-sdl.ps1 run                        # build + run default layout
+  pwsh tools/host_sdl/host-sdl.ps1 run 480x320                # build + run gui/480x320.yaml
+  pwsh tools/host_sdl/host-sdl.ps1 run -Size 320x240          # explicit WxH resolution override
+  pwsh tools/host_sdl/host-sdl.ps1 run 240x320 -Modules       # include simulated module pages (air_quality, dual_kmeter, cc1101)
+  pwsh tools/host_sdl/host-sdl.ps1 config 128x128             # validate only
+  pwsh tools/host_sdl/host-sdl.ps1 screenshot                 # save PNG of the running UI
+  pwsh tools/host_sdl/host-sdl.ps1 page next                  # navigate (next|prev|<index>)
+  pwsh tools/host_sdl/host-sdl.ps1 setup                      # one-time WSL toolchain install
+  pwsh tools/host_sdl/host-sdl.ps1 stop                       # kill a running instance
 #>
 param(
   [Parameter(Position = 0)]
@@ -25,6 +27,16 @@ param(
   # gui layout for run/compile/config/clean, or page target for 'page'
   [Parameter(Position = 1)]
   [string]$Arg = '',
+
+  # Explicit screen resolution override (<width>x<height>, e.g. 320x240, 480x320)
+  [string]$Size = '',
+
+  # Include simulated hardware module pages (air_quality, dual_kmeter, cc1101)
+  [switch]$Modules,
+
+  # CC1101 page variant when -Modules is active ('packet' or 'async')
+  [ValidateSet('', 'packet', 'async')]
+  [string]$Cc1101Mode = '',
 
   [string]$Distro = 'Ubuntu',
   [int]$ScreenshotPort = 8080,
@@ -69,6 +81,9 @@ switch ($Command) {
       $dir = Join-Path $PSScriptRoot 'screenshots'
       New-Item -ItemType Directory -Force $dir | Out-Null
       $Out = Join-Path $dir ("host-sdl-{0:yyyyMMdd-HHmmss}.png" -f (Get-Date))
+    } else {
+      $parentDir = Split-Path -Parent $Out
+      if ($parentDir) { New-Item -ItemType Directory -Force $parentDir | Out-Null }
     }
     Invoke-WebRequest "http://127.0.0.1:$ScreenshotPort/screenshot" -OutFile $Out -TimeoutSec 10 -UseBasicParsing
     Write-Host $Out
@@ -94,7 +109,12 @@ switch ($Command) {
   }
   default {
     $repo = Get-WslRepoPath
-    Invoke-Wsl "bash '$repo/tools/host_sdl/run.sh' $Command '$Arg'"
+    $runArgs = @($Command)
+    if ($Arg) { $runArgs += "'$Arg'" }
+    if ($Size) { $runArgs += "--size '$Size'" }
+    if ($Modules) { $runArgs += "--modules" }
+    if ($Cc1101Mode) { $runArgs += "--cc1101-mode '$Cc1101Mode'" }
+    $argString = $runArgs -join ' '
+    Invoke-Wsl "bash '$repo/tools/host_sdl/run.sh' $argString"
   }
 }
-

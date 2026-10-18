@@ -1,16 +1,11 @@
 labels: [virtual, simulated, temperature, humidity, pressure]
 ---
-# Simulated environment sensor for virtual (host) devices.
+# Simulated environment sensor & Home Assistant mock fallback for virtual (host) devices.
 #
 # Provides slowly drifting temperature / humidity / pressure readings so that
 # features/combined_env_sensors.yaml and GUI pages have local data to show.
-#
-# Use as a source in the device YAML:
-#   sensor:
-#     - id: !extend temperature_local
-#       sources:
-#         - source: temperature_simulated
-#
+# Also seeds NordPool and Weather LVGL widgets on boot if Home Assistant has not
+# populated them yet, ensuring deterministic offline/baseline screenshots.
 
 sensor:
   - platform: template
@@ -61,3 +56,46 @@ sensor:
       value = std::max(980.0f, std::min(1040.0f, value));
       return value;
 
+esphome:
+  on_boot:
+    - priority: -200
+      then:
+        # Seed NordPool prices & times if Home Assistant has not populated them
+        - lambda: |-
+            if (std::isnan(id(nordpool_price_0).state)) {
+              const float mock_prices[9] = {82.0f, 75.0f, 68.0f, 94.0f, 135.0f, 162.0f, 140.0f, 110.0f, 88.0f};
+              id(nordpool_price_0).publish_state(mock_prices[0]);
+              id(nordpool_price_1).publish_state(mock_prices[1]);
+              id(nordpool_price_2).publish_state(mock_prices[2]);
+              id(nordpool_price_3).publish_state(mock_prices[3]);
+              id(nordpool_price_4).publish_state(mock_prices[4]);
+              id(nordpool_price_5).publish_state(mock_prices[5]);
+              id(nordpool_price_6).publish_state(mock_prices[6]);
+              id(nordpool_price_7).publish_state(mock_prices[7]);
+              id(nordpool_price_8).publish_state(mock_prices[8]);
+              id(nordpool_time_0).publish_state("12");
+              id(nordpool_time_2).publish_state("14");
+              id(nordpool_time_4).publish_state("16");
+              id(nordpool_time_6).publish_state("18");
+              id(nordpool_time_8).publish_state("20");
+            }
+            if (!id(ha_weather_condition).has_state() || id(ha_weather_condition).state.empty()) {
+              id(ha_weather_condition).publish_state("partlycloudy");
+              id(ha_weather_temperature).publish_state("14.2");
+              id(ha_condition_today).publish_state("Delvis skyet");
+              id(ha_condition_0).publish_state("partlycloudy");
+              id(ha_weather_timestamp_0).publish_state("14:00");
+              id(ha_weather_temperature_0).publish_state(15.0f);
+              id(ha_condition_1).publish_state("sunny");
+              id(ha_weather_timestamp_1).publish_state("15:00");
+              id(ha_weather_temperature_1).publish_state(16.0f);
+              id(ha_condition_2).publish_state("cloudy");
+              id(ha_weather_timestamp_2).publish_state("16:00");
+              id(ha_weather_temperature_2).publish_state(14.0f);
+              id(ha_condition_3).publish_state("rainy");
+              id(ha_weather_timestamp_3).publish_state("17:00");
+              id(ha_weather_temperature_3).publish_state(12.0f);
+            }
+            if (std::isnan(id(room_temp_value_homeassistant).state)) {
+              id(room_temp_value_homeassistant).publish_state(21.8f);
+            }

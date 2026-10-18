@@ -1,0 +1,9 @@
+labels: [virtual, simulated, cc1101, kmeter, air_quality, lvgl]
+---
+# No-op placeholder when module pages are disabled in .host-sdl.yaml
+# (default: sim_modules_pkg: "host_simulated_modules_none").
+# Pass `-Modules` to `host-sdl.ps1` (or `-s sim_modules_pkg host_simulated_modules`)
+# to include board/module/host_simulated_modules.yaml instead.
+
+substitutions: {}
+
