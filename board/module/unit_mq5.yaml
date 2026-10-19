@@ -26,8 +26,8 @@ sensor:
   - platform: m5stack_unit_mq
     i2c_id: ${module.mq5_i2c_bus}
     id: mq5_sensor
-    # heat_mode: SWITCH CONTINUOUS, OFF
-    heat_mode: CONTINUOUS
+    # heat_mode: SWITCH CONTINUOUS, "OFF"
+    heat_mode: "OFF"
 #    high_level_time: 45  # Minimum/default is 30
 #    low_level_time: 5   # Minimum/default is 5
     update_interval: 5s

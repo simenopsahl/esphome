@@ -19,12 +19,16 @@ labels: [SPI, display, ePaper]
 #   7. PCF8563 RTC (I2C addr 0x51, CR1220 backup)
 #   8. PDM Microphone (CLK=42, DATA=41, EN=38)
 #   9. MicroSD card slot (SPI + DET=15, EN=16)
-#  10. Deep sleep with button wake-up
 #
 # NOTE: Requires ESPHome >= 2025.11.1 for epaper_spi platform
 #
 # Serial debug: UART0 via CH340K USB bridge
 # =============================================================================
+
+# Notes:
+# Not yet flashed and tested, copied from e1002
+# Display lambda and colors not migrated to 1872x1404 ePaper yet
+# Unsure if 16-level grayscale is needed (probably slower rendering)
 
 packages:
   epaper: !include ../../features/epaper.yaml

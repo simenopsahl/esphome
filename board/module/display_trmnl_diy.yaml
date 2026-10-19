@@ -16,6 +16,14 @@ labels: [SPI, display, ePaper]
 #
 # =============================================================================
 
+# Notes:
+# Not working yet, display does not render.
+# Might have broken the panel during initial testing due to incorrectly flashing e1001 version.
+# ESPHome docs:
+# The BUSY pin on the gdew0154m09, the Waveshare 7.30in-f and the Waveshare 7.50in V2
+# models must be inverted to prevent permanent display damage.
+# Set the busy pin to inverted: true in the config.
+
 packages:
   epaper: !include ../../features/epaper.yaml
 
