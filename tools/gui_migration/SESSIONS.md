@@ -18,8 +18,8 @@
 | **Session 3** | Simple Pages (`temperature`, `status`) & M5Stack Core Module Pages Cleanup (`air_quality`, `cc1101`, `dual_kmeter`) | ✅ **Done** | 2026-10-18 | Migrated `temperature`/`status` & all 5 module pages to `page_style` + `set_page_title`; removed `.sizing:` from all `board/module/module_*.yaml`; wired all 10 `gui/*.yaml` layouts into `chrome/*` + `fonts/responsive.yaml`. |
 | **Session 4** | Clock Page Migration (`page.yaml` & `page_narrow.yaml`) | ✅ **Done** | 2026-10-18 | Migrated `clock` (`page.yaml` & `page_narrow.yaml`) to `page_style`, `container_style`, `set_page_title`, and responsive Jinja meter/offset substitutions in `pages/clock/sensors.yaml`; removed `&clock_page_styles` from all 10 `gui/*.yaml` layouts. |
 | **Session 5** | NordPool Graph Spike & Migration (Option B) | ✅ **Done** | 2026-10-19 | Migrated `nordpool` (`page.yaml`, `page_narrow.yaml`, `sensors.yaml`) to `1x3` `[CONTENT, FR(1), CONTENT]` grid layout + Option B runtime `lv_obj_get_content_width/height` measurement; removed `&nordpool_page_styles` from all 10 `gui/*.yaml` layouts. |
-| **Session 6** | Weather Page Migration (`page.yaml` & `page_narrow.yaml`) | ⏳ **Next Up** | — | Ready to start. |
-| **Session 7** | Control Page, Unified `gui/main.yaml` & `gui/<W>x<H>.yaml` Stubs | ⬜ Pending | — | Depends on Sessions 3–6. |
+| **Session 6** | Weather Page Migration (`page.yaml` & `sensors.yaml`) | ✅ **Done** | 2026-10-20 | Unified `page.yaml` & `page_narrow.yaml` into a single responsive `page.yaml` with dynamic `weather_forecast_count` (`min(4, max(1, usable_w // 38))`) and responsive icon/font sizing in `pages/weather/sensors.yaml`; removed `&weather_page_styles` from all 10 `gui/*.yaml` layouts. |
+| **Session 7** | Control Page, Unified `gui/main.yaml` & `gui/<W>x<H>.yaml` Stubs | ⏳ **Next Up** | — | Ready to start. |
 
 ---
 
@@ -210,25 +210,32 @@ Migrate [`gui/pages/nordpool/`](file:///x:/esphome/gui/pages/nordpool/) to a `1x
 
 ---
 
-## Session 6 — Weather Page Migration
+## Session 6 — Weather Page Migration (✅ Completed)
 
 ### Goal
 
-Migrate [`gui/pages/weather/page.yaml`](file:///x:/esphome/gui/pages/weather/page.yaml) and [`gui/pages/weather/page_narrow.yaml`](file:///x:/esphome/gui/pages/weather/page_narrow.yaml) to responsive grid/flex sizing without hardcoded row/column pixel heights.
+Migrate [`gui/pages/weather/page.yaml`](file:///x:/esphome/gui/pages/weather/page.yaml) and [`gui/pages/weather/page_narrow.yaml`](file:///x:/esphome/gui/pages/weather/page_narrow.yaml) to responsive sizing without hardcoded row/column pixel heights.
 
 ### Tasks
 
-- [ ] **6.1** Replace `weather_row_1_height`, `weather_row_2_height`, `weather_col_1_width`, etc. in [`gui/pages/weather/page.yaml`](file:///x:/esphome/gui/pages/weather/page.yaml) and [`page_narrow.yaml`](file:///x:/esphome/gui/pages/weather/page_narrow.yaml) with percentage / `FR()` / `SIZE_CONTENT` layouts.
-- [ ] **6.2** Select weather icon tier (`20px`, `40px`, `60px`) dynamically via Jinja based on screen dimensions instead of per-layout anchors.
-- [ ] **6.3** Preserve hardcoded HA entity IDs in [`gui/weather/weather_today.yaml`](file:///x:/esphome/gui/weather/weather_today.yaml) and [`gui/weather/weather_forecast.yaml`](file:///x:/esphome/gui/weather/weather_forecast.yaml) (`sensor.waveshare_display_data`, `weather.local`).
-- [ ] **6.4** Verify with `esphome config` and capture `host-sdl` screenshots at `320x240`, `240x320`, `480x320`, and `128x128`.
+- [x] **6.1** Replace `weather_row_1_height`, `weather_row_2_height`, `weather_col_1_width`, etc. in [`gui/pages/weather/page.yaml`](file:///x:/esphome/gui/pages/weather/page.yaml) with percentage (`100%`) / `SIZE_CONTENT` flex layouts and unify `page_narrow.yaml` into `page.yaml` via dynamic `weather_forecast_count`.
+- [x] **6.2** Compute `weather_forecast_count`, `weather_forecast_icon_size`, `weather_today_icon_size`, and weather fonts dynamically via Jinja in [`gui/pages/weather/sensors.yaml`](file:///x:/esphome/gui/pages/weather/sensors.yaml) based on usable screen dimensions instead of per-layout anchors.
+- [x] **6.3** Preserve hardcoded HA entity IDs in [`gui/weather/weather_today.yaml`](file:///x:/esphome/gui/weather/weather_today.yaml) and [`gui/weather/weather_forecast.yaml`](file:///x:/esphome/gui/weather/weather_forecast.yaml) (`sensor.waveshare_display_data`, `weather.local`).
+- [x] **6.4** Verify with `esphome config` across all 10 layouts and capture `host-sdl` screenshots at `320x240`, `240x320`, `480x320`, and `128x128`.
 
 ### Session 6 Completion Report
 
-- **Date**: _TBD_
-- **Summary of Changes**: _TBD_
-- **Verification & Screenshots**: _TBD_
-- **Notes for Session 7**: _TBD_
+- **Date**: 2026-10-20
+- **Summary of Changes**:
+  - Created [`gui/pages/weather/sensors.yaml`](file:///x:/esphome/gui/pages/weather/sensors.yaml) defining responsive `weather_forecast_count` (`min(4, max(1, usable_width // 38))`), `weather_forecast_icon_size`, `weather_today_icon_size` (always distinct from `weather_forecast_icon_size` so `gui/weather/weather_icons.yaml` image IDs never collide), and weather font substitutions (`weather_today_temp_font`, `weather_today_condition_font`, `weather_forecast_temp_font`, `weather_forecast_time_font`), plus package includes for `weather_icons.yaml`, `weather_forecast.yaml`, and `weather_today.yaml`.
+  - Migrated [`gui/pages/weather/page.yaml`](file:///x:/esphome/gui/pages/weather/page.yaml) to `styles: page_style`, `styles: container_style`, `scrollable: false`, `set_page_title` (`icon: "\U000F0595"`), `width: 100%`, `SIZE_CONTENT` row containers, and per-item `hidden: ${ 'true' if N >= (weather_forecast_count|int) else 'false' }` on the 4 forecast slots (`0..3`).
+  - Removed [`gui/pages/weather/page_narrow.yaml`](file:///x:/esphome/gui/pages/weather/page_narrow.yaml) since `gui/pages/weather/page.yaml` now handles both narrow (`3` forecast columns on `128x128` / `240x135`) and standard/wide (`4` forecast columns) displays automatically.
+  - Removed `- &weather_page_styles` and replaced the 4 manual weather package includes in all 10 `gui/*.yaml` layout files (`128x128`, `200x200`, `240r`, `240x135`, `240x240`, `240x320`, `320x240`, `480x320`, `480x800`, `800x480`) with `weather_screen_sensors: !include { file: pages/weather/sensors.yaml }`.
+- **Verification & Screenshots**:
+  - Validated all 10 `gui/*.yaml` layouts via `pwsh tools/host_sdl/host-sdl.ps1 config <layout>` (`exit 0`).
+  - Compiled and captured live `host-sdl` Weather screenshots (`04_weather.png`) at `240x320`, `320x240`, `480x320`, and `128x128` in [`tools/gui_migration/screenshots/`](file:///x:/esphome/tools/gui_migration/screenshots/).
+- **Notes for Session 7**:
+  - All 5 standard pages (`clock`, `temperature`, `nordpool`, `weather`, `status`) and all 5 M5Stack Core module pages are now completely free of `.sizing:` anchors! Only `&boot_screen_styles` and button anchors remain in `gui/*.yaml`, ready to be replaced by `gui/main.yaml` and thin compatibility stubs in Session 7.
 
 ---
 

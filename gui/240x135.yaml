@@ -48,40 +48,6 @@ substitutions:
     pad_column: 5
     pad_row: 4
 
-  - &weather_page_styles
-    # Variables for the main layout grid
-    # Calculation for this 135x240 screen:
-    weather_row_1: 3
-    weather_row_2: 4
-    # Total fr units = 3 + 4 = 7
-    # Row 1 height = (3 / 7) * 203px = 87px
-    # Row 2 height = (4 / 7) * 203px = 116px
-    weather_row_1_height: 87
-    weather_row_2_height: 116
-    # Calculation for this 135x240 screen:
-    weather_column_1: 4
-    weather_column_2: 7
-    # Total fr units = 4 + 7 = 11
-    # Column 1 width = (4 / 11) * 123px = ~44px
-    # Column 2 width = (7 / 11) * 123px = ~78px
-    weather_column_1_width: 44
-    weather_column_2_width: 78
-    # Variables for the forecast objects at the bottom
-    weather_forecast_column_width: 31
-    weather_forecast_grid_pad_column: 1
-    weather_forecast_obj_radius: 3
-    weather_forecast_obj_pad_top: 0
-    weather_forecast_obj_pad_bottom: 0
-    # Font for the "Været nå" text
-    weather_today_condition_font: font_sm
-    weather_today_temp_font: font_md
-    # Font for the forecast temperature
-    weather_forecast_temp_font: font_sm
-    # Font for the forecast timestamp
-    weather_forecast_time_font: font_sm
-    initial_today_icon_src: "unknown_40"
-    initial_forecast_icon_src: "unknown_24"
-
   - &button_widget_vars
     width: 75
     height: 114
@@ -133,10 +99,9 @@ lvgl:
 
     # weather forecast
     - <<: !include
-        file: pages/weather/page_narrow.yaml
+        file: pages/weather/page.yaml
         vars:
-          <<: [*page_styles, *container_styles, *weather_page_styles]
-          page_title: "\U000F0595" # weather-partly-cloudy
+          page_title: "Vær"
 
     # device status
     - <<: !include
@@ -165,24 +130,5 @@ packages:
   # remote page navigation
   control_navigation: !include { file: functions/control_navigation.yaml }
 
-  # Weather packages
-  # Build icon set from .svg files
-  weather_icons_34: !include
-    file: weather/weather_icons.yaml
-    vars:
-      size: 24
-  # Display weather forcast using icon set (defined above)
-  weather_forcast_34: !include
-    file: weather/weather_forecast.yaml
-    vars:
-      size: 24
-  # Big icons for today weather
-  weather_icons_60: !include
-    file: weather/weather_icons.yaml
-    vars:
-      size: 40
-  # Get todays weather and display it
-  weather_today_60: !include
-    file: weather/weather_today.yaml
-    vars:
-      size: 40
+  # weather screen (responsive icons, fonts, forecast count + HA sensors)
+  weather_screen_sensors: !include { file: pages/weather/sensors.yaml }

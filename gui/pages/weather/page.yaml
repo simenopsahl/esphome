@@ -1,35 +1,24 @@
 # LVGL Weather forecast page
+#
+# Optional vars:
+# - page_title (e.g. "Vær")
+#
+# Sizes, fonts and the number of visible forecast entries come from the
+# substitutions in gui/pages/weather/sensors.yaml.
 
-# required vars:
-# - *page_styles
-# - *container_styles
-# - *weather_page_styles
-# - page_title
-
-# weather page
-#lvgl:
-#  pages:
     id: page_weather
-    <<: !include ../../styles/page_styles.yaml
-    # REMOVED: `<<: *page_styles`
-    # ADDED: Use the variables passed from the parent file
-    pad_top: ${page_pad_top}
-    pad_bottom: ${page_pad_bottom}
+    styles: page_style
     on_load:
-      - lvgl.label.update:
-          id: lbl_page_title
-          text: ${page_title}
+      - script.execute:
+          id: set_page_title
+          title: ${page_title}
+          icon: "\U000F0595" # weather-partly-cloudy
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
       - obj:
-          <<: !include ../../styles/container_styles.yaml
-          # Use the passed-in variables for size
-          pad_top: ${container_pad_top}
-          pad_bottom: ${container_pad_bottom}
-          pad_left: ${container_pad_left}
-          pad_right: ${container_pad_right}
-          scrollable: ${container_scrollable}
+          styles: container_style
+          scrollable: false
           align: CENTER
           layout:
             type: FLEX
@@ -50,16 +39,14 @@
                   flex_align_track: CENTER
                   pad_column: 0
                   pad_row: 0
-#                flex_grow: ${weather_row_1}
                 pad_all: 0
-                width: ${screen_width}
+                width: 100%
                 height: SIZE_CONTENT
                 widgets:
                   # Today's weather icon
                   - image:
                       id: weather_condition_icon
                       src: ${initial_today_icon_src}
-#                      flex_grow: ${weather_column_1}
 
                   # Today's temperature and condition
                   - obj:
@@ -72,7 +59,6 @@
                         flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
-#                      flex_grow: ${weather_column_2}
                       height: SIZE_CONTENT
                       width: SIZE_CONTENT
                       widgets:
@@ -87,7 +73,8 @@
                             scrollable: true
                             text_font: ${weather_today_condition_font}
 
-            # The second row (forecast section)
+            # The second row (forecast section). Entries beyond
+            # `weather_forecast_count` (what fits the width) are hidden.
             - obj:
                 pad_all: 0
                 layout:
@@ -96,26 +83,24 @@
                   flex_align_cross: CENTER
                   flex_align_main: SPACE_AROUND
                   flex_align_track: CENTER
-                  pad_column: ${weather_forecast_grid_pad_column}
+                  pad_column: 0
                   pad_row: 0
-#                flex_grow: ${weather_row_2}
-                width: ${screen_width}
+                width: 100%
                 height: SIZE_CONTENT
                 widgets:
                   # Forecast Item 0
                   - obj:
+                      hidden: ${ 'true' if 0 >= (weather_forecast_count|int) else 'false' }
                       bg_color: c_black
                       pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-#                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
                       height: SIZE_CONTENT
                       width: SIZE_CONTENT
-                      # --- Widgets for this forecast item ---
                       widgets:
                         - label:
                             id: forecast_timestamp_0
@@ -132,13 +117,13 @@
 
                   # Forecast Item 1
                   - obj:
+                      hidden: ${ 'true' if 1 >= (weather_forecast_count|int) else 'false' }
                       bg_color: c_black
                       pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-#                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
                       height: SIZE_CONTENT
@@ -159,13 +144,13 @@
 
                   # Forecast Item 2
                   - obj:
+                      hidden: ${ 'true' if 2 >= (weather_forecast_count|int) else 'false' }
                       bg_color: c_black
                       pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-#                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
                       height: SIZE_CONTENT
@@ -186,13 +171,13 @@
 
                   # Forecast Item 3
                   - obj:
+                      hidden: ${ 'true' if 3 >= (weather_forecast_count|int) else 'false' }
                       bg_color: c_black
                       pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
                         flex_align_cross: CENTER
-#                        flex_align_track: CENTER
                         pad_row: 0
                         pad_column: 0
                       height: SIZE_CONTENT

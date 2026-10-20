@@ -1,0 +1,57 @@
+# Responsive sizing + icon sets for the LVGL weather page.
+#
+# Everything is derived from `screen_width` / `screen_height` and the chrome /
+# container padding substitutions (see gui/chrome/base.yaml), so no per-layout
+# `&weather_page_styles` anchor is needed.
+#
+# Forecast entries: the page contains 4 forecast items. The number actually
+# shown (`weather_forecast_count`) is the number that fit in the usable width
+# at `weather_forecast_item_min_w` px each (max 4). Hidden items keep their ids
+# so the Home Assistant sensors in gui/weather/weather_forecast.yaml still work.
+#
+# Entity IDs in gui/weather/weather_today.yaml and gui/weather/weather_forecast.yaml
+# are intentionally hardcoded.
+
+substitutions:
+  # NOTE: each value below is written out in full (no references to other
+  # computed substitutions) because ESPHome evaluates computed substitutions
+  # that depend on other computed substitutions before those are resolved.
+  # Usable content area:
+  #   uw = screen_width  - container_pad_left/right
+  #   uh = screen_height - page_pad_top/bottom - container_pad_top/bottom
+  # Number of forecast entries shown = min(4, uw // 38)   (38px = min width of one entry)
+  weather_forecast_count: ${ ([4, [1, (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) // 38)] | max] | min) }
+  # Forecast icon = min(65% of one entry's width, 22% of uh), at least 16px
+  weather_forecast_icon_size: ${ ([16, [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 65 // (100 * ([4, [1, (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) // 38)] | max] | min))), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 22 // 100) ] | min] | max) }
+  # Today's icon = min(40% of uw, 38% of uh), always >= forecast icon + 8 (image ids are suffixed with the size)
+  weather_today_icon_size: ${ ([ [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 40 // 100), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 38 // 100) ] | min, (([16, [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 65 // (100 * ([4, [1, (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) // 38)] | max] | min))), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 22 // 100) ] | min] | max) + 8) ] | max) }
+  initial_today_icon_src: unknown_${weather_today_icon_size}
+  initial_forecast_icon_src: unknown_${weather_forecast_icon_size}
+  # Fonts
+  weather_today_temp_font: >-
+    ${ 'font_md' if ([screen_width|int, screen_height|int]|min) <= 135 else
+       ('font_lg' if ([screen_width|int, screen_height|int]|min) <= 240 else 'font_xl') }
+  weather_today_condition_font: ${ 'font_sm' if ([screen_width|int, screen_height|int]|min) <= 160 else 'font_md' }
+  weather_forecast_temp_font: ${ 'font_sm' if ([screen_width|int, screen_height|int]|min) <= 160 else 'font_md' }
+  weather_forecast_time_font: font_sm
+
+packages:
+  # Small icons for the forecast entries
+  weather_icons_forecast: !include
+    file: ../../weather/weather_icons.yaml
+    vars:
+      size: ${weather_forecast_icon_size}
+  weather_forecast: !include
+    file: ../../weather/weather_forecast.yaml
+    vars:
+      size: ${weather_forecast_icon_size}
+  # Big icons for today's weather
+  weather_icons_today: !include
+    file: ../../weather/weather_icons.yaml
+    vars:
+      size: ${weather_today_icon_size}
+  weather_today: !include
+    file: ../../weather/weather_today.yaml
+    vars:
+      size: ${weather_today_icon_size}
+
