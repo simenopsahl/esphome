@@ -1,0 +1,93 @@
+# Modular Remote Sensor Tile (Home Assistant Sensor)
+#
+# Pulls numeric state from a Home Assistant sensor entity and displays it on a grid dashboard page.
+#
+# Usage via packages:
+#   my_remote_sensor: !include
+#     file: gui/ui/sensor/remote.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: tile_outdoor_temp
+#       row: 1
+#       col: 1
+#       icon: "\U000F0595"
+#       title: "Ute"
+#       entity_id: sensor.outdoor_temperature
+#       unit: "°C"
+#       format: "%.1f"
+
+substitutions:
+  page_id: page_dashboard
+  col_span: "1"
+  row_span: "1"
+  unit: ""
+  format: "%.1f"
+  value_font: font_lg
+  icon_font: mdi_md
+  title_font: font_sm
+
+lvgl:
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      widgets:
+        - obj:
+            id: ${uid}_card
+            bg_color: c_bg_s
+            radius: 8
+            border_width: 1
+            border_color: c_bg_p
+            grid_cell_column_pos: ${col}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_span: ${col_span}
+            grid_cell_row_span: ${row_span}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            width: 100%
+            height: 100%
+            pad_all: 4
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: CENTER
+              flex_align_cross: CENTER
+              pad_row: 2
+            widgets:
+              - obj:
+                  pad_all: 0
+                  width: 100%
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: CENTER
+                    flex_align_cross: CENTER
+                    pad_column: 4
+                  widgets:
+                    - label:
+                        id: ${uid}_icon
+                        text: ${icon}
+                        text_font: ${icon_font}
+                        text_color: c_text_s
+                    - label:
+                        id: ${uid}_title
+                        text: ${title}
+                        text_font: ${title_font}
+                        text_color: c_text_s
+              - label:
+                  id: ${uid}_value
+                  text: "--"
+                  text_font: ${value_font}
+                  text_color: c_text_p
+                  align: CENTER
+
+sensor:
+  - platform: homeassistant
+    id: ${uid}_ha_sensor
+    entity_id: ${entity_id}
+    on_value:
+      - lvgl.label.update:
+          id: ${uid}_value
+          text:
+            format: "${format} ${unit}"
+            args: [ 'x' ]
+

@@ -1,13 +1,13 @@
 ---
 # Weather icons update
-# example -  !include { file: modules/lvgl/weather/weather_icons_update.yaml, vars: { size: 200, id: weather_condition_name, input_id: weather_condition  } }
+# example -  !include { file: gui/weather/weather_icons_update.yaml, vars: { suffix: "${suffix}", id: weather_condition_name, input_id: weather_condition  } }
           - if:
               condition:
                 lambda: 'return id(${input_id}).state == "clear-night";'
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'clear_night_${size}'
+                  src: 'clear_night_${suffix}'
 
           - if:
               condition:
@@ -15,7 +15,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'cloudy_${size}'
+                  src: 'cloudy_${suffix}'
 
           - if:
               condition:
@@ -23,7 +23,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'exceptional_${size}'
+                  src: 'exceptional_${suffix}'
 
           - if:
               condition:
@@ -31,7 +31,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'fog_${size}'
+                  src: 'fog_${suffix}'
 
           - if:
               condition:
@@ -39,7 +39,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'hail_${size}'
+                  src: 'hail_${suffix}'
 
           - if:
               condition:
@@ -47,7 +47,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'lightning_${size}'
+                  src: 'lightning_${suffix}'
 
           - if:
               condition:
@@ -55,7 +55,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'lightning_rainy_${size}'
+                  src: 'lightning_rainy_${suffix}'
 
           - if:
               condition:
@@ -63,7 +63,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'partlycloudy_${size}'
+                  src: 'partlycloudy_${suffix}'
 
           - if:
               condition:
@@ -71,7 +71,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'pouring_${size}'
+                  src: 'pouring_${suffix}'
 
           - if:
               condition:
@@ -79,7 +79,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'rainy_${size}'
+                  src: 'rainy_${suffix}'
 
           - if:
               condition:
@@ -87,7 +87,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'snowy_${size}'
+                  src: 'snowy_${suffix}'
 
           - if:
               condition:
@@ -95,7 +95,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'snowy_rainy_${size}'
+                  src: 'snowy_rainy_${suffix}'
 
           - if:
               condition:
@@ -103,7 +103,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'sunny_${size}'
+                  src: 'sunny_${suffix}'
 
           - if:
               condition:
@@ -111,7 +111,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'windy_${size}'
+                  src: 'windy_${suffix}'
 
           - if:
               condition:
@@ -119,7 +119,7 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'unknown_${size}'
+                  src: 'unknown_${suffix}'
 
           - if:
               condition:
@@ -127,4 +127,4 @@
               then:
                 lvgl.image.update:
                   id: ${id}
-                  src: 'unavailable_${size}'
+                  src: 'unavailable_${suffix}'

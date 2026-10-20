@@ -23,10 +23,10 @@ substitutions:
   weather_forecast_count: ${ ([4, [1, (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) // 38)] | max] | min) }
   # Forecast icon = min(65% of one entry's width, 22% of uh), at least 16px
   weather_forecast_icon_size: ${ ([16, [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 65 // (100 * ([4, [1, (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) // 38)] | max] | min))), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 22 // 100) ] | min] | max) }
-  # Today's icon = min(40% of uw, 38% of uh), always >= forecast icon + 8 (image ids are suffixed with the size)
-  weather_today_icon_size: ${ ([ [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 40 // 100), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 38 // 100) ] | min, (([16, [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 65 // (100 * ([4, [1, (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) // 38)] | max] | min))), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 22 // 100) ] | min] | max) + 8) ] | max) }
-  initial_today_icon_src: unknown_${weather_today_icon_size}
-  initial_forecast_icon_src: unknown_${weather_forecast_icon_size}
+  # Today's icon = min(40% of uw, 38% of uh), at least 24px (semantic suffixes prevent ID collisions)
+  weather_today_icon_size: ${ ([24, [ (((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)) * 40 // 100), (((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) * 38 // 100) ] | min] | max) }
+  initial_today_icon_src: unknown_today
+  initial_forecast_icon_src: unknown_forecast
   # Fonts
   weather_today_temp_font: >-
     ${ 'font_md' if ([screen_width|int, screen_height|int]|min) <= 135 else
@@ -41,17 +41,20 @@ packages:
     file: ../../weather/weather_icons.yaml
     vars:
       size: ${weather_forecast_icon_size}
+      suffix: forecast
   weather_forecast: !include
     file: ../../weather/weather_forecast.yaml
     vars:
       size: ${weather_forecast_icon_size}
+      suffix: forecast
   # Big icons for today's weather
   weather_icons_today: !include
     file: ../../weather/weather_icons.yaml
     vars:
       size: ${weather_today_icon_size}
+      suffix: today
   weather_today: !include
     file: ../../weather/weather_today.yaml
     vars:
       size: ${weather_today_icon_size}
-
+      suffix: today

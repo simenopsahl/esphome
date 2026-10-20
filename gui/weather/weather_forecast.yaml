@@ -1,13 +1,16 @@
 ---
 # Weather forcast from Home Assistant Accuweather plugin
 
+substitutions:
+  suffix: "${size}"
+
 text_sensor:
   - platform: homeassistant
     entity_id: sensor.waveshare_display_data
     attribute: weather_condition_0
     id: ha_condition_0
     on_value:
-      - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: forecast_condition_icon_0, input_id: ha_condition_0 }}
+      - then:  !include { file: weather_icons_update.yaml, vars: { suffix: "${suffix}", id: forecast_condition_icon_0, input_id: ha_condition_0 }}
 
   - platform: homeassistant
     entity_id: sensor.waveshare_display_data
@@ -27,7 +30,7 @@ text_sensor:
     attribute: weather_condition_1
     id: ha_condition_1
     on_value:
-      - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: forecast_condition_icon_1, input_id: ha_condition_1 }}
+      - then:  !include { file: weather_icons_update.yaml, vars: { suffix: "${suffix}", id: forecast_condition_icon_1, input_id: ha_condition_1 }}
 
   - platform: homeassistant
     entity_id: sensor.waveshare_display_data
@@ -47,7 +50,7 @@ text_sensor:
     attribute: weather_condition_2
     id: ha_condition_2
     on_value:
-      - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: forecast_condition_icon_2, input_id: ha_condition_2 }}
+      - then:  !include { file: weather_icons_update.yaml, vars: { suffix: "${suffix}", id: forecast_condition_icon_2, input_id: ha_condition_2 }}
 
   - platform: homeassistant
     entity_id: sensor.waveshare_display_data
@@ -67,7 +70,7 @@ text_sensor:
     attribute: weather_condition_3
     id: ha_condition_3
     on_value:
-      - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: forecast_condition_icon_3, input_id: ha_condition_3 }}
+      - then:  !include { file: weather_icons_update.yaml, vars: { suffix: "${suffix}", id: forecast_condition_icon_3, input_id: ha_condition_3 }}
 
   - platform: homeassistant
     entity_id: sensor.waveshare_display_data

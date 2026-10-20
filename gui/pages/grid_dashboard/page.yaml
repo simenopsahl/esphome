@@ -1,0 +1,26 @@
+# Reusable Responsive Grid Dashboard Page (2x2 Grid)
+#
+# Can be included in any device configuration under `lvgl: pages:`.
+# Tiles can be added directly under `widgets:` or modularly via `packages:`
+# using `lvgl: pages: - id: !extend <page_id>: widgets: [...]`.
+#
+# Variables:
+#   page_id:       Page ID (e.g. "page_dashboard")
+#   page_title:    Header title text (e.g. "Dashboard")
+#   page_icon:     Header icon glyph (e.g. "\U000F056E" - view-dashboard)
+
+id: ${page_id | default("page_dashboard")}
+styles: page_style
+scrollable: false
+layout:
+  type: GRID
+  grid_columns: [FR(1), FR(1)]
+  grid_rows: [FR(1), FR(1)]
+  pad_row: 4
+  pad_column: 4
+on_load:
+  - script.execute:
+      id: set_page_title
+      title: ${page_title | default("Dashboard")}
+      icon: ${page_icon | default("\U000F056E")}
+<<: !include ../../functions/swipe_navigation.yaml

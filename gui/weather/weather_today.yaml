@@ -1,12 +1,15 @@
 ---
 # Weather for today from Home Assistant Accuweather plugin
 
+substitutions:
+  suffix: "${size}"
+
 text_sensor:
   - platform: homeassistant
     entity_id: weather.local
     id: ha_weather_condition
     on_value:
-      - then:  !include { file: weather_icons_update.yaml, vars: { size: "${size}", id: weather_condition_icon, input_id: ha_weather_condition  } }
+      - then:  !include { file: weather_icons_update.yaml, vars: { suffix: "${suffix}", id: weather_condition_icon, input_id: ha_weather_condition } }
 
   - platform: homeassistant
     entity_id: weather.local

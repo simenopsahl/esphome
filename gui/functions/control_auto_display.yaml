@@ -44,7 +44,7 @@ script:
                       id: backlight_light
                       brightness: 50%
                       transition_length: 10s
-                  - logger.log: "Motion NOT detected. Display 50%"
+                  - logger.log: "Motion NOT detected. Display 50%%"
                   - if:
                       condition:
                         - binary_sensor.is_off: presence_detected
@@ -54,7 +54,7 @@ script:
                             id: backlight_light
                             brightness: 25%
                             transition_length: 10s
-                        - logger.log: "Motion NOT detected. Display 25%"
+                        - logger.log: "Motion NOT detected. Display 25%%"
                         - if:
                             condition:
                               and:
@@ -66,7 +66,7 @@ script:
                                   id: backlight_light
                                   brightness: 10%
                                   transition_length: 10s
-                              - logger.log: "Motion NOT detected. Display 10%"
+                              - logger.log: "Motion NOT detected. Display 10%%"
                               - if:
                                   condition:
                                     and:

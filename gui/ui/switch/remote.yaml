@@ -1,0 +1,88 @@
+# Modular Remote Switch Tile (Home Assistant Switch)
+#
+# Interactive touch tile that controls and reflects the state of a Home Assistant entity.
+#
+# Usage via packages:
+#   my_remote_switch: !include
+#     file: gui/ui/switch/remote.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: sw_plug
+#       row: 0
+#       col: 1
+#       icon: "\U000F0425"
+#       title: "Plugg"
+#       entity_id: switch.living_room_plug
+#       service: "switch.toggle" # optional, default switch.toggle
+
+substitutions:
+  page_id: page_dashboard
+  col_span: "1"
+  row_span: "1"
+  service: "switch.toggle"
+  icon_font: mdi_lg
+  title_font: font_sm
+
+lvgl:
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      widgets:
+        - button:
+            id: ${uid}_btn
+            checkable: true
+            grid_cell_column_pos: ${col}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_span: ${col_span}
+            grid_cell_row_span: ${row_span}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            width: 100%
+            height: 100%
+            pad_all: 4
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: CENTER
+              flex_align_cross: CENTER
+              pad_row: 2
+            on_click:
+              - homeassistant.service:
+                  service: ${service}
+                  data:
+                    entity_id: ${entity_id}
+            widgets:
+              - label:
+                  id: ${uid}_icon
+                  text: ${icon}
+                  text_font: ${icon_font}
+                  text_color: c_text_s
+                  align: CENTER
+              - label:
+                  id: ${uid}_label
+                  text: ${title}
+                  text_font: ${title_font}
+                  text_color: c_text_s
+                  text_align: CENTER
+                  align: CENTER
+
+binary_sensor:
+  - platform: homeassistant
+    id: ${uid}_state
+    entity_id: ${entity_id}
+    on_state:
+      - lvgl.widget.update:
+          id: ${uid}_btn
+          state:
+            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.label.update:
+                id: ${uid}_icon
+                text_color: c_yellow
+          else:
+            - lvgl.label.update:
+                id: ${uid}_icon
+                text_color: c_text_s
+
