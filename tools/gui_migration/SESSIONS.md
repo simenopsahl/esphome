@@ -20,6 +20,7 @@
 | **Session 5** | NordPool Graph Spike & Migration (Option B) | ✅ **Done** | 2026-10-19 | Migrated `nordpool` (`page.yaml`, `page_narrow.yaml`, `sensors.yaml`) to `1x3` `[CONTENT, FR(1), CONTENT]` grid layout + Option B runtime `lv_obj_get_content_width/height` measurement; removed `&nordpool_page_styles` from all 10 `gui/*.yaml` layouts. |
 | **Session 6** | Weather Page Migration (`page.yaml` & `sensors.yaml`) | ✅ **Done** | 2026-10-20 | Unified `page.yaml` & `page_narrow.yaml` into a single responsive `page.yaml` with dynamic `weather_forecast_count` (`min(4, max(1, usable_w // 38))`) and responsive icon/font sizing in `pages/weather/sensors.yaml`; removed `&weather_page_styles` from all 10 `gui/*.yaml` layouts. |
 | **Session 7** | Control Page, Unified `gui/main.yaml` & `gui/<W>x<H>.yaml` Stubs | ⏳ **Next Up** | — | Ready to start. |
+| **Session 8** | Widget Hierarchy Modernization (`obj` $\rightarrow$ `container` & Card Styling) | 📋 **Planned** | — | Migrate layout grouping `obj` to `container` (ESPHome 2025.11+); restyle `obj:` in `gui/themes/main.yaml` as styled cards/tiles. |
 
 ---
 
@@ -251,11 +252,51 @@ Migrate [`gui/pages/control/page.yaml`](file:///x:/esphome/gui/pages/control/pag
 - [ ] **7.2** Create [`gui/main.yaml`](file:///x:/esphome/gui/main.yaml) combining theme, fonts, chrome (`base` + conditional `header`/`footer`), overlays (`boot_screen`, `ota_screen`), and pages.
 - [ ] **7.3** Convert the 11 resolution files (`gui/128x128.yaml`, `gui/135x240.yaml`, `gui/172x320.yaml`, `gui/240r.yaml`, `gui/240x135.yaml`, `gui/240x320.yaml`, `gui/320x240.yaml`, `gui/320x480.yaml`, `gui/480x320.yaml`, `gui/720x1280.yaml`, `gui/1280x720.yaml`) into thin compatibility stubs that include `gui/main.yaml` with appropriate defaults (e.g. `chrome_footer: "false"` on `128x128`, `240x135`, `135x240`, `240r`), leaving `gui/5x5.yaml` untouched.
 - [ ] **7.4** Run `esphome config` across all physical root device YAMLs that include `gui/*.yaml` or `board/module/module_*.yaml` to verify zero regressions.
-- [ ] **7.5** Capture final multi-resolution screenshot matrix in `host-sdl` and complete the project handover report.
+- [ ] **7.5** Capture post-unification multi-resolution screenshot matrix in `host-sdl` (serving as baseline for Session 8) and record Session 7 completion report.
 
 ### Session 7 Completion Report
 
 - **Date**: _TBD_
 - **Summary of Changes**: _TBD_
 - **Devices Validated**: _TBD_
+- **Final Notes**: _TBD_
+
+---
+
+## Session 8 — Widget Hierarchy Modernization (`obj` $\rightarrow$ `container` & Card Styling)
+
+### Goal
+
+Migrate all invisible layout-grouping `obj` widgets across `gui/` to ESPHome 2025.11's `container` widget, verify 100% layout parity with `host-sdl`, and reconfigure `obj:` in [`gui/themes/main.yaml`](file:///x:/esphome/gui/themes/main.yaml) to serve as styled cards, panels, and touch surfaces matching the button design language.
+
+### Background & Rationale
+
+ESPHome 2025.11 introduced the native `container` widget. Unlike `obj`, `container` has:
+- **Zero default styling**: No default theme borders, backgrounds, or radii (`bg_opa: TRANSP`, `border_width: 0`, `pad_all: 0`).
+- **Default dimensions**: Defaults to `width: 100%`, `height: 100%`, eliminating repetitive boilerplate.
+- **Click-through by default**: ESPHome removes `LV_OBJ_FLAG_CLICKABLE` at construction, preventing transparent layout containers from inadvertently capturing touch gestures or click events meant for underlying elements.
+- **Role separation**: Historically, `obj:` in `gui/themes/main.yaml` was stripped down to transparent and borderless to act as an invisible flex/grid container. Migrating layouts to `container` frees `obj` to become a styled card/panel surface (mirroring button styling) as recommended in [`gui/LVGL_REFERENCE.md`](file:///x:/esphome/gui/LVGL_REFERENCE.md#L90-L95).
+
+### Tasks
+
+- [ ] **8.1** Replace layout-grouping `obj` with `container` across:
+  - Standard pages: [`gui/pages/clock/`](file:///x:/esphome/gui/pages/clock/), [`gui/pages/temperature/`](file:///x:/esphome/gui/pages/temperature/), [`gui/pages/status/`](file:///x:/esphome/gui/pages/status/), [`gui/pages/nordpool/`](file:///x:/esphome/gui/pages/nordpool/), [`gui/pages/weather/`](file:///x:/esphome/gui/pages/weather/), and [`gui/pages/control/`](file:///x:/esphome/gui/pages/control/).
+  - Module pages: [`gui/pages/air_quality/`](file:///x:/esphome/gui/pages/air_quality/), [`gui/pages/cc1101/`](file:///x:/esphome/gui/pages/cc1101/), [`gui/pages/dual_kmeter/`](file:///x:/esphome/gui/pages/dual_kmeter/).
+  - Chrome & Widgets: [`gui/widgets/header/widget.yaml`](file:///x:/esphome/gui/widgets/header/widget.yaml), [`gui/widgets/footer/widget.yaml`](file:///x:/esphome/gui/widgets/footer/widget.yaml), [`gui/widgets/boot_screen/widget.yaml`](file:///x:/esphome/gui/widgets/boot_screen/widget.yaml), [`gui/widgets/ota_screen/widget.yaml`](file:///x:/esphome/gui/widgets/ota_screen/widget.yaml), and templates in [`gui/ui/`](file:///x:/esphome/gui/ui/).
+  - *Cleanup*: Remove redundant `width: 100%`, `height: 100%`, `border_width: 0`, `pad_all: 0`, and `bg_opa: TRANSP` lines on pure grouping containers.
+  - *Exceptions*: Keep explicit `width: SIZE_CONTENT` / `height: SIZE_CONTENT` on containers that wrap child sizes (e.g. icon clusters in header/weather), and retain `clickable: true` or keep as `obj`/`button` if the element intercepts touch events.
+- [ ] **8.2** Visual regression verification with `host-sdl`:
+  - Run `./tools/gui_migration/capture_baseline.sh` and compare screenshots against Session 7. All screens must be 100% pixel-identical before proceeding to theme modifications.
+- [ ] **8.3** Restyle `obj:` in [`gui/themes/main.yaml`](file:///x:/esphome/gui/themes/main.yaml):
+  - Change `obj:` to represent styled cards/tiles (e.g., `bg_color: c_bg_s`, `border_width: 1`, `border_color: c_bg_p`, `radius: 10-20`, `text_color: c_text_p`).
+- [ ] **8.4** Final verification & project handover:
+  - Run `esphome config` across device YAMLs to confirm clean compilation.
+  - Capture final `host-sdl` screenshots and record completion report.
+  - Complete the final project handover report across all 8 migration sessions.
+
+### Session 8 Completion Report
+
+- **Date**: _TBD_
+- **Summary of Changes**: _TBD_
+- **Visual Parity Confirmed**: _TBD_
 - **Final Notes**: _TBD_

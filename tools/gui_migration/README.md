@@ -108,7 +108,7 @@ Five hardware module packages in [`board/module/`](file:///x:/esphome/board/modu
 
 ## 4. Multi-Session Roadmap Overview
 
-To avoid hitting 5-hour or weekly token limits, the migration is divided into **7 self-contained sessions**. Each session has a small, well-defined scope, verification commands, and visual screenshot checks.
+To avoid hitting 5-hour or weekly token limits, the migration is divided into **8 self-contained sessions**. Each session has a small, well-defined scope, verification commands, and visual screenshot checks.
 
 | Session | Title | Key Deliverables | Scope / Complexity |
 | :--- | :--- | :--- | :--- |
@@ -118,7 +118,8 @@ To avoid hitting 5-hour or weekly token limits, the migration is divided into **
 | **Session 4** | **Clock Page Migration** | Migrate `clock/page.yaml` and `clock/page_narrow.yaml` to `page_style` + `set_page_title` and dynamic meter sizing across resolutions. | Low–Medium |
 | **Session 5** | **NordPool Graph Spike & Migration** | Migrate `nordpool` to `1x3` `[CONTENT, FR(1), CONTENT]` grid; implement **Option B** (runtime `lv_obj_get_content_width/height`) AND prototype **Option A** (LVGL `chart` widget); capture comparison screenshots for review. | Medium–High (1 complex page + C++ lambda spike) |
 | **Session 6** | **Weather Page Migration** | Migrate `weather/page.yaml` and `weather/page_narrow.yaml` to responsive grid/flex without hardcoded row/column pixel heights; dynamic icon size selection; preserve HA entity IDs. | Medium (1 multi-section page) |
-| **Session 7** | **Control Page, Unified `gui/main.yaml` & Stubs** | Migrate `control/page.yaml`; create `gui/main.yaml`; convert all `gui/<W>x<H>.yaml` (except `5x5.yaml`) into thin compatibility stubs; validate all physical device YAMLs with `esphome config`. | Medium (Final cutover & repo-wide validation) |
+| **Session 7** | **Control Page, Unified `gui/main.yaml` & Stubs** | Migrate `control/page.yaml`; create `gui/main.yaml`; convert all `gui/<W>x<H>.yaml` (except `5x5.yaml`) into thin compatibility stubs; validate all physical device YAMLs with `esphome config`. | Medium (Unified cutover & repo-wide validation) |
+| **Session 8** | **Widget Hierarchy Modernization (`obj` $\rightarrow$ `container`)** | Migrate layout grouping `obj` widgets to unstyled `container` widgets (ESPHome 2025.11+); verify zero layout shift with `host-sdl`; reconfigure `obj:` in `gui/themes/main.yaml` as styled surfaces/cards matching button design language. | Low–Medium (Refactoring + Theme polish) |
 
 👉 **Open [`SESSIONS.md`](file:///x:/esphome/tools/gui_migration/SESSIONS.md) to view detailed tasks for each session and check what was completed in previous sessions.**
 
@@ -126,7 +127,7 @@ To avoid hitting 5-hour or weekly token limits, the migration is divided into **
 
 ## 5. Post-Migration Backlog (Future Phase)
 
-Once the core `gui/` migration is complete (Sessions 1–7), the following enhancements are planned next:
+Once the core `gui/` migration is complete (Sessions 1–8), the following enhancements are planned next:
 
 1. **Climate Page (`gui/pages/climate/` or modular climate widget/detail)**: Add a responsive LVGL climate control/status page aligned with `esphome-modular-lvgl-buttons`.
 2. **Monochrome B/W Theme (`gui/themes/colors_bw.yaml` + e-Ink styling)**: High-contrast black/white theme with zero gradients/shadows so e-Ink displays can migrate from C++ display lambdas to LVGL.

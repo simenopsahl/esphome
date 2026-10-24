@@ -2,6 +2,7 @@ labels: [esp32s3, BM8563, RTC, SCD40, CO2, temperature, humidity, SEN55, particu
 ---
 # https://docs.m5stack.com/en/core/Air_Quality
 # https://devices.esphome.io/devices/M5Stack-AirQ
+# https://github.com/Chill-Division/M5Stack-ESPHome/blob/main/Air%20Quality%20Kit%20v1.1%20with%20M5StampS3A%20(SEN55%2C%20SCD40).md
 # Base functions for:
 # M5Stack PM2.5 Air Quality
 #

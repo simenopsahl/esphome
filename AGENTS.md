@@ -95,4 +95,5 @@ Specialized multi-step procedures are located in `.agents/skills/`:
 - **`esphome-validate`**: Automated syntax validation and dry-run compilation.
 - **`esphome-new-device`**: Scaffold a new device configuration following repo conventions.
 - **`esphome-add-board`**: Guide for adding a new board or pinout mapping.
+- **`esphome-update`**: Guide for updating and synchronizing local ESPHome CLI with HA/build servers.
 
