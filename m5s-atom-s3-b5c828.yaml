@@ -19,17 +19,17 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors:
     !include {
-      file: gui/widgets/labels/number_sensor.yaml,
+      file: gui/functions/number_sensor.yaml,
       vars: { uid: room_temp_value, entity_id: sensor.etg2_bod_tc_heatindex },
     }
   fridge_temperature_widget_sensors:
     !include {
-      file: gui/widgets/labels/number_sensor.yaml,
+      file: gui/functions/number_sensor.yaml,
       vars: { uid: fridge_temp_value, entity_id: sensor.etg2_bod_kjoleskap_temp_temperature },
     }
   freezer_temperature_widget_sensors:
     !include {
-      file: gui/widgets/labels/number_sensor.yaml,
+      file: gui/functions/number_sensor.yaml,
       vars: { uid: freezer_temp_value, entity_id: sensor.etg2_bod_fryser_temp_temperature },
     }
 
