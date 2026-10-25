@@ -4,6 +4,7 @@ Modular LVGL configs for different screen sizes
 Top-level files are resolution-specific entry points (e.g. 240x135, 480x320)  
 Images might be out of date
 
+Documentation: [ARCHITECTURE.md](ARCHITECTURE.md) · [LVGL_REFERENCE.md](LVGL_REFERENCE.md)  
 Subdirectories: [pages](pages) · [tiles](tiles) · [common](common) · [themes](themes) · [styles](styles) · [fonts](fonts) · [functions](functions) · [img](img)
 
 <details>

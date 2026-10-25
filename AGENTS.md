@@ -11,7 +11,7 @@ This document serves as the canonical guide for AI coding assistants operating w
 Instead of monolithic single-file configurations, devices are composed dynamically using ESPHome's `packages` and `substitutions` features:
 
 ```text
-Root Device YAML (e.g., m5s-fire-a70780.yaml)
+Root Device YAML (e.g., m5s-fire-a70780.yaml, jc4880p443.yaml)
   ├── common/           (Shared base: Wi-Fi, OTA, API, time, logger, fallback restart)
   ├── bluetooth/        (BLE tracker & Home Assistant Bluetooth Proxy)
   ├── board/            (Platform, framework, clock, flash, display, onboard peripherals)
@@ -19,7 +19,15 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml)
   ├── board/extension/  (Headers, HATs, Grove buses, MBUS breakout units)
   ├── board/module/     (Sensors, e-Paper controllers, environment monitors)
   ├── features/         (Cross-device logic: NordPool alerts, combined sensor templates)
-  └── gui/              (Resolution-specific LVGL configurations, themes, pages, widgets)
+  └── gui/              (Responsive LVGL UI engine — see gui/ARCHITECTURE.md)
+        ├── main.yaml   (Unified responsive entry point; <W>x<H>.yaml stubs set dimensions)
+        ├── common/     (Top-layer chrome/header/footer, boot_screen, ota_screen)
+        ├── fonts/      (Responsive 5-tier font sizing in main.yaml + MDI glyphs.yaml)
+        ├── functions/  (Auto-display, HA nav, swipe nav, number/text label helpers)
+        ├── pages/      (Full-screen pages: clock, temperature, nordpool, weather, status, climate, grid_dashboard, modules)
+        ├── styles/     (Shared LVGL style_definitions: page_styles.yaml, container_styles.yaml)
+        ├── themes/     (Widget theme defaults in main.yaml + color palettes colors_*.yaml)
+        └── tiles/      (Modular grid_dashboard tiles: climate, light, switch, button, sensor, binary_sensor, text_sensor)
 ```
 
 ### Key Composition Rules
@@ -47,7 +55,7 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml)
 | **[`bluetooth/`](file:///x:/esphome/bluetooth)** | Bluetooth functionality. | BLE tracker & BLE proxy packages (`bluetooth_proxy.yaml`, `esp32_ble_tracker.yaml`). |
 | **[`common/`](file:///x:/esphome/common)** | Universal base packages. | Wi-Fi, OTA, Home Assistant API, logger, fallback reboot, status sensors. Included via `<<: !include_dir_named common`. |
 | **[`features/`](file:///x:/esphome/features)** | Cross-device feature bundles. | Combined virtual sensors (`combined_env_sensors.yaml`), NordPool power indicators, IR commands. |
-| **[`gui/`](file:///x:/esphome/gui)** | Modular LVGL UI system. | Organized by screen resolution (e.g. `240x320.yaml`). Subdirectories: `pages/`, `widgets/`, `themes/`, `styles/`, `fonts/`. |
+| **[`gui/`](file:///x:/esphome/gui)** | Modular responsive LVGL UI system. | Entry point [`gui/main.yaml`](file:///x:/esphome/gui/main.yaml) (and `<W>x<H>.yaml` stubs). Subdirectories: `common/`, `fonts/`, `functions/`, `pages/`, `styles/`, `themes/`, `tiles/`. Detailed guide: [`gui/ARCHITECTURE.md`](file:///x:/esphome/gui/ARCHITECTURE.md) & [`gui/LVGL_REFERENCE.md`](file:///x:/esphome/gui/LVGL_REFERENCE.md). |
 | **[`pinmap/`](file:///x:/esphome/pinmap)** | Reference pinout sheets. | Human and agent documentation for hardware connectors. |
 
 ---
