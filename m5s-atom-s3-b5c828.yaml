@@ -164,7 +164,7 @@ lvgl:
       <<: !include
         file: gui/functions/swipe_navigation.yaml
       widgets:
-        - obj:
+        - container:
             styles: container_style
             align: CENTER
             layout:
@@ -176,9 +176,7 @@ lvgl:
               pad_column: 0
               pad_row: 0
             widgets:
-              - obj:
-                  pad_all: 0
-                  width: 100%
+              - container:
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
@@ -189,8 +187,7 @@ lvgl:
                     pad_row: 0
                   widgets:
                     # Fridge temperature
-                    - obj:
-                        pad_all: 0
+                    - container:
                         width: SIZE_CONTENT
                         height: SIZE_CONTENT
                         layout:
@@ -225,8 +222,7 @@ lvgl:
                         text_color: c_text_p
                         text_align: CENTER
                     # Freezer temperature
-                    - obj:
-                        pad_all: 0
+                    - container:
                         width: SIZE_CONTENT
                         height: SIZE_CONTENT
                         layout:
@@ -253,9 +249,7 @@ lvgl:
                               text_font: font_sm
                               text_color: c_text_p
 
-              - obj:
-                  pad_all: 0
-                  width: 100%
+              - container:
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
