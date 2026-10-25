@@ -10,7 +10,7 @@ packages:
   lvgl: !include gui/800x480.yaml
   
   # --- LVGL PAGE & WIDGET PACKAGES ---
-  climate_tile: !include
+  tile_climate: !include
     file: gui/ui/climate/remote.yaml
     vars:
       uid: heatpump
@@ -21,8 +21,32 @@ packages:
       entity_id: climate.faircon_norgespumpa12_proxy
       title: "Varmepumpe"
       icon: "\U000F1A43"
+  tile_outdoor_temp_sensor: !include
+    file: gui/ui/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_outdoor_temp
+      row: 1
+      col: 0
+      icon: "\U000F0595"
+      title: "Ute"
+      entity_id: sensor.ute_temperature
+      unit: "°C" # Note: escape literal '%' as '%%' (e.g. unit: "%%")
+      format: "%.1f"
+  tile_t22_temp_sensor: !include
+    file: gui/ui/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_t22_temp
+      row: 1
+      col: 1
+      icon: "\U000F050F"
+      title: "T22"
+      entity_id: sensor.t22_temperature
+      unit: "°C" # Note: escape literal '%' as '%%' (e.g. unit: "%%")
+      format: "%.1f"
       
-  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+  room_temp_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
