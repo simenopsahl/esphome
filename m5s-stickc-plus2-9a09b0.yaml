@@ -76,7 +76,7 @@ lvgl:
       <<: !include
         file: gui/functions/swipe_navigation.yaml
       widgets:
-        - obj:
+        - container:
             styles: container_style
             align: CENTER
             layout:
@@ -88,9 +88,7 @@ lvgl:
               pad_column: 0
               pad_row: 0
             widgets:
-              - obj:
-                  pad_all: 0
-                  width: 100%
+              - container:
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
@@ -116,9 +114,7 @@ lvgl:
                         text: "°C"
                         text_font: font_lg
                         text_color: c_text_s
-              - obj:
-                  pad_all: 0
-                  width: 100%
+              - container:
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
@@ -144,9 +140,7 @@ lvgl:
                         text: "°C"
                         text_font: font_lg
                         text_color: c_text_s
-              - obj:
-                  pad_all: 0
-                  width: 100%
+              - container:
                   height: SIZE_CONTENT
                   layout:
                     type: FLEX
