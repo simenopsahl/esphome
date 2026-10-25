@@ -11,7 +11,7 @@ packages:
   
   # --- LVGL PAGE & WIDGET PACKAGES ---
   tile_climate: !include
-    file: gui/ui/climate/remote.yaml
+    file: gui/widgets/tiles/climate/remote.yaml
     vars:
       uid: heatpump
       row: 0
@@ -22,7 +22,7 @@ packages:
       title: "Varmepumpe"
       icon: "\U000F1A43"
   tile_outdoor_temp_sensor: !include
-    file: gui/ui/sensor/remote.yaml
+    file: gui/widgets/tiles/sensor/remote.yaml
     vars:
       page_id: page_dashboard
       uid: tile_outdoor_temp
@@ -34,7 +34,7 @@ packages:
       unit: "°C" # Note: escape literal '%' as '%%' (e.g. unit: "%%")
       format: "%.1f"
   tile_t22_temp_sensor: !include
-    file: gui/ui/sensor/remote.yaml
+    file: gui/widgets/tiles/sensor/remote.yaml
     vars:
       page_id: page_dashboard
       uid: tile_t22_temp
