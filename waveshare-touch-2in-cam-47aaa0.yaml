@@ -10,7 +10,7 @@ packages:
   lvgl: !include gui/320x240.yaml
 
   # --- LVGL WIDGET PACKAGES ---
-  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
