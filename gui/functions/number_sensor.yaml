@@ -1,0 +1,21 @@
+# Update an arbitrary LVGL label to display the value of a Home Assistant numeric sensor.
+#
+# Required vars:
+# - entity_id   # The Home Assistant sensor entity ID whose value will be displayed
+#
+# Optional vars:
+# - uid         # Unique identifier prefix (default: "room_temp_value")
+# - label_id    # Target LVGL label ID (default: "<uid>_widget_text")
+# - format      # printf format string (default: "%.0f")
+
+sensor:
+  - id: ${uid | default("room_temp_value")}_homeassistant
+    platform: homeassistant
+    entity_id: ${entity_id}
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: ${label_id | default((uid | default("room_temp_value")) ~ "_widget_text")}
+              text:
+                format: "${format | default('%.0f')}"
+                args: [ 'x' ]

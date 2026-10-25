@@ -1,16 +1,12 @@
-# Responsive sizing + icon sets for the LVGL weather page.
+# Responsive sizing, icon sets, and Home Assistant sensors for the LVGL weather page.
 #
 # Everything is derived from `screen_width` / `screen_height` and the chrome /
-# container padding substitutions (see gui/chrome/base.yaml), so no per-layout
-# `&weather_page_styles` anchor is needed.
+# container padding substitutions (see gui/chrome/base.yaml).
 #
 # Forecast entries: the page contains 4 forecast items. The number actually
 # shown (`weather_forecast_count`) is the number that fit in the usable width
 # at `weather_forecast_item_min_w` px each (max 4). Hidden items keep their ids
-# so the Home Assistant sensors in gui/weather/weather_forecast.yaml still work.
-#
-# Entity IDs in gui/weather/weather_today.yaml and gui/weather/weather_forecast.yaml
-# are intentionally hardcoded.
+# so the Home Assistant sensors below still work.
 
 substitutions:
   # NOTE: each value below is written out in full (no references to other
@@ -38,23 +34,172 @@ substitutions:
 packages:
   # Small icons for the forecast entries
   weather_icons_forecast: !include
-    file: ../../weather/weather_icons.yaml
-    vars:
-      size: ${weather_forecast_icon_size}
-      suffix: forecast
-  weather_forecast: !include
-    file: ../../weather/weather_forecast.yaml
+    file: icons.yaml
     vars:
       size: ${weather_forecast_icon_size}
       suffix: forecast
   # Big icons for today's weather
   weather_icons_today: !include
-    file: ../../weather/weather_icons.yaml
+    file: icons.yaml
     vars:
       size: ${weather_today_icon_size}
       suffix: today
-  weather_today: !include
-    file: ../../weather/weather_today.yaml
-    vars:
-      size: ${weather_today_icon_size}
-      suffix: today
+
+text_sensor:
+  # --- Today's Weather ---
+  - platform: homeassistant
+    entity_id: weather.local
+    id: ha_weather_condition
+    on_value:
+      - then: !include { file: icons_update.yaml, vars: { suffix: today, id: weather_condition_icon, input_id: ha_weather_condition } }
+
+  - platform: homeassistant
+    entity_id: weather.local
+    attribute: temperature
+    id: ha_weather_temperature
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: weather_temperature_today
+              text:
+                format: "%s°C"
+                args: [ 'id(ha_weather_temperature).state.c_str()' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_now_string
+    id: ha_condition_today
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: weather_condition_today
+              text:
+                format: "%s"
+                args: [ 'id(ha_condition_today).state.c_str()' ]
+
+  # --- Forecast Conditions & Timestamps (0..3) ---
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_0
+    id: ha_condition_0
+    on_value:
+      - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_0, input_id: ha_condition_0 } }
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_0
+    id: ha_weather_timestamp_0
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_timestamp_0
+              text:
+                format: "%s"
+                args: [ 'id(ha_weather_timestamp_0).state.c_str()' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_1
+    id: ha_condition_1
+    on_value:
+      - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_1, input_id: ha_condition_1 } }
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_1
+    id: ha_weather_timestamp_1
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_timestamp_1
+              text:
+                format: "%s"
+                args: [ 'id(ha_weather_timestamp_1).state.c_str()' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_2
+    id: ha_condition_2
+    on_value:
+      - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_2, input_id: ha_condition_2 } }
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_2
+    id: ha_weather_timestamp_2
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_timestamp_2
+              text:
+                format: "%s"
+                args: [ 'id(ha_weather_timestamp_2).state.c_str()' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_3
+    id: ha_condition_3
+    on_value:
+      - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_3, input_id: ha_condition_3 } }
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_3
+    id: ha_weather_timestamp_3
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_timestamp_3
+              text:
+                format: "%s"
+                args: [ 'id(ha_weather_timestamp_3).state.c_str()' ]
+
+sensor:
+  # --- Forecast Temperatures (0..3) ---
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_0
+    id: ha_weather_temperature_0
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_temperature_0
+              text:
+                format: "%.0f°C"
+                args: [ 'x' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_1
+    id: ha_weather_temperature_1
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_temperature_1
+              text:
+                format: "%.0f°C"
+                args: [ 'x' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_2
+    id: ha_weather_temperature_2
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_temperature_2
+              text:
+                format: "%.0f°C"
+                args: [ 'x' ]
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_3
+    id: ha_weather_temperature_3
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: forecast_temperature_3
+              text:
+                format: "%.0f°C"
+                args: [ 'x' ]

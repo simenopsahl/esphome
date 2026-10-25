@@ -1,0 +1,174 @@
+# Responsive font size definitions and LVGL font declarations derived from
+# `${screen_width}` and `${screen_height}`.
+#
+# Uses 5 size tiers matched to the repository's physical display families so that:
+# - Header/footer status & navigation icons (`mdi_lg`, `mdi_md`, `font_md`) always fit within `chrome_h`
+# - Page typography (`font_sm` .. `font_fl`) matches existing screen layouts across:
+#     Tier 1 (Tiny / Narrow):  min(W,H) <= 160 (e.g. 128x128, 135x240)
+#     Tier 2 (Compact Square): max(W,H) <= 240 (e.g. 200x200, 240x240, 240r)
+#     Tier 3 (Standard):       max(W,H) <= 320 (e.g. 320x240, 240x320)
+#     Tier 4 (Medium-Large):   max(W,H) <= 480 (e.g. 320x480, 480x320)
+#     Tier 5 (Large HD):       max(W,H) >  480 (e.g. 480x800, 800x480, 720x1280)
+#
+# Any individual size can be overridden in a device YAML via `substitutions:`.
+
+substitutions:
+  text_sm: >-
+    ${ 12 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (16 if ([screen_width|int, screen_height|int]|max) <= 480 else 26)) }
+  text_md: >-
+    ${ 14 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (16 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 30))) }
+  text_lg: >-
+    ${ 18 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (22 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 480 else 34)) }
+  text_xl: >-
+    ${ 24 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (22 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (32 if ([screen_width|int, screen_height|int]|max) <= 480 else 48))) }
+  text_xxl: >-
+    ${ 32 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 64))) }
+  text_hg: >-
+    ${ 42 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (36 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (56 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (90 if ([screen_width|int, screen_height|int]|max) <= 480 else 120))) }
+  text_fl: >-
+    ${ 54 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (88 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (112 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (150 if ([screen_width|int, screen_height|int]|max) <= 480 else 200))) }
+
+  icons_sm: >-
+    ${ 16 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (18 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 26)))) }
+  icons_md: >-
+    ${ 18 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (20 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 480 else 32))) }
+  icons_lg: >-
+    ${ 22 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (24 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (28 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (34 if ([screen_width|int, screen_height|int]|max) <= 480 else 40)))) }
+  icons_xl: >-
+    ${ 28 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (30 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (38 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (42 if ([screen_width|int, screen_height|int]|max) <= 480 else 48)))) }
+  icons_xxl: >-
+    ${ 36 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (38 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (42 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (50 if ([screen_width|int, screen_height|int]|max) <= 480 else 56)))) }
+
+font:
+  - id: font_sm
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_sm}
+    bpp: 4
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', '!', '#', '$', '&', '(', ')',
+      '*', '+', '=', '<', '>', '[', ']', '\', '|', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+
+  - id: font_md
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_md}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_lg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_lg}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_xl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_xl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_xxl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_xxl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_hg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    size: ${text_hg}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: font_fl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    size: ${text_fl}
+    bpp: 4
+    glyphs: *norwegian-glyphs
+
+  - id: mdi_sm
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_sm}
+    bpp: 4
+    glyphs: !include glyphs.yaml
+
+  - id: mdi_md
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_md}
+    bpp: 4
+    glyphs: !include glyphs.yaml
+
+  - id: mdi_lg
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_lg}
+    bpp: 4
+    glyphs: !include glyphs.yaml
+
+  - id: mdi_xl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_xl}
+    bpp: 4
+    glyphs: !include glyphs.yaml
+
+  - id: mdi_xxl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_xxl}
+    bpp: 4
+    glyphs: !include glyphs.yaml
+

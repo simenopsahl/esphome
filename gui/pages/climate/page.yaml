@@ -1,0 +1,597 @@
+# LVGL Climate / Thermostat page (responsive across standard and large displays)
+#
+# Inspired by agillis/esphome-modular-lvgl-buttons/ui/climate/detail.yaml,
+# adapted to the repository's responsive sizing system, container/obj hierarchy,
+# and Norwegian UI labels.
+#
+# Optional vars when included under `lvgl: pages:`:
+#   page_title: "Klima" (default)
+#   page_icon:  "\U000F1A43" (default: heat-pump; use "\U000F0438" for radiator)
+#   back_page_id: "page_dashboard" (optional: page shown by top-right back button)
+#   show_back_btn: "false" (default: "false", set "true" when linked from a dashboard tile)
+
+    id: page_climate
+    styles: page_style
+    on_load:
+      - script.execute:
+          id: set_page_title
+          title: ${page_title | default("Klima")}
+          icon: ${page_icon | default("\U000F1A43")}
+    <<: !include
+      file: ../../functions/swipe_navigation.yaml
+    widgets:
+      - container:
+          styles: container_style
+          align: CENTER
+          widgets:
+            # ── MAIN CONTENT GROUP (hidden while a modal dropdown is open) ──
+            - container:
+                id: climate_content
+                align: CENTER
+                widgets:
+                  # 1. Target Setpoint Arc (values in 0.1°C, e.g. 215 = 21.5°C)
+                  - arc:
+                      id: climate_arc
+                      align: CENTER
+                      width: ${climate_arc_size}
+                      height: ${climate_arc_size}
+                      adjustable: true
+                      clickable: false
+                      mode: NORMAL
+                      value: 210
+                      min_value: 100
+                      max_value: 300
+                      arc_width: ${climate_arc_width}
+                      arc_color: c_bg_s
+                      indicator:
+                        arc_color: c_bg_s
+                        arc_width: ${climate_arc_width}
+                      knob:
+                        bg_color: c_white
+                        bg_opa: TRANSP
+                      on_value:
+                        then:
+                          - lambda: |-
+                              if (id(climate_programmatic_update)) return;
+                              int step = (int) roundf(id(climate_temp_step) * 10.0f);
+                              if (step < 1) step = 5;
+                              int snapped = ((x + step / 2) / step) * step;
+                              float new_temp = snapped / 10.0f;
+                              if (std::abs(id(climate_target_temp) - new_temp) >= 0.04f) {
+                                id(climate_target_temp) = new_temp;
+                                char buf[16];
+                                snprintf(buf, sizeof(buf), "%.1f°", id(climate_target_temp));
+                                lv_label_set_text(id(climate_target_label), buf);
+                                id(climate_arc_send_temp).execute();
+                              }
+
+                  # 2. Action / Mode Status Label (top inside arc)
+                  - label:
+                      id: climate_mode_label
+                      align: CENTER
+                      y: ${climate_mode_label_y}
+                      text_font: ${climate_mode_font}
+                      text: "AV"
+                      text_color: c_gray
+
+                  # 3. Target Temperature Label (center of arc)
+                  - label:
+                      id: climate_target_label
+                      align: CENTER
+                      y: ${climate_target_label_y}
+                      text_font: ${climate_target_font}
+                      text: "AV"
+                      text_color: c_text_p
+
+                  # 4. Current Room Temperature Label (bottom inside arc)
+                  - label:
+                      id: climate_current_label
+                      align: CENTER
+                      y: ${climate_current_label_y}
+                      text_font: ${climate_current_font}
+                      text: "--.-°C"
+                      text_color: c_text_s
+
+                  # 5. Top-Left Corner Button — Swing Mode (shown at runtime if supported)
+                  - button:
+                      id: climate_swing_corner_btn
+                      hidden: true
+                      align: TOP_LEFT
+                      x: 2
+                      y: 2
+                      width: ${climate_corner_btn_size}
+                      height: ${climate_corner_btn_size}
+                      radius: ${climate_corner_btn_radius}
+                      bg_color: c_bg_s
+                      bg_opa: 60%
+                      border_width: 1
+                      border_color: c_bg_p
+                      shadow_width: 0
+                      widgets:
+                        - label:
+                            id: climate_swing_corner_icon
+                            align: CENTER
+                            text_font: ${climate_corner_icon_font}
+                            text_color: c_gray
+                            text: "\U000F1C91" # arrow-oscillating
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_content
+                          - lvgl.widget.show: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_swing_dropdown
+
+                  # 6. Top-Right Corner Button — Back to Dashboard (optional)
+                  - button:
+                      id: climate_back_corner_btn
+                      hidden: ${ "false" if (show_back_btn | default("false") == "true") else "true" }
+                      align: TOP_RIGHT
+                      x: -2
+                      y: 2
+                      width: ${climate_corner_btn_size}
+                      height: ${climate_corner_btn_size}
+                      radius: ${climate_corner_btn_radius}
+                      bg_color: c_bg_s
+                      bg_opa: 60%
+                      border_width: 1
+                      border_color: c_bg_p
+                      shadow_width: 0
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text_font: ${climate_corner_icon_font}
+                            text_color: c_blue
+                            text: "\U000F0141" # chevron-left
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_fan_dropdown
+                          - lvgl.widget.hide: climate_swing_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - lvgl.page.show:
+                              id: ${back_page_id | default(display.home_page)}
+                              animation: OUT_RIGHT
+                              time: 200ms
+
+                  # 7. Bottom-Left Corner Button — HVAC Mode
+                  - button:
+                      id: climate_mode_corner_btn
+                      align: BOTTOM_LEFT
+                      x: 2
+                      y: -2
+                      width: ${climate_corner_btn_size}
+                      height: ${climate_corner_btn_size}
+                      radius: ${climate_corner_btn_radius}
+                      bg_color: c_bg_s
+                      bg_opa: 60%
+                      border_width: 1
+                      border_color: c_bg_p
+                      shadow_width: 0
+                      widgets:
+                        - label:
+                            id: climate_mode_corner_icon
+                            align: CENTER
+                            text_font: ${climate_corner_icon_font}
+                            text_color: c_gray
+                            text: "\U000F0425" # power
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_content
+                          - lvgl.widget.show: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_mode_dropdown
+
+                  # 8. Bottom-Right Corner Button — Fan Speed (shown at runtime if supported)
+                  - button:
+                      id: climate_fan_corner_btn
+                      hidden: true
+                      align: BOTTOM_RIGHT
+                      x: -2
+                      y: -2
+                      width: ${climate_corner_btn_size}
+                      height: ${climate_corner_btn_size}
+                      radius: ${climate_corner_btn_radius}
+                      bg_color: c_bg_s
+                      bg_opa: 60%
+                      border_width: 1
+                      border_color: c_bg_p
+                      shadow_width: 0
+                      widgets:
+                        - label:
+                            id: climate_fan_corner_icon
+                            align: CENTER
+                            text_font: ${climate_corner_icon_font}
+                            text_color: c_blue
+                            text: "\U000F0210" # fan
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_content
+                          - lvgl.widget.show: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_fan_dropdown
+
+            # ── DISMISS OVERLAY (closes open modal popup when tapped outside) ──
+            - container:
+                id: climate_dismiss_overlay
+                hidden: true
+                x: 0
+                y: 0
+                bg_color: c_black
+                bg_opa: 70%
+                clickable: true
+                on_click:
+                  then:
+                    - lvgl.widget.hide: climate_mode_dropdown
+                    - lvgl.widget.hide: climate_fan_dropdown
+                    - lvgl.widget.hide: climate_swing_dropdown
+                    - lvgl.widget.hide: climate_dismiss_overlay
+                    - lvgl.widget.show: climate_content
+
+            # ── HVAC MODE MODAL POPUP ─────────────────────────────────────────
+            - obj:
+                id: climate_mode_dropdown
+                hidden: true
+                align: CENTER
+                width: ${climate_dropdown_width}
+                height: 92%
+                radius: 16
+                pad_all: 6
+                layout:
+                  type: FLEX
+                  flex_flow: COLUMN
+                  flex_align_main: SPACE_EVENLY
+                  flex_align_cross: CENTER
+                  pad_row: 4
+                widgets:
+                  - button:
+                      id: climate_btn_mode_off
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "AV"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_gray
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_mode_off
+                  - button:
+                      id: climate_btn_mode_heat
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "VARME"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_red
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_mode_heat
+                  - button:
+                      id: climate_btn_mode_cool
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "KJØLE"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_blue
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_mode_cool
+                  - button:
+                      id: climate_btn_mode_auto
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "AUTO"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_green
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_mode_auto
+                  - button:
+                      id: climate_btn_mode_fan_only
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "VIFTE"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_pink
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_mode_fan_only
+                  - button:
+                      id: climate_btn_mode_dry
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "TØRKE"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_yellow
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_mode_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_mode_dry
+
+            # ── FAN MODE MODAL POPUP ──────────────────────────────────────────
+            - obj:
+                id: climate_fan_dropdown
+                hidden: true
+                align: CENTER
+                width: ${climate_dropdown_width}
+                height: 92%
+                radius: 16
+                pad_all: 6
+                layout:
+                  type: FLEX
+                  flex_flow: COLUMN
+                  flex_align_main: SPACE_EVENLY
+                  flex_align_cross: CENTER
+                  pad_row: 4
+                widgets:
+                  - button:
+                      id: climate_btn_fan_auto
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "AUTO"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_blue
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_fan_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_fan_auto
+                  - button:
+                      id: climate_btn_fan_quiet
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "STILLE"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_pink
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_fan_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_fan_quiet
+                  - button:
+                      id: climate_btn_fan_low
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "LAV"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_green
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_fan_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_fan_low
+                  - button:
+                      id: climate_btn_fan_medium
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "MIDDELS"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_yellow
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_fan_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_fan_medium
+                  - button:
+                      id: climate_btn_fan_high
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "HØY"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_red
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_fan_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_fan_high
+
+            # ── SWING MODE MODAL POPUP ────────────────────────────────────────
+            - obj:
+                id: climate_swing_dropdown
+                hidden: true
+                align: CENTER
+                width: ${climate_dropdown_width}
+                height: 92%
+                radius: 16
+                pad_all: 6
+                layout:
+                  type: FLEX
+                  flex_flow: COLUMN
+                  flex_align_main: SPACE_EVENLY
+                  flex_align_cross: CENTER
+                  pad_row: 4
+                widgets:
+                  - button:
+                      id: climate_btn_swing_off
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "AV"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_gray
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_swing_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_swing_off
+                  - button:
+                      id: climate_btn_swing_on
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "PÅ"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_green
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_swing_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_swing_on
+                  - button:
+                      id: climate_btn_swing_both
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "BEGGE"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_blue
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_swing_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_swing_both
+                  - button:
+                      id: climate_btn_swing_vertical
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "VERTIKAL"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_green
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_swing_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_swing_vertical
+                  - button:
+                      id: climate_btn_swing_horizontal
+                      hidden: true
+                      width: 100%
+                      flex_grow: 1
+                      bg_color: c_bg_p
+                      radius: 10
+                      pad_all: 2
+                      widgets:
+                        - label:
+                            align: CENTER
+                            text: "HORISONTAL"
+                            text_font: ${climate_dropdown_font}
+                            text_color: c_yellow
+                      on_click:
+                        then:
+                          - lvgl.widget.hide: climate_swing_dropdown
+                          - lvgl.widget.hide: climate_dismiss_overlay
+                          - lvgl.widget.show: climate_content
+                          - script.execute: climate_set_swing_horizontal
+

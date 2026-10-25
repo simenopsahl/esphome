@@ -1,23 +1,28 @@
-# Reusable Responsive Grid Dashboard Page (2x2 Grid)
+# Reusable Responsive Grid Dashboard Page
 #
 # Can be included in any device configuration under `lvgl: pages:`.
 # Tiles can be added directly under `widgets:` or modularly via `packages:`
 # using `lvgl: pages: - id: !extend <page_id>: widgets: [...]`.
 #
 # Variables:
-#   page_id:       Page ID (e.g. "page_dashboard")
-#   page_title:    Header title text (e.g. "Dashboard")
-#   page_icon:     Header icon glyph (e.g. "\U000F056E" - view-dashboard)
+#   page_id:       Page ID (default: "page_dashboard")
+#   page_title:    Header title text (default: "Dashboard")
+#   page_icon:     Header icon glyph (default: "\U000F056E" - view-dashboard)
+#   layout:        Grid shorthand "<rows>x<cols>" (default: "2x2", e.g. "3x2", "4x2")
+#   rows:          Explicit row count override (optional, parsed from `layout` by default)
+#   cols:          Explicit column count override (optional, parsed from `layout` by default)
+#   pad_row:       Row gap in pixels (default: 4)
+#   pad_column:    Column gap in pixels (default: 4)
 
 id: ${page_id | default("page_dashboard")}
 styles: page_style
 scrollable: false
 layout:
   type: GRID
-  grid_columns: [FR(1), FR(1)]
-  grid_rows: [FR(1), FR(1)]
-  pad_row: 4
-  pad_column: 4
+  grid_rows: ${ ["FR(1)"] * ((rows | default((layout | default("2x2")).split("x")[0])) | int) }
+  grid_columns: ${ ["FR(1)"] * ((cols | default((layout | default("2x2")).split("x")[1])) | int) }
+  pad_row: ${pad_row | default(4)}
+  pad_column: ${pad_column | default(4)}
 on_load:
   - script.execute:
       id: set_page_title

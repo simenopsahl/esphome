@@ -23,6 +23,7 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml)
 ```
 
 ### Key Composition Rules
+
 1. **Never redefine components; use `!extend`**:
    - Shared components declared in `common/`, `board/`, or `features/` (like `temperature_local`, `btn_a`, `presence_detected`) should be extended in device YAMLs using `- id: !extend <id>`.
 2. **Keep Shared Packages Generic**:
@@ -53,10 +54,13 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml)
 
 ## 3. Verification & CLI Workflows
 
-The local environment has the ESPHome CLI installed:
+Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI installed:
+
+- **Use the Windows 11 ESPHome installation for configuration validation (`esphome config`)**: Because the workspace resides on a Windows/SMB path (`X:\esphome`), running `esphome config` directly in Windows PowerShell avoids WSL2 cross-filesystem (`drvfs`/9P) I/O overhead and is significantly faster.
+- **Use the WSL ESPHome installation only for `host-sdl` virtual display builds and screenshot verification**: The `host` platform with SDL2 requires Linux (`pwsh tools/host_sdl/host-sdl.ps1 ...`).
 
 ```powershell
-# 1. Validate YAML syntax and substitution resolution (fast):
+# 1. Validate YAML syntax and substitution resolution (run on Windows 11 PowerShell):
 esphome config <device-config.yaml>
 
 # 2. Dry-run compile without flashing (checks C++ code generation and library dependencies):
@@ -64,10 +68,15 @@ esphome compile <device-config.yaml>
 
 # 3. Clean platformio build cache for a device (if build artifacts become stale):
 esphome clean <device-config.yaml>
+
+# 4. Build, run, or screenshot the virtual host-sdl LVGL display (uses WSL):
+pwsh tools/host_sdl/host-sdl.ps1 config 240x320
+pwsh tools/host_sdl/host-sdl.ps1 run 240x320
+pwsh tools/host_sdl/host-sdl.ps1 screenshot
 ```
 
 > [!IMPORTANT]
-> Always run `esphome config <target>.yaml` after creating or editing a configuration to verify that all packages, includes, substitutions, and IDs resolve correctly.
+> Always run `esphome config <target>.yaml` on Windows 11 after creating or editing a configuration to verify that all packages, includes, substitutions, and IDs resolve correctly. When batch-validating multiple devices, validate at most 8 devices per command invocation to avoid command timeouts.
 
 ---
 
@@ -92,8 +101,8 @@ esphome clean <device-config.yaml>
 ## 5. Agent Skills Available
 
 Specialized multi-step procedures are located in `.agents/skills/`:
+
 - **`esphome-validate`**: Automated syntax validation and dry-run compilation.
 - **`esphome-new-device`**: Scaffold a new device configuration following repo conventions.
 - **`esphome-add-board`**: Guide for adding a new board or pinout mapping.
 - **`esphome-update`**: Guide for updating and synchronizing local ESPHome CLI with HA/build servers.
-

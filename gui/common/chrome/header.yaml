@@ -1,0 +1,90 @@
+# Top status & title bar overlay package (`titlebar` on `lvgl: top_layer`).
+#
+# Requires `gui/chrome/base.yaml` to be included.
+# Extends `set_page_title` so each page's `on_load` automatically updates
+# `lbl_page_title` with either the MDI icon (on narrow displays where
+# `chrome_use_icon_title == "true"`) or the text title.
+
+api:
+  on_client_connected:
+    - lvgl.widget.show: lbl_ha_status
+  on_client_disconnected:
+    - lvgl.widget.hide: lbl_ha_status
+
+wifi:
+  on_connect:
+    - lvgl.widget.show: lbl_wifi_status
+  on_disconnect:
+    - lvgl.widget.hide: lbl_wifi_status
+
+script:
+  - id: !extend set_page_title
+    then:
+      - lvgl.label.update:
+          id: lbl_page_title
+          text: !lambda |-
+            if (std::string("${chrome_use_icon_title}") == "true" && !icon.empty()) {
+              return icon;
+            }
+            return title;
+
+lvgl:
+  top_layer:
+    widgets:
+      - container:
+          id: titlebar
+          height: ${chrome_h}
+          bg_color: c_black
+          bg_opa: COVER
+          align: TOP_MID
+          layout:
+            type: FLEX
+            flex_flow: ROW
+            flex_align_main: SPACE_BETWEEN
+            flex_align_cross: CENTER
+            pad_column: 1
+          widgets:
+            # Left side: Wi-Fi icon + page title
+            - container:
+                height: SIZE_CONTENT
+                width: SIZE_CONTENT
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: START
+                  flex_align_cross: CENTER
+                  pad_column: 1
+                overflow_visible: true
+                widgets:
+                  - label:
+                      id: lbl_wifi_status
+                      text: "\U000F05A9" # wifi
+                      text_font: mdi_lg
+                      text_color: c_green
+                  - label:
+                      id: lbl_page_title
+                      pad_left: ${chrome_pad}
+                      text_font: ${chrome_title_font}
+                      text: " "
+
+            # Right side: clock + Home Assistant status icon
+            - container:
+                height: SIZE_CONTENT
+                width: SIZE_CONTENT
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: END
+                  flex_align_cross: CENTER
+                  pad_column: 1
+                overflow_visible: true
+                widgets:
+                  - label:
+                      id: nav_clock
+                      pad_right: ${chrome_pad}
+                      text: " "
+                  - label:
+                      id: lbl_ha_status
+                      text: "\U000F07D0" # home-assistant
+                      text_font: mdi_lg
+                      text_color: c_ha_icon

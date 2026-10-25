@@ -1,0 +1,20 @@
+# Bind the standard LVGL temperature page (`page_temperature`) to a Home Assistant sensor.
+#
+# Required vars:
+# - entity_id   # Home Assistant sensor entity ID (e.g. "sensor.stue_temperature")
+#
+# Optional vars:
+# - uid         # Sensor ID prefix (default: "room_temp_value")
+# - format      # printf format string (default: "%.0f")
+
+sensor:
+  - id: ${uid | default("room_temp_value")}_homeassistant
+    platform: homeassistant
+    entity_id: ${entity_id}
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: room_temp_value_widget_text
+              text:
+                format: "${format | default('%.0f')}"
+                args: [ 'x' ]

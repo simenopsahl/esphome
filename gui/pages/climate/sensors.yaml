@@ -1,0 +1,751 @@
+# LVGL Climate page responsive sizing, state globals, UI sync script, and
+# Home Assistant climate entity bindings.
+#
+# Usage via packages (standalone full-screen climate page):
+#   climate_screen_sensors: !include
+#     file: gui/pages/climate/sensors.yaml
+#     vars:
+#       entity_id: climate.faircon_norgespumpa12_proxy
+#
+# Also included automatically by `gui/ui/climate/remote.yaml` (or `base_only`
+# part by `gui/ui/climate/local.yaml`).
+
+substitutions:
+  # Default HA climate entity (override via `vars: { entity_id: ... }` or device substitutions)
+  entity_id: climate.faircon_norgespumpa12_proxy
+
+  # Responsive arc diameter (94% of usable content height/width between header & footer)
+  climate_arc_size: >-
+    ${ (([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+           ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 94 // 100) }
+
+  # Arc stroke width scales with display size (14px on 240/320px displays, 20px on 480px, 28px on 800px)
+  climate_arc_width: >-
+    ${ 12 if ([screen_width|int, screen_height|int]|min) <= 200 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 28)) }
+
+  # Corner action button size and radius
+  climate_corner_btn_size: >-
+    ${ 34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 60)) }
+  climate_corner_btn_radius: >-
+    ${ (34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 60))) // 2 }
+  climate_corner_icon_font: >-
+    ${ 'mdi_md' if ([screen_width|int, screen_height|int]|max) <= 320 else 'mdi_lg' }
+
+  # Vertical label offsets inside the arc (proportional to arc diameter)
+  climate_mode_label_y: >-
+    ${ -(([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+            ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 23 // 100) }
+  climate_target_label_y: >-
+    ${ -(([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+            ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 3 // 100) }
+  climate_current_label_y: >-
+    ${ (([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+           ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 20 // 100) }
+
+  # Fonts for arc labels and modal dropdown buttons
+  climate_mode_font: font_sm
+  climate_target_font: >-
+    ${ 'font_xxl' if ([screen_width|int, screen_height|int]|max) <= 320 else 'font_hg' }
+  climate_current_font: >-
+    ${ 'font_md' if ([screen_width|int, screen_height|int]|max) <= 320 else 'font_lg' }
+  climate_dropdown_width: >-
+    ${ 150 if (screen_width|int) <= 240 else
+       (170 if (screen_width|int) <= 320 else
+       (210 if (screen_width|int) <= 480 else 260)) }
+  climate_dropdown_font: >-
+    ${ 'font_sm' if ([screen_width|int, screen_height|int]|max) <= 320 else 'font_md' }
+
+# ── Shared Climate State Globals ──────────────────────────────────────────────
+#   climate_mode:       0=off, 1=heat, 2=cool, 3=auto/heat_cool, 4=fan_only, 5=dry
+#   climate_action:     0=idle/off, 1=heating, 2=cooling, 3=fan, 4=drying
+#   climate_fan_mode:   0=auto, 1=low, 2=medium, 3=high, 4=quiet
+#   climate_swing_mode: 0=off, 1=both, 2=vertical, 3=horizontal, 4=on
+globals:
+  - id: climate_target_temp
+    type: float
+    initial_value: '21.0'
+  - id: climate_target_temp_low
+    type: float
+    initial_value: '18.0'
+  - id: climate_target_temp_high
+    type: float
+    initial_value: '24.0'
+  - id: climate_current_temp
+    type: float
+    initial_value: '0.0'
+  - id: climate_temp_step
+    type: float
+    initial_value: '0.5'
+  - id: climate_mode
+    type: int
+    initial_value: '0'
+  - id: climate_action
+    type: int
+    initial_value: '0'
+  - id: climate_fan_mode
+    type: int
+    initial_value: '0'
+  - id: climate_swing_mode
+    type: int
+    initial_value: '0'
+  - id: climate_dual_setpoint
+    type: bool
+    initial_value: 'false'
+  - id: climate_programmatic_update
+    type: bool
+    initial_value: 'false'
+  - id: climate_uses_auto_mode
+    type: bool
+    initial_value: 'true'
+
+# ── Home Assistant State & Attribute Sensors ──────────────────────────────────
+text_sensor:
+  # 1. Main state (hvac_mode: off / heat / cool / auto / heat_cool / fan_only / dry)
+  - platform: homeassistant
+    id: climate_ha_mode
+    entity_id: ${entity_id}
+    internal: true
+    on_value:
+      - lambda: |-
+          if      (x == "heat")                      id(climate_mode) = 1;
+          else if (x == "cool")                      id(climate_mode) = 2;
+          else if (x == "auto" || x == "heat_cool")  id(climate_mode) = 3;
+          else if (x == "fan_only")                  id(climate_mode) = 4;
+          else if (x == "dry")                       id(climate_mode) = 5;
+          else                                       id(climate_mode) = 0;
+      - script.execute: climate_sync_state
+
+  # 2. hvac_action attribute (heating / cooling / idle / off / fan / drying)
+  - platform: homeassistant
+    id: climate_ha_action
+    entity_id: ${entity_id}
+    attribute: hvac_action
+    internal: true
+    on_value:
+      - lambda: |-
+          if      (x == "heating") id(climate_action) = 1;
+          else if (x == "cooling") id(climate_action) = 2;
+          else if (x == "fan")     id(climate_action) = 3;
+          else if (x == "drying")  id(climate_action) = 4;
+          else                     id(climate_action) = 0;
+      - script.execute: climate_sync_state
+
+  # 3. Target temperature (single setpoint)
+  - platform: homeassistant
+    id: climate_ha_target_temp
+    entity_id: ${entity_id}
+    attribute: temperature
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null" && !id(climate_arc_send_temp)->is_running();
+          then:
+            - lambda: id(climate_target_temp) = atof(x.c_str());
+            - script.execute: climate_sync_state
+
+  # 4. Dual setpoint low/high (if used by an entity in heat_cool mode)
+  - platform: homeassistant
+    id: climate_ha_target_temp_low
+    entity_id: ${entity_id}
+    attribute: target_temp_low
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null";
+          then:
+            - lambda: |-
+                id(climate_dual_setpoint) = true;
+                id(climate_target_temp_low) = atof(x.c_str());
+                if (id(climate_mode) == 1 && !id(climate_arc_send_temp)->is_running())
+                  id(climate_target_temp) = id(climate_target_temp_low);
+            - script.execute: climate_sync_state
+
+  - platform: homeassistant
+    id: climate_ha_target_temp_high
+    entity_id: ${entity_id}
+    attribute: target_temp_high
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null";
+          then:
+            - lambda: |-
+                id(climate_dual_setpoint) = true;
+                id(climate_target_temp_high) = atof(x.c_str());
+                if (id(climate_mode) == 2 && !id(climate_arc_send_temp)->is_running())
+                  id(climate_target_temp) = id(climate_target_temp_high);
+            - script.execute: climate_sync_state
+
+  # 5. Current measured temperature
+  - platform: homeassistant
+    id: climate_ha_current_temp
+    entity_id: ${entity_id}
+    attribute: current_temperature
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null";
+          then:
+            - lambda: id(climate_current_temp) = atof(x.c_str());
+            - script.execute: climate_sync_state
+
+  # 6. Target temperature step (e.g. 0.5 or 1.0)
+  - platform: homeassistant
+    id: climate_ha_temp_step
+    entity_id: ${entity_id}
+    attribute: target_temp_step
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null";
+          then:
+            - lambda: |-
+                float step = atof(x.c_str());
+                if (step >= 0.1f) id(climate_temp_step) = step;
+
+  # 7. Min / Max temperature bounds for the arc
+  - platform: homeassistant
+    id: climate_ha_min_temp
+    entity_id: ${entity_id}
+    attribute: min_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null";
+          then:
+            - lambda: id(climate_programmatic_update) = true;
+            - lvgl.arc.update:
+                id: climate_arc
+                min_value: !lambda return (int) roundf(atof(x.c_str()) * 10.0f);
+            - lambda: id(climate_programmatic_update) = false;
+            - script.execute: climate_sync_state
+
+  - platform: homeassistant
+    id: climate_ha_max_temp
+    entity_id: ${entity_id}
+    attribute: max_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: return !x.empty() && x != "None" && x != "null";
+          then:
+            - lambda: id(climate_programmatic_update) = true;
+            - lvgl.arc.update:
+                id: climate_arc
+                max_value: !lambda return (int) roundf(atof(x.c_str()) * 10.0f);
+            - lambda: id(climate_programmatic_update) = false;
+            - script.execute: climate_sync_state
+
+  # 8. Fan mode (auto / quiet / low / medium / high)
+  - platform: homeassistant
+    id: climate_ha_fan_mode
+    entity_id: ${entity_id}
+    attribute: fan_mode
+    internal: true
+    on_value:
+      - lambda: |-
+          if      (x == "auto")                 id(climate_fan_mode) = 0;
+          else if (x == "low")                  id(climate_fan_mode) = 1;
+          else if (x == "medium" || x == "mid") id(climate_fan_mode) = 2;
+          else if (x == "high")                 id(climate_fan_mode) = 3;
+          else if (x == "quiet")                id(climate_fan_mode) = 4;
+      - script.execute: climate_sync_state
+
+  # 9. Swing mode (off / on / both / vertical / horizontal)
+  - platform: homeassistant
+    id: climate_ha_swing_mode
+    entity_id: ${entity_id}
+    attribute: swing_mode
+    internal: true
+    on_value:
+      - lambda: |-
+          if      (x == "off")        id(climate_swing_mode) = 0;
+          else if (x == "both")       id(climate_swing_mode) = 1;
+          else if (x == "vertical")   id(climate_swing_mode) = 2;
+          else if (x == "horizontal") id(climate_swing_mode) = 3;
+          else if (x == "on")         id(climate_swing_mode) = 4;
+      - script.execute: climate_sync_state
+
+  # 10. Supported hvac_modes — auto-show/hide mode buttons at runtime
+  - platform: homeassistant
+    id: climate_ha_hvac_modes
+    entity_id: ${entity_id}
+    attribute: hvac_modes
+    internal: true
+    on_value:
+      - lambda: |-
+          auto show_hide = [](lv_obj_t* obj, bool hide) {
+            if (hide) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+            else      lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
+          };
+          bool has_auto      = x.find("auto") != std::string::npos;
+          bool has_heat_cool = x.find("heat_cool") != std::string::npos;
+          id(climate_uses_auto_mode) = has_auto || !has_heat_cool;
+          show_hide(id(climate_btn_mode_heat),     x.find("heat") == std::string::npos);
+          show_hide(id(climate_btn_mode_cool),     x.find("cool") == std::string::npos);
+          show_hide(id(climate_btn_mode_auto),     !has_auto && !has_heat_cool);
+          show_hide(id(climate_btn_mode_fan_only), x.find("fan_only") == std::string::npos);
+          show_hide(id(climate_btn_mode_dry),      x.find("dry") == std::string::npos);
+
+  # 11. Supported fan_modes — auto-show/hide fan corner button & options
+  - platform: homeassistant
+    id: climate_ha_fan_modes
+    entity_id: ${entity_id}
+    attribute: fan_modes
+    internal: true
+    on_value:
+      - lambda: |-
+          auto show_hide = [](lv_obj_t* obj, bool hide) {
+            if (hide) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+            else      lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
+          };
+          bool has_fan = !x.empty() && x != "None" && x != "null" && x != "[]";
+          show_hide(id(climate_fan_corner_btn), !has_fan);
+          if (has_fan) {
+            show_hide(id(climate_btn_fan_auto),   x.find("auto") == std::string::npos);
+            show_hide(id(climate_btn_fan_quiet),  x.find("quiet") == std::string::npos);
+            show_hide(id(climate_btn_fan_low),    x.find("low") == std::string::npos);
+            show_hide(id(climate_btn_fan_medium), x.find("medium") == std::string::npos &&
+                                                  x.find("mid") == std::string::npos);
+            show_hide(id(climate_btn_fan_high),   x.find("high") == std::string::npos);
+          }
+
+  # 12. Supported swing_modes — auto-show/hide swing corner button & options
+  - platform: homeassistant
+    id: climate_ha_swing_modes
+    entity_id: ${entity_id}
+    attribute: swing_modes
+    internal: true
+    on_value:
+      - lambda: |-
+          auto show_hide = [](lv_obj_t* obj, bool hide) {
+            if (hide) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+            else      lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
+          };
+          bool has_swing = !x.empty() && x != "None" && x != "null" && x != "[]";
+          show_hide(id(climate_swing_corner_btn), !has_swing);
+          if (has_swing) {
+            show_hide(id(climate_btn_swing_off),        x.find("off") == std::string::npos);
+            show_hide(id(climate_btn_swing_on),         x.find("'on'") == std::string::npos &&
+                                                        x.find("\"on\"") == std::string::npos &&
+                                                        x.find("on") == std::string::npos);
+            show_hide(id(climate_btn_swing_both),       x.find("both") == std::string::npos);
+            show_hide(id(climate_btn_swing_vertical),   x.find("vertical") == std::string::npos);
+            show_hide(id(climate_btn_swing_horizontal), x.find("horizontal") == std::string::npos);
+          }
+
+# ── Scripts: Debounce, UI State Sync, and HA Service Calls ────────────────────
+script:
+  # Debounces arc dragging so HA is only called 500ms after the user stops dragging
+  - id: climate_arc_send_temp
+    mode: restart
+    then:
+      - delay: 500ms
+      - script.execute: climate_set_target_temp
+
+  # Hook extended by `gui/ui/climate/*.yaml` if a dashboard shortcut tile is present
+  - id: climate_tile_sync
+    then:
+      - lambda: 'return;'
+
+  # Synchronizes all climate globals to the LVGL widgets on `page_climate`
+  - id: climate_sync_state
+    then:
+      - lambda: id(climate_programmatic_update) = true;
+      # 1. Current room temperature label
+      - lvgl.label.update:
+          id: climate_current_label
+          text: !lambda |-
+            if (id(climate_current_temp) == 0.0f) return std::string("--.-°C");
+            char buf[16];
+            snprintf(buf, sizeof(buf), "Nå: %.1f°C", id(climate_current_temp));
+            return std::string(buf);
+
+      # 2. Update optional dashboard tile
+      - script.execute: climate_tile_sync
+
+      # 3. Mode-specific arc, knob, target label, and mode icon/status updates
+      # --- MODE 1: HEAT (VARME) ---
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 1;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                value: !lambda return (int) roundf(id(climate_target_temp) * 10.0f);
+                indicator:
+                  arc_color: c_red
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: true
+                knob:
+                  bg_opa: COVER
+                  bg_color: c_white
+            - lvgl.widget.show: climate_target_label
+            - lvgl.label.update:
+                id: climate_target_label
+                text: !lambda |-
+                  char buf[16];
+                  snprintf(buf, sizeof(buf), "%.1f°", id(climate_target_temp));
+                  return std::string(buf);
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F0238" # fire
+                text_color: c_red
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: !lambda |-
+                  return id(climate_action) == 1 ? std::string("VARMER") : std::string("VENTEMODUS");
+                text_color: !lambda |-
+                  return id(climate_action) == 1 ? id(c_red) : id(c_gray);
+
+      # --- MODE 2: COOL (KJØLE) ---
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 2;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                value: !lambda return (int) roundf(id(climate_target_temp) * 10.0f);
+                indicator:
+                  arc_color: c_blue
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: true
+                knob:
+                  bg_opa: COVER
+                  bg_color: c_white
+            - lvgl.widget.show: climate_target_label
+            - lvgl.label.update:
+                id: climate_target_label
+                text: !lambda |-
+                  char buf[16];
+                  snprintf(buf, sizeof(buf), "%.1f°", id(climate_target_temp));
+                  return std::string(buf);
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F0717" # snowflake
+                text_color: c_blue
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: !lambda |-
+                  return id(climate_action) == 2 ? std::string("KJØLER") : std::string("VENTEMODUS");
+                text_color: !lambda |-
+                  return id(climate_action) == 2 ? id(c_blue) : id(c_gray);
+
+      # --- MODE 3: AUTO / HEAT_COOL ---
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 3;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                value: !lambda return (int) roundf(id(climate_target_temp) * 10.0f);
+                indicator:
+                  arc_color: c_green
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: !lambda return !id(climate_dual_setpoint);
+                knob:
+                  bg_opa: !lambda |-
+                    return id(climate_dual_setpoint) ? LV_OPA_TRANSP : LV_OPA_COVER;
+                  bg_color: c_white
+            - lvgl.widget.show: climate_target_label
+            - lvgl.label.update:
+                id: climate_target_label
+                text: !lambda |-
+                  char buf[20];
+                  if (id(climate_dual_setpoint)) {
+                    snprintf(buf, sizeof(buf), "%.0f°-%.0f°", id(climate_target_temp_low), id(climate_target_temp_high));
+                  } else {
+                    snprintf(buf, sizeof(buf), "%.1f°", id(climate_target_temp));
+                  }
+                  return std::string(buf);
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F1352" # hvac
+                text_color: c_green
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: !lambda |-
+                  if (id(climate_action) == 1) return std::string("AUTO (VARMER)");
+                  if (id(climate_action) == 2) return std::string("AUTO (KJØLER)");
+                  return std::string("AUTO");
+                text_color: !lambda |-
+                  if (id(climate_action) == 1) return id(c_red);
+                  if (id(climate_action) == 2) return id(c_blue);
+                  return id(c_green);
+
+      # --- MODE 4: FAN_ONLY (VIFTE) ---
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 4;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                indicator:
+                  arc_color: c_pink
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: false
+                knob:
+                  bg_opa: TRANSP
+            - lvgl.widget.show: climate_target_label
+            - lvgl.label.update:
+                id: climate_target_label
+                text: "VIFTE"
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F0210" # fan
+                text_color: c_pink
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: "VENTILERER"
+                text_color: c_pink
+
+      # --- MODE 5: DRY (TØRKE) ---
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 5;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                indicator:
+                  arc_color: c_yellow
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: false
+                knob:
+                  bg_opa: TRANSP
+            - lvgl.widget.show: climate_target_label
+            - lvgl.label.update:
+                id: climate_target_label
+                text: "TØRKE"
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F058E" # water-percent
+                text_color: c_yellow
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: "TØRKER"
+                text_color: c_yellow
+
+      # --- MODE 0: OFF (AV) ---
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 0;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                indicator:
+                  arc_color: c_bg_s
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: false
+                knob:
+                  bg_opa: TRANSP
+            - lvgl.widget.show: climate_target_label
+            - lvgl.label.update:
+                id: climate_target_label
+                text: "AV"
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: "AVSLÅTT"
+                text_color: c_gray
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F0425" # power
+                text_color: c_gray
+
+      # 4. Fan corner icon color feedback
+      - lvgl.label.update:
+          id: climate_fan_corner_icon
+          text_color: !lambda |-
+            switch (id(climate_fan_mode)) {
+              case 0: return id(c_blue);   // auto
+              case 1: return id(c_green);  // low
+              case 2: return id(c_yellow); // medium
+              case 3: return id(c_red);    // high
+              case 4: return id(c_pink);   // quiet
+              default: return id(c_gray);
+            }
+
+      # 5. Swing corner icon color feedback
+      - lvgl.label.update:
+          id: climate_swing_corner_icon
+          text_color: !lambda |-
+            return id(climate_swing_mode) == 0 ? id(c_gray) : id(c_green);
+      - lambda: id(climate_programmatic_update) = false;
+
+  # ── HA Service Action Scripts ───────────────────────────────────────────────
+  - id: climate_set_mode_off
+    then:
+      - homeassistant.action:
+          action: climate.set_hvac_mode
+          data:
+            entity_id: ${entity_id}
+            hvac_mode: "off"
+
+  - id: climate_set_mode_heat
+    then:
+      - homeassistant.action:
+          action: climate.set_hvac_mode
+          data:
+            entity_id: ${entity_id}
+            hvac_mode: "heat"
+
+  - id: climate_set_mode_cool
+    then:
+      - homeassistant.action:
+          action: climate.set_hvac_mode
+          data:
+            entity_id: ${entity_id}
+            hvac_mode: "cool"
+
+  - id: climate_set_mode_auto
+    then:
+      - homeassistant.action:
+          action: climate.set_hvac_mode
+          data:
+            entity_id: ${entity_id}
+            hvac_mode: !lambda |-
+              return id(climate_uses_auto_mode) ? "auto" : "heat_cool";
+
+  - id: climate_set_mode_fan_only
+    then:
+      - homeassistant.action:
+          action: climate.set_hvac_mode
+          data:
+            entity_id: ${entity_id}
+            hvac_mode: "fan_only"
+
+  - id: climate_set_mode_dry
+    then:
+      - homeassistant.action:
+          action: climate.set_hvac_mode
+          data:
+            entity_id: ${entity_id}
+            hvac_mode: "dry"
+
+  - id: climate_set_target_temp
+    then:
+      - if:
+          condition:
+            lambda: return id(climate_dual_setpoint) && id(climate_mode) == 1;
+          then:
+            - homeassistant.action:
+                action: climate.set_temperature
+                data:
+                  entity_id: ${entity_id}
+                  target_temp_low: !lambda return id(climate_target_temp);
+      - if:
+          condition:
+            lambda: return id(climate_dual_setpoint) && id(climate_mode) == 2;
+          then:
+            - homeassistant.action:
+                action: climate.set_temperature
+                data:
+                  entity_id: ${entity_id}
+                  target_temp_high: !lambda return id(climate_target_temp);
+      - if:
+          condition:
+            lambda: return !id(climate_dual_setpoint);
+          then:
+            - homeassistant.action:
+                action: climate.set_temperature
+                data:
+                  entity_id: ${entity_id}
+                  temperature: !lambda return id(climate_target_temp);
+
+  - id: climate_set_fan_auto
+    then:
+      - homeassistant.action:
+          action: climate.set_fan_mode
+          data:
+            entity_id: ${entity_id}
+            fan_mode: "auto"
+
+  - id: climate_set_fan_quiet
+    then:
+      - homeassistant.action:
+          action: climate.set_fan_mode
+          data:
+            entity_id: ${entity_id}
+            fan_mode: "quiet"
+
+  - id: climate_set_fan_low
+    then:
+      - homeassistant.action:
+          action: climate.set_fan_mode
+          data:
+            entity_id: ${entity_id}
+            fan_mode: "low"
+
+  - id: climate_set_fan_medium
+    then:
+      - homeassistant.action:
+          action: climate.set_fan_mode
+          data:
+            entity_id: ${entity_id}
+            fan_mode: "medium"
+
+  - id: climate_set_fan_high
+    then:
+      - homeassistant.action:
+          action: climate.set_fan_mode
+          data:
+            entity_id: ${entity_id}
+            fan_mode: "high"
+
+  - id: climate_set_swing_off
+    then:
+      - homeassistant.action:
+          action: climate.set_swing_mode
+          data:
+            entity_id: ${entity_id}
+            swing_mode: "off"
+
+  - id: climate_set_swing_on
+    then:
+      - homeassistant.action:
+          action: climate.set_swing_mode
+          data:
+            entity_id: ${entity_id}
+            swing_mode: "on"
+
+  - id: climate_set_swing_both
+    then:
+      - homeassistant.action:
+          action: climate.set_swing_mode
+          data:
+            entity_id: ${entity_id}
+            swing_mode: "both"
+
+  - id: climate_set_swing_vertical
+    then:
+      - homeassistant.action:
+          action: climate.set_swing_mode
+          data:
+            entity_id: ${entity_id}
+            swing_mode: "vertical"
+
+  - id: climate_set_swing_horizontal
+    then:
+      - homeassistant.action:
+          action: climate.set_swing_mode
+          data:
+            entity_id: ${entity_id}
+            swing_mode: "horizontal"

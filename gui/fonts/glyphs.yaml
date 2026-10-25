@@ -52,6 +52,15 @@
 - "\U000F010B" # car
 - "\U000F08CA" # bus-clock
 - "\U000F0F92" # water-boiler
+# climate
+- "\U000F1A43" # heat-pump
+- "\U000F1352" # hvac
+- "\U000F0438" # radiator
+- "\U000F0210" # fan
+- "\U000F1C91" # arrow-oscillating
+- "\U000F0238" # fire
+- "\U000F0717" # snowflake
+- "\U000F058E" # water-percent
 # weather
 - "\U000F0590" # weather-cloudy
 - "\U000F0F2F" # weather-cloudy-alert

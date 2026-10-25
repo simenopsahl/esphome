@@ -13,7 +13,7 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
           align: CENTER
           layout:
@@ -24,14 +24,13 @@
             flex_align_track: CENTER
           widgets:
             # --- The Water Tank Graphic ---
-            # Wrapped in a transparent obj to isolate the layout engine
-            - obj:
+            # Wrapped in a transparent container to isolate the layout engine
+            - container:
                 width: 110
                 height: 166
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
-                # By being a standard rigid obj, the parent's FLEX ROW will center this perfectly.
+                # By being a standard rigid container, the parent's FLEX ROW will center this perfectly.
                 widgets:
                   # 1. The Bar Widget (Base Layer)
                   - bar:
@@ -95,10 +94,9 @@
                       y: -15
 
             # --- The Info Panel (Flanked) ---
-            - obj:
+            - container:
                 width: SIZE_CONTENT
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -112,11 +110,9 @@
                       text: "Mix"
                       text_font: font_xxl
                       text_color: c_text_s
-                  - obj:
+                  - container:
                       width: SIZE_CONTENT
                       height: SIZE_CONTENT
-                      bg_opa: TRANSP
-                      border_width: 0
                       layout:
                         type: FLEX
                         flex_flow: ROW

@@ -1,0 +1,23 @@
+# Update an arbitrary LVGL label to display the state (or attribute) of a Home Assistant text sensor.
+#
+# Required vars:
+# - uid         # Unique identifier prefix
+# - entity_id   # The Home Assistant entity ID whose state/attribute will be displayed
+#
+# Optional vars:
+# - label_id    # Target LVGL label ID (default: "<uid>_widget_text")
+# - attribute   # Optional Home Assistant attribute name (default: state)
+# - format      # printf format string (default: "%s")
+
+text_sensor:
+  - id: ${uid}_homeassistant
+    platform: homeassistant
+    entity_id: ${entity_id}
+    attribute: ${attribute | default("")}
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: ${label_id | default(uid ~ "_widget_text")}
+              text:
+                format: "${format | default('%s')}"
+                args: [ 'x.c_str()' ]

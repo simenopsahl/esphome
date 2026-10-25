@@ -13,7 +13,7 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
           align: CENTER
           layout:
@@ -26,11 +26,9 @@
             pad_column: 0
           widgets:
             # --- Row 1: Frequency ---
-            - obj:
+            - container:
                 # This is a container for a single row
-                width: 100%
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -64,10 +62,8 @@
                       text_color: c_text_s
 
             # --- Row 2: Modulation & Tx Power ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -78,10 +74,9 @@
                   pad_row: 0
                   pad_column: 0
                 widgets:
-                  - obj:
+                  - container:
                       width: 65%
                       height: SIZE_CONTENT
-                      pad_all: 0
                       pad_left: 0
                       pad_right: 10
                       layout:
@@ -94,23 +89,22 @@
                       widgets:
                         # Descriptor Label
                         - label:
-                            id: lbl_modulation_l
-                            text: "Protokoll: "
-                            pad_left: ${container_pad_left}
-                            pad_right: ${container_pad_right}
-                            text_font: font_sm
-                            text_color: c_text_s
+                             id: lbl_modulation_l
+                             text: "Protokoll: "
+                             pad_left: ${container_pad_left}
+                             pad_right: ${container_pad_right}
+                             text_font: font_sm
+                             text_color: c_text_s
                         # Value Label
                         - label:
-                            id: lbl_modulation_value
-                            text: "?"
-                            pad_right: ${container_pad_right}
-                            text_font: font_md
-                            text_color: c_text_p
-                  - obj:
+                             id: lbl_modulation_value
+                             text: "?"
+                             pad_right: ${container_pad_right}
+                             text_font: font_md
+                             text_color: c_text_p
+                  - container:
                       width: 35%
                       height: SIZE_CONTENT
-                      pad_all: 0
                       pad_left: 10
                       pad_right: 0
                       layout:
@@ -123,23 +117,22 @@
                       widgets:
                         # Value Label
                         - label:
-                            id: lbl_tx_power_value
-                            text: "?"
-                            pad_left: ${container_pad_left}
-                            pad_right: ${container_pad_right}
-                            text_font: font_sm
-                            text_color: c_text_p
+                             id: lbl_tx_power_value
+                             text: "?"
+                             pad_left: ${container_pad_left}
+                             pad_right: ${container_pad_right}
+                             text_font: font_sm
+                             text_color: c_text_p
                         # Unit Label
                         - label:
-                            id: lbl_tx_power_unit
-                            text: "dBm"
-                            pad_right: ${container_pad_right}
-                            text_font: font_sm
-                            text_color: c_text_s
+                             id: lbl_tx_power_unit
+                             text: "dBm"
+                             pad_right: ${container_pad_right}
+                             text_font: font_sm
+                             text_color: c_text_s
 
             # --- Row 3: Transmit/Receive ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
                 pad_top: 10
                 pad_bottom: 10

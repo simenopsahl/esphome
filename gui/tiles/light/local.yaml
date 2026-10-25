@@ -1,0 +1,123 @@
+# Modular Local Light Tile (ESPHome Light Component, e.g. `backlight_light`)
+#
+# Interactive touch tile that controls and displays the state + brightness (%)
+# of an on-device ESPHome light.
+# - Short click: toggles the light on/off (or steps brightness if `click_mode: step`).
+# - Long press:  cycles brightness (25% -> 50% -> 75% -> 100%) on dimmable lights.
+#
+# Usage via packages:
+#   my_backlight_tile: !include
+#     file: gui/tiles/light/local.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: tile_backlight
+#       row: 0
+#       col: 1
+#       icon: "\U000F0335" # lightbulb
+#       title: "Skjermlys"
+#       light_id: backlight_light
+
+substitutions:
+  page_id: page_dashboard
+  col_span: "1"
+  row_span: "1"
+  icon: "\U000F0335"
+  icon_font: mdi_lg
+  title_font: font_sm
+  value_font: font_md
+  state_on: "PÅ"
+  state_off: "AV"
+  light_id: backlight_light
+
+lvgl:
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      widgets:
+        - button:
+            id: ${uid}_btn
+            radius: 12
+            grid_cell_row_pos: ${row}
+            grid_cell_column_pos: ${col}
+            grid_cell_row_span: ${row_span | default(1)}
+            grid_cell_column_span: ${col_span | default(1)}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            pad_all: 6
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: SPACE_EVENLY
+              flex_align_cross: CENTER
+              pad_row: 2
+            on_short_click:
+              - light.toggle: ${light_id}
+            on_long_press:
+              - lambda: |-
+                  auto call = id(${light_id}).turn_on();
+                  float b = id(${light_id}).current_values.is_on()
+                              ? id(${light_id}).current_values.get_brightness()
+                              : 0.0f;
+                  float next_b = (b < 0.30f) ? 0.50f : ((b < 0.60f) ? 0.75f : ((b < 0.90f) ? 1.00f : 0.25f));
+                  call.set_brightness(next_b);
+                  call.perform();
+            widgets:
+              - container:
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: CENTER
+                    flex_align_cross: CENTER
+                    pad_column: 6
+                  widgets:
+                    - label:
+                        id: ${uid}_icon
+                        text: "${icon | default('\U000F0335')}"
+                        text_font: ${icon_font | default("mdi_lg")}
+                        text_color: c_text_s
+                    - label:
+                        id: ${uid}_value
+                        text: "${state_off}"
+                        text_font: ${value_font | default("font_md")}
+                        text_color: c_text_p
+              - label:
+                  id: ${uid}_title
+                  text: "${title}"
+                  text_font: ${title_font | default("font_sm")}
+                  text_color: c_text_s
+                  text_align: CENTER
+                  width: 100%
+                  long_mode: DOT
+
+light:
+  - id: !extend ${light_id}
+    on_state:
+      - lvgl.widget.update:
+          id: ${uid}_btn
+          state:
+            checked: !lambda "return id(${light_id}).current_values.is_on();"
+      - if:
+          condition:
+            lambda: "return id(${light_id}).current_values.is_on();"
+          then:
+            - lvgl.label.update:
+                id: ${uid}_icon
+                text_color: c_yellow
+            - lvgl.label.update:
+                id: ${uid}_value
+                text: !lambda |-
+                  int pct = (int) roundf(id(${light_id}).current_values.get_brightness() * 100.0f);
+                  if (pct > 0) {
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "%d%%", pct);
+                    return std::string(buf);
+                  }
+                  return std::string("${state_on}");
+          else:
+            - lvgl.label.update:
+                id: ${uid}_icon
+                text_color: c_text_s
+            - lvgl.label.update:
+                id: ${uid}_value
+                text: "${state_off}"
+

@@ -18,9 +18,8 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
-          scrollable: false
           align: CENTER
           layout:
             type: GRID
@@ -30,14 +29,12 @@
             pad_column: 0
           widgets:
             # --- TOP ROW: Price Labels ---
-            - obj:
+            - container:
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 0
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: START
                 height: SIZE_CONTENT
-                width: 100%
-                pad_all: 0
                 layout:
                   type: GRID
                   grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
@@ -97,13 +94,12 @@
                       text_align: RIGHT
 
             # --- MIDDLE ROW: Price Graph ---
-            - obj:
+            - container:
                 id: nordpool_graph_area
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 1
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: STRETCH
-                pad_all: 0
                 widgets:
                   - line:
                       id: lvgl_nordpool_line
@@ -136,14 +132,12 @@
                           y: !lambda return id(nordpool_points_y)[8];
 
             # --- BOTTOM ROW: Time Labels ---
-            - obj:
+            - container:
                 grid_cell_column_pos: 0
                 grid_cell_row_pos: 2
                 grid_cell_x_align: STRETCH
                 grid_cell_y_align: END
-                width: 100%
                 height: SIZE_CONTENT
-                pad_all: 0
                 layout:
                   type: GRID
                   grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
@@ -201,4 +195,3 @@
                       text_font: font_sm
                       text_color: c_text_s
                       text_align: RIGHT
-

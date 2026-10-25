@@ -1,2 +1,9 @@
-# pad_top: 40 # RESOLUTION-SPECIFIC
-# pad_bottom: 40 # RESOLUTION-SPECIFIC
+- id: page_style
+  bg_color: c_black
+  bg_opa: COVER
+  border_width: 0
+  radius: 0
+  pad_top: ${page_pad_top}
+  pad_bottom: ${page_pad_bottom}
+  pad_left: 0
+  pad_right: 0

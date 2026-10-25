@@ -13,7 +13,7 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
           align: CENTER
           layout:
@@ -26,11 +26,9 @@
             pad_column: 0
           widgets:
             # --- Row 1: Water Meter ---
-            - obj:
+            - container:
                 # This is a container for a single row
-                width: 100%
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -65,11 +63,9 @@
                       text_color: c_text_p
 
             # --- Row 2: Water Consumption ---
-            - obj:
+            - container:
                 # This is a container for a single row
-                width: 100%
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -103,10 +99,8 @@
                       text_color: c_text_s
 
             # --- Row 3: Water Meter Alarms ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -141,10 +135,8 @@
                       text_color: c_text_s
 
             # --- Row 4: RSSI & Status ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -155,10 +147,9 @@
                   pad_row: 0
                   pad_column: 0
                 widgets:
-                  - obj:
+                  - container:
                       width: 60%
                       height: SIZE_CONTENT
-                      pad_all: 0
                       pad_left: 10
                       pad_right: 0
                       layout:
@@ -185,10 +176,9 @@
                             pad_right: ${container_pad_right}
                             text_font: font_md
                             text_color: c_text_p
-                  - obj:
+                  - container:
                       width: 40%
                       height: SIZE_CONTENT
-                      pad_all: 0
                       pad_left: 0
                       pad_right: 10
                       layout:

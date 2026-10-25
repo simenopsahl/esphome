@@ -1,11 +1,15 @@
 obj:
-  border_width: 0
-  bg_color: c_bg_p
-  bg_opa: TRANSP
+  bg_color: c_bg_s
+  bg_opa: COVER
+  border_width: 1
+  border_color: c_bg_p
+  radius: 20
+  shadow_width: 0
   text_color: c_text_p
   scrollable: false
 label:
   border_width: 0
+  text_color: c_text_p
   scrollable: false
 image:
   border_width: 0

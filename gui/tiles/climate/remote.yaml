@@ -1,0 +1,156 @@
+# Modular Remote Climate Tile (Home Assistant Climate Entity)
+#
+# Displays live climate status (setpoint + hvac_action) on a grid dashboard page
+# and opens `page_climate` when tapped.
+#
+# Also includes `gui/pages/climate/sensors.yaml` so you only need to add
+# `- <<: !include { file: gui/pages/climate/page.yaml, vars: { show_back_btn: "true" } }`
+# under `lvgl: pages:` (or it will attach to `page_climate`).
+#
+# Usage via packages:
+#   my_climate_tile: !include
+#     file: gui/tiles/climate/remote.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: tile_climate
+#       row: 0
+#       col: 0
+#       icon: "\U000F1A43" # heat-pump (or "\U000F0438" radiator)
+#       title: "Varmepumpe"
+#       entity_id: climate.faircon_norgespumpa12_proxy
+
+substitutions:
+  page_id: page_dashboard
+  climate_page_id: page_climate
+  col_span: "1"
+  row_span: "1"
+  icon: "\U000F1A43"
+  icon_font: mdi_md
+  title_font: font_sm
+  value_font: font_lg
+  action_font: font_sm
+
+packages:
+  climate_screen_sensors: !include
+    file: ../../pages/climate/sensors.yaml
+    vars:
+      entity_id: ${entity_id}
+
+lvgl:
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      widgets:
+        - button:
+            id: ${uid}_btn
+            radius: 12
+            grid_cell_column_pos: ${col}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_span: ${col_span}
+            grid_cell_row_span: ${row_span}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            width: 100%
+            height: 100%
+            pad_all: 4
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: SPACE_EVENLY
+              flex_align_cross: CENTER
+              pad_row: 1
+            on_click:
+              - lvgl.widget.show: climate_back_corner_btn
+              - lvgl.page.show:
+                  id: ${climate_page_id}
+                  animation: OUT_LEFT
+                  time: 200ms
+            widgets:
+              - container:
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: CENTER
+                    flex_align_cross: CENTER
+                    pad_column: 4
+                  widgets:
+                    - label:
+                        id: ${uid}_icon
+                        text: ${icon}
+                        text_font: ${icon_font}
+                        text_color: c_text_s
+                    - label:
+                        id: ${uid}_title
+                        text: ${title}
+                        text_font: ${title_font}
+                        text_color: c_text_s
+              - label:
+                  id: ${uid}_value
+                  text: "--°C"
+                  text_font: ${value_font}
+                  text_color: c_text_p
+                  align: CENTER
+              - label:
+                  id: ${uid}_action
+                  text: "AV"
+                  text_font: ${action_font}
+                  text_color: c_gray
+                  align: CENTER
+
+script:
+  - id: !extend climate_tile_sync
+    then:
+      # 1. Update tile setpoint value
+      - lvgl.label.update:
+          id: ${uid}_value
+          text: !lambda |-
+            char buf[20];
+            if (id(climate_mode) == 0) {
+              return std::string("AV");
+            } else if (id(climate_mode) == 3 && id(climate_dual_setpoint)) {
+              snprintf(buf, sizeof(buf), "%.0f°-%.0f°", id(climate_target_temp_low), id(climate_target_temp_high));
+            } else if (id(climate_mode) == 4) {
+              return std::string("VIFTE");
+            } else if (id(climate_mode) == 5) {
+              return std::string("TØRKE");
+            } else {
+              snprintf(buf, sizeof(buf), "%.1f°C", id(climate_target_temp));
+            }
+            return std::string(buf);
+          text_color: !lambda |-
+            return id(climate_mode) == 0 ? id(c_gray) : id(c_text_p);
+
+      # 2. Update tile action status & icon color
+      - lvgl.label.update:
+          id: ${uid}_action
+          text: !lambda |-
+            if (id(climate_mode) == 0) return std::string("Avslått");
+            switch (id(climate_action)) {
+              case 1: return std::string("Varmer");
+              case 2: return std::string("Kjøler");
+              case 3: return std::string("Vifte");
+              case 4: return std::string("Tørker");
+              default: return std::string("Ventemodus");
+            }
+          text_color: !lambda |-
+            if (id(climate_mode) == 0) return id(c_gray);
+            switch (id(climate_action)) {
+              case 1: return id(c_red);
+              case 2: return id(c_blue);
+              case 3: return id(c_pink);
+              case 4: return id(c_yellow);
+              default: return id(c_text_s);
+            }
+
+      - lvgl.label.update:
+          id: ${uid}_icon
+          text_color: !lambda |-
+            if (id(climate_mode) == 0) return id(c_gray);
+            switch (id(climate_action)) {
+              case 1: return id(c_red);
+              case 2: return id(c_blue);
+              case 3: return id(c_pink);
+              case 4: return id(c_yellow);
+              default: return id(c_green);
+            }
+

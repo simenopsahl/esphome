@@ -1,4 +1,4 @@
-# LVGL device status page
+# LVGL device status page (responsive across standard and narrow displays)
 #
 # Optional vars:
 # - page_title (e.g. "Enhet")
@@ -13,9 +13,8 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
-          scrollable: false
           align: CENTER
           layout:
             type: FLEX
@@ -27,17 +26,14 @@
             pad_column: 0
           widgets:
             # --- Row 1: Device Name ---
-            - obj:
-                # This is a container for a single row
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
+                pad_left: ${ 0 if (screen_width|int < 180) else container_pad_left }
+                pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
                 layout:
                   type: FLEX
                   flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
+                  flex_align_main: ${ "CENTER" if (screen_width|int < 180) else "SPACE_BETWEEN" }
                   flex_align_cross: CENTER
                   pad_row: 0
                   pad_column: 0
@@ -46,31 +42,28 @@
                   - label:
                       id: lbl_name_l
                       text: "ID: "
+                      hidden: ${ "true" if (screen_width|int < 180) else "false" }
                       pad_left: ${container_pad_left}
                       pad_right: ${container_pad_right}
-#                      text_align: RIGHT
                       text_font: font_sm
                       text_color: c_text_s
                   # Value Label
                   - label:
                       id: lbl_name
                       text: ${device.name}
-                      pad_right: ${container_pad_right}
-#                      text_align: LEFT
-                      text_font: font_md
+                      pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
+                      text_font: ${ "font_sm" if (screen_width|int < 180) else "font_md" }
                       text_color: c_text_p
 
             # --- Row 2: Build Info ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
+                pad_left: ${ 0 if (screen_width|int < 180) else container_pad_left }
+                pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
                 layout:
                   type: FLEX
                   flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
+                  flex_align_main: ${ "CENTER" if (screen_width|int < 180) else "SPACE_BETWEEN" }
                   flex_align_cross: CENTER
                   pad_row: 0
                   pad_column: 0
@@ -79,33 +72,30 @@
                   - label:
                       id: lbl_build_l
                       text: "Build: "
+                      hidden: ${ "true" if (screen_width|int < 180) else "false" }
                       pad_left: ${container_pad_left}
                       pad_right: ${container_pad_right}
-#                      text_align: RIGHT
                       text_font: font_sm
                       text_color: c_text_s
                   # Value Label
                   - label:
                       id: lbl_build
-                      pad_right: ${container_pad_right}
-#                      text_align: LEFT
-                      text_font: font_md
+                      pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
+                      text_font: ${ "font_sm" if (screen_width|int < 180) else "font_md" }
                       text_color: c_text_p
                       text:
-                          format: "%s - %s"
-                          args: [__DATE__, __TIME__]
+                        format: "%s - %s"
+                        args: [__DATE__, __TIME__]
 
             # --- Row 3: SSID ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
+                pad_left: ${ 0 if (screen_width|int < 180) else container_pad_left }
+                pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
                 layout:
                   type: FLEX
                   flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
+                  flex_align_main: ${ "CENTER" if (screen_width|int < 180) else "SPACE_BETWEEN" }
                   flex_align_cross: CENTER
                   pad_row: 0
                   pad_column: 0
@@ -114,31 +104,28 @@
                   - label:
                       id: lbl_ssid_l
                       text: "SSID: "
+                      hidden: ${ "true" if (screen_width|int < 180) else "false" }
                       pad_left: ${container_pad_left}
                       pad_right: ${container_pad_right}
-#                      text_align: RIGHT
                       text_font: font_sm
                       text_color: c_text_s
                   # Value Label
                   - label:
                       id: lbl_ssid
                       text: "?"
-                      pad_right: ${container_pad_right}
-#                      text_align: LEFT
-                      text_font: font_md
+                      pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
+                      text_font: ${ "font_sm" if (screen_width|int < 180) else "font_md" }
                       text_color: c_text_p
 
             # --- Row 4: IP Address ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
+                pad_left: ${ 0 if (screen_width|int < 180) else container_pad_left }
+                pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
                 layout:
                   type: FLEX
                   flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
+                  flex_align_main: ${ "CENTER" if (screen_width|int < 180) else "SPACE_BETWEEN" }
                   flex_align_cross: CENTER
                   pad_row: 0
                   pad_column: 0
@@ -147,31 +134,28 @@
                   - label:
                       id: lbl_ip_l
                       text: "IP: "
+                      hidden: ${ "true" if (screen_width|int < 180) else "false" }
                       pad_left: ${container_pad_left}
                       pad_right: ${container_pad_right}
-#                      text_align: RIGHT
                       text_font: font_sm
                       text_color: c_text_s
                   # Value Label
                   - label:
                       id: lbl_ip
                       text: "?"
-                      pad_right: ${container_pad_right}
-#                      text_align: LEFT
-                      text_font: font_md
+                      pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
+                      text_font: ${ "font_sm" if (screen_width|int < 180) else "font_md" }
                       text_color: c_text_p
-    
+
             # --- Row 5: MAC Address ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
-                pad_left: ${container_pad_left}
-                pad_right: ${container_pad_right}
+                pad_left: ${ 0 if (screen_width|int < 180) else container_pad_left }
+                pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
                 layout:
                   type: FLEX
                   flex_flow: ROW
-                  flex_align_main: SPACE_BETWEEN
+                  flex_align_main: ${ "CENTER" if (screen_width|int < 180) else "SPACE_BETWEEN" }
                   flex_align_cross: CENTER
                   pad_row: 0
                   pad_column: 0
@@ -180,16 +164,15 @@
                   - label:
                       id: lbl_mac_l
                       text: "MAC: "
+                      hidden: ${ "true" if (screen_width|int < 180) else "false" }
                       pad_left: ${container_pad_left}
                       pad_right: ${container_pad_right}
-#                      text_align: RIGHT
                       text_font: font_sm
                       text_color: c_text_s
                   # Value Label
                   - label:
                       id: lbl_mac
                       text: "?"
-                      pad_right: ${container_pad_right}
-#                      text_align: LEFT
-                      text_font: font_md
+                      pad_right: ${ 0 if (screen_width|int < 180) else container_pad_right }
+                      text_font: ${ "font_sm" if (screen_width|int < 180) else "font_md" }
                       text_color: c_text_p

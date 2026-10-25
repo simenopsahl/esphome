@@ -1,0 +1,36 @@
+# Boot & OTA screen sensors + responsive sizing substitutions
+#
+# All dimensions scale automatically from `${screen_width}` and `${screen_height}`,
+# and can be overridden in a device YAML or layout stub (e.g. `gui/240r.yaml`).
+
+substitutions:
+  img_size: >-
+    ${ '90x90' if ([screen_width|int, screen_height|int]|min) <= 128 else
+       ('110x110' if ([screen_width|int, screen_height|int]|min) <= 160 else
+       ('140x140' if ([screen_width|int, screen_height|int]|min) <= 200 else
+       ('160x160' if ([screen_width|int, screen_height|int]|max) <= 320 else '200x200'))) }
+  spinner_size: >-
+    ${ 32 if ([screen_width|int, screen_height|int]|min) <= 128 else 50 }
+  spinner_arc: >-
+    ${ 6 if ([screen_width|int, screen_height|int]|min) <= 128 else 8 }
+  logo_offset: >-
+    ${ 22 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (40 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (34 if ([screen_width|int, screen_height|int]|max) <= 320 else 60))) }
+  spinner_offset: >-
+    ${ 38 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (60 if ([screen_width|int, screen_height|int]|min) <= 200 else
+       (70 if ([screen_width|int, screen_height|int]|max) <= 320 else 90)) }
+
+api:
+  on_client_connected:
+    - lvgl.widget.hide: boot_screen
+
+image:
+  - platform: file
+    file: https://esphome.io/favicon-512x512.png
+    id: boot_logo
+    resize: ${img_size}
+    type: RGB565
+    transparency: alpha_channel

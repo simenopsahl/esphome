@@ -10,7 +10,7 @@ PORT=8080
 ONLY_240X320="${1:-}"
 
 cleanup() {
-  pkill -f '.esphome-host/build/.*/program' 2>/dev/null || true
+  pkill -x program 2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -43,7 +43,7 @@ echo "=== Building & running 240x320 (with modules: packet) ==="
 cleanup
 "$RUN_SH" compile 240x320 --modules
 mkdir -p "$OUT_ROOT/240x320"
-"$RUN_SH" run 240x320 --modules >/tmp/host-sdl-run.log 2>&1 &
+"$HOME/.esphome-host/build/host-sdl/.pioenvs/host-sdl/program" >/tmp/host-sdl-run.log 2>&1 &
 wait_for_server
 sleep 1.5
 capture_page 1 "$OUT_ROOT/240x320/01_clock.png"
@@ -60,7 +60,7 @@ cleanup
 # 2. Capture 240x320 with cc1101 async mode (page 9 = cc1101_async)
 echo "=== Building & running 240x320 (with modules: async) ==="
 "$RUN_SH" compile 240x320 --modules --cc1101-mode async
-"$RUN_SH" run 240x320 --modules --cc1101-mode async >/tmp/host-sdl-run.log 2>&1 &
+"$HOME/.esphome-host/build/host-sdl/.pioenvs/host-sdl/program" >/tmp/host-sdl-run.log 2>&1 &
 wait_for_server
 sleep 1.0
 capture_page 9 "$OUT_ROOT/240x320/10_cc1101_async.png"
@@ -76,7 +76,7 @@ for layout in 320x240 480x320 128x128 240r 240x135; do
   echo "=== Building & running $layout ==="
   "$RUN_SH" compile "$layout"
   mkdir -p "$OUT_ROOT/$layout"
-  "$RUN_SH" run "$layout" >/tmp/host-sdl-run.log 2>&1 &
+  "$HOME/.esphome-host/build/host-sdl/.pioenvs/host-sdl/program" >/tmp/host-sdl-run.log 2>&1 &
   wait_for_server
   sleep 1.5
   capture_page 1 "$OUT_ROOT/$layout/01_clock.png"

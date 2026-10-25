@@ -1,0 +1,97 @@
+# Unified responsive LVGL GUI configuration.
+#
+# Adapts typography, header/footer chrome, boot/OTA overlays, and all 5 standard
+# pages (clock, temperature, nordpool, weather, status) dynamically from
+# `${screen_width}` and `${screen_height}` (defined by the board or layout stub).
+#
+# Optional substitutions (can be overridden in device YAML or layout stub):
+#   display.home_page: page_analog_clock
+#   display.page.temperature.area_label: "Rom"
+#   chrome_header: "true" | "false"
+#   chrome_footer: "true" | "false"
+#   chrome_title_mode: "auto" | "text" | "icon"
+
+substitutions:
+  display:
+    home_page: page_analog_clock
+    page:
+      temperature:
+        area_label: "Rom"
+
+script:
+  - id: go_home
+    then:
+      - lvgl.page.show: ${display.home_page}
+
+lvgl:
+  id: display_lvgl
+  buffer_size: 75%
+  default_font: font_md
+  theme: !include themes/main.yaml
+  style_definitions: !include_dir_merge_list styles
+  bottom_layer: 0x000000
+  bg_color: 0x000000
+  top_layer:
+    widgets:
+      - <<: !include { file: common/boot_screen/widget.yaml }
+      - <<: !include { file: common/ota_screen/widget.yaml }
+  pages:
+    - id: page_splash
+      skip: true
+      on_load:
+        - then:
+            - script.execute: go_home
+
+    # analog clock
+    - <<: !include
+        file: pages/clock/page.yaml
+        vars:
+          page_title: "Klokke"
+
+    # room temperature
+    - <<: !include
+        file: pages/temperature/page.yaml
+        vars:
+          page_title: ${ "Temp" if (screen_width|int < 200) else "Temperatur" }
+
+    # nordpool prices
+    - <<: !include
+        file: pages/nordpool/page.yaml
+        vars:
+          page_title: "NordPool"
+
+    # weather forecast
+    - <<: !include
+        file: pages/weather/page.yaml
+        vars:
+          page_title: "Vær"
+
+    # device status
+    - <<: !include
+        file: pages/status/page.yaml
+        vars:
+          page_title: "Enhet"
+
+packages:
+  # responsive fonts & chrome
+  fonts: !include { file: fonts/main.yaml }
+  chrome_base: !include { file: common/chrome/base.yaml }
+  chrome_header: !include { file: common/chrome/header.yaml }
+  chrome_footer: !include { file: common/chrome/footer.yaml }
+  # boot screen
+  boot_screen_sensors: !include { file: common/boot_screen/sensors.yaml }
+  # ota screen
+  ota_screen_sensors: !include { file: common/ota_screen/sensors.yaml }
+  # clock screen
+  clock_screen_sensors: !include { file: pages/clock/sensors.yaml }
+  # nordpool screen
+  nordpool_screen_sensors: !include { file: pages/nordpool/sensors.yaml }
+  # device status screen
+  device_status_screen_sensors: !include { file: pages/status/sensors.yaml }
+  # automatic screen control
+  control_auto_display: !include { file: functions/control_auto_display.yaml }
+  # remote page navigation
+  control_navigation: !include { file: functions/control_navigation.yaml }
+  # weather screen (responsive icons, fonts, forecast count + HA sensors)
+  weather_screen_sensors: !include { file: pages/weather/sensors.yaml }
+

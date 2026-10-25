@@ -1,0 +1,15 @@
+# Bind the standard LVGL temperature page (`page_temperature`) to a local ESPHome sensor.
+#
+# Optional vars:
+# - sensor_id   # Local ESPHome sensor ID to extend (default: "temperature_local")
+# - format      # printf format string (default: "%.1f")
+
+sensor:
+  - id: !extend ${sensor_id | default("temperature_local")}
+    on_value:
+      - then:
+          - lvgl.label.update:
+              id: room_temp_value_widget_text
+              text:
+                format: "${format | default('%.1f')}"
+                args: [ 'x' ]

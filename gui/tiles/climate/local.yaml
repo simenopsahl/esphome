@@ -1,0 +1,457 @@
+# Modular Local Climate Tile (ESPHome Climate Component)
+#
+# Displays live status (setpoint + hvac_action) of a local ESPHome `climate:`
+# component on a grid dashboard page and opens `page_climate` when tapped.
+#
+# Usage via packages:
+#   my_local_climate: !include
+#     file: gui/tiles/climate/local.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: tile_climate
+#       row: 0
+#       col: 0
+#       icon: "\U000F0438" # radiator
+#       title: "Termostat"
+#       climate_id: my_thermostat
+
+substitutions:
+  page_id: page_dashboard
+  climate_page_id: page_climate
+  col_span: "1"
+  row_span: "1"
+  icon: "\U000F0438"
+  icon_font: mdi_md
+  title_font: font_sm
+  value_font: font_lg
+  action_font: font_sm
+
+  # Responsive sizing substitutions (matching gui/pages/climate/sensors.yaml)
+  climate_arc_size: >-
+    ${ (([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+           ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 94 // 100) }
+  climate_arc_width: >-
+    ${ 12 if ([screen_width|int, screen_height|int]|min) <= 200 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 28)) }
+  climate_corner_btn_size: >-
+    ${ 34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 60)) }
+  climate_corner_btn_radius: >-
+    ${ (34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 60))) // 2 }
+  climate_corner_icon_font: >-
+    ${ 'mdi_md' if ([screen_width|int, screen_height|int]|max) <= 320 else 'mdi_lg' }
+  climate_mode_label_y: >-
+    ${ -(([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+            ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 23 // 100) }
+  climate_target_label_y: >-
+    ${ -(([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+            ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 3 // 100) }
+  climate_current_label_y: >-
+    ${ (([ ((screen_width|int) - (container_pad_left|int) - (container_pad_right|int)),
+           ((screen_height|int) - (page_pad_top|int) - (page_pad_bottom|int) - (container_pad_top|int) - (container_pad_bottom|int)) ] | min) * 20 // 100) }
+  climate_mode_font: font_sm
+  climate_target_font: >-
+    ${ 'font_xxl' if ([screen_width|int, screen_height|int]|max) <= 320 else 'font_hg' }
+  climate_current_font: >-
+    ${ 'font_md' if ([screen_width|int, screen_height|int]|max) <= 320 else 'font_lg' }
+  climate_dropdown_width: >-
+    ${ 150 if (screen_width|int) <= 240 else
+       (170 if (screen_width|int) <= 320 else
+       (210 if (screen_width|int) <= 480 else 260)) }
+  climate_dropdown_font: >-
+    ${ 'font_sm' if ([screen_width|int, screen_height|int]|max) <= 320 else 'font_md' }
+
+globals:
+  - id: climate_target_temp
+    type: float
+    initial_value: '21.0'
+  - id: climate_target_temp_low
+    type: float
+    initial_value: '18.0'
+  - id: climate_target_temp_high
+    type: float
+    initial_value: '24.0'
+  - id: climate_current_temp
+    type: float
+    initial_value: '0.0'
+  - id: climate_temp_step
+    type: float
+    initial_value: '0.5'
+  - id: climate_mode
+    type: int
+    initial_value: '0'
+  - id: climate_action
+    type: int
+    initial_value: '0'
+  - id: climate_fan_mode
+    type: int
+    initial_value: '0'
+  - id: climate_swing_mode
+    type: int
+    initial_value: '0'
+  - id: climate_dual_setpoint
+    type: bool
+    initial_value: 'false'
+  - id: climate_programmatic_update
+    type: bool
+    initial_value: 'false'
+
+lvgl:
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      widgets:
+        - button:
+            id: ${uid}_btn
+            radius: 12
+            grid_cell_column_pos: ${col}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_span: ${col_span}
+            grid_cell_row_span: ${row_span}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            width: 100%
+            height: 100%
+            pad_all: 4
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: SPACE_EVENLY
+              flex_align_cross: CENTER
+              pad_row: 1
+            on_click:
+              - lvgl.widget.show: climate_back_corner_btn
+              - lvgl.page.show:
+                  id: ${climate_page_id}
+                  animation: OUT_LEFT
+                  time: 200ms
+            widgets:
+              - container:
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_main: CENTER
+                    flex_align_cross: CENTER
+                    pad_column: 4
+                  widgets:
+                    - label:
+                        id: ${uid}_icon
+                        text: ${icon}
+                        text_font: ${icon_font}
+                        text_color: c_text_s
+                    - label:
+                        id: ${uid}_title
+                        text: ${title}
+                        text_font: ${title_font}
+                        text_color: c_text_s
+              - label:
+                  id: ${uid}_value
+                  text: "--°C"
+                  text_font: ${value_font}
+                  text_color: c_text_p
+                  align: CENTER
+              - label:
+                  id: ${uid}_action
+                  text: "AV"
+                  text_font: ${action_font}
+                  text_color: c_gray
+                  align: CENTER
+
+# Detect local climate capabilities at boot from traits
+esphome:
+  on_boot:
+    - priority: -200
+      then:
+        - lambda: |-
+            auto show = [](lv_obj_t* obj) { lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN); };
+            auto traits = id(${climate_id})->get_traits();
+            if (traits.supports_mode(climate::CLIMATE_MODE_HEAT))      show(id(climate_btn_mode_heat));
+            if (traits.supports_mode(climate::CLIMATE_MODE_COOL))      show(id(climate_btn_mode_cool));
+            if (traits.supports_mode(climate::CLIMATE_MODE_HEAT_COOL) ||
+                traits.supports_mode(climate::CLIMATE_MODE_AUTO))      show(id(climate_btn_mode_auto));
+            if (traits.supports_mode(climate::CLIMATE_MODE_FAN_ONLY))  show(id(climate_btn_mode_fan_only));
+            if (traits.supports_mode(climate::CLIMATE_MODE_DRY))       show(id(climate_btn_mode_dry));
+            if (traits.get_supports_fan_modes()) {
+              show(id(climate_fan_corner_btn));
+              if (traits.supports_fan_mode(climate::CLIMATE_FAN_AUTO))   show(id(climate_btn_fan_auto));
+              if (traits.supports_fan_mode(climate::CLIMATE_FAN_QUIET))  show(id(climate_btn_fan_quiet));
+              if (traits.supports_fan_mode(climate::CLIMATE_FAN_LOW))    show(id(climate_btn_fan_low));
+              if (traits.supports_fan_mode(climate::CLIMATE_FAN_MEDIUM)) show(id(climate_btn_fan_medium));
+              if (traits.supports_fan_mode(climate::CLIMATE_FAN_HIGH))   show(id(climate_btn_fan_high));
+            }
+            int arc_min = (int) roundf(traits.get_visual_min_temperature() * 10.0f);
+            int arc_max = (int) roundf(traits.get_visual_max_temperature() * 10.0f);
+            if (arc_min < arc_max) {
+              id(climate_programmatic_update) = true;
+              lv_arc_set_range(id(climate_arc), arc_min, arc_max);
+              id(climate_programmatic_update) = false;
+            }
+            if (traits.get_supports_swing_modes()) {
+              show(id(climate_swing_corner_btn));
+              if (traits.supports_swing_mode(climate::CLIMATE_SWING_OFF))        show(id(climate_btn_swing_off));
+              if (traits.supports_swing_mode(climate::CLIMATE_SWING_BOTH))       show(id(climate_btn_swing_both));
+              if (traits.supports_swing_mode(climate::CLIMATE_SWING_VERTICAL))   show(id(climate_btn_swing_vertical));
+              if (traits.supports_swing_mode(climate::CLIMATE_SWING_HORIZONTAL)) show(id(climate_btn_swing_horizontal));
+            }
+
+climate:
+  - id: !extend ${climate_id}
+    on_state:
+      - lambda: |-
+          switch (x.mode) {
+            case climate::CLIMATE_MODE_HEAT:      id(climate_mode) = 1; break;
+            case climate::CLIMATE_MODE_COOL:      id(climate_mode) = 2; break;
+            case climate::CLIMATE_MODE_HEAT_COOL:
+            case climate::CLIMATE_MODE_AUTO:      id(climate_mode) = 3; break;
+            case climate::CLIMATE_MODE_FAN_ONLY:  id(climate_mode) = 4; break;
+            case climate::CLIMATE_MODE_DRY:       id(climate_mode) = 5; break;
+            default:                              id(climate_mode) = 0; break;
+          }
+          switch (x.action) {
+            case climate::CLIMATE_ACTION_HEATING: id(climate_action) = 1; break;
+            case climate::CLIMATE_ACTION_COOLING: id(climate_action) = 2; break;
+            case climate::CLIMATE_ACTION_FAN:     id(climate_action) = 3; break;
+            case climate::CLIMATE_ACTION_DRYING:  id(climate_action) = 4; break;
+            default:                              id(climate_action) = 0; break;
+          }
+          if (!std::isnan(x.current_temperature))
+            id(climate_current_temp) = x.current_temperature;
+          if (!std::isnan(x.target_temperature_low))
+            id(climate_target_temp_low) = x.target_temperature_low;
+          if (!std::isnan(x.target_temperature_high))
+            id(climate_target_temp_high) = x.target_temperature_high;
+          if (!std::isnan(x.target_temperature_low) || !std::isnan(x.target_temperature_high))
+            id(climate_dual_setpoint) = true;
+          if (!id(climate_arc_send_temp)->is_running()) {
+            if (id(climate_dual_setpoint)) {
+              if (x.mode == climate::CLIMATE_MODE_HEAT && !std::isnan(x.target_temperature_low))
+                id(climate_target_temp) = x.target_temperature_low;
+              else if (x.mode == climate::CLIMATE_MODE_COOL && !std::isnan(x.target_temperature_high))
+                id(climate_target_temp) = x.target_temperature_high;
+            } else if (!std::isnan(x.target_temperature)) {
+              id(climate_target_temp) = x.target_temperature;
+            }
+          }
+          if (x.fan_mode.has_value()) {
+            switch (x.fan_mode.value()) {
+              case climate::CLIMATE_FAN_AUTO:   id(climate_fan_mode) = 0; break;
+              case climate::CLIMATE_FAN_LOW:    id(climate_fan_mode) = 1; break;
+              case climate::CLIMATE_FAN_MEDIUM: id(climate_fan_mode) = 2; break;
+              case climate::CLIMATE_FAN_HIGH:   id(climate_fan_mode) = 3; break;
+              case climate::CLIMATE_FAN_QUIET:  id(climate_fan_mode) = 4; break;
+              default: break;
+            }
+          }
+          switch (x.swing_mode) {
+            case climate::CLIMATE_SWING_OFF:        id(climate_swing_mode) = 0; break;
+            case climate::CLIMATE_SWING_BOTH:       id(climate_swing_mode) = 1; break;
+            case climate::CLIMATE_SWING_VERTICAL:   id(climate_swing_mode) = 2; break;
+            case climate::CLIMATE_SWING_HORIZONTAL: id(climate_swing_mode) = 3; break;
+            default: break;
+          }
+      - script.execute: climate_sync_state
+
+script:
+  - id: climate_arc_send_temp
+    mode: restart
+    then:
+      - delay: 500ms
+      - script.execute: climate_set_target_temp
+
+  - id: climate_tile_sync
+    then:
+      - lvgl.label.update:
+          id: ${uid}_value
+          text: !lambda |-
+            char buf[20];
+            if (id(climate_mode) == 0) return std::string("AV");
+            snprintf(buf, sizeof(buf), "%.1f°C", id(climate_target_temp));
+            return std::string(buf);
+          text_color: !lambda |-
+            return id(climate_mode) == 0 ? id(c_gray) : id(c_text_p);
+      - lvgl.label.update:
+          id: ${uid}_action
+          text: !lambda |-
+            if (id(climate_mode) == 0) return std::string("Avslått");
+            switch (id(climate_action)) {
+              case 1: return std::string("Varmer");
+              case 2: return std::string("Kjøler");
+              case 3: return std::string("Vifte");
+              case 4: return std::string("Tørker");
+              default: return std::string("Ventemodus");
+            }
+          text_color: !lambda |-
+            if (id(climate_mode) == 0) return id(c_gray);
+            switch (id(climate_action)) {
+              case 1: return id(c_red);
+              case 2: return id(c_blue);
+              default: return id(c_text_s);
+            }
+      - lvgl.label.update:
+          id: ${uid}_icon
+          text_color: !lambda |-
+            if (id(climate_mode) == 0) return id(c_gray);
+            switch (id(climate_action)) {
+              case 1: return id(c_red);
+              case 2: return id(c_blue);
+              default: return id(c_green);
+            }
+
+  - id: climate_sync_state
+    then:
+      - lambda: id(climate_programmatic_update) = true;
+      - lvgl.label.update:
+          id: climate_current_label
+          text: !lambda |-
+            if (id(climate_current_temp) == 0.0f) return std::string("--.-°C");
+            char buf[16];
+            snprintf(buf, sizeof(buf), "Nå: %.1f°C", id(climate_current_temp));
+            return std::string(buf);
+      - script.execute: climate_tile_sync
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 1;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                value: !lambda return (int) roundf(id(climate_target_temp) * 10.0f);
+                indicator:
+                  arc_color: c_red
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: true
+                knob:
+                  bg_opa: COVER
+                  bg_color: c_white
+            - lvgl.label.update:
+                id: climate_target_label
+                text: !lambda |-
+                  char buf[16];
+                  snprintf(buf, sizeof(buf), "%.1f°", id(climate_target_temp));
+                  return std::string(buf);
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F0238"
+                text_color: c_red
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: !lambda |-
+                  return id(climate_action) == 1 ? std::string("VARMER") : std::string("VENTEMODUS");
+                text_color: !lambda |-
+                  return id(climate_action) == 1 ? id(c_red) : id(c_gray);
+      - if:
+          condition:
+            lambda: return id(climate_mode) == 0;
+          then:
+            - lvgl.arc.update:
+                id: climate_arc
+                indicator:
+                  arc_color: c_bg_s
+            - lvgl.widget.update:
+                id: climate_arc
+                clickable: false
+                knob:
+                  bg_opa: TRANSP
+            - lvgl.label.update:
+                id: climate_target_label
+                text: "AV"
+            - lvgl.label.update:
+                id: climate_mode_label
+                text: "AVSLÅTT"
+                text_color: c_gray
+            - lvgl.label.update:
+                id: climate_mode_corner_icon
+                text: "\U000F0425"
+                text_color: c_gray
+      - lambda: id(climate_programmatic_update) = false;
+
+  - id: climate_set_mode_off
+    then:
+      - climate.control:
+          id: ${climate_id}
+          mode: "OFF"
+  - id: climate_set_mode_heat
+    then:
+      - climate.control:
+          id: ${climate_id}
+          mode: "HEAT"
+  - id: climate_set_mode_cool
+    then:
+      - climate.control:
+          id: ${climate_id}
+          mode: "COOL"
+  - id: climate_set_mode_auto
+    then:
+      - climate.control:
+          id: ${climate_id}
+          mode: "HEAT_COOL"
+  - id: climate_set_mode_fan_only
+    then:
+      - climate.control:
+          id: ${climate_id}
+          mode: "FAN_ONLY"
+  - id: climate_set_mode_dry
+    then:
+      - climate.control:
+          id: ${climate_id}
+          mode: "DRY"
+  - id: climate_set_target_temp
+    then:
+      - climate.control:
+          id: ${climate_id}
+          target_temperature: !lambda return id(climate_target_temp);
+  - id: climate_set_fan_auto
+    then:
+      - climate.control:
+          id: ${climate_id}
+          fan_mode: AUTO
+  - id: climate_set_fan_quiet
+    then:
+      - climate.control:
+          id: ${climate_id}
+          fan_mode: QUIET
+  - id: climate_set_fan_low
+    then:
+      - climate.control:
+          id: ${climate_id}
+          fan_mode: LOW
+  - id: climate_set_fan_medium
+    then:
+      - climate.control:
+          id: ${climate_id}
+          fan_mode: MEDIUM
+  - id: climate_set_fan_high
+    then:
+      - climate.control:
+          id: ${climate_id}
+          fan_mode: HIGH
+  - id: climate_set_swing_off
+    then:
+      - climate.control:
+          id: ${climate_id}
+          swing_mode: "OFF"
+  - id: climate_set_swing_on
+    then:
+      - climate.control:
+          id: ${climate_id}
+          swing_mode: "BOTH"
+  - id: climate_set_swing_both
+    then:
+      - climate.control:
+          id: ${climate_id}
+          swing_mode: "BOTH"
+  - id: climate_set_swing_vertical
+    then:
+      - climate.control:
+          id: ${climate_id}
+          swing_mode: "VERTICAL"
+  - id: climate_set_swing_horizontal
+    then:
+      - climate.control:
+          id: ${climate_id}
+          swing_mode: "HORIZONTAL"
+

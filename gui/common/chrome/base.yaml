@@ -1,0 +1,65 @@
+# Base chrome configuration: sizing substitutions, shared LVGL styles, and
+# safe no-op `set_page_title` script.
+#
+# Always include this package in any LVGL GUI configuration.
+# When `gui/chrome/header.yaml` is also included, it `!extend`s `set_page_title`
+# to update `lbl_page_title` (choosing `title` on regular screens or `icon` on
+# narrow screens where `screen_width < 180`).
+#
+# Uses flat `screen_width` / `screen_height` substitutions for Jinja arithmetic
+# (since ESPHome Jinja treats `device.screen` as a dict only if defined in the
+# same scope, whereas flat `screen_width` / `screen_height` are always strings/ints).
+#
+# Chrome enable flags (set in root device YAML or layout stub):
+#   chrome_header: "true" (default) | "false"
+#   chrome_footer: "true" (default on height >= 240 and width >= 200) | "false"
+#   chrome_title_mode: "auto" (default: icon if width < 180 else text) | "text" | "icon"
+
+substitutions:
+  chrome_header: "true"
+  chrome_footer: ${ 'false' if ([screen_width|int, screen_height|int]|max) <= 240 else 'true' }
+  chrome_title_mode: "auto"
+
+  # Header & footer bar height scales with the smaller screen dimension:
+  #   128x128 -> 24px | 135x240 -> 26px | 200x200 -> 28px | 240x240 -> 30px
+  #   320x240 / 240x320 -> 32px | 320x480 -> 40px | 800x480 -> 44px
+  chrome_h: >-
+    ${ 24 if ([screen_width|int, screen_height|int]|min) <= 128 else
+       (26 if ([screen_width|int, screen_height|int]|min) <= 160 else
+       (28 if ([screen_width|int, screen_height|int]|min) <= 200 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (32 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 480 else 44))))) }
+
+  # Horizontal padding between status icons and title/clock in the header bar
+  chrome_pad: >-
+    ${ 4 if (screen_width|int) <= 200 else
+       (6 if (screen_width|int) <= 240 else
+       (12 if (screen_width|int) <= 320 else 14)) }
+
+  # Font used for `lbl_page_title` in the header (`mdi_md` for icon mode, `font_md` for text mode)
+  chrome_use_icon_title: ${ 'true' if (chrome_title_mode == 'icon' or (chrome_title_mode == 'auto' and screen_width|int < 180)) else 'false' }
+  chrome_title_font: ${ 'mdi_md' if chrome_use_icon_title == 'true' else 'font_md' }
+
+  # Top and bottom padding reserved by `page_style` so page content never overlaps header/footer
+  page_pad_top: ${ chrome_h|int if chrome_header == 'true' else 0 }
+  page_pad_bottom: ${ chrome_h|int if chrome_footer == 'true' else 0 }
+
+  # Default inner container padding
+  container_pad_top: ${ 0 if (screen_height|int) <= 128 else (1 if (screen_height|int) <= 240 else 2) }
+  container_pad_bottom: ${ 4 if chrome_footer == 'false' else (1 if (screen_height|int) <= 240 else 2) }
+  container_pad_left: ${ 2 if (screen_width|int) <= 240 else (4 if (screen_width|int) <= 320 else 6) }
+  container_pad_right: ${ 2 if (screen_width|int) <= 240 else (4 if (screen_width|int) <= 320 else 6) }
+
+script:
+  # Safe no-op by default so pages can always call `set_page_title` even when
+  # `gui/chrome/header.yaml` is omitted.
+  - id: set_page_title
+    parameters:
+      title: string
+      icon: string
+    then:
+      - lambda: |-
+          (void) title;
+          (void) icon;
+

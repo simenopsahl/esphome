@@ -13,7 +13,7 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
           align: CENTER
           layout:
@@ -26,11 +26,9 @@
             pad_column: 0
           widgets:
             # --- Row 1: Temperature ---
-            - obj:
+            - container:
                 # This is a container for a single row
-                width: 100%
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -64,10 +62,8 @@
                       text_color: c_text_s
 
             # --- Row 2: Carbonmonoxide ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -101,10 +97,8 @@
                       text_color: c_text_s
 
             # --- Row 3: PM1.0 ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -138,10 +132,8 @@
                       text_color: c_text_s
 
             # --- Row 4: PM2.5 ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:
@@ -175,10 +167,8 @@
                       text_color: c_text_s
 
             # --- Row 5: PM10.0 ---
-            - obj:
-                width: 100%
+            - container:
                 height: SIZE_CONTENT
-                pad_all: 0
                 pad_left: ${container_pad_left}
                 pad_right: ${container_pad_right}
                 layout:

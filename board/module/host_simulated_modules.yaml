@@ -37,6 +37,66 @@ lvgl:
         vars:
           page_title: "Radio"
 
+    - <<: !include
+        file: ../../gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_id: page_dashboard
+          page_title: "Kontrollpanel"
+
+    - <<: !include
+        file: ../../gui/pages/climate/page.yaml
+        vars:
+          page_title: "Varmepumpe"
+          page_icon: "\U000F1A43"
+          back_page_id: page_dashboard
+          show_back_btn: "true"
+
+packages:
+  climate_tile: !include
+    file: ../../gui/tiles/climate/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_varmepumpe
+      row: 0
+      col: 0
+      icon: "\U000F1A43"
+      title: "Varmepumpe"
+      entity_id: climate.faircon_norgespumpa12_proxy
+  room_temp_tile: !include
+    file: ../../gui/tiles/sensor/local.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_room_temp
+      row: 0
+      col: 1
+      icon: "\U000F050F"
+      title: "Temperatur"
+      sensor_id: temperature_local
+      unit: "°C"
+      format: "%.1f"
+  humidity_tile: !include
+    file: ../../gui/tiles/sensor/local.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_humidity
+      row: 1
+      col: 0
+      icon: "\U000F058E"
+      title: "Luftfuktighet"
+      sensor_id: humidity_local
+      unit: "%%"
+      format: "%.0f"
+  auto_disp_tile: !include
+    file: ../../gui/tiles/switch/local.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_auto_disp
+      row: 1
+      col: 1
+      icon: "\U000F0335"
+      title: "Auto skjerm"
+      switch_id: display_auto
+
 esphome:
   on_boot:
     - priority: -200
@@ -113,3 +173,31 @@ esphome:
         - lvgl.label.update:
             id: lbl_lqi_value
             text: "4"
+
+        # --- Climate (Faircon Norgespumpa12 Proxy) Mock Values ---
+        - lambda: |-
+            id(climate_programmatic_update) = true;
+            id(climate_mode) = 1;          // heat
+            id(climate_action) = 1;        // heating
+            id(climate_target_temp) = 22.5f;
+            id(climate_current_temp) = 23.1f;
+            id(climate_fan_mode) = 0;      // auto
+            id(climate_swing_mode) = 4;    // on
+            lv_arc_set_range(id(climate_arc), 180, 300);
+            id(climate_programmatic_update) = false;
+            // Reveal supported modes/buttons matching Faircon Norgespumpa12
+            lv_obj_clear_flag(id(climate_btn_mode_heat), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_mode_cool), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_mode_auto), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_mode_fan_only), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_mode_dry), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_fan_corner_btn), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_fan_auto), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_fan_quiet), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_fan_low), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_fan_medium), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_fan_high), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_swing_corner_btn), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_swing_off), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(climate_btn_swing_on), LV_OBJ_FLAG_HIDDEN);
+        - script.execute: climate_sync_state

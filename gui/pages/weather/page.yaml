@@ -16,9 +16,8 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
-          scrollable: false
           align: CENTER
           layout:
             type: FLEX
@@ -30,7 +29,7 @@
             pad_row: 0
           widgets:
             # The first row (today's weather)
-            - obj:
+            - container:
                 layout:
                   type: FLEX
                   flex_flow: ROW
@@ -39,8 +38,6 @@
                   flex_align_track: CENTER
                   pad_column: 0
                   pad_row: 0
-                pad_all: 0
-                width: 100%
                 height: SIZE_CONTENT
                 widgets:
                   # Today's weather icon
@@ -49,8 +46,7 @@
                       src: ${initial_today_icon_src}
 
                   # Today's temperature and condition
-                  - obj:
-                      pad_all: 0
+                  - container:
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
@@ -75,8 +71,7 @@
 
             # The second row (forecast section). Entries beyond
             # `weather_forecast_count` (what fits the width) are hidden.
-            - obj:
-                pad_all: 0
+            - container:
                 layout:
                   type: FLEX
                   flex_flow: ROW
@@ -85,14 +80,11 @@
                   flex_align_track: CENTER
                   pad_column: 0
                   pad_row: 0
-                width: 100%
                 height: SIZE_CONTENT
                 widgets:
                   # Forecast Item 0
-                  - obj:
+                  - container:
                       hidden: ${ 'true' if 0 >= (weather_forecast_count|int) else 'false' }
-                      bg_color: c_black
-                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
@@ -116,10 +108,8 @@
                             text_font: ${weather_forecast_temp_font}
 
                   # Forecast Item 1
-                  - obj:
+                  - container:
                       hidden: ${ 'true' if 1 >= (weather_forecast_count|int) else 'false' }
-                      bg_color: c_black
-                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
@@ -143,10 +133,8 @@
                             text_font: ${weather_forecast_temp_font}
 
                   # Forecast Item 2
-                  - obj:
+                  - container:
                       hidden: ${ 'true' if 2 >= (weather_forecast_count|int) else 'false' }
-                      bg_color: c_black
-                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN
@@ -170,10 +158,8 @@
                             text_font: ${weather_forecast_temp_font}
 
                   # Forecast Item 3
-                  - obj:
+                  - container:
                       hidden: ${ 'true' if 3 >= (weather_forecast_count|int) else 'false' }
-                      bg_color: c_black
-                      pad_all: 0
                       layout:
                         type: FLEX
                         flex_flow: COLUMN

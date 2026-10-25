@@ -1,4 +1,4 @@
-# LVGL room temperature page
+# LVGL room temperature page (responsive across standard and narrow displays)
 #
 # Optional vars:
 # - page_title (e.g. "Temperatur")
@@ -13,25 +13,29 @@
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:
-      - obj:
+      - container:
           styles: container_style
-          scrollable: false
           align: CENTER
           layout:
             type: GRID
             grid_columns: [ FR(1), FR(2), FR(1) ]
-            grid_rows: [ FR(1), FR(4) ]
+            grid_rows:
+              - ${ "FR(2)" if (screen_width|int < 180) else "FR(1)" }
+              - ${ "FR(1)" if (screen_width|int < 180) else "FR(4)" }
           widgets:
-            - obj:
+            - container:
                 grid_cell_row_pos: 1
                 grid_cell_column_pos: 0
-                grid_cell_y_align: STRETCH
-                grid_cell_x_align: START
+                grid_cell_column_span: ${ 2 if (screen_width|int < 180) else 1 }
+                grid_cell_y_align: ${ "CENTER" if (screen_width|int < 180) else "STRETCH" }
+                grid_cell_x_align: ${ "STRETCH" if (screen_width|int < 180) else "START" }
+                width: ${ "100%" if (screen_width|int < 180) else "SIZE_CONTENT" }
+                height: ${ "SIZE_CONTENT" if (screen_width|int < 180) else "100%" }
                 layout:
                   type: FLEX
-                  flex_flow: COLUMN
-                  flex_align_main: CENTER
-                  flex_align_cross: START
+                  flex_flow: ${ "ROW" if (screen_width|int < 180) else "COLUMN" }
+                  flex_align_main: ${ "SPACE_AROUND" if (screen_width|int < 180) else "CENTER" }
+                  flex_align_cross: ${ "CENTER" if (screen_width|int < 180) else "START" }
                 widgets:
                   - label: # thermometer icon
                       id: rom_temp_icon_widget_icon
@@ -51,17 +55,18 @@
                 text_font: font_fl
                 text_color: c_text_p
                 text_align: CENTER
-                grid_cell_column_pos: 1
-                grid_cell_row_pos: 1
+                grid_cell_column_pos: ${ 0 if (screen_width|int < 180) else 1 }
+                grid_cell_column_span: ${ 3 if (screen_width|int < 180) else 1 }
+                grid_cell_row_pos: ${ 0 if (screen_width|int < 180) else 1 }
                 grid_cell_x_align: CENTER
                 grid_cell_y_align: CENTER
             - label: # temperature unit
                 id: room_temp_unit_widget_text
                 text: "°C"
-                text_font: font_xl
+                text_font: ${ "font_lg" if (screen_width|int < 180) else "font_xl" }
                 text_color: c_text_s
                 text_align: RIGHT
                 grid_cell_column_pos: 2
                 grid_cell_row_pos: 1
-                grid_cell_x_align: END
+                grid_cell_x_align: ${ "CENTER" if (screen_width|int < 180) else "END" }
                 grid_cell_y_align: CENTER
