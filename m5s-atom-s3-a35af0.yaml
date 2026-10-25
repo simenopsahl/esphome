@@ -16,7 +16,7 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors:
     !include {
-      file: gui/widgets/labels/number_sensor.yaml,
+      file: gui/functions/number_sensor.yaml,
       vars: { uid: room_temp_value, entity_id: sensor.etg2_simen_tc_heatindex },
     }
 
