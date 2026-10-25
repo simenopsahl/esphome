@@ -9,18 +9,24 @@ packages:
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/800x480.yaml
   
-  # --- LVGL PAGE PACKAGES ---
-  climate_sensors: !include
-    file: gui/pages/climate/sensors.yaml
+  # --- LVGL PAGE & WIDGET PACKAGES ---
+  climate_tile: !include
+    file: gui/ui/climate/remote.yaml
     vars:
+      uid: heatpump
+      row: 0
+      col: 0
+      row_span: 1
+      col_span: 2          # e.g. span across both columns in row 0, or 1 for a single cell
       entity_id: climate.faircon_norgespumpa12_proxy
       title: "Varmepumpe"
-
-  # --- LVGL WIDGET PACKAGES ---
+      icon: "\U000F1A43"
+      
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
+
 
 substitutions:
   common:
@@ -63,6 +69,11 @@ time:
 
 lvgl:
   pages:
+    - <<: !include
+        file: gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_title: "Kontrollpanel"
+          layout: 4x2
     - <<: !include
         file: gui/pages/climate/page.yaml
         vars:
