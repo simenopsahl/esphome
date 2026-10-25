@@ -105,7 +105,7 @@ lvgl:
       <<: !include
         file: gui/functions/swipe_navigation.yaml
       widgets:
-        - obj:
+        - container:
             styles: container_style
             align: CENTER
             widgets:
