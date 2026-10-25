@@ -8,6 +8,13 @@ packages:
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/800x480.yaml
+  
+  # --- LVGL PAGE PACKAGES ---
+  climate_sensors: !include
+    file: gui/pages/climate/sensors.yaml
+    vars:
+      entity_id: climate.faircon_norgespumpa12_proxy
+      title: "Varmepumpe"
 
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
@@ -54,6 +61,12 @@ time:
         then:
           - script.execute: lvgl_time_update
 
+lvgl:
+  pages:
+    - <<: !include
+        file: gui/pages/climate/page.yaml
+        vars:
+          page_title: "Varmepumpe"
 
 binary_sensor:
   # Call sensors from HA.
