@@ -45,21 +45,21 @@ packages:
       entity_id: sensor.t22_temperature
       unit: "°C"
       format: "%.1f"
-  tile_flip_clock: !include
-    file: gui/tiles/clock/flip_clock.yaml
-    vars:
-      uid: flip_clock
-      row: 2
-      col: 0
-      row_span: 1
-      col_span: 2
-      show_date: true
-  tile_time_btn: !include
-    file: gui/tiles/clock/time_button.yaml
-    vars:
-      uid: tile_time
-      row: 3
-      col: 0
+#  tile_flip_clock: !include
+#    file: gui/tiles/clock/flip_clock.yaml
+#    vars:
+#      uid: flip_clock
+#      row: 2
+#      col: 0
+#      row_span: 1
+#      col_span: 2
+#      show_date: true
+#  tile_time_btn: !include
+#    file: gui/tiles/clock/time_button.yaml
+#    vars:
+#      uid: tile_time
+#      row: 3
+#      col: 0
       
   room_temp_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
