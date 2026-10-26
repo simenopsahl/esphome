@@ -20,7 +20,6 @@
 
 substitutions:
   page_id: page_dashboard
-  click_page: page_analog_clock
   col_span: "1"
   row_span: "1"
   height: "100%"

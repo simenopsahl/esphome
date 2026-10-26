@@ -15,6 +15,7 @@
 #       sensor_id: temperature_local
 #       unit: "°C"
 #       format: "%.1f"
+#       click_page: page_temperature # optional
 
 substitutions:
   page_id: page_dashboard
@@ -48,6 +49,12 @@ lvgl:
               flex_align_main: CENTER
               flex_align_cross: CENTER
               pad_row: 2
+            clickable: ${ "true" if (click_page | default("")) != "" else "false" }
+            on_short_click:
+              - lvgl.page.show:
+                  id: ${ click_page if (click_page | default("")) != "" else (page_id | default("page_dashboard")) }
+                  animation: OUT_LEFT
+                  time: 200ms
             widgets:
               - container:
                   height: SIZE_CONTENT

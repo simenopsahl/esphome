@@ -18,7 +18,6 @@
 
 substitutions:
   page_id: page_dashboard
-  click_page: page_analog_clock
   col_span: "1"
   row_span: "1"
   bg_opa: COVER
