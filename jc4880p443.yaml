@@ -77,7 +77,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_analog_clock
+    home_page: page_dashboard
     page:
       temperature:
         area_label: T22
