@@ -31,7 +31,7 @@ packages:
       icon: "\U000F0595"
       title: "Ute"
       entity_id: sensor.ute_temperature
-      unit: "°C" # Note: escape literal '%' as '%%' (e.g. unit: "%%")
+      unit: "°C"
       format: "%.1f"
   tile_t22_temp_sensor: !include
     file: gui/tiles/sensor/remote.yaml
@@ -43,7 +43,7 @@ packages:
       icon: "\U000F050F"
       title: "T22"
       entity_id: sensor.t22_temperature
-      unit: "°C" # Note: escape literal '%' as '%%' (e.g. unit: "%%")
+      unit: "°C"
       format: "%.1f"
       
   room_temp_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
