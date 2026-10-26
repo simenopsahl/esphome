@@ -11,6 +11,7 @@
           id: set_page_title
           title: ${page_title}
           icon: "\U000F0954"
+      - lvgl.widget.hide: nav_clock
     <<: !include
       file: ../../functions/swipe_navigation.yaml
     widgets:

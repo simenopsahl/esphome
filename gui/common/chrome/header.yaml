@@ -20,6 +20,7 @@ wifi:
 script:
   - id: !extend set_page_title
     then:
+      - lvgl.widget.show: nav_clock
       - lvgl.label.update:
           id: lbl_page_title
           text: !lambda |-

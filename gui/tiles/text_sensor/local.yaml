@@ -18,6 +18,7 @@ substitutions:
   page_id: page_dashboard
   col_span: "1"
   row_span: "1"
+  unit: ""
   value_font: font_md
   icon_font: mdi_md
   title_font: font_sm
@@ -76,6 +77,7 @@ text_sensor:
     on_value:
       - lvgl.label.update:
           id: ${uid}_value
-          text:
-            format: "%s"
-            args: [ 'x.c_str()' ]
+          text: !lambda |-
+            if (x.empty()) return std::string("--");
+            std::string u = "${unit}";
+            return u.empty() ? x : x + " " + u;

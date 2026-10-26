@@ -1,0 +1,255 @@
+# Modular 24h Flip Clock Tile
+#
+# Renders a split-card 24-hour digital clock (hour card + blinking colon + minute card)
+# with an optional uppercase Norwegian date line below the cards.
+# Tapping the clock navigates to `page_analog_clock` (or a custom `click_page`).
+# Automatically extends `lvgl_time_update` to update the hour, minute, and date labels.
+#
+# Usage via packages:
+#   tile_flip_clock: !include
+#     file: gui/tiles/clock/flip_clock.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: flip_clock
+#       row: 0
+#       col: 0
+#       row_span: 1
+#       col_span: 2
+#       show_date: true
+#       click_page: page_analog_clock
+
+substitutions:
+  page_id: page_dashboard
+  click_page: page_analog_clock
+  col_span: "1"
+  row_span: "1"
+  height: "100%"
+  show_date: "false"
+
+  # Responsive default font sizes (can be overridden via vars: font_size)
+  flip_digit_size: >-
+    ${ font_size | default(
+         44 if ([screen_width|int, screen_height|int]|max) <= 320 else
+         (54 if ([screen_width|int, screen_height|int]|max) <= 480 else 76)
+       ) }
+  flip_colon_size: >-
+    ${ ((font_size | default(
+         44 if ([screen_width|int, screen_height|int]|max) <= 320 else
+         (54 if ([screen_width|int, screen_height|int]|max) <= 480 else 76)
+       )) | int) * 62 // 100 }
+  flip_date_size: >-
+    ${ 12 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 480 else 18) }
+
+font:
+  # Stylized split-flap digits (Space Grotesk @600)
+  - file: "gfonts://Space+Grotesk@600"
+    id: flip_sg_font
+    size: ${flip_digit_size}
+    bpp: 4
+    glyphs: "0123456789"
+
+  # Blinking colon between the two cards
+  - file: "gfonts://Space+Grotesk@600"
+    id: flip_colon_font
+    size: ${flip_colon_size}
+    bpp: 4
+    glyphs: ":"
+
+  # Optional uppercase Norwegian date line (IBM Plex Sans @500)
+  - file: "gfonts://IBM+Plex+Sans@500"
+    id: flip_date_font
+    size: ${flip_date_size}
+    bpp: 4
+    glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ0123456789., "
+
+globals:
+  # Drives the 1 Hz blinking colon
+  - id: flip_colon_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+
+lvgl:
+  gradients:
+    - id: flip_card_gradient
+      direction: ver
+      stops:
+        - color: c_bg_p
+          position: 0
+        - color: c_black
+          position: 255
+
+  style_definitions:
+    - id: flip_card_style
+      bg_grad: flip_card_gradient
+      bg_grad_dir: ver
+      bg_opa: COVER
+      radius: 12
+      border_width: 1
+      border_color: c_dark_gray
+      pad_all: 0
+      scrollbar_mode: "OFF"
+
+    - id: flip_digit_style
+      text_font: flip_sg_font
+      text_color: c_text_p
+      align: CENTER
+
+    - id: flip_outer_style
+      bg_opa: TRANSP
+      border_width: 0
+      radius: 0
+      pad_all: 0
+
+    - id: flip_colon_style
+      text_font: flip_colon_font
+      text_color: c_gray
+
+    - id: flip_date_style
+      text_font: flip_date_font
+      text_color: c_text_s
+
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      on_load:
+        - lvgl.widget.hide: nav_clock
+      widgets:
+        - container:
+            id: ${uid}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_pos: ${col | default(column)}
+            grid_cell_row_span: ${row_span | default(1)}
+            grid_cell_column_span: ${col_span | default(column_span | default(1))}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            styles: flip_outer_style
+            clickable: true
+            on_short_click:
+              - lvgl.page.show:
+                  id: ${click_page | default("page_analog_clock")}
+                  animation: OUT_LEFT
+                  time: 200ms
+            widgets:
+              # Column: [ clock row ] then optional [ date line ]
+              - container:
+                  width: 100%
+                  height: ${height | default("100%")}
+                  align: CENTER
+                  pad_all: 2
+                  layout:
+                    type: FLEX
+                    flex_flow: COLUMN
+                    flex_align_main: CENTER
+                    flex_align_cross: CENTER
+                    flex_align_track: CENTER
+                    pad_row: 4
+                  widgets:
+                    # --- Clock row: hour card, colon, minute card ---
+                    - container:
+                        width: 100%
+                        flex_grow: 1
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: CENTER
+                          flex_align_cross: CENTER
+                          flex_align_track: CENTER
+                          pad_column: 6
+                        widgets:
+                          # --- Hour card ---
+                          - obj:
+                              styles: flip_card_style
+                              flex_grow: 1
+                              height: 100%
+                              scrollable: false
+                              clickable: false
+                              widgets:
+                                - label:
+                                    id: flip_hour_label
+                                    styles: flip_digit_style
+                                    align: CENTER
+                                    text: "00"
+
+                          # --- Blinking colon ---
+                          - label:
+                              id: flip_colon
+                              styles: flip_colon_style
+                              text: ":"
+
+                          # --- Minute card ---
+                          - obj:
+                              styles: flip_card_style
+                              flex_grow: 1
+                              height: 100%
+                              scrollable: false
+                              clickable: false
+                              widgets:
+                                - label:
+                                    id: flip_min_label
+                                    styles: flip_digit_style
+                                    align: CENTER
+                                    text: "00"
+
+                    # --- Optional Norwegian date line ---
+                    - label:
+                        id: flip_date
+                        styles: flip_date_style
+                        text: ""
+                        hidden: ${ "false" if (show_date | default(false)) in [true, "true", "True", 1] else "true" }
+
+interval:
+  # Blink the colon (1s on, 1s off)
+  - interval: 1s
+    then:
+      - lambda: 'id(flip_colon_on) = !id(flip_colon_on);'
+      - if:
+          condition:
+            lambda: 'return id(flip_colon_on);'
+          then:
+            - lvgl.widget.update:
+                id: flip_colon
+                text_opa: 100%
+          else:
+            - lvgl.widget.update:
+                id: flip_colon
+                text_opa: 0%
+
+script:
+  - id: !extend lvgl_time_update
+    then:
+      - lvgl.label.update:
+          id: flip_hour_label
+          text: !lambda |-
+            auto now = id(time_homeassistant).now();
+            if (!now.is_valid()) return std::string("00");
+            char buf[4];
+            snprintf(buf, sizeof(buf), "%02d", now.hour);
+            return std::string(buf);
+      - lvgl.label.update:
+          id: flip_min_label
+          text: !lambda |-
+            auto now = id(time_homeassistant).now();
+            if (!now.is_valid()) return std::string("00");
+            char buf[4];
+            snprintf(buf, sizeof(buf), "%02d", now.minute);
+            return std::string(buf);
+      - lvgl.label.update:
+          id: flip_date
+          text: !lambda |-
+            auto t = id(time_homeassistant).now();
+            if (!t.is_valid() || t.day_of_week < 1 || t.day_of_week > 7 || t.month < 1 || t.month > 12) {
+              return std::string("");
+            }
+            static const char *const days[] = {
+                "SØN", "MAN", "TIR", "ONS", "TOR", "FRE", "LØR"
+            };
+            static const char *const months[] = {
+                "JAN", "FEB", "MAR", "APR", "MAI", "JUN",
+                "JUL", "AUG", "SEP", "OKT", "NOV", "DES"
+            };
+            char buf[48];
+            snprintf(buf, sizeof(buf), "%s, %d. %s",
+                     days[t.day_of_week - 1], t.day_of_month, months[t.month - 1]);
+            return std::string(buf);
+

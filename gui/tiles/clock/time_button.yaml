@@ -1,0 +1,68 @@
+# Modular 24h Digital Time Button Tile
+#
+# Displays the current 24-hour time (`HH:MM`) on a grid dashboard page and
+# navigates to `page_analog_clock` (or a custom `click_page`) when tapped.
+# Automatically extends `lvgl_time_update` to stay synchronized.
+#
+# Usage via packages:
+#   tile_clock: !include
+#     file: gui/tiles/clock/time_button.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: tile_time
+#       row: 0
+#       col: 0
+#       col_span: 1
+#       row_span: 1
+#       click_page: page_analog_clock
+
+substitutions:
+  page_id: page_dashboard
+  click_page: page_analog_clock
+  col_span: "1"
+  row_span: "1"
+  bg_opa: COVER
+  time_font: font_xxl
+
+lvgl:
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      on_load:
+        - lvgl.widget.hide: nav_clock
+      widgets:
+        - button:
+            id: ${uid}_btn
+            radius: 12
+            bg_opa: ${bg_opa | default("COVER")}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_pos: ${col | default(column)}
+            grid_cell_row_span: ${row_span | default(1)}
+            grid_cell_column_span: ${col_span | default(column_span | default(1))}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            pad_all: 6
+            on_short_click:
+              - lvgl.page.show:
+                  id: ${click_page | default("page_analog_clock")}
+                  animation: OUT_LEFT
+                  time: 200ms
+            widgets:
+              - label:
+                  id: ${uid}_time_label
+                  align: CENTER
+                  text: "00:00"
+                  text_font: ${time_font | default("font_xxl")}
+                  text_color: c_text_p
+
+script:
+  - id: !extend lvgl_time_update
+    then:
+      - lvgl.label.update:
+          id: ${uid}_time_label
+          text: !lambda |-
+            auto now = id(time_homeassistant).now();
+            if (!now.is_valid()) return std::string("00:00");
+            char buf[8];
+            snprintf(buf, sizeof(buf), "%02d:%02d", now.hour, now.minute);
+            return std::string(buf);
+

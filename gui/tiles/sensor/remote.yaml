@@ -13,7 +13,7 @@
 #       icon: "\U000F0595"
 #       title: "Ute"
 #       entity_id: sensor.outdoor_temperature
-#       unit: "°C" # Note: escape literal '%' as '%%' (e.g. unit: "%%")
+#       unit: "°C"
 #       format: "%.1f"
 
 substitutions:
@@ -82,6 +82,10 @@ sensor:
     on_value:
       - lvgl.label.update:
           id: ${uid}_value
-          text:
-            format: "${format} ${unit}"
-            args: [ 'x' ]
+          text: !lambda |-
+            if (std::isnan(x)) return std::string("--");
+            char buf[32];
+            snprintf(buf, sizeof(buf), "${format}", x);
+            std::string s(buf);
+            std::string u = "${unit}";
+            return u.empty() ? s : s + " " + u;

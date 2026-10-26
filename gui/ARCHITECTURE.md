@@ -52,6 +52,7 @@ gui/
         ├── binary_sensor/    # `local.yaml` & `remote.yaml` (read-only on/off indicator tile)
         ├── button/           # `local.yaml` & `remote.yaml` (stateless action/service trigger tile)
         ├── climate/          # `local.yaml` & `remote.yaml` (live setpoint/action tile -> opens `page_climate`)
+        ├── clock/            # `flip_clock.yaml` & `time_button.yaml` (24h digital clock tiles -> opens `page_analog_clock`)
         ├── light/            # `local.yaml` & `remote.yaml` (toggle + brightness % tile)
         ├── sensor/           # `local.yaml` & `remote.yaml` (numeric sensor readout tile)
         ├── switch/           # `local.yaml` & `remote.yaml` (stateful toggle tile)
@@ -63,10 +64,12 @@ gui/
 ## 2. Responsive Layout Engine
 
 All layouts scale automatically from two flat substitutions declared by the board or resolution stub (`gui/<W>x<H>.yaml`):
+
 - `screen_width`: Horizontal pixel count (e.g. `"240"`, `"320"`, `"480"`, `"800"`)
 - `screen_height`: Vertical pixel count (e.g. `"135"`, `"240"`, `"320"`, `"800"`)
 
 ### How Chrome & Content Area Work Together
+
 1. **[`gui/common/chrome/base.yaml`](file:///x:/esphome/gui/common/chrome/base.yaml)** computes:
    - `chrome_h`: Height of the top header (`titlebar`) and bottom navigation bar (`navbar`), scaling from `24px` (`128×128`) up to `44px` (`800×480`).
    - `page_pad_top` / `page_pad_bottom`: Automatically set to `chrome_h` when `chrome_header` / `chrome_footer` is `"true"` (or `0` when `"false"`, such as `chrome_footer: "false"` on small/round screens $\le 240$ px).
@@ -76,6 +79,7 @@ All layouts scale automatically from two flat substitutions declared by the boar
    - When `screen_width < 180` (e.g. `128×128` or `135×240` portrait), `header.yaml` switches `lbl_page_title` from the text title to the page's MDI icon (`chrome_use_icon_title: "true"`), and standard pages automatically compact their layouts via Jinja conditionals.
 
 ### `container` vs. `obj`
+
 - Use **`container`** for invisible layout grouping (flex rows/columns, grid wrappers). `container` defaults to `width: 100%`, `height: 100%`, transparent background, zero border/padding, and does not intercept touch events.
 - Use **`obj`** when you want a visible card, tile, or modal popup surface. In [`gui/themes/main.yaml`](file:///x:/esphome/gui/themes/main.yaml), `obj` is styled as a rounded card (`bg_color: c_bg_s`, `border_width: 1`, `radius: 20`) matching `button`.
 
@@ -84,7 +88,9 @@ All layouts scale automatically from two flat substitutions declared by the boar
 ## 3. Standard vs. Opt-In Pages
 
 ### Standard Pages (Included by [`gui/main.yaml`](file:///x:/esphome/gui/main.yaml))
+
 Every device that includes `gui/main.yaml` (or a `gui/<W>x<H>.yaml` stub) receives 5 built-in pages:
+
 1. `page_analog_clock` ([`gui/pages/clock/`](file:///x:/esphome/gui/pages/clock))
 2. `page_temperature` ([`gui/pages/temperature/`](file:///x:/esphome/gui/pages/temperature))
 3. `page_nordpool` ([`gui/pages/nordpool/`](file:///x:/esphome/gui/pages/nordpool))
@@ -95,6 +101,7 @@ Every device that includes `gui/main.yaml` (or a `gui/<W>x<H>.yaml` stub) receiv
 > A device can remove any standard page it does not need by adding `- id: !remove <page_id>` under `lvgl: pages:`.
 
 ### Opt-In Pages (`grid_dashboard`, `climate`, Module Pages)
+
 Additional pages are added in the root device YAML under `lvgl: pages:`:
 
 ```yaml
@@ -119,10 +126,12 @@ lvgl:
 ## 4. Dashboard Tiles (`gui/tiles/`)
 
 Tiles are self-contained ESPHome packages (`local.yaml` for on-device ESPHome components, `remote.yaml` for Home Assistant entities) that combine:
+
 1. The LVGL tile widget (injected into `page_dashboard` via `lvgl: pages: - id: !extend ${page_id}`).
 2. The underlying ESPHome / Home Assistant sensors, switches, or scripts that keep the tile's icon color and labels synchronized.
 
 ### Example: Adding Tiles to `page_dashboard`
+
 ```yaml
 packages:
   # Climate shortcut tile (also pulls in gui/pages/climate/sensors.yaml automatically)
@@ -146,7 +155,7 @@ packages:
       icon: "\U000F0595"
       title: "Ute"
       entity_id: sensor.ute_temperature
-      unit: "°C"          # Note: escape literal '%' as '%%' (unit: "%%")
+      unit: "°C"
       format: "%.1f"
 
   # Local display backlight tile (short click toggles, long press cycles brightness)
@@ -169,8 +178,7 @@ packages:
    - Wrap the page's main body in a `- container:` with `styles: container_style`.
 2. **Jinja Substitution Rules in ESPHome**:
    - Do not reference one computed Jinja substitution inside another computed Jinja substitution in the same `substitutions:` block (ESPHome evaluates them in a single pass before chained expressions resolve). Write each formula directly in terms of `screen_width`, `screen_height`, `page_pad_top/bottom`, and `container_pad_*`.
-   - In inline YAML lambdas, never write an unquoted ternary `a ? b : c` on a single line (YAML parses `: ` as a mapping key); always use a block scalar (`!lambda |-`).
-   - In `lvgl.label.update` `format:` strings, always escape literal percent signs as `%%`.
+   - In inline YAML lambdas, never write an unquoted ternary `a ? b : c` on a single line (YAML parses `:` as a mapping key); always use a block scalar (`!lambda |-`).
+   - In raw `lvgl.label.update` `format:` strings (when not using C++ lambdas), always escape literal percent signs as `%%`. In sensor tiles, inline lambdas handle unit concatenation automatically so `unit: "%"` is safe as-is.
 3. **Font Glyphs**:
    - Whenever a new MDI icon `\U000Fxxxx` is used in a page or tile, add its codepoint to [`gui/fonts/glyphs.yaml`](file:///x:/esphome/gui/fonts/glyphs.yaml) so it is compiled into `mdi_sm`..`mdi_xxl`.
-

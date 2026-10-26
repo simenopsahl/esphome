@@ -84,7 +84,7 @@ packages:
       icon: "\U000F058E"
       title: "Luftfuktighet"
       sensor_id: humidity_local
-      unit: "%%"
+      unit: "%"
       format: "%.0f"
   auto_disp_tile: !include
     file: ../../gui/tiles/switch/local.yaml
