@@ -225,7 +225,7 @@ sensor:
       name: "Noise Level"
       id: average_loudness
       filters:
-        - multiply: -1
+        - offset: 100.0
   # CPU Temperature
   - platform: internal_temperature
     name: "CPU Temperature"

@@ -90,7 +90,7 @@ sensor:
       name: "Noise Level"
       id: average_loudness
       filters:
-        - multiply: -1
+        - offset: 100.0
 
 switch:
   # NS4150B

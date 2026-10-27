@@ -27,7 +27,7 @@ sensor:
       name: "PDM Noise Level"
       id: pdm_average_loudness
       filters:
-        - multiply: -1
+        - offset: 100.0
 
 switch:
   - platform: template
