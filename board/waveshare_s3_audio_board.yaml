@@ -1,0 +1,863 @@
+labels: [esp32s3, psram, audio]
+---
+# https://github.com/MichalZaniewicz/esphome-waveshare-esp32-s3-audio-va/blob/main/base/core.yaml
+# Base functions for Waveshare ESP32S3 Audio Board
+# Model:  ESP32-S3R8
+# Flash:  16MB
+# PSRAM:  8MB
+
+# Pins for this model
+packages:
+  pins: !include pins/waveshare_s3_audio_board.yaml
+  i2c: !include extension/internal_i2c.yaml
+
+substitutions:
+  device:
+    model: "Waveshare S3 Audio Board"
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+
+    # Software off: long-press the onboard BOOT button (GPIO0) for ~2 s to enter
+    # deep sleep; a short press wakes the board again. Off by default - set to
+    # 'true' in your thin config to enable it. Note the savings on this board are
+    # modest: the ES8311/ES7210 codecs and the LED strip stay powered (no hardware
+    # shutdown line), so this is closer to a low-power idle than a true power off.
+    enable_deep_sleep: 'false'
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  extension:
+    i2c:
+      internal:
+        frequency: 100kHz
+  feature:
+    audio:
+      volume_min: '0.4'
+      volume_max: '0.8'
+      boot_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+
+esphome:
+  project:
+    name: "Waveshare.S3 Audio Board"
+    version: "1.0.0"
+  on_boot:
+    # Paint the ring as early as we can, so
+    # the device shows life while Wi-Fi/API are still coming up.
+    - priority: 375
+      then:
+        - script.execute: control_leds
+        # Safety net: if HA never connects, stop showing the boot animation.
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(init_in_progress);
+            then:
+              - lambda: id(init_in_progress) = false;
+              - script.execute: control_leds
+    - priority: -100
+      then:
+        # Push the mic gain restored from flash into the ES7210. The codec boots
+        # with `mic_gain` from audio_adc, so without this a saved value would show
+        # in HA while the hardware sat at the default.
+        - lambda: |-
+            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
+            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
+        # Diagnostics: an explicit OFF switch that silences the mic completely.
+        # ON = microphone disabled. (This used to be inverted, so the mic was
+        # stopped on every boot with the switch in its default OFF position.)
+        - if:
+            condition:
+              switch.is_on: diag_disable_mic
+            then:
+              - logger.log: "Mic DISABLED for diagnostics"
+              - microphone.stop_capture: i2s_mic
+            else:
+              - logger.log: "Mic enabled"
+
+esp32:
+# esp32-s3r8
+# FLASH:  16MB
+# PSRAM:  8MB
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      enable_idf_experimental_features: true
+      execute_from_psram: true
+      loop_task_stack_size: 16384
+      assertion_level: DISABLE
+      enable_lwip_assert : false
+    sdkconfig_options:
+      # Caching Optimizations
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
+      
+      # PSRAM Integrations
+      CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      
+      # TLS and Logging
+      CONFIG_MBEDTLS_SSL_PROTO_TLS1_3: "y"
+      CONFIG_LOG_DEFAULT_LEVEL: "0"  # prevents "ESP-IDF" Guru Meditation Error
+
+      # Considerably speeds up micro_wake_word at the cost of more PSRAM.
+      CONFIG_SPIRAM_RODATA: "y"
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: "y"
+
+      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
+      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+    type: ${device.framework.type}
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+wifi:
+  use_psram: true
+  power_save_mode: none
+  enable_btm: true
+  enable_rrm: true
+  on_connect:
+    - script.execute: control_leds
+  on_disconnect:
+    - script.execute: control_leds
+
+api:
+  on_client_connected:
+    - script.execute: control_leds
+  on_client_disconnected:
+    - script.execute: control_leds
+
+logger:
+  deassert_rts_dtr: true
+
+# Software off. No run_duration / sleep_duration, so the node never sleeps on
+# its own: the only path in is the BOOT-button long-press below, which calls
+# deep_sleep.enter only when ${enable_deep_sleep} is 'true'. Wake is a low level
+# on GPIO0 (BOOT pressed). GPIO0 is a strapping pin - holding BOOT through a
+# power cycle still drops the chip into the serial bootloader, unavoidably.
+deep_sleep:
+  id: deep_sleep_ctrl
+  wakeup_pin:
+    number: ${pin.btn.boot}
+    inverted: true            # BOOT is active-low; wake when it is pulled low
+    allow_other_uses: true    # GPIO0 is also the boot_button binary_sensor
+  wakeup_pin_mode: INVERT_WAKEUP   # BOOT still held at sleep time -> flip, don't loop
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: ${pin.int.spi.miso}
+
+globals:
+  - id: mic_is_muted
+    type: bool
+    restore_value: no          # the switch forces OFF at boot (see on_client_connected)
+    initial_value: 'false'
+  # Transient pass-through for the current ring colour (set by led_set_effect
+  # from its params right before use), so no need to persist across reboots.
+  - id: led_ring_color_r
+    type: float
+    restore_value: no
+    initial_value: '1.0'
+  - id: led_ring_color_g
+    type: float
+    restore_value: no
+    initial_value: '0.0'
+  - id: led_ring_color_b
+    type: float
+    restore_value: no
+    initial_value: '1.0'
+  # Ring brightness for the current paint: the day slider, or the night one
+  # while Night mode is on. Set by led_set_effect alongside the colour.
+  - id: led_ring_level
+    type: float
+    restore_value: no
+    initial_value: '0.8'
+  - id: init_in_progress
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+  - id: boot_chime_done
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+# I/O expander: amplifier enable + the three front buttons.
+tca9555:
+  id: ioexp
+  i2c_id: ${module.internal.i2c_bus}
+  address: 0x20
+
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex (the mic and speaker each call i2s_new_channel on the port, and
+# the second fails with "Parent bus is busy"). So we use TWO buses (two I2S ports)
+# over the shared pins:
+#   - i2s_input  = the MIC bus, I2S MASTER. The mic is always capturing (wake
+#     word), so it drives BCLK/LRCLK/MCLK continuously. Using the ESP as master
+#     is what makes the mic get a correct-rate stream (a codec-mastered clock via
+#     force_master gave the mic garbage and killed wake word).
+#   - i2s_output = the SPEAKER bus, I2S SLAVE. It reads the mic's clock and only
+#     needs to output data, so it never contends for a port of its own.
+# The ES8311 (DAC) and ES7210 (ADC) are stock and slave to the mic's clock; no
+# patched es8311 / force_master is needed.
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_adc:
+  - platform: es7210
+    id: adc_es7210
+    i2c_id: ${module.internal.i2c_bus}
+    # Runtime gain lives on the `mic_gain_db` number below (3 dB steps, the
+    # resolution of the ES7210 gain register).
+    mic_gain: 24db
+
+audio_dac:
+  - platform: es8311
+    id: dac_es8311
+    i2c_id: ${module.internal.i2c_bus}
+
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    i2s_audio_id: i2s_input
+    i2s_din_pin: ${pin.audio.i2s_din}
+    adc_type: external
+    pdm: false
+    # default i2s_mode: primary -> this bus masters the shared clock.
+    # 16-bit on purpose: as master the mic defines the frame's slot width, and
+    # the i2s_audio default is 32-bit. The ES8311/speaker are 16-bit, so a
+    # 32-bit frame doubles the bit clock they expect and playback comes out as
+    # noise. Matching 16-bit aligns the whole bus (the ES7210 is 16-bit too).
+    bits_per_sample: 16bit
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    i2s_mode: secondary          # slave to the mic bus's clock
+    dac_type: external
+    audio_dac: dac_es8311
+    timeout: never
+    buffer_duration: 100ms
+
+  # Mixes the announcement and media pipelines into the one physical output.
+  # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
+  # channel would just be discarded.
+  - platform: mixer
+    id: mixing_speaker
+    output_speaker: i2s_speaker
+    num_channels: 1
+    source_speakers:
+      - id: announcement_mixing_input
+        timeout: never
+      - id: media_mixing_input
+        timeout: never
+
+  # The mixer needs both inputs at one sample rate; these resample if needed.
+  - platform: resampler
+    id: announcement_resampling_speaker
+    output_speaker: announcement_mixing_input
+  - platform: resampler
+    id: media_resampling_speaker
+    output_speaker: media_mixing_input
+
+media_player:
+  - platform: speaker
+    id: external_media_player
+    name: None
+    internal: False
+    volume_increment: 0.01
+    volume_min: ${feature.audio.volume_min}
+    volume_max: ${feature.audio.volume_max}
+    announcement_pipeline:
+      speaker: announcement_resampling_speaker
+      format: FLAC              # cheapest codec for the S3
+      num_channels: 1           # stereo is pointless for announcements
+      sample_rate: 48000        # what Music Assistant serves
+    media_pipeline:
+      speaker: media_resampling_speaker
+      format: FLAC
+      num_channels: 1           # mono hardware, one speaker
+      sample_rate: 48000
+    on_announcement:
+      - mixer_speaker.apply_ducking:
+          id: media_mixing_input
+          decibel_reduction: 20
+          duration: 0.0s
+    on_state:
+      # Amp follows playback: turn it on the instant audio starts. It stays on
+      # afterwards (the speaker then holds the line at clean silence), so there
+      # is no per-sound clicking - only the boot window is silent.
+      - if:
+          condition:
+            or:
+              - media_player.is_announcing:
+              - lambda: 'return id(external_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - switch.turn_on: amp_enable
+      - if:
+          condition:
+            - not:
+                media_player.is_announcing:
+          then:
+            - mixer_speaker.apply_ducking:
+                id: media_mixing_input
+                decibel_reduction: 0
+                duration: 1.0s
+    on_mute:
+      - delay: 100ms            # debounce
+      - script.execute: control_leds_volume_changed
+    on_unmute:
+      - delay: 100ms
+      - script.execute: control_leds_volume_changed
+    on_volume:
+      if:
+        condition:
+          - lambda: return !id(init_in_progress);
+        then:
+          - delay: 100ms
+          - script.execute: control_leds_volume_changed
+    files:
+      - id: timer_finished_sound
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
+      - id: wake_word_triggered_sound
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
+      - id: error_cloud_expired
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
+      - id: boot_sound_custom
+        file: ${feature.audio.boot_sound_file}
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: status_ring
+    name: "Status Ring"
+    pin: ${pin.light.rgb}
+    num_leds: 7
+    chipset: WS2812
+    channel_colors: RGB
+    default_transition_length: 150ms
+    effects:
+      # update_interval must be LONGER than transition_length: it is how often
+      # the pulse flips its brightness target (min<->max), not a frame rate. A
+      # 16ms interval flips faster than the transition can move, so the ring just
+      # sits at one brightness (looks solid). ~2x the transition pulses cleanly.
+      - pulse:
+          name: "Pulse Slow"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 2000ms
+          update_interval: 3000ms
+      - pulse:
+          name: "Pulse Medium"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 600ms
+          update_interval: 1200ms
+      - pulse:
+          name: "Pulse Fast"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 300ms
+          update_interval: 600ms
+      - addressable_rainbow:
+          name: "Rainbow Slow"
+          speed: 6
+          width: 7
+      - addressable_color_wipe:
+          name: "Wipe"
+      # Scan / Twinkle use the phase colour set by control_leds, so they still
+      # read as "listening/thinking/replying" while looking different.
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 120ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 8%
+          progress_interval: 40ms
+      - addressable_fireworks:
+          name: "Fireworks"
+          spark_probability: 12%
+          use_random_color: true
+      - addressable_random_twinkle:
+          name: "Random Twinkle"
+          twinkle_probability: 8%
+          progress_interval: 40ms
+      - addressable_rainbow:
+          name: "Rainbow Fast"
+          speed: 15
+          width: 7
+      # Custom effects. current_color is the phase colour set by control_leds,
+      # so these still read as the current assistant state.
+      - addressable_lambda:
+          name: "Comet"
+          update_interval: 70ms
+          lambda: |-
+            static int head = 0;
+            const int n = it.size();
+            for (int i = 0; i < n; i++) {
+              int d = (head - i + n) % n;                 // 0 at head, grows behind
+              float b = (d < 5) ? (1.0f / (1 << d)) : 0.0f;
+              it[i] = Color((uint8_t)(current_color.red   * b),
+                            (uint8_t)(current_color.green * b),
+                            (uint8_t)(current_color.blue  * b));
+            }
+            head = (head + 1) % n;
+      - addressable_lambda:
+          name: "Breathe"
+          update_interval: 32ms
+          lambda: |-
+            static uint16_t t = 0;
+            float b = (sinf(t * 3.14159265f / 128.0f) + 1.0f) * 0.5f;  // 0..1
+            b = 0.12f + b * 0.88f;                                     // floor 12%
+            it.all() = Color((uint8_t)(current_color.red   * b),
+                             (uint8_t)(current_color.green * b),
+                             (uint8_t)(current_color.blue  * b));
+            t = (t + 2) % 256;
+      - addressable_lambda:
+          name: "Spinner"
+          update_interval: 90ms
+          lambda: |-
+            static int pos = 0;
+            const int n = it.size();
+            it.all() = Color(0, 0, 0);
+            it[pos % n] = current_color;
+            it[(pos + 1) % n] = Color((uint8_t)(current_color.red   * 0.35f),
+                                      (uint8_t)(current_color.green * 0.35f),
+                                      (uint8_t)(current_color.blue  * 0.35f));
+            pos = (pos + 1) % n;
+      - addressable_lambda:
+          name: "Fire"
+          update_interval: 70ms
+          lambda: |-
+            const int n = it.size();
+            for (int i = 0; i < n; i++) {
+              uint8_t r = 160 + (esp_random() % 96);       // 160..255
+              uint8_t g = (uint8_t)(r * (0.20f + (esp_random() % 45) / 255.0f));
+              it[i] = Color(r, g, 0);
+            }
+
+sensor:
+  - platform: internal_temperature
+    name: "CPU Temperature"
+    id: cpu_temperature
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: 5s
+    entity_category: diagnostic
+
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 3000ms
+    rms:
+      name: "Noise Level"
+      id: average_loudness
+      filters:
+        - multiply: -1
+
+script:
+  - id: flash_ring
+    then:
+      - light.turn_on:
+          id: status_ring
+          brightness: 100%
+          red: 1.0
+          green: 0.0
+          blue: 0.0
+          effect: "None"
+      - delay: 250ms
+      # Return to the real state instead of going dark (e.g. if a timer is
+      # counting or the VA is active while the mic is muted/unmuted).
+      - script.execute: control_leds
+
+  # Minimal LED dispatcher: off / solid / a named built-in effect.
+  - id: led_set_effect
+    mode: restart
+    parameters:
+      effect: std::string
+      r: float
+      g: float
+      b: float
+    then:
+      - lambda: |-
+          const bool night = id(night_mode).state;
+          const float level = night ? id(night_led_brightness).state : id(led_ring_brightness).state;
+          // The pulse effects drive brightness themselves (30..100%) and ignore
+          // the level, so at night they are dimmed through the colour instead.
+          const float k = (night && effect.rfind("Pulse", 0) == 0) ? level : 1.0f;
+          id(led_ring_color_r) = r * k;
+          id(led_ring_color_g) = g * k;
+          id(led_ring_color_b) = b * k;
+          id(led_ring_level) = level;
+          ESP_LOGI("led", "led_set_effect: effect='%s' rgb(%.2f, %.2f, %.2f) brightness=%.2f night=%d",
+                   effect.c_str(), r * k, g * k, b * k, level, (int) night);
+      - if:
+          condition:
+            lambda: 'return effect == "off";'
+          then:
+            - light.turn_off: status_ring
+          else:
+            - if:
+                condition:
+                  lambda: 'return effect == "solid";'
+                then:
+                  - light.turn_on:
+                      id: status_ring
+                      effect: "None"    # clear any running effect so solid is steady
+                      brightness: !lambda 'return id(led_ring_level);'
+                      red: !lambda 'return id(led_ring_color_r);'
+                      green: !lambda 'return id(led_ring_color_g);'
+                      blue: !lambda 'return id(led_ring_color_b);'
+                else:
+                  - light.turn_on:
+                      id: status_ring
+                      brightness: !lambda 'return id(led_ring_level);'
+                      red: !lambda 'return id(led_ring_color_r);'
+                      green: !lambda 'return id(led_ring_color_g);'
+                      blue: !lambda 'return id(led_ring_color_b);'
+                      effect: !lambda 'return effect;'
+  
+  # The single LED state machine. Everything that changes device state calls
+  # this; nothing else paints the ring directly.
+  - id: control_leds
+    mode: single
+    then:
+      - lambda: |-
+          const bool wifi_connected = id(component_wifi).is_connected();
+          const bool api_connected  = id(component_api).is_connected();
+          const bool init_progress  = id(init_in_progress);
+
+          ESP_LOGD("led",
+                   "control_leds: wifi=%d api=%d init=%d",
+                   (int)wifi_connected, (int)api_connected, (int)init_progress);
+
+          auto set = [&](const std::string &effect, float r, float g, float b) {
+            id(led_set_effect).execute(effect, r, g, b);
+          };
+
+          if (init_progress) {                       // booting
+            if (wifi_connected) set("Rainbow Slow", 0.9, 0.1, 0.85);
+            else                set("Rainbow Slow", 1.0, 0.1, 0.1);
+            return;
+          }
+          if (!wifi_connected || !api_connected) {   // HA unreachable
+            set("Pulse Medium", 1.0, 0.0, 0.0);
+            return;
+          }
+
+          set("off", 0, 0, 0);                       // idle
+
+  # A short green pulse on a volume change, then back to the state machine.
+  - id: control_leds_volume_changed
+    mode: restart
+    then:
+      - light.turn_on:
+          id: status_ring
+          brightness: !lambda 'return id(led_ring_brightness).state;'
+          red: 0.0
+          # Pulse Fast sets its own brightness, so Night mode dims the colour.
+          green: !lambda 'return id(night_mode).state ? id(night_led_brightness).state : 1.0f;'
+          blue: 0.0
+          effect: "Pulse Fast"
+      - delay: 1.2s
+      - script.execute: control_leds
+
+  # ESPHome 2026.10 made audio files const; 2026.8/2026.9 still take a mutable
+  # pointer in play_file(). A const parameter accepts both, and the const_cast
+  # below keeps play_file() compiling on either. The type is spelled with
+  # add_const_t because script parameter types may not contain spaces.
+  - id: play_sound
+    parameters:
+      priority: bool
+      sound_file: "std::add_const_t<audio::AudioFile>*"
+    then:
+      - lambda: |-
+          if (priority) {
+            id(external_media_player)
+              ->make_call()
+              .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_STOP)
+              .set_announcement(true)
+              .perform();
+          }
+          if ((id(external_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+            id(external_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
+          }
+
+  - id: send_tts_uri_event
+    parameters:
+      tts_uri: string
+    then:
+      - homeassistant.event:
+          event: esphome.tts_uri
+          data:
+            uri: !lambda return tts_uri;
+
+  - id: send_stt_text_event
+    parameters:
+      stt_text: string
+    then:
+      - homeassistant.event:
+          event: esphome.stt_text
+          data:
+            text: !lambda return stt_text;
+
+  - id: publish_current_time
+    mode: single
+    then:
+      - lambda: |-
+          static std::string last_time_string = "";
+          auto time_now = id(time_homeassistant).now();
+          std::string current_time_string = time_now.strftime("%H:%M");
+          if (current_time_string != last_time_string) {
+            id(current_time).publish_state(current_time_string);
+            last_time_string = current_time_string;
+          }
+
+switch:
+  - platform: template
+    id: diag_disable_mic
+    name: "Diag: disable microphone"
+    icon: mdi:microphone-settings
+    internal: true                      # diagnostic-only, not shown in HA
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF   # OFF = mic works as usual
+    # These triggers also fire during setup() when the state is restored from
+    # flash - at setup_priority HARDWARE-2, i.e. before the mic and mWW exist.
+    # on_boot (priority -100) applies the restored state once everything is up,
+    # so here we only handle a live toggle.
+    on_turn_on:
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - microphone.stop_capture: i2s_mic
+    on_turn_off:
+      - if:
+          condition:
+            - lambda: return !id(init_in_progress);
+            - switch.is_off: mic_mute_switch
+          then:
+            - microphone.capture: i2s_mic
+
+  - platform: gpio
+    id: amp_enable
+    name: Amplifier
+    icon: "mdi:volume-high"
+    entity_category: config
+    pin:
+      tca9555: ioexp
+      number: ${pin.audio.amp}
+      inverted: false
+    # OFF at boot so the amp doesn't amplify the undriven DAC line as a hiss
+    # before the speaker's first playback. The media_player on_state turns it on
+    # the moment audio starts and leaves it on (the speaker then holds the line
+    # at silence, which is clean).
+    restore_mode: ALWAYS_OFF
+
+  - platform: template
+    id: mic_mute_switch
+    name: "Microphone Mute"
+    icon: mdi:microphone-off
+    # State comes from the lambda below, so restore_mode would be a no-op here.
+    # The mute is forced off at boot by the voice_assistant on_client_connected.
+    lambda: |-
+      return id(mic_is_muted);
+    # A real mute, via ESPHome's own primitive: microphone.mute makes the
+    # Microphone hand every consumer a zero-filled buffer, so the wake word
+    # literally hears silence. The stream keeps running, so there is no I2S
+    # restart and no start/stop race.
+    #
+    # The previous implementation dropped the ES7210 gain to 0.0f - but 0 dB is
+    # UNITY gain, not silence. The mic kept hearing the room and only the wake
+    # word handler ignored it.
+    turn_on_action:
+      - lambda: id(mic_is_muted) = true;
+      - microphone.mute: i2s_mic
+      - script.execute: flash_ring
+    turn_off_action:
+      - lambda: id(mic_is_muted) = false;
+      - microphone.unmute: i2s_mic
+      - script.execute: flash_ring
+
+  - platform: template
+    id: boot_sound
+    name: Boot sound
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+  # Night mode: the ring uses "Night LED Ring Brightness" and the wake sound and
+  # boot chime are skipped. Replies, timers and the alarm still play. Flip it
+  # from a Home Assistant automation (sunset/sunrise, a bedtime scene, ...).
+  - platform: template
+    id: night_mode
+    name: Night mode
+    icon: "mdi:weather-night"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    # Also fires during the restore in setup(), hence the init_in_progress gate.
+    on_turn_on: &repaint_if_ready
+      - if:
+          condition:
+            lambda: 'return !id(init_in_progress);'
+          then:
+            - script.execute: control_leds
+    on_turn_off: *repaint_if_ready
+
+number:
+  - platform: template
+    id: mic_gain_db
+    name: "Mic gain (ES7210)"
+    icon: mdi:microphone-settings
+    entity_category: config
+    unit_of_measurement: dB
+    min_value: 0
+    # The ES7210 gain register moves in 3 dB steps up to 33 dB (then 34.5, 36
+    # and 37.5), so a finer slider step would leave every second position a
+    # no-op. 36 dB is the highest value that sits on the 3 dB grid.
+    max_value: 36
+    step: 3
+    restore_value: true
+    initial_value: 24
+    mode: slider
+    # Without `optimistic`, a template number with only a set_action never
+    # publishes the new value back: the slider snapped back to 24 dB in HA even
+    # though the ES7210 had already been reprogrammed. The restored value is
+    # applied to the codec in on_boot (-100), since TemplateNumber::setup() only
+    # publishes it and does not run set_action.
+    optimistic: true
+    set_action:
+      - lambda: |-
+          id(adc_es7210).set_mic_gain(x);
+      - logger.log:
+          format: "[MIC] ES7210 gain -> %.1f dB"
+          args: ["x"]
+
+  - platform: template
+    id: led_ring_brightness
+    name: "LED Ring Brightness"
+    icon: mdi:brightness-6
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    min_value: 0.4
+    max_value: 1.0
+    step: 0.05
+    initial_value: 0.8
+    mode: slider
+    on_value:
+      - if:
+          condition:
+            and:
+              - light.is_on: status_ring
+              - switch.is_off: night_mode   # Night mode has its own brightness
+          then:
+            - light.turn_on:
+                id: status_ring
+                brightness: !lambda 'return x;'
+
+  # Ring brightness while Night mode is on. The floor is where the WS2812s are
+  # still visibly lit after gamma correction.
+  - platform: template
+    id: night_led_brightness
+    name: "Night LED Ring Brightness"
+    icon: mdi:brightness-4
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    min_value: 0.2
+    max_value: 1.0
+    step: 0.05
+    initial_value: 0.3
+    mode: slider
+    on_value: *repaint_if_ready
+
+text_sensor:
+  # Published for the alarm/clock logic, but not shown in HA (it's just the
+  # device's own clock, which HA already has).
+  - platform: template
+    id: current_time
+    internal: true
+
+binary_sensor:
+  - platform: gpio
+    id: btn_key1
+    name: "Key1"
+    pin:
+      tca9555: ioexp
+      number: ${pin.btn.key1}
+      inverted: true
+    on_press:
+      - media_player.volume_down: external_media_player
+
+  - platform: gpio
+    id: btn_key2
+    name: "Key2"
+    pin:
+      tca9555: ioexp
+      number: ${pin.btn.key2}
+      inverted: true
+    on_press:
+      - media_player.toggle: external_media_player
+
+  - platform: gpio
+    id: btn_key3
+    name: "Key3"
+    pin:
+      tca9555: ioexp
+      number: ${pin.btn.key3}
+      inverted: true
+    on_press:
+      - media_player.volume_up: external_media_player
+
+  # Onboard BOOT button (GPIO0, a strapping pin, direct - not via the expander).
+  # Held for 2 to 10 s it enters deep sleep, but only when ${enable_deep_sleep}
+  # is 'true'; otherwise the long-press does nothing. A short press wakes the
+  # board from deep sleep (handled by the deep_sleep wakeup_pin, not this
+  # sensor). Disabled in HA by default - it exists here for the sleep gesture.
+  - platform: gpio
+    id: boot_button
+    name: "BOOT button"
+    entity_category: diagnostic
+    disabled_by_default: true
+    pin:
+      number: ${pin.btn.boot}
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+      allow_other_uses: true
+    on_click:
+      min_length: 2s
+      max_length: 10s
+      then:
+        - if:
+            condition:
+              lambda: 'return strcmp("${enable_deep_sleep}", "true") == 0;'
+            then:
+              - logger.log: "BOOT long-press: entering deep sleep"
+              - deep_sleep.enter: deep_sleep_ctrl

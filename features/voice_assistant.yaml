@@ -4,6 +4,11 @@
 
 substitutions:
   feature:
+    audio:
+      jack_connected_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_connected.flac
+      jack_disconnected_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_disconnected.flac
+      mute_switch_on_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_on.flac
+      mute_switch_off_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
     voice:
       output_speaker: i2s_speaker
       # Phases of the Voice Assistant
@@ -22,10 +27,6 @@ substitutions:
       # The voice assistant encountered an error
       assist_error_phase_id: '11'
       # Substitutions for audio files
-      jack_connected_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_connected.flac
-      jack_disconnected_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_disconnected.flac
-      mute_switch_on_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_on.flac
-      mute_switch_off_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
       timer_finished_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
       wake_word_triggered_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
       error_cloud_expired_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
@@ -310,13 +311,13 @@ script:
 
 audio_file:
   - id: jack_connected_sound
-    file: ${feature.voice.jack_connected_sound_file}
+    file: ${feature.audio.jack_connected_sound_file}
   - id: jack_disconnected_sound
-    file: ${feature.voice.jack_disconnected_sound_file}
+    file: ${feature.audio.jack_disconnected_sound_file}
   - id: mute_switch_on_sound
-    file: ${feature.voice.mute_switch_on_sound_file}
+    file: ${feature.audio.mute_switch_on_sound_file}
   - id: mute_switch_off_sound
-    file: ${feature.voice.mute_switch_off_sound_file}
+    file: ${feature.audio.mute_switch_off_sound_file}
   - id: timer_finished_sound
     file: ${feature.voice.timer_finished_sound_file}
   - id: wake_word_triggered_sound

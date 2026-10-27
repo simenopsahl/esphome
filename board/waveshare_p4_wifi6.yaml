@@ -200,7 +200,7 @@ sensor:
     microphone:
       microphone: i2s_mic
       channels: 1
-    measurement_duration: 2000ms
+    measurement_duration: 3000ms
     rms:
       name: "Noise Level"
       id: average_loudness

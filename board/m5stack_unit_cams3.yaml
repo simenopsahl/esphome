@@ -166,7 +166,7 @@ sensor:
   - platform: sound_level
     id: sound_level_sensor
     passive: false
-    measurement_duration: 2000ms
+    measurement_duration: 3000ms
     rms:
       name: "PDM Noise Level"
       id: pdm_average_loudness

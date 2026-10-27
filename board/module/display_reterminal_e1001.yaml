@@ -25,10 +25,6 @@ labels: [SPI, display, ePaper]
 # Serial debug: UART0 via CH340K USB bridge
 # =============================================================================
 
-# Notes:
-# Not yet flashed and tested, copied from e1002
-# Display lambda and colors not migrated to B/W ePaper yet
-
 packages:
   epaper: !include ../../features/epaper.yaml
 
@@ -98,12 +94,6 @@ esphome:
         # Read RTC time on boot
         - pcf8563.read_time:
 
-globals:
-  - id: !extend epaper_bg_color
-    initial_value: 'Color(255, 255, 255, 0)' # Default to white background
-  - id: !extend epaper_text_color
-    initial_value: 'Color(0, 0, 0, 0)' # Default to black text
-
 # =============================================================================
 # [1] ePaper display (7.5" B/W, 800x480)
 # Requires ESPHome >= 2025.11.1
@@ -115,17 +105,18 @@ display:
     id: display_eink
     model: Seeed-reTerminal-E1001
     update_interval: never
+    full_update_every: 2
     pages:
       - id: page_black
         lambda: |-
           ESP_LOGI("display", "Page: Black");
           // Fill background.
-          it.fill( id(color_black) );
+          it.fill( COLOR_ON );
       - id: page_white
         lambda: |-
           ESP_LOGI("display", "Page: White");
           // Fill background.
-          it.fill( id(color_white) );
+          it.fill( COLOR_OFF );
       - id: page_info
         lambda: |-
           ESP_LOGI("display", "Page: Info");
@@ -134,7 +125,7 @@ display:
 
           // NAV
             // Home
-          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F02DC");
+          it.print( (it.get_width()/40)*27 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F02DC");
             // Next
           it.print( (it.get_width()/40)*25 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
             // Back
@@ -142,11 +133,11 @@ display:
           
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
-            it.print( 0 , 0, id(mdi_md), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
+            it.print( 0 , 0, id(mdi_md), id(epaper_text_color), TextAlign::TOP_LEFT, "\U000F05A9");
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.print( it.get_width() , 0, id(mdi_md), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
+            it.print( it.get_width() , 0, id(mdi_md), id(epaper_text_color), TextAlign::TOP_RIGHT, "\U000F07D0");
           }
           // PAGE
           it.print( (it.get_width()/40)*5 , 0, id(mdi_md), id(epaper_text_color), "\U000F02FC");
@@ -155,8 +146,8 @@ display:
 
           
           // DEVICE
-          it.filled_rectangle(20, 65, 15, 180, id(epaper_accent1_color));
-          it.line(20, 245, 370, 245, id(epaper_accent1_color));
+          it.filled_rectangle(20, 65, 15, 180, id(epaper_text_color));
+          it.line(20, 245, 370, 245, id(epaper_text_color));
           // NAME
           it.printf( 40, 80, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
           it.printf(40, 135, id(font_sm), id(epaper_text_color), "KEY0 GPIO3: Grønn");
@@ -164,8 +155,8 @@ display:
           it.printf(40, 205, id(font_sm), id(epaper_text_color), "KEY2 GPIO5: Venstre");
           
           // NETWORK
-          it.filled_rectangle(20, 265, 15, 180, id(epaper_accent2_color));
-          it.line(20, 445, 370, 445, id(epaper_accent2_color));
+          it.filled_rectangle(20, 265, 15, 180, id(epaper_text_color));
+          it.line(20, 445, 370, 445, id(epaper_text_color));
           // SSID
           it.printf( 40, 280, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
           // IP
@@ -174,8 +165,8 @@ display:
           it.printf( 40, 395, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
 
           // SENSORS
-          it.filled_rectangle(410, 65, 15, 380, id(epaper_accent3_color));
-          it.line(410, 445, 760, 445, id(epaper_accent3_color));
+          it.filled_rectangle(410, 65, 15, 380, id(epaper_text_color));
+          it.line(410, 445, 760, 445, id(epaper_text_color));
           // PERCENT
           it.print( 430, 80, id(font_md), id(epaper_text_color), "Batteriprosent: " );
           if (id(battery_level).has_state()) {
@@ -190,48 +181,21 @@ display:
           } else {
             it.print(640, 150, id(font_md), id(epaper_text_color), "--V");
           }
-          // TEMPERATURE
-          it.print( 430, 235, id(font_md), id(epaper_text_color), "Temperatur: " );
-          if (id(temperature_sht40).has_state()) {
-            it.printf(640, 235, id(font_md), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
-          } else {
-            it.print(640, 235, id(font_md), id(epaper_text_color), "-- C");
-          }
-          // HUMIDITY
-          it.print( 430, 300, id(font_md), id(epaper_text_color), "Luftfuktighet: " );
-          if (id(humidity_sht40).has_state()) {
-            it.printf(640, 300, id(font_md), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
-          } else {
-            it.print(640, 300, id(font_md), id(epaper_text_color), "-- %");
-          }
-          // SD card
-          if (id(sd_card_detect).state) {
-            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Kort: oppdaget");
-          } else {
-            it.printf(430, 385, id(font_sm), id(epaper_text_color), "SD Kort: ikke oppdaget");
-          }
           
           // Refresh Timestamp
           // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
           char str[17];
-          time_t currTime = id(time_rtc).now().timestamp;
+          time_t currTime = id(time_homeassistant).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
           it.printf( 0, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "@ %s", str );
 
 #    lambda: |-
-#      const auto BLACK   = Color(0,   0,   0,   0);
-#      const auto WHITE   = Color(255, 255, 255, 0);
-#      const auto RED     = Color(255, 0,   0,   0);
-#      const auto GREEN   = Color(0,   255, 0,   0);
-#      const auto BLUE    = Color(0,   0,   255, 0);
-#      const auto YELLOW  = Color(255, 255, 0,   0);
-
-#      it.rectangle(10, 10, 100, 50, BLACK);
-#      it.rectangle(150, 10, 50, 50, RED);
-#      it.circle(250, 35, 25, GREEN);
-#      it.filled_rectangle(10, 80, 100, 50, BLUE);
-#      it.filled_rectangle(150, 80, 50, 50, YELLOW);
-#      it.filled_circle(250, 105, 25, WHITE);
+#      it.rectangle(10, 10, 100, 50);
+#      it.rectangle(150, 10, 50, 50);
+#      it.circle(250, 35, 25);
+#      it.filled_rectangle(10, 80, 100, 50);
+#      it.filled_rectangle(150, 80, 50, 50);
+#      it.filled_circle(250, 105, 25);
 
 font:
   - id: font_sm
@@ -422,22 +386,6 @@ sensor:
     heater_power: Low
     heater_time: Short
     update_interval: 10s
-
-  - id: !extend recorded_display_refresh_sensor
-    # Alternate epaper colors
-    on_value:
-      - then:
-          - lambda: |-
-              // This C++ logic updates the color globals
-              if (((int)x) % 5 == 0) {
-                // On refreshes 0, 5, 10, etc., set Black background, White text
-                id(epaper_bg_color) = Color(0, 0, 0, 0);
-                id(epaper_text_color) = Color(255, 255, 255, 0);
-              } else {
-                // On all other refreshes, set White background, Black text
-                id(epaper_bg_color) = Color(255, 255, 255, 0);
-                id(epaper_text_color) = Color(0, 0, 0, 0);
-              }
 
 binary_sensor:
   # KEY0 (GPIO3)
