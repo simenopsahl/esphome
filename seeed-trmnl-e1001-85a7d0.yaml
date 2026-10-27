@@ -1,0 +1,372 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
+  board: !include board/seeed_xiao_esp32s3_plus.yaml
+  e1002: !include board/module/display_reterminal_e1001.yaml
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: seeed-trmnl-e1001-85a7d0
+    location: "Storage"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_info
+    font:
+      text_sm: 18
+      text_md: 22
+      text_lg: 26
+      text_xl: 30
+      text_xxl: 36
+      text_hg: 44
+      text_fl: 54
+      icons_sm: 30
+      icons_md: 38
+      icons_lg: 46
+      icons_xl: 56
+      icons_xxl: 66
+
+esphome:
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
+
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.39
+
+display:
+  - id: !extend display_eink
+    pages:
+      - id: page_image
+        lambda: |-
+          ESP_LOGI("display", "Page: Image");
+          // esp_random() generates a random 32-bit integer.
+          // Using modulo 3 (% 3) strictly limits the result to 0, 1, or 2.
+          uint8_t random_choice = esp_random() % 3;
+          
+          if (random_choice == 0) {
+            it.image(0, 0, id(i_selma_1));
+          } else if (random_choice == 1) {
+            it.image(0, 0, id(i_selma_2));
+          } else {
+            it.image(0, 0, id(i_selma_3));
+          }
+
+# Check if person is home
+binary_sensor:
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_occupancy
+    id: presence_detected
+
+  # Home
+  - id: !extend button_green
+    on_press:
+      - display.page.show: ${display.home_page}
+      - script.execute: update_screen
+  # Stick Press
+  - id: !extend button_left
+    on_press:
+      - display.page.show_previous: display_eink
+      - script.execute: update_screen
+  # Stick Down
+  - id: !extend button_right
+    on_press:
+      - display.page.show_next: display_eink
+      - script.execute: update_screen
+
+image:
+  - platform: file
+    defaults:
+      type: BINARY
+    files:
+      - id: i_selma_1
+        file: gui/img/eink/selma_1_480x800.png
+      - id: i_selma_2
+        file: gui/img/eink/selma_3_480x800.png
+      - id: i_selma_3
+        file: gui/img/eink/selma_3_480x800.png
+
+sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: car_battery_percent
+    id: car_battery_percent
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: car_battery_range
+    id: car_battery_range
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_forecast
+    id: weather_temperature_forecast
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_measured
+    id: weather_temperature_actual
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_0
+    id: weather_temperature_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_1
+    id: weather_temperature_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_2
+    id: weather_temperature_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_3
+    id: weather_temperature_3
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_temperature_4
+    id: weather_temperature_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    id: nordpool_sensor
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price0
+    id: nordpool_price_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price4
+    id: nordpool_price_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: price8
+    id: nordpool_price_8
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+graph:
+  - id: graph_nordpool
+    duration: 9h
+    border: false
+    x_grid: 1h
+    y_grid: 10.0
+    width: 390
+    height: 160
+    traces:
+      - id: trace_nordpool
+        sensor: nordpool_sensor
+        line_thickness: 8
+
+# Strings from Home Assistant
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_time_0
+    id: bus_bregnefaret_due_at_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_line_0
+    id: bus_bregnefaret_line_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_time_1
+    id: bus_bregnefaret_due_at_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_line_1
+    id: bus_bregnefaret_line_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_line_2
+    id: bus_bregnefaret_line_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: bus_bregnefaret_time_2
+    id: bus_bregnefaret_due_at_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: folloren_next
+    id: folloren_next
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: folloren_restavfall
+    id: folloren_restavfall
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: folloren_papir
+    id: folloren_papir
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_now
+    id: weather_condition_now
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_0
+    id: weather_condition_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_0
+    id: weather_timestamp_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_1
+    id: weather_condition_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_1
+    id: weather_timestamp_1
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_2
+    id: weather_condition_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_2
+    id: weather_timestamp_2
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_3
+    id: weather_condition_3
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_3
+    id: weather_timestamp_3
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_4
+    id: weather_condition_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_timestamp_4
+    id: weather_timestamp_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time0
+    id: nordpool_time_0
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time4
+    id: nordpool_time_4
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_nordpool_future_offset
+    attribute: time8
+    id: nordpool_time_8
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
