@@ -42,7 +42,7 @@ wifi:
   manual_ip: 
     gateway: 192.168.68.1
     subnet: 255.255.252.0
-    static_ip: 192.168.71.37
+    static_ip: 192.168.71.39
     
 # Check if person is home
 binary_sensor:
