@@ -5,8 +5,8 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r_voice.yaml
-  grove: !include board/extension/grove_i2c.yaml
-  disp: !include board/module/unit_oled.yaml
+#  grove: !include board/extension/grove_i2c.yaml
+#  disp: !include board/module/unit_oled.yaml
 
 substitutions:
   common:
@@ -33,9 +33,9 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.73
 
-binary_sensor:
+#binary_sensor:
   # Button Press
-  - id: !extend btn_front
-    on_press:
-      - display.page.show_next: display_oled
-      - component.update: display_oled
+#  - id: !extend btn_front
+#    on_press:
+#      - display.page.show_next: display_oled
+#      - component.update: display_oled
