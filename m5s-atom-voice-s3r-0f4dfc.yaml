@@ -21,7 +21,6 @@ substitutions:
     home_page: page_info
 
 esphome:
-  build_path: C:/Users/simen/.esphome_build/m5s-as3r-voice-0f4dfc
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
