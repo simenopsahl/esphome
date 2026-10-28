@@ -25,6 +25,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack Air Quality"
+    rtc: "true"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -39,7 +40,7 @@ esphome:
   on_boot:
     - priority: 800
       then:
-        - bm8563.read_time
+        - bm8563.read_time:
     - priority: 800
       then:
         # Bypass sleep circuit arduino
@@ -73,7 +74,7 @@ time:
     i2c_id: ${module.internal.i2c_bus}
     id: time_rtc
     address: 0x51
-    update_interval: 15min
+    update_interval: never
   - id: !extend time_homeassistant
     on_time_sync:
       - then:

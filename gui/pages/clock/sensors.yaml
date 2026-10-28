@@ -20,6 +20,27 @@ substitutions:
   clock_translate_x: ${ clock_label_offset if (screen_width|int > screen_height|int) else 0 }
   clock_translate_y: ${ 0 if (screen_width|int > screen_height|int) else clock_label_offset }
 
+  # Time source driving all LVGL clocks: the board's RTC (`time_rtc`) when the
+  # board sets `device.rtc: "true"`, otherwise Home Assistant time.
+  # Nested under `clock:` so ESPHome evaluates it in `do_substitution_pass`
+  # after all package `device:` dicts (`common`, `board`, root) are deep-merged.
+  clock:
+    time_id: >-
+      ${ "time_rtc" if ((device.rtc | default("false") | string | lower) == "true")
+         else "time_homeassistant" }
+
+# Refresh all clocks on time sync (boot RTC read / HA sync) and every minute
+time:
+  - id: !extend ${clock.time_id}
+    on_time_sync:
+      - then:
+          - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
 # clock update script
 script:
   - id: lvgl_time_update
@@ -28,26 +49,26 @@ script:
           id: nav_clock
           text:
             time_format: "%H:%M"
-            time: time_homeassistant
+            time: ${clock.time_id}
       - lvgl.indicator.update:
           id: minute_hand
           value: !lambda |-
-            return id(time_homeassistant).now().minute;
+            return id(${clock.time_id}).now().minute;
       - lvgl.indicator.update:
           id: hour_hand
           value: !lambda |-
-            auto now = id(time_homeassistant).now();
+            auto now = id(${clock.time_id}).now();
             return std::fmod(now.hour, 12) * 60 + now.minute;
       - lvgl.label.update:
           id: date_label
           text: !lambda |-
             static const char * const mon_names[] = {"JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEC"};
             static char date_buf[8];
-            auto now = id(time_homeassistant).now();
+            auto now = id(${clock.time_id}).now();
             snprintf(date_buf, sizeof(date_buf), "%s %2d", mon_names[now.month-1], now.day_of_month);
             return date_buf;
       - lvgl.label.update:
           id: day_label
           text: !lambda |-
             static const char * const day_names[] = {"SØN", "MAN", "TIR", "ONS", "TOR", "FRE", "LØR"};
-            return day_names[id(time_homeassistant).now().day_of_week - 1];
+            return day_names[id(${clock.time_id}).now().day_of_week - 1];

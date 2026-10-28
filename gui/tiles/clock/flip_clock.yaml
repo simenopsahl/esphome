@@ -220,7 +220,7 @@ script:
       - lvgl.label.update:
           id: flip_hour_label
           text: !lambda |-
-            auto now = id(time_homeassistant).now();
+            auto now = id(${clock.time_id}).now();
             if (!now.is_valid()) return std::string("00");
             char buf[4];
             snprintf(buf, sizeof(buf), "%02d", now.hour);
@@ -228,7 +228,7 @@ script:
       - lvgl.label.update:
           id: flip_min_label
           text: !lambda |-
-            auto now = id(time_homeassistant).now();
+            auto now = id(${clock.time_id}).now();
             if (!now.is_valid()) return std::string("00");
             char buf[4];
             snprintf(buf, sizeof(buf), "%02d", now.minute);
@@ -236,7 +236,7 @@ script:
       - lvgl.label.update:
           id: flip_date
           text: !lambda |-
-            auto t = id(time_homeassistant).now();
+            auto t = id(${clock.time_id}).now();
             if (!t.is_valid() || t.day_of_week < 1 || t.day_of_week > 7 || t.month < 1 || t.month > 12) {
               return std::string("");
             }

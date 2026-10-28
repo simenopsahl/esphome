@@ -34,6 +34,7 @@ substitutions:
   screen_height: "480"
   device:
     model: "Seeed reTerminal E1002"
+    rtc: "true"
     screen:
       width: ${screen_width}
       height: ${screen_height}

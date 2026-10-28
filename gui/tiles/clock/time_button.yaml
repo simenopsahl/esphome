@@ -59,7 +59,7 @@ script:
       - lvgl.label.update:
           id: ${uid}_time_label
           text: !lambda |-
-            auto now = id(time_homeassistant).now();
+            auto now = id(${clock.time_id}).now();
             if (!now.is_valid()) return std::string("00:00");
             char buf[8];
             snprintf(buf, sizeof(buf), "%02d:%02d", now.hour, now.minute);

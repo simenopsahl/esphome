@@ -32,12 +32,11 @@ esphome:
   project:
     name: "M5Stack.CoreInk"
     version: "1.0.0"
+  on_boot:
 # i2c RTC only with one additional i2c bus
-#  on_boot:
 #    - priority: 800
 #      then:
-#        - pcf8563.read_time
-  on_boot:
+#        - pcf8563.read_time:
     - priority: 800
       then:
         # Bypass sleep circuit arduino

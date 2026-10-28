@@ -54,15 +54,6 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.44
 
-# --- LVGL CLOCKS ---
-time:
-  - id: !extend time_homeassistant
-    on_time:
-      - minutes: '*'
-        seconds: 0
-        then:
-          - script.execute: lvgl_time_update
-
 lvgl:
   buffer_size: 40%
   pages:

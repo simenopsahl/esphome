@@ -16,6 +16,7 @@ packages:
 substitutions:
   device:
     model: "Ulanzi TC001"
+    rtc: "true"
     rmt_symbols_block: 64
     framework:
       type: esp-idf
@@ -25,7 +26,8 @@ esphome:
     name: "Ulanzi.EHMTXv2"
     version: "1.0.0"
   on_boot:
-    - then:
+    - priority: 800
+      then:
         - ds1307.read_time:
   # Initialize CLOCK screen
         - lambda: |-

@@ -14,6 +14,7 @@ packages:
 substitutions:
   device:
     model: "Waveshare S3 Audio Board"
+    rtc: "true"
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -42,6 +43,9 @@ esphome:
     name: "Waveshare.S3 Audio Board"
     version: "1.0.0"
   on_boot:
+    - priority: 800
+      then:
+        - pcf85063.read_time:
     # Paint the ring as early as we can, so
     # the device shows life while Wi-Fi/API are still coming up.
     - priority: 375
@@ -185,6 +189,17 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+
+time:
+  - platform: pcf85063
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    address: 0x51
+    update_interval: never
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - pcf85063.write_time:
 
 # I/O expander: amplifier enable + the three front buttons.
 tca9555:
@@ -628,7 +643,7 @@ script:
     then:
       - lambda: |-
           static std::string last_time_string = "";
-          auto time_now = id(time_homeassistant).now();
+          auto time_now = id(time_rtc).now();
           std::string current_time_string = time_now.strftime("%H:%M");
           if (current_time_string != last_time_string) {
             id(current_time).publish_state(current_time_string);
