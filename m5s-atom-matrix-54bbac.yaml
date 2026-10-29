@@ -24,7 +24,6 @@ substitutions:
     home_page: page_status
 
 esphome:
-  build_path: C:/Users/simen/.esphome_build/m5s-atom-matrix-54bbac
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
