@@ -28,7 +28,8 @@ substitutions:
     audio:
       volume_min: '0.4'
       volume_max: '0.8'
-      boot_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+      sound_file_boot: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+      sound_file_speaker_enable: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
 
 esphome:
   project:
@@ -108,9 +109,9 @@ api:
         then:
           - switch.turn_off: mic_mute_switch
     - lambda: id(init_in_progress) = false;
-    # One-shot "ready" chime. It MUST run after micro_wake_word.start above: the
+    # One-shot "ready" chime. It MUST run after the mic is turned on: the
     # speaker is a slave to the mic's I2S clock, so playing before the mic is
-    # capturing hangs the announcement (and then wake word stops working). The
+    # capturing hangs the announcement and can interrupt mic operation. The
     # flag is set first so an HA reconnect can't replay it.
     - if:
         condition:
@@ -331,7 +332,9 @@ media_player:
                 duration: 1.0s
     files:
       - id: boot_sound_custom
-        file: ${feature.audio.boot_sound_file}
+        file: ${feature.audio.sound_file_boot}
+      - id: speaker_enable_sound
+        file: ${feature.audio.sound_file_speaker_enable}
 
 switch:
   # Speaker Amplifier Enable
@@ -342,6 +345,22 @@ switch:
     name: "Amplifier"
     icon: "mdi:volume-high"
     entity_category: config
+    on_turn_on:
+      - if:
+          condition:
+            - lambda: 'return id(boot_chime_done);'
+            - lambda: 'return !id(init_in_progress);'
+            - switch.is_on: boot_sound
+            - switch.is_off: diag_disable_mic
+            - not:
+                media_player.is_announcing: speaker_media_player
+            - lambda: 'return id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - delay: 250ms            # let the amplifier settle
+            - script.execute:
+                id: play_sound
+                priority: false
+                sound_file: !lambda return id(speaker_enable_sound);
 
   - platform: template
     id: diag_disable_mic

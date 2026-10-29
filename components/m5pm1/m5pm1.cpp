@@ -6,177 +6,338 @@ namespace m5pm1 {
 
 static const char *const TAG = "m5pm1";
 
+// ============================================================================
+// Low-level register access
+// ============================================================================
+
+bool M5PM1Component::read_reg(uint8_t reg, uint8_t *value) {
+  return this->read_register(reg, value, 1) == i2c::ERROR_OK;
+}
+
+bool M5PM1Component::write_reg(uint8_t reg, uint8_t value) {
+  return this->write_register(reg, &value, 1) == i2c::ERROR_OK;
+}
+
+bool M5PM1Component::read_reg16(uint8_t reg, uint16_t *value) {
+  uint8_t buf[2];
+  if (this->read_register(reg, buf, 2) != i2c::ERROR_OK)
+    return false;
+  // Little-endian: low byte first
+  *value = (uint16_t) buf[0] | ((uint16_t) buf[1] << 8);
+  return true;
+}
+
+bool M5PM1Component::write_reg16(uint8_t reg, uint16_t value) {
+  uint8_t buf[2] = {(uint8_t) (value & 0xFF), (uint8_t) ((value >> 8) & 0xFF)};
+  return this->write_register(reg, buf, 2) == i2c::ERROR_OK;
+}
+
+bool M5PM1Component::read_bytes_reg(uint8_t reg, uint8_t *data, uint8_t len) {
+  return this->read_register(reg, data, len) == i2c::ERROR_OK;
+}
+
+bool M5PM1Component::write_bytes_reg(uint8_t reg, const uint8_t *data, uint8_t len) {
+  return this->write_register(reg, data, len) == i2c::ERROR_OK;
+}
+
+bool M5PM1Component::update_bits(uint8_t reg, uint8_t mask, uint8_t value) {
+  uint8_t current;
+  if (!this->read_reg(reg, &current))
+    return false;
+  current = (current & ~mask) | (value & mask);
+  return this->write_reg(reg, current);
+}
+
+// ============================================================================
+// Component lifecycle
+// ============================================================================
+
 void M5PM1Component::setup() {
-  ESP_LOGCONFIG(TAG, "M5PM1 @ 0x%02X", this->address_);
-  // read_reg_ handles wake-up automatically now
-}
-
-void M5PM1Component::update() {
-  read_sensors_();
-  update_power_level_();
-}
-
-void M5PM1Component::trigger_update() {
-  read_sensors_();
-}
-
-void M5PM1Component::read_sensors_() {
-  if (battery_voltage_sensor_) {
-    uint16_t voltage_mv = read_battery_voltage_mv_();
-    float voltage = voltage_mv / 1000.0f;
-    battery_voltage_sensor_->publish_state(voltage);
+  ESP_LOGCONFIG(TAG, "Setting up M5PM1...");
+  uint8_t id = 0;
+  if (!this->get_device_id(&id)) {
+    ESP_LOGE(TAG, "Communication with M5PM1 failed");
+    this->mark_failed();
+    return;
   }
+  ESP_LOGCONFIG(TAG, "  Device ID: 0x%02X", id);
 
-  if (on_battery_sensor_ || on_usb_sensor_) {
-    uint8_t src = read_reg_(REG_PWR_SRC);
-    bool on_bat = (src == 2);
-    bool on_usb = (src == 0) || (src == 1);
-    if (on_battery_sensor_) on_battery_sensor_->publish_state(on_bat);
-    if (on_usb_sensor_) on_usb_sensor_->publish_state(on_usb);
+  if (this->i2c_sleep_boot_ >= 0)
+    this->set_i2c_sleep_time((uint8_t) this->i2c_sleep_boot_);
+  if (this->battery_lvp_boot_ >= 0)
+    this->set_battery_lvp((uint16_t) this->battery_lvp_boot_);
+  if (this->charge_boot_ >= 0)
+    this->set_charge_enable(this->charge_boot_ != 0);
+  if (this->dcdc_boot_ >= 0)
+    this->set_dcdc_enable(this->dcdc_boot_ != 0);
+  if (this->ldo_boot_ >= 0)
+    this->set_ldo_enable(this->ldo_boot_ != 0);
+  if (this->boost_boot_ >= 0)
+    this->set_boost_enable(this->boost_boot_ != 0);
+  if (this->l3b_boot_ >= 0) {
+    this->gpio_set_func(2, GPIO_FUNC_GPIO);
+    this->gpio_set_drive(2, GPIO_DRIVE_PUSHPULL);
+    this->gpio_set_mode(2, true);
+    this->gpio_set_output(2, this->l3b_boot_ != 0);
   }
-}
-
-void M5PM1Component::update_power_level_() {
-  uint8_t pwr_cfg = read_reg_(REG_PWR_CFG);
-  uint8_t gpio_out = read_reg_(REG_GPIO_OUT);
-  ESP_LOGD(TAG, "PWR_CFG=0x%02X GPIO_OUT=0x%02X", pwr_cfg, gpio_out);
-  
-  bool dcdc_en = pwr_cfg & PWR_CFG_DCDC_EN;   // DCDC3V3 - ESP32 power
-  bool ldo_en = pwr_cfg & PWR_CFG_LDO_EN;    // LDO3V3 - IMU power  
-  bool boost_en = pwr_cfg & PWR_CFG_BOOST_EN;  // BOOST5V - 5V output
-  bool gpio2_out = gpio_out & (1 << 2);     // GPIO2: LOW=L3B, HIGH=L3A
-  bool charging_en = pwr_cfg & PWR_CFG_CHG_EN;
-
-  const char* level = "L0";
-
-  // L0: Only PMIC powered, everything off (CHG may be on)
-  if (!dcdc_en && !ldo_en && charging_en) {
-    level = "L0";
+  if ((this->boost_boot_ > 0) || (this->l3b_boot_ > 0)) {
+    // Allow external Grove / HAT sensors and rails to power up and stabilize
+    delay(100);
   }
-  // L1: LDO enabled (IMU), ESP32 off
-  else if (ldo_en && !dcdc_en && !gpio2_out) {
-    level = "L1";
-  }
-  // L3A: DCDC on + GPIO2 LOW (ESP32 active, peripherals on)
-  else if (dcdc_en && !gpio2_out) {
-    level = "L3A";
-  }
-  // L3B: DCDC on + GPIO2 HIGH (all peripherals on)
-  else if (dcdc_en && gpio2_out) {
-    level = "L3B";
-  }
-  // Fallback
-  else {
-    level = "LX";
-  }
-
-  power_level_ = level;
-  ESP_LOGD(TAG, "Power level set to: %s", level);
 }
 
 void M5PM1Component::dump_config() {
   ESP_LOGCONFIG(TAG, "M5PM1:");
   LOG_I2C_DEVICE(this);
-  ESP_LOGD(TAG, " Update interval: %u ms", this->update_interval_);
-  uint8_t pwr_src = read_reg_(REG_PWR_SRC);
-  uint8_t pwr_cfg = read_reg_(REG_PWR_CFG);
-  ESP_LOGD(TAG, "PWR_SRC=0x%02X PWR_CFG=0x%02X", pwr_src, pwr_cfg);
+  if (this->is_failed()) {
+    ESP_LOGE(TAG, "  Communication failed!");
+    return;
+  }
+  uint8_t hw = 0, sw = 0, model = 0;
+  this->read_reg(REG_HW_REV, &hw);
+  this->read_reg(REG_SW_REV, &sw);
+  this->read_reg(REG_DEVICE_MODEL, &model);
+  ESP_LOGCONFIG(TAG, "  Model: 0x%02X  HW rev: 0x%02X  FW rev: 0x%02X", model, hw, sw);
 }
 
-uint8_t M5PM1Component::read_reg_(uint8_t reg) {
+// ============================================================================
+// ADC / temperature
+// ============================================================================
+
+bool M5PM1Component::read_adc(AdcChannel channel, uint16_t *value) {
+  // Start conversion: [3:1] channel, [0] start
+  uint8_t ctrl = (uint8_t) ((channel << 1) | 0x01);
+  if (!this->write_reg(REG_ADC_CTRL, ctrl))
+    return false;
+
+  // Poll until the start bit clears (max ~500 ms)
+  uint8_t reg = 0;
+  int tries = 0;
+  do {
+    delay(10);
+    if (!this->read_reg(REG_ADC_CTRL, &reg))
+      return false;
+    tries++;
+  } while ((reg & 0x01) && tries < 50);
+
+  if (reg & 0x01) {
+    ESP_LOGW(TAG, "ADC conversion timeout on channel %d", channel);
+    return false;
+  }
+
+  if (!this->read_reg16(REG_ADC_RES_L, value))
+    return false;
+  *value &= 0x0FFF;  // 12-bit result
+  return true;
+}
+
+// ============================================================================
+// Power source
+// ============================================================================
+
+bool M5PM1Component::get_power_source(PowerSource *src) {
   uint8_t val = 0;
-  
-  // Wake-up: read REG 0x06 first to wake PM1 from sleep
-  //uint8_t wake = 0;
-  //this->read_register(0x06, &wake, 1);
-  
-  // Now do intended read 
-  if (this->read_register(reg, &val, 1) != i2c::ERROR_OK) {
-    ESP_LOGW(TAG, "I2C read failed: 0x%02X", reg);
+  if (!this->read_reg(REG_PWR_SRC, &val))
+    return false;
+  *src = (PowerSource) (val & 0x07);
+  return true;
+}
+
+// ============================================================================
+// Holds
+// ============================================================================
+
+bool M5PM1Component::set_gpio_hold(uint8_t pin, bool en) {
+  if (pin > 4)
+    return false;
+  return this->update_bits(REG_HOLD_CFG, (uint8_t) (1 << pin), en ? (uint8_t) (1 << pin) : 0);
+}
+
+// ============================================================================
+// Battery LVP
+// ============================================================================
+
+bool M5PM1Component::set_battery_lvp(uint16_t mv) {
+  if (mv < 2000 || mv > 4000) {
+    ESP_LOGW(TAG, "Battery LVP %u mV out of range (2000-4000)", mv);
+    return false;
   }
-  return val;
+  // value = (mv - 2000) / 7.81  ->  (mv - 2000) * 100 / 781
+  uint8_t lvp = (uint8_t) ((mv - 2000) * 100 / 781);
+  return this->write_reg(REG_BATT_LVP, lvp);
 }
 
-void M5PM1Component::write_reg_(uint8_t reg, uint8_t val) {
-  // Wake-up read first
-  //uint8_t wake = 0;
-  //this->read_register(0x06, &wake, 1);
-  
-  // Now do intended write
-  if (this->write_register(reg, &val, 1) != i2c::ERROR_OK) {
-    ESP_LOGW(TAG, "I2C write failed: 0x%02X", reg);
-  }
+// ============================================================================
+// Timer
+// ============================================================================
+
+bool M5PM1Component::timer_set(uint32_t seconds, TimerAction action) {
+  if (seconds > 214748364)
+    return false;
+  uint8_t data[4] = {
+      (uint8_t) (seconds & 0xFF),
+      (uint8_t) ((seconds >> 8) & 0xFF),
+      (uint8_t) ((seconds >> 16) & 0xFF),
+      (uint8_t) ((seconds >> 24) & 0x7F),
+  };
+  if (!this->write_bytes_reg(REG_TIM_CNT_0, data, 4))
+    return false;
+  uint8_t cfg = (uint8_t) (0x08 | (uint8_t) action);  // ARM=1, set action
+  if (!this->write_reg(REG_TIM_CFG, cfg))
+    return false;
+  return this->write_reg(REG_TIM_KEY, TIM_RELOAD_KEY);
 }
 
-uint16_t M5PM1Component::read_battery_voltage_mv_() {
-  uint8_t buf[2] = {0};
-  this->read_register(REG_VBAT_L, buf, 2);
-  return (buf[1] << 8) | buf[0];
+bool M5PM1Component::timer_clear() {
+  if (!this->write_reg(REG_TIM_CFG, 0))
+    return false;
+  return this->write_reg(REG_TIM_KEY, TIM_RELOAD_KEY);
 }
 
-void M5PM1Component::set_ldo_enabled(bool on) {
-  uint8_t cfg = read_reg_(REG_PWR_CFG);
-  if (on) cfg |= PWR_CFG_LDO_EN;
-  else cfg &= ~PWR_CFG_LDO_EN;
-  write_reg_(REG_PWR_CFG, cfg);
-}
-void M5PM1Component::set_dcdc_enabled(bool on) {
-  uint8_t cfg = read_reg_(REG_PWR_CFG);
-  if (on) cfg |= PWR_CFG_DCDC_EN;
-  else cfg &= ~PWR_CFG_DCDC_EN;
-  write_reg_(REG_PWR_CFG, cfg);
-}
-void M5PM1Component::set_5v_enabled(bool on) {
-  uint8_t cfg = read_reg_(REG_PWR_CFG);
-  if (on) cfg |= PWR_CFG_BOOST_EN;
-  else cfg &= ~PWR_CFG_BOOST_EN;
-  write_reg_(REG_PWR_CFG, cfg);
-}
-void M5PM1Component::set_charging_enabled(bool on) {
-  uint8_t cfg = read_reg_(REG_PWR_CFG);
-  if (on) cfg |= PWR_CFG_CHG_EN;
-  else cfg &= ~PWR_CFG_CHG_EN;
-  write_reg_(REG_PWR_CFG, cfg);
+// ============================================================================
+// GPIO
+// ============================================================================
+
+bool M5PM1Component::gpio_set_func(uint8_t pin, GpioFunc func) {
+  if (pin > 4)
+    return false;
+  uint8_t reg = (pin < 4) ? REG_GPIO_FUNC0 : REG_GPIO_FUNC1;
+  uint8_t shift = (pin < 4) ? (uint8_t) (pin * 2) : (uint8_t) ((pin - 4) * 2);
+  return this->update_bits(reg, (uint8_t) (0x03 << shift), (uint8_t) (func << shift));
 }
 
-void M5PM1Component::set_standby(bool on) {
-  // L3A = active (LOW power), L3B = all peripherals (HIGH power)
-  // Control via M5PM1 GPIO2 (PYG2 pin)
-  // Set GPIO2 function: REG 0x16 bits [5:4] = 0 (GPIO function)
-  uint8_t func = read_reg_(REG_GPIO_FUNC0);
-  func &= ~(0b11 << 4);  // Clear bits 4-5 for GPIO2 function
-  func |= (GPIO_FUNC_GPIO << 4);
-  write_reg_(REG_GPIO_FUNC0, func);
-  
-  // Set GPIO2 mode: REG 0x10 bit 2 = 1 (output)
-  uint8_t mode = read_reg_(REG_GPIO_MODE);
-  mode |= (1 << 2);   // output
-  write_reg_(REG_GPIO_MODE, mode);
-  
-  // Set GPIO2 drive: REG 0x13 bit 2 = 0 (push-pull)
-  uint8_t drv = read_reg_(REG_GPIO_DRV);
-  drv &= ~(1 << 2);   // push-pull
-  write_reg_(REG_GPIO_DRV, drv);
-  
-  // Set output level via REG 0x11 bit 2
-  // GPIO2 HIGH = L3B (all peripherals), GPIO2 LOW = L3A (ESP32 active)
-  // on=true (standby) = L3A, on=false (normal) = L3B
-  uint8_t out = read_reg_(REG_GPIO_OUT);
-  if (on) {
-    out &= ~(1 << 2);   // L3A = standby (ESP32 active, peripherals minimal)
-  } else {
-    out |= (1 << 2);    // L3B = normal (all peripherals on)
-  }
-  write_reg_(REG_GPIO_OUT, out);
-  
-  ESP_LOGD(TAG, "Standby: %s (L3%s)", on ? "ON" : "OFF", on ? "A" : "B");
+bool M5PM1Component::gpio_set_mode(uint8_t pin, bool output) {
+  if (pin > 4)
+    return false;
+  return this->update_bits(REG_GPIO_MODE, (uint8_t) (1 << pin), output ? (uint8_t) (1 << pin) : 0);
 }
 
-void M5PM1Component::shutdown(bool hold) {
-  (void)hold;
-  write_reg_(REG_SYS_CMD, (0xA << 4) | 0x01);
+bool M5PM1Component::gpio_set_output(uint8_t pin, bool level) {
+  if (pin > 4)
+    return false;
+  return this->update_bits(REG_GPIO_OUT, (uint8_t) (1 << pin), level ? (uint8_t) (1 << pin) : 0);
+}
+
+bool M5PM1Component::gpio_get_input(uint8_t pin, bool *level) {
+  if (pin > 4)
+    return false;
+  uint8_t val = 0;
+  if (!this->read_reg(REG_GPIO_IN, &val))
+    return false;
+  *level = ((val >> pin) & 0x01) != 0;
+  return true;
+}
+
+bool M5PM1Component::gpio_set_pull(uint8_t pin, GpioPull pull) {
+  if (pin > 4)
+    return false;
+  uint8_t reg = (pin < 4) ? REG_GPIO_PUPD0 : REG_GPIO_PUPD1;
+  uint8_t shift = (pin < 4) ? (uint8_t) (pin * 2) : (uint8_t) ((pin - 4) * 2);
+  return this->update_bits(reg, (uint8_t) (0x03 << shift), (uint8_t) (pull << shift));
+}
+
+bool M5PM1Component::gpio_set_drive(uint8_t pin, GpioDrive drive) {
+  if (pin > 4)
+    return false;
+  return this->update_bits(REG_GPIO_DRV, (uint8_t) (1 << pin), drive ? (uint8_t) (1 << pin) : 0);
+}
+
+// ============================================================================
+// PWM
+// ============================================================================
+
+bool M5PM1Component::set_pwm_duty12(uint8_t channel, uint16_t duty12, bool polarity, bool enable) {
+  if (channel > 1 || duty12 > 0x0FFF)
+    return false;
+  uint8_t reg_l = (channel == 0) ? REG_PWM0_L : REG_PWM1_L;
+  uint8_t data_h = (uint8_t) ((duty12 >> 8) & 0x0F);
+  if (polarity)
+    data_h |= 0x20;
+  if (enable)
+    data_h |= 0x10;
+  uint8_t buf[2] = {(uint8_t) (duty12 & 0xFF), data_h};
+  return this->write_bytes_reg(reg_l, buf, 2);
+}
+
+// ============================================================================
+// Button
+// ============================================================================
+
+bool M5PM1Component::btn_get_state(bool *pressed) {
+  uint8_t val = 0;
+  if (!this->read_reg(REG_BTN_STATUS, &val))
+    return false;
+  *pressed = (val & 0x01) != 0;
+  return true;
+}
+
+// ============================================================================
+// NeoPixel
+// ============================================================================
+
+bool M5PM1Component::set_led_count(uint8_t count) {
+  if (count == 0 || count > MAX_LED_COUNT)
+    return false;
+  return this->write_reg(REG_NEO_CFG, (uint8_t) (count & NEO_CFG_COUNT_MASK));
+}
+
+bool M5PM1Component::set_led_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
+  if (index >= MAX_LED_COUNT)
+    return false;
+  uint16_t rgb565 = (uint16_t) (((uint16_t) (r & 0xF8) << 8) | ((uint16_t) (g & 0xFC) << 3) | (b >> 3));
+  return this->write_reg16((uint8_t) (REG_NEO_DATA_START + index * 2), rgb565);
+}
+
+bool M5PM1Component::refresh_leds() {
+  uint8_t cfg = 0;
+  if (!this->read_reg(REG_NEO_CFG, &cfg))
+    return false;
+  cfg |= NEO_CFG_REFRESH;
+  return this->write_reg(REG_NEO_CFG, cfg);
+}
+
+// ============================================================================
+// AW8737A audio amplifier gain pulse
+// ============================================================================
+
+bool M5PM1Component::aw8737a_pulse(uint8_t pin, Aw8737aPulse num, bool refresh_now) {
+  if (pin > 4)
+    return false;
+  uint8_t val = (uint8_t) (((uint8_t) num << 5) | (pin & 0x1F));
+  if (refresh_now)
+    val |= 0x80;  // REFRESH
+  if (!this->write_reg(REG_AW8737A_PULSE, val))
+    return false;
+  if (refresh_now)
+    delay(20);
+  return true;
+}
+
+// ============================================================================
+// I2C runtime config
+// ============================================================================
+
+bool M5PM1Component::set_i2c_sleep_time(uint8_t seconds) {
+  if (seconds > 15)
+    return false;
+  return this->update_bits(REG_I2C_CFG, I2C_CFG_SLEEP_MASK, seconds);
+}
+
+bool M5PM1Component::switch_i2c_speed_400k(bool fast) {
+  // Note: only writes the PMIC-side config bit. The ESPHome I2C bus speed is
+  // configured separately in the `i2c:` block and is not changed here.
+  return this->update_bits(REG_I2C_CFG, I2C_CFG_SPEED_400K, fast ? I2C_CFG_SPEED_400K : 0);
+}
+
+// ============================================================================
+// System commands
+// ============================================================================
+
+bool M5PM1Component::sys_cmd(SysCmd cmd) {
+  delay(120);
+  uint8_t val = (uint8_t) (SYS_CMD_KEY | (uint8_t) cmd);
+  return this->write_reg(REG_SYS_CMD, val);
 }
 
 }  // namespace m5pm1
 }  // namespace esphome
-

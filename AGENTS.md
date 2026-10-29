@@ -62,14 +62,46 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml, jc4880p443.yaml)
 
 ## 3. Verification & CLI Workflows
 
-Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI installed:
+Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI installed. In addition, a high-performance LXC remote build server and File Browser are integrated with Home Assistant.
 
-- **Use the Windows 11 ESPHome installation for configuration validation, compilation, flashing, and logs**: Because the workspace resides on a Windows/SMB path (`X:\esphome`), running ESPHome directly on Windows 11 avoids WSL2 cross-filesystem (`drvfs`/9P) I/O overhead and provides direct access to USB COM ports.
-- **Use the WSL ESPHome installation only for `host-sdl` virtual display builds and screenshot verification**: The `host` platform with SDL2 requires Linux (`pwsh tools/host_sdl/host-sdl.ps1 ...`).
+- **Fastest Compilation (Preferred)**: Offload compilation to the remote build server (`pve-esphome` @ `192.168.68.110`) via the Home Assistant MCP tool `esphome-device-builder__compile`. This compiles in **~15–30 seconds** on local NVMe storage, bypassing SMB network overhead and eliminating the need to set/unset local `build_path` overrides.
+- **Local Windows 11 CLI**: Use for fast syntax validation (`esphome config <device.yaml>`), direct USB serial flashing/logging (`COM<N>`), and fallback offline compilation.
+- **WSL ESPHome CLI**: Reserved for `host-sdl` virtual display builds and screenshot verification (`pwsh tools/host_sdl/host-sdl.ps1 ...`).
 
-### Windows Compilation & Local Build Path (SMB / UNC Fix)
+---
+
+### Remote Compilation & Artifact Retrieval Workflow (Recommended)
+
+1. **Queue Build via Home Assistant MCP**:
+   Call `call_mcp_tool` with `ServerName: "homeassistant"`, `ToolName: "esphome-device-builder__compile"`, and `configuration: "<device-config>.yaml"`.
+2. **Monitor Build Progress**:
+   Poll status with `esphome-device-builder__get_job(job_id=...)` until completed.
+3. **Download Firmware & ELF via File Browser**:
+   The build server filesystem is exposed at `http://192.168.68.110:8080`:
+   - Authenticate: `POST http://192.168.68.110:8080/api/login` with body `{}` to obtain a JWT token.
+   - Files reside under `/root/config/.esphome/.remote_builds/<build_id>/.esphome/build/<short_name>/build/`.
+   - Download `firmware.factory.bin` (for initial/full USB flash at offset `0x0`) and `firmware.elf` (for `addr2line` crash decoding) via `GET /api/raw/<path>` using header `X-Auth: <token>`. Save to `C:\Users\simen\.esphome_build\<device>\`.
+
+---
+
+### Flashing Firmware over USB (`esptool`)
+
+When flashing downloaded firmware directly via COM port:
+```powershell
+# Flash factory combined binary to offset 0x0:
+esptool --chip <chip> --port COM<N> --baud <baud> --before default-reset --after hard-reset write-flash -z 0x0 "C:\Users\simen\.esphome_build\<device>\firmware.factory.bin"
+```
+> [!TIP]
+> **Baud Rate Selection**:
+> - **ESP32 with USB-to-UART bridge (CP2104 / CH9102 / CH340, e.g. Atom Matrix / Atom Lite)**: Use `--baud 115200`. Higher baud rates often cause RTS/DTR dropouts during baud switching on these bridges.
+> - **Native USB CDC / JTAG (ESP32-S3, ESP32-C3, ESP32-C6, ESP32-P4)**: Supports higher rates (`--baud 460800` or `--baud 921600`).
+
+---
+
+### Windows Local Compilation & Build Path (Fallback / Offline)
+
 Because `X:\esphome` maps to a network SMB share (`\\192.168.68.100\config\esphome`), `cmd.exe` and CMake will fail if building directly on the share (`UNC paths are not supported` or `Permission denied` on compiler test binaries).
-To build locally without errors:
+To build locally on Windows without errors:
 1. Temporarily specify a local Windows path in the root device YAML under `esphome.build_path`:
    ```yaml
    esphome:
@@ -80,6 +112,8 @@ To build locally without errors:
 > [!WARNING]
 > **Remove `build_path` after local testing**: The Home Assistant ESPHome Dashboard runs in a Linux container on the server and cannot access Windows `C:/...` paths. Leaving `build_path: C:/...` in a device YAML will break subsequent updates and installs run from the Home Assistant ESPHome dashboard. Always remove or comment out `build_path` once local verification and flashing are complete.
 
+---
+
 ### Common CLI Commands
 
 ```powershell
@@ -89,7 +123,7 @@ esphome config <device-config.yaml>
 # 2. Compile firmware locally (writes binary & ELF to local build_path):
 esphome compile <device-config.yaml>
 
-# 3. Flash / Upload via local USB COM port:
+# 3. Flash / Upload via local USB COM port (using esphome):
 esphome upload <device-config.yaml> --device COM<N>
 
 # 4. Flash / Upload via OTA over Wi-Fi:

@@ -16,6 +16,9 @@ substitutions:
     rmt_symbols_block: 64
     framework:
       type: esp-idf
+  feature:
+    audio:
+      buffer_size: '32000'
 
 esphome:
   project:

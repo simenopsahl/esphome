@@ -30,6 +30,7 @@ substitutions:
       i2s_bclk: GPIO42
       i2s_mclk: GPIO00
       i2s_dout: GPIO41
+      spk: GPIO41
     
     ext:
       i2c:
@@ -131,3 +132,4 @@ substitutions:
   disp_bl_pin: GPIO1 # io01
 # Power MOS
   bat_feedback: GPIO5 # io05
+  spk_pin: GPIO41 # io41

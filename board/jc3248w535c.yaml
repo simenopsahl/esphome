@@ -1,4 +1,4 @@
-labels: [esp32s3, psram, JC4832W535, display, i2c]
+labels: [esp32s3, psram, JC4832W535, display, i2c, audio, speaker]
 ---
 # PINs for Sunton module ESP32-S3 with Guition 3.5" display
 #
@@ -18,11 +18,28 @@ substitutions:
     screen:
       width: ${screen_width}
       height: ${screen_height}
+    psram: 'true'
+  feature:
+    audio:
+      volume_min: '0.4'
+      volume_max: '0.8'
+      sound_file_boot: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+      sound_file_speaker_enable: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
 
 esphome:
   project:
     name: 'Sunton.3,5" 320x480'
     version: "1.0.0"
+  on_boot:
+    - priority: 375
+      then:
+        # Safety net: if HA never connects.
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(init_in_progress);
+            then:
+              - lambda: id(init_in_progress) = false;
 
 esp32:
 # ESP32-S3N16R8 (Dual-core, 240MHz)
@@ -119,3 +136,127 @@ touchscreen:
 #      - logger.log:
 #          format: Touch %d at (%d, %d)
 #          args: [ 'touch->id', 'touch->x', 'touch->y' ]
+
+api:
+  on_client_connected:
+    - lambda: id(init_in_progress) = false;
+    - if:
+        condition:
+          - lambda: 'return !id(boot_chime_done);'
+          - switch.is_on: boot_sound
+        then:
+          - lambda: id(boot_chime_done) = true;
+          - delay: 500ms
+          - script.execute:
+              id: play_sound
+              priority: true
+              sound_file: !lambda return id(boot_sound_custom);
+
+globals:
+  - id: init_in_progress
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+  - id: boot_chime_done
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+switch:
+  - platform: template
+    id: boot_sound
+    name: Boot sound
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+script:
+  - id: play_sound
+    parameters:
+      priority: bool
+      sound_file: "std::add_const_t<audio::AudioFile>*"
+    then:
+      - lambda: |-
+          if (priority) {
+            id(speaker_media_player)
+              ->make_call()
+              .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_STOP)
+              .set_announcement(true)
+              .perform();
+          }
+          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+            id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
+          }
+
+i2s_audio:
+  - id: i2s_output
+    i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+    i2s_bclk_pin: ${pin.audio.i2s_bclk}
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.spk}
+    dac_type: external
+    buffer_duration: 500ms
+
+  # Mixes the announcement and media pipelines into the one physical output.
+  - platform: mixer
+    id: mixing_speaker
+    output_speaker: i2s_speaker
+    num_channels: 1
+    source_speakers:
+      - id: announcement_mixing_input
+        timeout: never
+      - id: media_mixing_input
+        timeout: never
+
+  # The mixer needs both inputs at one sample rate; these resample if needed.
+  - platform: resampler
+    id: announcement_resampling_speaker
+    output_speaker: announcement_mixing_input
+  - platform: resampler
+    id: media_resampling_speaker
+    output_speaker: media_mixing_input
+
+media_player:
+  - platform: speaker
+    id: speaker_media_player
+    name: None
+    internal: False
+    task_stack_in_psram: ${device.psram | default("true")}
+    volume_increment: 0.01
+    volume_min: ${feature.audio.volume_min}
+    volume_max: ${feature.audio.volume_max}
+    announcement_pipeline:
+      speaker: announcement_resampling_speaker
+      format: FLAC              # cheapest codec for the S3
+      num_channels: 1           # stereo is pointless for announcements
+      sample_rate: 48000        # what Music Assistant serves
+    media_pipeline:
+      speaker: media_resampling_speaker
+      format: FLAC
+      num_channels: 1           # mono hardware, one speaker
+      sample_rate: 48000
+    on_announcement:
+      - mixer_speaker.apply_ducking:
+          id: media_mixing_input
+          decibel_reduction: 20
+          duration: 0.0s
+    on_state:
+      - if:
+          condition:
+            - not:
+                media_player.is_announcing:
+          then:
+            - mixer_speaker.apply_ducking:
+                id: media_mixing_input
+                decibel_reduction: 0
+                duration: 1.0s
+    files:
+      - id: boot_sound_custom
+        file: ${feature.audio.sound_file_boot}
+      - id: speaker_enable_sound
+        file: ${feature.audio.sound_file_speaker_enable}

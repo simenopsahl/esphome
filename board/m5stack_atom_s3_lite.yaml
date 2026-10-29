@@ -17,6 +17,9 @@ substitutions:
     framework:
       type: esp-idf
     psram: "false"
+  feature:
+    audio:
+      buffer_size: '32000'
 
 esphome:
   project:

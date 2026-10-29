@@ -21,7 +21,8 @@ substitutions:
     audio:
       volume_min: '0.4'
       volume_max: '0.8'
-      boot_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+      sound_file_boot: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+      sound_file_speaker_enable: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
 
 packages:
   hat_i2c: !include ../extension/hat_i2c.yaml
@@ -60,22 +61,26 @@ api:
         then:
           - switch.turn_off: mic_mute_switch
     - lambda: id(init_in_progress) = false;
-    # One-shot "ready" chime. It MUST run after micro_wake_word.start above: the
+    # One-shot "ready" chime. It MUST run after the mic is turned on: the
     # speaker is a slave to the mic's I2S clock, so playing before the mic is
-    # capturing hangs the announcement (and then wake word stops working). The
+    # capturing hangs the announcement and can interrupt mic operation. The
     # flag is set first so an HA reconnect can't replay it.
     - if:
         condition:
           - lambda: 'return !id(boot_chime_done);'
-          - switch.is_on: boot_sound
-          - switch.is_off: diag_disable_mic
         then:
+          - if:
+              condition:
+                - switch.is_on: boot_sound
+                - switch.is_off: diag_disable_mic
+              then:
+                - delay: 1s            # let the mic-master clock settle
+                - script.execute:
+                    id: play_sound
+                    priority: true
+                    sound_file: !lambda return id(boot_sound_custom);
+                - delay: 2s            # wait for boot chime to finish playing!
           - lambda: id(boot_chime_done) = true;
-          - delay: 1s            # let the mic-master clock settle
-          - script.execute:
-              id: play_sound
-              priority: true
-              sound_file: !lambda return id(boot_sound_custom);
 
 globals:
   - id: mic_is_muted
@@ -122,7 +127,6 @@ audio_dac:
     i2c_id: i2c_hat
     id: dac_es8311
     bits_per_sample: 16bit
-    sample_rate: 48000
     use_microphone: false  # analog microphone here
     mic_gain: 30DB
     use_mclk: false        # no mclk pin is connected
@@ -141,12 +145,11 @@ speaker:
     i2s_audio_id: i2s_output
     i2s_mode: secondary
     dac_type: external
-    sample_rate: 48000
     audio_dac: dac_es8311
     id: i2s_speaker
     i2s_dout_pin: ${pin.audio.spk}
     channel: left
-    buffer_duration: 250ms
+    buffer_duration: 500ms
 
   # Mixes the announcement and media pipelines into the one physical output.
   # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
@@ -175,6 +178,7 @@ media_player:
     name: None
     internal: False
     task_stack_in_psram: ${device.psram | default("false")}
+    buffer_size: ${feature.audio.buffer_size | default("1000000")}
     volume_increment: 0.01
     volume_min: ${feature.audio.volume_min}
     volume_max: ${feature.audio.volume_max}
@@ -215,7 +219,9 @@ media_player:
                 duration: 1.0s
     files:
       - id: boot_sound_custom
-        file: ${feature.audio.boot_sound_file}
+        file: ${feature.audio.sound_file_boot}
+      - id: speaker_enable_sound
+        file: ${feature.audio.sound_file_speaker_enable}
 
 sensor:
   - platform: sound_level
@@ -241,6 +247,22 @@ switch:
     name: "Amplifier"
     icon: "mdi:volume-high"
     entity_category: config
+    on_turn_on:
+      - if:
+          condition:
+            - lambda: 'return id(boot_chime_done);'
+            - lambda: 'return !id(init_in_progress);'
+            - switch.is_on: boot_sound
+            - switch.is_off: diag_disable_mic
+            - not:
+                media_player.is_announcing: speaker_media_player
+            - lambda: 'return id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - delay: 250ms            # let the amplifier settle
+            - script.execute:
+                id: play_sound
+                priority: false
+                sound_file: !lambda return id(speaker_enable_sound);
 
   - platform: template
     id: diag_disable_mic
@@ -334,6 +356,6 @@ script:
               .set_announcement(true)
               .perform();
           }
-          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+          if ((id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
             id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }
