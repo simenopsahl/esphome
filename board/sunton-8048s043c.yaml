@@ -80,10 +80,22 @@ light:
     name: "Backlight"
     entity_category: config
 
-# https://community.home-assistant.io/t/esp32-8048s043-sunton-4-3-cyd-config/780603
+# -------------------------------------------
+# Display EK9716 (raw RGB panel)
+# Migrated from the deprecated rpi_dpi_rgb component to mipi_rgb.
+# Notes:
+#   - model: RPI selects the generic raw-RGB driver (no SPI controller).
+#   - pclk_inverted: true matches the original rpi_dpi_rgb config and
+#     also happens to be the mipi_rgb default.
+#   - The hsync/vsync porch values are panel-specific and carried over
+#     verbatim from the rpi_dpi_rgb config.
+# -------------------------------------------
 display:
-  - platform: rpi_dpi_rgb
+  - platform: mipi_rgb
     id: display_lcd
+    model: RPI
+    color_order: RGB
+    invert_colors: false
     de_pin: ${pin.int.disp.de}
     hsync_pin: ${pin.int.disp.hsync}
     hsync_front_porch: 8
@@ -95,7 +107,7 @@ display:
     vsync_back_porch: 8
     pclk_pin: ${pin.int.disp.pclk}
     pclk_inverted: true
-    pclk_frequency: 14MHz
+    pclk_frequency: 16MHz
     data_pins:
       red:
         - ${pin.int.disp.red.r1}
@@ -119,7 +131,6 @@ display:
     dimensions:
       height: ${device.screen.height}
       width: ${device.screen.width}
-    color_order: RGB
     auto_clear_enabled: false
     update_interval: 10s
 

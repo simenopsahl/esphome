@@ -11,12 +11,14 @@ substitutions:
       spi:
         clk: GPIO15
         mosi: GPIO21
+        # No display on S3R-CAM / S3R-M12 / EchoS3R / VoiceS3R
         disp:
           cs: GPIO14
           dc: GPIO42
           reset: GPIO48
     
     light:
+      # No RGB LED on S3R-CAM / S3R-M12 / EchoS3R / VoiceS3R
       led: GPIO18
       ir: GPIO47
     
@@ -51,6 +53,7 @@ substitutions:
         port_abc:
           in: GPIO8
           out: GPIO7
+      # Bottom pins for the base connector
       base:
         p4:
           p1: GPIO39
@@ -59,13 +62,14 @@ substitutions:
           p4: gnd
         p5:
           p1: 3v3
-          p2: GPIO5
-          p3: GPIO6
-          p4: GPIO7
-          p5: GPIO8
+          p2: GPIO5  # DOUT (Speaker)
+          p3: GPIO6  # LRCK
+          p4: GPIO7  # DIN (Microphone)
+          p5: GPIO8  # BCLK
         
     btn: GPIO41
 
+    # Additional pins for S3R-CAM / S3R-M12
     cam:
       sda: GPIO12
       scl: GPIO9
@@ -85,6 +89,7 @@ substitutions:
       m_clk: GPIO21
       pwr: GPIO18
 
+    # Additional pins for EchoS3R / VoiceS3R
     audio:
       i2s_lrclk: GPIO3
       #i2s_wck: GPIO33
@@ -95,7 +100,7 @@ substitutions:
       mic: GPIO4
       i2s_dout: GPIO48
       i2s_dato: GPIO48
-      pwr: GPIO18
+      amp: GPIO18
 
   # Internal
   i2c_int_sda_pin: GPIO45

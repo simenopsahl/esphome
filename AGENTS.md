@@ -64,23 +64,76 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml, jc4880p443.yaml)
 
 Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI installed:
 
-- **Use the Windows 11 ESPHome installation for configuration validation (`esphome config`)**: Because the workspace resides on a Windows/SMB path (`X:\esphome`), running `esphome config` directly in Windows PowerShell avoids WSL2 cross-filesystem (`drvfs`/9P) I/O overhead and is significantly faster.
+- **Use the Windows 11 ESPHome installation for configuration validation, compilation, flashing, and logs**: Because the workspace resides on a Windows/SMB path (`X:\esphome`), running ESPHome directly on Windows 11 avoids WSL2 cross-filesystem (`drvfs`/9P) I/O overhead and provides direct access to USB COM ports.
 - **Use the WSL ESPHome installation only for `host-sdl` virtual display builds and screenshot verification**: The `host` platform with SDL2 requires Linux (`pwsh tools/host_sdl/host-sdl.ps1 ...`).
 
+### Windows Compilation & Local Build Path (SMB / UNC Fix)
+Because `X:\esphome` maps to a network SMB share (`\\192.168.68.100\config\esphome`), `cmd.exe` and CMake will fail if building directly on the share (`UNC paths are not supported` or `Permission denied` on compiler test binaries).
+To build locally without errors:
+1. Temporarily specify a local Windows path in the root device YAML under `esphome.build_path`:
+   ```yaml
+   esphome:
+     build_path: C:/Users/simen/.esphome_build/<device-name>
+   ```
+2. When executing build/flash commands in the agent environment, run with unsandboxed permissions (`BypassSandbox: true`) because SMB network access and local COM ports require host elevation.
+
+> [!WARNING]
+> **Remove `build_path` after local testing**: The Home Assistant ESPHome Dashboard runs in a Linux container on the server and cannot access Windows `C:/...` paths. Leaving `build_path: C:/...` in a device YAML will break subsequent updates and installs run from the Home Assistant ESPHome dashboard. Always remove or comment out `build_path` once local verification and flashing are complete.
+
+### Common CLI Commands
+
 ```powershell
-# 1. Validate YAML syntax and substitution resolution (run on Windows 11 PowerShell):
+# 1. Validate YAML syntax and substitution resolution (on Windows 11):
 esphome config <device-config.yaml>
 
-# 2. Dry-run compile without flashing (checks C++ code generation and library dependencies):
+# 2. Compile firmware locally (writes binary & ELF to local build_path):
 esphome compile <device-config.yaml>
 
-# 3. Clean platformio build cache for a device (if build artifacts become stale):
+# 3. Flash / Upload via local USB COM port:
+esphome upload <device-config.yaml> --device COM<N>
+
+# 4. Flash / Upload via OTA over Wi-Fi:
+esphome upload <device-config.yaml> --device <IP-or-hostname>
+
+# 5. Monitor logs (always specify --device to avoid interactive prompt blocks):
+esphome logs <device-config.yaml> --device 192.168.xx.xx
+esphome logs <device-config.yaml> --device COM<N>
+
+# 6. Clean build cache if artifacts become corrupted:
 esphome clean <device-config.yaml>
 
-# 4. Build, run, or screenshot the virtual host-sdl LVGL display (uses WSL):
+# 7. Virtual host-sdl LVGL display (uses WSL):
 pwsh tools/host_sdl/host-sdl.ps1 config 240x320
 pwsh tools/host_sdl/host-sdl.ps1 run 240x320
 pwsh tools/host_sdl/host-sdl.ps1 screenshot
+```
+
+### Automated Log Sampling via Python (Agent Tasks)
+When capturing logs non-interactively in an automated script or background task, prevent Python buffering by using `bufsize=1` and `python -u`:
+```python
+import subprocess, sys, time
+
+proc = subprocess.Popen(
+    ['esphome', 'logs', '<device.yaml>', '--device', '<IP-or-COM>'],
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, encoding='utf-8'
+)
+end = time.time() + 8
+while time.time() < end:
+    line = proc.stdout.readline()
+    if line:
+        sys.stdout.write(line)
+        sys.stdout.flush()
+proc.kill()
+```
+
+### Decoding Crash Backtraces (`addr2line`)
+When an ESP32 panics or aborts (`[E][esp32.crash:...]`), decode the backtrace addresses (`PC` and `BT0`..`BTn`) using the architecture-specific `addr2line` and the local `.elf` binary:
+```powershell
+# For Xtensa (ESP32 / ESP32-S3):
+xtensa-esp32s3-elf-addr2line -pfiaC -e C:\Users\simen\.esphome_build\<device>\build\firmware.elf <addresses...>
+
+# For RISC-V (ESP32-P4 / ESP32-C3 / ESP32-C6):
+riscv32-esp-elf-addr2line -pfiaC -e C:\Users\simen\.esphome_build\<device>\build\firmware.elf <addresses...>
 ```
 
 > [!IMPORTANT]

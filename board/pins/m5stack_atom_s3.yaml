@@ -59,10 +59,10 @@ substitutions:
           p4: gnd
         p5:
           p1: 3v3
-          p2: GPIO5
-          p3: GPIO6
-          p4: GPIO7
-          p5: GPIO8
+          p2: GPIO5  # DOUT (Speaker)
+          p3: GPIO6  # LRCK
+          p4: GPIO7  # DIN (Microphone)
+          p5: GPIO8  # BCLK
 
     btn: GPIO41
 

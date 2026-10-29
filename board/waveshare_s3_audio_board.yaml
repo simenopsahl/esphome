@@ -18,6 +18,7 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    psram: "true"
 
     # Software off: long-press the onboard BOOT button (GPIO0) for ~2 s to enter
     # deep sleep; a short press wakes the board again. Off by default - set to
@@ -121,7 +122,6 @@ psram:
 
 wifi:
   use_psram: true
-  power_save_mode: none
   enable_btm: true
   enable_rrm: true
   on_connect:
@@ -132,6 +132,30 @@ wifi:
 api:
   on_client_connected:
     - script.execute: control_leds
+    - if:
+        condition:
+          - lambda: return id(init_in_progress);
+          - switch.is_on: mic_mute_switch
+        then:
+          - switch.turn_off: mic_mute_switch
+    - lambda: id(init_in_progress) = false;
+    # One-shot "ready" chime. It MUST run after micro_wake_word.start above: the
+    # speaker is a slave to the mic's I2S clock, so playing before the mic is
+    # capturing hangs the announcement (and then wake word stops working). The
+    # flag is set first so an HA reconnect can't replay it.
+    - if:
+        condition:
+          - lambda: 'return !id(boot_chime_done);'
+          - switch.is_on: boot_sound
+          - switch.is_off: night_mode
+          - switch.is_off: diag_disable_mic
+        then:
+          - lambda: id(boot_chime_done) = true;
+          - delay: 1s            # let the mic-master clock settle
+          - script.execute:
+              id: play_sound
+              priority: true
+              sound_file: !lambda return id(boot_sound_custom);
   on_client_disconnected:
     - script.execute: control_leds
 
@@ -272,7 +296,7 @@ speaker:
     dac_type: external
     audio_dac: dac_es8311
     timeout: never
-    buffer_duration: 100ms
+    buffer_duration: 250ms
 
   # Mixes the announcement and media pipelines into the one physical output.
   # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
@@ -297,9 +321,10 @@ speaker:
 
 media_player:
   - platform: speaker
-    id: external_media_player
+    id: speaker_media_player
     name: None
     internal: False
+    task_stack_in_psram: ${device.psram}
     volume_increment: 0.01
     volume_min: ${feature.audio.volume_min}
     volume_max: ${feature.audio.volume_max}
@@ -326,7 +351,7 @@ media_player:
           condition:
             or:
               - media_player.is_announcing:
-              - lambda: 'return id(external_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+              - lambda: 'return id(speaker_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
           then:
             - switch.turn_on: amp_enable
       - if:
@@ -352,12 +377,6 @@ media_player:
           - delay: 100ms
           - script.execute: control_leds_volume_changed
     files:
-      - id: timer_finished_sound
-        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
-      - id: wake_word_triggered_sound
-        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
-      - id: error_cloud_expired
-        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
       - id: boot_sound_custom
         file: ${feature.audio.boot_sound_file}
 
@@ -610,14 +629,14 @@ script:
     then:
       - lambda: |-
           if (priority) {
-            id(external_media_player)
+            id(speaker_media_player)
               ->make_call()
               .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_STOP)
               .set_announcement(true)
               .perform();
           }
-          if ((id(external_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
-            id(external_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
+          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+            id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }
 
   - id: send_tts_uri_event
@@ -695,6 +714,7 @@ switch:
     id: mic_mute_switch
     name: "Microphone Mute"
     icon: mdi:microphone-off
+    entity_category: config
     # State comes from the lambda below, so restore_mode would be a no-op here.
     # The mute is forced off at boot by the voice_assistant on_client_connected.
     lambda: |-
@@ -742,6 +762,18 @@ switch:
           then:
             - script.execute: control_leds
     on_turn_off: *repaint_if_ready
+
+  - platform: template
+    id: sound_level_enabled
+    optimistic: true
+    restore_mode: ALWAYS_ON
+    name: "Sound Level Tracking"
+    icon: "mdi:waveform"
+    entity_category: config
+    on_turn_off:
+        - sound_level.stop: sound_level_sensor
+    on_turn_on:
+        - sound_level.start: sound_level_sensor
 
 number:
   - platform: template
@@ -827,7 +859,7 @@ binary_sensor:
       number: ${pin.btn.key1}
       inverted: true
     on_press:
-      - media_player.volume_down: external_media_player
+      - media_player.volume_down: speaker_media_player
 
   - platform: gpio
     id: btn_key2
@@ -837,7 +869,7 @@ binary_sensor:
       number: ${pin.btn.key2}
       inverted: true
     on_press:
-      - media_player.toggle: external_media_player
+      - media_player.toggle: speaker_media_player
 
   - platform: gpio
     id: btn_key3
@@ -847,7 +879,7 @@ binary_sensor:
       number: ${pin.btn.key3}
       inverted: true
     on_press:
-      - media_player.volume_up: external_media_player
+      - media_player.volume_up: speaker_media_player
 
   # Onboard BOOT button (GPIO0, a strapping pin, direct - not via the expander).
   # Held for 2 to 10 s it enters deep sleep, but only when ${enable_deep_sleep}

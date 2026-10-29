@@ -16,6 +16,7 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+    psram: "false"
 
 esphome:
   project:

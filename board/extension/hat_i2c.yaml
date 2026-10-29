@@ -22,4 +22,4 @@ i2c:
       allow_other_uses: ${extension.i2c.hat.shared}
     frequency: ${extension.i2c.hat.frequency}
 #    timeout: 10ms
-    scan: false
+    scan: true

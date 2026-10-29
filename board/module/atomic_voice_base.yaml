@@ -1,6 +1,6 @@
 labels: [es8311, msm381a3729h9bpc, speaker, microphone, sound_level, i2s_audio]
 ---
-# https://docs.m5stack.com/en/atom/Atomic%20Echo%20Base
+# https://docs.m5stack.com/en/atom/Atomic_Voice_Base
 # https://docs.m5stack.com/en/homeassistant/voice_assistant/atoms3r_with_atomic_echo_base_voice_assistant
 # Atomic Voice Base
 # 
@@ -13,19 +13,83 @@ substitutions:
           sda: ${pin.ext.base.p4.p2}
           scl: ${pin.ext.base.p4.p1}
     audio:
-      mic: ${pin.ext.base.p5.p2}
+      mic: ${pin.ext.base.p5.p4}
       i2s_lrclk: ${pin.ext.base.p5.p3}
-      spk: ${pin.ext.base.p5.p4}
+      spk: ${pin.ext.base.p5.p2}
       i2s_bclk: ${pin.ext.base.p5.p5}
+  feature:
+    audio:
+      volume_min: '0.4'
+      volume_max: '0.8'
+      boot_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
 
 packages:
   hat_i2c: !include ../extension/hat_i2c.yaml
 
 esphome:
   on_boot:
+    - priority: 375
+      then:
+        # Safety net: if HA never connects.
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(init_in_progress);
+            then:
+              - lambda: id(init_in_progress) = false;
     - priority: -100
       then:
-        - switch.turn_on: sound_level_enabled
+        # Diagnostics: an explicit OFF switch that silences the mic completely.
+        # ON = microphone disabled. (This used to be inverted, so the mic was
+        # stopped on every boot with the switch in its default OFF position.)
+        - if:
+            condition:
+              switch.is_on: diag_disable_mic
+            then:
+              - logger.log: "Mic DISABLED for diagnostics"
+              - microphone.stop_capture: i2s_mic
+            else:
+              - logger.log: "Mic enabled"
+
+api:
+  on_client_connected:
+    - if:
+        condition:
+          - lambda: return id(init_in_progress);
+          - switch.is_on: mic_mute_switch
+        then:
+          - switch.turn_off: mic_mute_switch
+    - lambda: id(init_in_progress) = false;
+    # One-shot "ready" chime. It MUST run after micro_wake_word.start above: the
+    # speaker is a slave to the mic's I2S clock, so playing before the mic is
+    # capturing hangs the announcement (and then wake word stops working). The
+    # flag is set first so an HA reconnect can't replay it.
+    - if:
+        condition:
+          - lambda: 'return !id(boot_chime_done);'
+          - switch.is_on: boot_sound
+          - switch.is_off: diag_disable_mic
+        then:
+          - lambda: id(boot_chime_done) = true;
+          - delay: 1s            # let the mic-master clock settle
+          - script.execute:
+              id: play_sound
+              priority: true
+              sound_file: !lambda return id(boot_sound_custom);
+
+globals:
+  - id: mic_is_muted
+    type: bool
+    restore_value: no          # the switch forces OFF at boot (see on_client_connected)
+    initial_value: 'false'
+  - id: init_in_progress
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+  - id: boot_chime_done
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
 # Ehco Base GPIO Expander
 pi4ioe5v6408:
@@ -34,9 +98,24 @@ pi4ioe5v6408:
 
 # I2S Bus Configuration
 i2s_audio:
-  id: i2s_audio_bus
-  i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
-  i2s_bclk_pin: ${pin.audio.i2s_bclk}
+  - id: i2s_input
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: [ es8311 ]
 
 audio_dac:
   - platform: es8311
@@ -45,41 +124,98 @@ audio_dac:
     bits_per_sample: 16bit
     sample_rate: 48000
     use_microphone: false  # analog microphone here
+    mic_gain: 30DB
     use_mclk: false        # no mclk pin is connected
 
 microphone:
   - platform: i2s_audio
-    i2s_audio_id: i2s_audio_bus
-    id: i2s_mic_mems
-    bits_per_sample: 32bit
+    i2s_audio_id: i2s_input
+    id: i2s_mic
+    bits_per_sample: 16bit
     channel: left
-    sample_rate: 16000
-    use_apll: true
     adc_type: external
     i2s_din_pin: ${pin.audio.mic}
 
 speaker:
   - platform: i2s_audio
-    i2s_audio_id: i2s_audio_bus
+    i2s_audio_id: i2s_output
+    i2s_mode: secondary
     dac_type: external
+    sample_rate: 48000
     audio_dac: dac_es8311
-    use_apll: true
     id: i2s_speaker
     i2s_dout_pin: ${pin.audio.spk}
-    sample_rate: 16000
-    channel: stereo
+    channel: left
+    buffer_duration: 250ms
+
+  # Mixes the announcement and media pipelines into the one physical output.
+  # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
+  # channel would just be discarded.
+  - platform: mixer
+    id: mixing_speaker
+    output_speaker: i2s_speaker
+    num_channels: 1
+    source_speakers:
+      - id: announcement_mixing_input
+        timeout: never
+      - id: media_mixing_input
+        timeout: never
+
+  # The mixer needs both inputs at one sample rate; these resample if needed.
+  - platform: resampler
+    id: announcement_resampling_speaker
+    output_speaker: announcement_mixing_input
+  - platform: resampler
+    id: media_resampling_speaker
+    output_speaker: media_mixing_input
 
 media_player:
   - platform: speaker
-    name: "Echo Base Player"
-    id: echo_base_player
-    volume_initial: 0.1
-    volume_max: 0.8
+    id: speaker_media_player
+    name: None
+    internal: False
+    task_stack_in_psram: ${device.psram | default("false")}
+    volume_increment: 0.01
+    volume_min: ${feature.audio.volume_min}
+    volume_max: ${feature.audio.volume_max}
     announcement_pipeline:
-      speaker: i2s_speaker
+      speaker: announcement_resampling_speaker
+      format: FLAC              # cheapest codec for the S3
+      num_channels: 1           # stereo is pointless for announcements
+      sample_rate: 48000        # what Music Assistant serves
+    media_pipeline:
+      speaker: media_resampling_speaker
       format: FLAC
-      sample_rate: 16000
-      num_channels: 1
+      num_channels: 1           # mono hardware, one speaker
+      sample_rate: 48000
+    on_announcement:
+      - mixer_speaker.apply_ducking:
+          id: media_mixing_input
+          decibel_reduction: 20
+          duration: 0.0s
+    on_state:
+      # Amp follows playback: turn it on the instant audio starts. It stays on
+      # afterwards (the speaker then holds the line at clean silence), so there
+      # is no per-sound clicking - only the boot window is silent.
+      - if:
+          condition:
+            or:
+              - media_player.is_announcing:
+              - lambda: 'return id(speaker_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - switch.turn_on: amp_enable
+      - if:
+          condition:
+            - not:
+                media_player.is_announcing:
+          then:
+            - mixer_speaker.apply_ducking:
+                id: media_mixing_input
+                decibel_reduction: 0
+                duration: 1.0s
+    files:
+      - id: boot_sound_custom
+        file: ${feature.audio.boot_sound_file}
 
 sensor:
   - platform: sound_level
@@ -95,25 +231,109 @@ sensor:
 switch:
   # NS4150B
   - platform: gpio
-    id: speaker_enable
+    id: amp_enable
     pin:
       pi4ioe5v6408: hub_pi4ioe5v6408
       number: 0
       mode:
         output: true
-    restore_mode: RESTORE_DEFAULT_ON
-    name: "Speaker Enable"
+    restore_mode: ALWAYS_OFF
+    name: "Amplifier"
     icon: "mdi:volume-high"
     entity_category: config
 
   - platform: template
+    id: diag_disable_mic
+    name: "Diag: disable microphone"
+    icon: mdi:microphone-settings
+    internal: true                      # diagnostic-only, not shown in HA
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF   # OFF = mic works as usual
+    # These triggers also fire during setup() when the state is restored from
+    # flash - at setup_priority HARDWARE-2, i.e. before the mic and mWW exist.
+    # on_boot (priority -100) applies the restored state once everything is up,
+    # so here we only handle a live toggle.
+    on_turn_on:
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - microphone.stop_capture: i2s_mic
+    on_turn_off:
+      - if:
+          condition:
+            - lambda: return !id(init_in_progress);
+            - switch.is_off: mic_mute_switch
+          then:
+            - microphone.capture: i2s_mic
+
+  - platform: template
+    id: mic_mute_switch
+    name: "Microphone Mute"
+    icon: mdi:microphone-off
+    entity_category: config
+    # State comes from the lambda below, so restore_mode would be a no-op here.
+    # The mute is forced off at boot by the voice_assistant on_client_connected.
+    lambda: |-
+      return id(mic_is_muted);
+    # A real mute, via ESPHome's own primitive: microphone.mute makes the
+    # Microphone hand every consumer a zero-filled buffer, so the wake word
+    # literally hears silence. The stream keeps running, so there is no I2S
+    # restart and no start/stop race.
+    turn_on_action:
+      - lambda: id(mic_is_muted) = true;
+      - microphone.mute: i2s_mic
+    turn_off_action:
+      - lambda: id(mic_is_muted) = false;
+      - microphone.unmute: i2s_mic
+
+  - platform: template
+    id: boot_sound
+    name: Boot sound
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - platform: template
     id: sound_level_enabled
     optimistic: true
-    restore_mode: ALWAYS_OFF
+    restore_mode: ALWAYS_ON
     name: "Sound Level Tracking"
     icon: "mdi:waveform"
     entity_category: config
     on_turn_off:
-        - sound_level.stop: sound_level_sensor
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - sound_level.stop: sound_level_sensor
     on_turn_on:
-        - sound_level.start: sound_level_sensor
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - sound_level.start: sound_level_sensor
+
+script:
+  # ESPHome 2026.10 made audio files const; 2026.8/2026.9 still take a mutable
+  # pointer in play_file(). A const parameter accepts both, and the const_cast
+  # below keeps play_file() compiling on either. The type is spelled with
+  # add_const_t because script parameter types may not contain spaces.
+  - id: play_sound
+    parameters:
+      priority: bool
+      sound_file: "std::add_const_t<audio::AudioFile>*"
+    then:
+      - switch.turn_on: amp_enable
+      - lambda: |-
+          if (priority) {
+            id(speaker_media_player)
+              ->make_call()
+              .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_STOP)
+              .set_announcement(true)
+              .perform();
+          }
+          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+            id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
+          }
