@@ -1,8 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  # Bluetooth proxy disabled while working in another room
-  #  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_core_s3se.yaml
@@ -29,7 +28,7 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+    log_level: INFO
 #    log_baud_rate: "0"
   device:
     name: m5s-c3se-e93464
@@ -62,8 +61,7 @@ lvgl:
 binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    # changed from etg2_stue_occupancy to etg2_simen_occupancy during testing
-    entity_id: binary_sensor.etg2_simen_occupancy
+    entity_id: binary_sensor.etg2_stue_occupancy
     id: presence1
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
