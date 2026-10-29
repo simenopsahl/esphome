@@ -5,8 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
-  grove: !include board/extension/grove_i2c.yaml
-  mq5: !include board/module/unit_mq5.yaml
+  audio: !include board/module/atomic_voice_base.yaml
 
   # --- FEATURE PACKAGES ---
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
