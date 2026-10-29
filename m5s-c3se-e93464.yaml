@@ -1,7 +1,8 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+  # Bluetooth proxy disabled while working in another room
+  #  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_core_s3se.yaml
