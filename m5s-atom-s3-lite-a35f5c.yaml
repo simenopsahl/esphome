@@ -1,7 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-  <<: !include_dir_named bluetooth
+#  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
@@ -25,6 +25,7 @@ substitutions:
       type: esp-idf
 
 esphome:
+  build_path: C:/Users/simen/.esphome_build/m5s-atom-s3-lite-a35f5c
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
