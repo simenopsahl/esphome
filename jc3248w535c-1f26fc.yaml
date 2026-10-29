@@ -5,9 +5,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/jc3248w535c.yaml
-#  grove: !include board/extension/grove_i2c.yaml
-#  env_iv: !include board/module/unit_env_iv.yaml
-#  co2: !include board/module/unit_co2.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -50,7 +47,7 @@ wifi:
     static_ip: 192.168.71.34
 
 lvgl:
-  buffer_size: 75%
+  buffer_size: 50%
 
 binary_sensor:
   # Call sensors from HA.
