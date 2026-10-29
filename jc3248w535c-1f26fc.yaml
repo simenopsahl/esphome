@@ -18,7 +18,7 @@ packages:
 
 substitutions:
   common:
-    log_level: WARN
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: jc3248w535c-1f26fc
