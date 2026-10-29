@@ -62,6 +62,7 @@ lvgl:
 binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
+    # changed from etg2_stue_occupancy to etg2_simen_occupancy during testing
     entity_id: binary_sensor.etg2_simen_occupancy
     id: presence1
   - platform: homeassistant
