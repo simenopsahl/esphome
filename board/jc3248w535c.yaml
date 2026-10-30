@@ -21,7 +21,6 @@ substitutions:
     psram: 'true'
   feature:
     audio:
-      buffer_size: "1000000"
       volume_min: '0.4'
       volume_max: '0.8'
       sound_file_boot: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
