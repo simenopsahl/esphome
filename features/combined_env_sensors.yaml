@@ -61,7 +61,7 @@ sensor:
     filters:
       - or:
         - heartbeat: 900s
-        - delta: 0.15
+        - delta: 0.5
 
   - platform: combination
     type: median
@@ -82,4 +82,4 @@ sensor:
     filters:
       - or:
         - heartbeat: 900s
-        - delta: 0.15
+        - delta: 0.2

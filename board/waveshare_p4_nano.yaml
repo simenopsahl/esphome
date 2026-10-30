@@ -247,6 +247,7 @@ microphone:
     id: i2s_mic
     i2s_audio_id: i2s_input
     i2s_din_pin: ${pin.audio.mic}
+    sample_rate: 48000
     bits_per_sample: 16bit
     adc_type: external
     channel: left
@@ -264,8 +265,6 @@ speaker:
     buffer_duration: 250ms
 
   # Mixes the announcement and media pipelines into the one physical output.
-  # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
-  # channel would just be discarded.
   - platform: mixer
     id: mixing_speaker
     output_speaker: i2s_speaker
@@ -297,13 +296,13 @@ media_player:
     volume_max: ${feature.audio.volume_max}
     announcement_pipeline:
       speaker: announcement_resampling_speaker
-      format: FLAC              # cheapest codec for the S3
-      num_channels: 1           # stereo is pointless for announcements
+      format: FLAC
+      num_channels: 1
       sample_rate: 48000        # what Music Assistant serves
     media_pipeline:
       speaker: media_resampling_speaker
       format: FLAC
-      num_channels: 1           # mono hardware, one speaker
+      num_channels: 1
       sample_rate: 48000
     on_announcement:
       - mixer_speaker.apply_ducking:
@@ -479,6 +478,6 @@ script:
               .set_announcement(true)
               .perform();
           }
-          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+          if ((id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
             id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }

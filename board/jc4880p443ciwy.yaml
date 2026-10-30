@@ -49,12 +49,6 @@ esphome:
               - lambda: id(init_in_progress) = false;
     - priority: -100
       then:
-        # Push the mic gain restored from flash into the ES7210. The codec boots
-        # with `mic_gain` from audio_adc, so without this a saved value would show
-        # in HA while the hardware sat at the default.
-        - lambda: |-
-            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
-            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
         # Diagnostics: an explicit OFF switch that silences the mic completely.
         # ON = microphone disabled. (This used to be inverted, so the mic was
         # stopped on every boot with the switch in its default OFF position.)
@@ -83,7 +77,11 @@ esp32:
       # Memory allocation for large RGB graphics buffers
       CONFIG_SPIRAM_USE_CAPS_ALLOC: y
       CONFIG_SPIRAM_USE_MALLOC: y
+      CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG: y
     type: ${device.framework.type}
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
 
 esp_ldo:
   - channel: 3
@@ -215,6 +213,7 @@ touchscreen:
           format: Touch %d at (%d, %d)
           args: [ 'touch.id', 'touch.x', 'touch.y' ]
 
+# MIPI CSI Camera not yet supported in ESPHome
 # esp32_camera:
 #   i2c_id: i2c_internal
 #   id: espcam
@@ -246,6 +245,10 @@ touchscreen:
 # #  horizontal_mirror: true
 
 # Audio - speaker/mic
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex with active capture (mutex contention). So we use TWO buses:
+#   - i2s_input  = the MIC bus, I2S MASTER. Continuous capture generates BCLK/LRCLK.
+#   - i2s_output = the SPEAKER bus, I2S SLAVE (secondary). Receives the mic clock.
 i2s_audio:
   - id: i2s_input
     i2s_mclk_pin: ${pin.audio.i2s_mclk}
@@ -268,15 +271,10 @@ audio_dac:
     i2c_id: i2c_internal
     id: dac_es8311
     address: 0x18
-
-audio_adc:
-  - platform: es7210
-    i2c_id: i2c_internal
-    id: adc_es7210
-    address: 0x36
-    # Runtime gain lives on the `mic_gain_db` number below (3 dB steps, the
-    # resolution of the ES7210 gain register).
-    mic_gain: 24db
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    use_microphone: false
+    mic_gain: 30DB
 
 microphone:
   - platform: i2s_audio
@@ -292,14 +290,13 @@ speaker:
     id: i2s_speaker
     i2s_audio_id: i2s_output
     i2s_dout_pin: ${pin.audio.spk}
-    audio_dac: dac_es8311
-    dac_type: external
     i2s_mode: secondary
-    buffer_duration: 1000ms
-
+    dac_type: external
+    sample_rate: 16000
+    audio_dac: dac_es8311
+    channel: left
+    buffer_duration: 250ms
   # Mixes the announcement and media pipelines into the one physical output.
-  # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
-  # channel would just be discarded.
   - platform: mixer
     id: mixing_speaker
     output_speaker: i2s_speaker
@@ -494,35 +491,6 @@ sensor:
     update_interval: 5s
     entity_category: diagnostic
 
-number:
-  - platform: template
-    id: mic_gain_db
-    name: "Mic gain (ES7210)"
-    icon: mdi:microphone-settings
-    entity_category: config
-    unit_of_measurement: dB
-    min_value: 0
-    # The ES7210 gain register moves in 3 dB steps up to 33 dB (then 34.5, 36
-    # and 37.5), so a finer slider step would leave every second position a
-    # no-op. 36 dB is the highest value that sits on the 3 dB grid.
-    max_value: 36
-    step: 3
-    restore_value: true
-    initial_value: 24
-    mode: slider
-    # Without `optimistic`, a template number with only a set_action never
-    # publishes the new value back: the slider snapped back to 24 dB in HA even
-    # though the ES7210 had already been reprogrammed. The restored value is
-    # applied to the codec in on_boot (-100), since TemplateNumber::setup() only
-    # publishes it and does not run set_action.
-    optimistic: true
-    set_action:
-      - lambda: |-
-          id(adc_es7210).set_mic_gain(x);
-      - logger.log:
-          format: "[MIC] ES7210 gain -> %.1f dB"
-          args: ["x"]
-
 script:
   # ESPHome 2026.10 made audio files const; 2026.8/2026.9 still take a mutable
   # pointer in play_file(). A const parameter accepts both, and the const_cast
@@ -542,7 +510,7 @@ script:
               .set_announcement(true)
               .perform();
           }
-          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+          if ((id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
             id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }
 

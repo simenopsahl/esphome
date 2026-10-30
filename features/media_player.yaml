@@ -6,13 +6,23 @@
 
 # Media Player package for devices with a i2s_speaker and i2s_mic
 
+#--------------#
+# For AI AGENTS:
+#--------------#
+# For esphome.on_boot, api.on_client_connected, media_player.on_state, switch.(amp_enable).on_turn_on
+# actions that can not be standardized it might work to have scripts in the board configuration files instead that are called from these events.
+# E.g
+#  api:
+#    on_client_connected:
+#      - script.execute: play_boot_chime # script located in for example m5stack_core_s3se.yaml
+#  switch
+#    - id: !extend amp_enable
+#      on_turn_on:
+#        - script.execute: enable_amplifier
+
+
 esphome:
-  project:
-    name: "M5Stack.StickS3"
-    version: "1.0.0"
   on_boot:
-    # Note: M5PM1 hub initializes at setup_priority::BUS - 1.0f (999.0f),
-    # enabling 5V Boost and L3B (GPIO2) rails before hardware sensors probe I2C.
     - priority: 375
       then:
         # Safety net: if HA never connects.
@@ -81,9 +91,6 @@ globals:
     initial_value: 'false'
 
 speaker:
-  # Mixes the announcement and media pipelines into the one physical output.
-  # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
-  # channel would just be discarded.
   - platform: mixer
     id: mixing_speaker
     output_speaker: i2s_speaker
@@ -114,13 +121,13 @@ media_player:
     volume_max: ${feature.audio.volume_max}
     announcement_pipeline:
       speaker: announcement_resampling_speaker
-      format: FLAC              # cheapest codec for the S3
+      format: FLAC
       num_channels: 1           # stereo is pointless for announcements
       sample_rate: 48000        # what Music Assistant serves
     media_pipeline:
       speaker: media_resampling_speaker
       format: FLAC
-      num_channels: 1           # mono hardware, one speaker
+      num_channels: 1
       sample_rate: 48000
     on_announcement:
       - mixer_speaker.apply_ducking:
@@ -179,10 +186,6 @@ switch:
     internal: true                      # diagnostic-only, not shown in HA
     optimistic: true
     restore_mode: RESTORE_DEFAULT_OFF   # OFF = mic works as usual
-    # These triggers also fire during setup() when the state is restored from
-    # flash - at setup_priority HARDWARE-2, i.e. before the mic and mWW exist.
-    # on_boot (priority -100) applies the restored state once everything is up,
-    # so here we only handle a live toggle.
     on_turn_on:
       - if:
           condition:
@@ -257,3 +260,5 @@ sensor:
       id: average_loudness
       filters:
         - offset: 100.0
+        # Throttle to reduce Home Assistant DB writes
+        - throttle_average: 10s
