@@ -24,6 +24,7 @@ substitutions:
     model: "M5Stack Core S3 SE"
     rmt_symbols_block: 48
     rtc: "true"
+    psram: "true"
     framework:
       type: esp-idf
     screen:
@@ -72,6 +73,7 @@ esphome:
               - microphone.stop_capture: i2s_mic
             else:
               - logger.log: "Mic enabled"
+              - microphone.capture: i2s_mic
 
 esp32:
 # ESP32-S3@Xtensa LX7 Dual-Core, 240MHz
@@ -186,8 +188,12 @@ spi:
 #    scan: true
 
 external_components:
+  - source:
+      type: local
+      path: components
+    components: [ aw88298 ]
   - source: github://m5stack/esphome-yaml/components
-    components: [axp2101, aw88298, aw9523b]
+    components: [ axp2101, aw9523b ]
 
 # IO Expander
 aw9523b:
@@ -366,6 +372,44 @@ sensor:
         - offset: 100.0
 
 switch:
+  # Audio Amplifier (AW88298 via software mute)
+  - platform: template
+    id: amp_enable
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    turn_on_action:
+      - lambda: 'id(dac_aw88298).set_mute_off();'
+    turn_off_action:
+      - lambda: 'id(dac_aw88298).set_mute_on();'
+    on_turn_on:
+      - if:
+          condition:
+            - lambda: 'return id(boot_chime_done);'
+            - lambda: 'return !id(init_in_progress);'
+            - switch.is_on: boot_sound
+            - switch.is_off: diag_disable_mic
+            - not:
+                media_player.is_announcing: speaker_media_player
+            - lambda: 'return id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - delay: 250ms
+            - script.execute:
+                id: play_sound
+                priority: false
+                sound_file: !lambda return id(speaker_enable_sound);
+
+  - platform: gpio
+    id: sw_aw_rst
+    name: "AW RST P0_2"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 2
+    internal: true
+    restore_mode: ALWAYS_ON
+
   - platform: gpio
     id: sw_bus_out_en
     name: "BUS_OUT_EN"
@@ -497,7 +541,7 @@ audio_dac:
   - platform: aw88298
     i2c_id: ${module.internal.i2c_bus}
     id: dac_aw88298
-    sample_rate: 48000
+    sample_rate: 16000
 
 audio_adc:
   - platform: es7210
@@ -550,7 +594,8 @@ media_player:
     id: speaker_media_player
     name: None
     internal: False
-    task_stack_in_psram: True
+    task_stack_in_psram: ${device.psram}
+    buffer_size: ${feature.audio.buffer_size | default("1000000")}
     volume_increment: 0.01
     volume_min: ${feature.audio.volume_min}
     volume_max: ${feature.audio.volume_max}
@@ -570,6 +615,14 @@ media_player:
           decibel_reduction: 20
           duration: 0.0s
     on_state:
+      # Amp follows playback: turn it on the instant audio starts.
+      - if:
+          condition:
+            or:
+              - media_player.is_announcing:
+              - lambda: 'return id(speaker_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - switch.turn_on: amp_enable
       - if:
           condition:
             - not:
@@ -632,6 +685,6 @@ script:
               .set_announcement(true)
               .perform();
           }
-          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+          if ((id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
             id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }
