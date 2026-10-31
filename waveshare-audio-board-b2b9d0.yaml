@@ -2,11 +2,11 @@ packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
 
-  # --- BOARD AND MODULES ---
-  board: !include board/waveshare_s3_audio_board.yaml
-
   # --- FEATURE PACKAGES ---
   media_player: !include features/media_player.yaml
+
+  # --- BOARD AND MODULES ---
+  board: !include board/waveshare_s3_audio_board.yaml
 
 substitutions:
   common:
