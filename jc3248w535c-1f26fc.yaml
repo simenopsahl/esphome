@@ -6,6 +6,9 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/jc3248w535c.yaml
 
+  # --- FEATURE PACKAGES ---
+  media_player: !include features/media_player.yaml
+
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/480x320.yaml
