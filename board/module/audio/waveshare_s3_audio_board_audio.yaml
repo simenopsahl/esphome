@@ -1,0 +1,277 @@
+labels: [es8311, es7210, audio]
+---
+# https://github.com/MichalZaniewicz/esphome-waveshare-esp32-s3-audio-va/blob/main/base/core.yaml
+# Audio functions for Waveshare ESP32S3 Audio Board
+# Model:  ESP32-S3R8
+# DAC:  ES8311
+# ADC:  ES7210
+
+substitutions:
+  feature:
+    audio:
+      volume_min: '0.4'
+      volume_max: '0.8'
+
+# Possible scripts for device specific on_boot and on_client_connected actions
+# Unsure if esphome.on_boot and api.on_client_connected are best defined in this file or the media_player package.
+script:
+  # Push the mic gain restored from flash into the ES7210. The codec boots
+  # with `mic_gain` from audio_adc, so without this a saved value would show
+  # in HA while the hardware sat at the default.
+  - id: set_mic_gain
+    mode: single
+    then:
+      - lambda: |-
+          id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
+          ESP_LOGI("mic", "[MIC] set ES7210 gain -> %.1f dB", id(mic_gain_db).state);
+  
+  # Diagnostics: an explicit OFF switch that silences the mic completely.
+  # ON = microphone disabled. (This used to be inverted, so the mic was
+  # stopped on every boot with the switch in its default OFF position.)
+  - id: set_diag_mic
+    mode: single
+    then:
+      - if:
+          condition:
+            switch.is_on: diag_disable_mic
+          then:
+            - logger.log: "Mic DISABLED for diagnostics"
+            - microphone.stop_capture: i2s_mic
+          else:
+            - logger.log: "Mic enabled"
+
+
+  # One-shot "ready" chime. It MUST run after the mic is turned on: the
+  # speaker is a slave to the mic's I2S clock, so playing before the mic is
+  # capturing hangs the announcement and can interrupt mic operation. The
+  # flag is set first so an HA reconnect can't replay it.
+  - id: play_boot_chime
+    mode: single
+    then:
+      - if:
+          condition:
+            - lambda: 'return !id(boot_chime_done);'
+          then:
+            - if:
+                condition:
+                  - switch.is_on: boot_sound
+                  - switch.is_off: night_mode
+                  - switch.is_off: diag_disable_mic
+                then:
+                  - delay: 1s            # let the mic-master clock settle
+                  - script.execute:
+                      id: play_sound
+                      priority: true
+                      sound_file: !lambda return id(boot_sound_custom);
+                  - delay: 2s            # wait for boot chime to finish playing!
+            - lambda: id(boot_chime_done) = true;
+
+esphome:
+  project:
+    name: "Waveshare.S3 Audio Board"
+    version: "1.0.0"
+  on_boot:
+    - priority: 800
+      then:
+        - pcf85063.read_time:
+    # Paint the ring as early as we can, so
+    # the device shows life while Wi-Fi/API are still coming up.
+    - priority: 375
+      then:
+        - script.execute: control_leds
+        # Safety net: if HA never connects, stop showing the boot animation.
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(init_in_progress);
+            then:
+              - lambda: id(init_in_progress) = false;
+              - script.execute: control_leds
+    - priority: -100
+      then:
+        # Push the mic gain restored from flash into the ES7210. The codec boots
+        # with `mic_gain` from audio_adc, so without this a saved value would show
+        # in HA while the hardware sat at the default.
+        - lambda: |-
+            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
+            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
+        # Diagnostics: an explicit OFF switch that silences the mic completely.
+        # ON = microphone disabled. (This used to be inverted, so the mic was
+        # stopped on every boot with the switch in its default OFF position.)
+        - if:
+            condition:
+              switch.is_on: diag_disable_mic
+            then:
+              - logger.log: "Mic DISABLED for diagnostics"
+              - microphone.stop_capture: i2s_mic
+            else:
+              - logger.log: "Mic enabled"
+
+api:
+  on_client_connected:
+    - script.execute: control_leds
+    - if:
+        condition:
+          - lambda: return id(init_in_progress);
+          - switch.is_on: mic_mute_switch
+        then:
+          - switch.turn_off: mic_mute_switch
+    - lambda: id(init_in_progress) = false;
+    # One-shot "ready" chime. It MUST run after the mic is turned on: the
+    # speaker is a slave to the mic's I2S clock, so playing before the mic is
+    # capturing hangs the announcement and can interrupt mic operation. The
+    # flag is set first so an HA reconnect can't replay it.
+    - if:
+        condition:
+          - lambda: 'return !id(boot_chime_done);'
+        then:
+          - if:
+              condition:
+                - switch.is_on: boot_sound
+                - switch.is_off: night_mode
+                - switch.is_off: diag_disable_mic
+              then:
+                - delay: 1s            # let the mic-master clock settle
+                - script.execute:
+                    id: play_sound
+                    priority: true
+                    sound_file: !lambda return id(boot_sound_custom);
+                - delay: 2s            # wait for boot chime to finish playing!
+          - lambda: id(boot_chime_done) = true;
+  on_client_disconnected:
+    - script.execute: control_leds
+
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex (the mic and speaker each call i2s_new_channel on the port, and
+# the second fails with "Parent bus is busy"). So we use TWO buses (two I2S ports)
+# over the shared pins:
+#   - i2s_input  = the MIC bus, I2S MASTER. The mic is always capturing (wake
+#     word), so it drives BCLK/LRCLK/MCLK continuously. Using the ESP as master
+#     is what makes the mic get a correct-rate stream (a codec-mastered clock via
+#     force_master gave the mic garbage and killed wake word).
+#   - i2s_output = the SPEAKER bus, I2S SLAVE. It reads the mic's clock and only
+#     needs to output data, so it never contends for a port of its own.
+# The ES8311 (DAC) and ES7210 (ADC) are stock and slave to the mic's clock; no
+# patched es8311 / force_master is needed.
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_adc:
+  - platform: es7210
+    id: adc_es7210
+    i2c_id: ${module.internal.i2c_bus}
+    # Runtime gain lives on the `mic_gain_db` number below (3 dB steps, the
+    # resolution of the ES7210 gain register).
+    mic_gain: 24db
+
+audio_dac:
+  - platform: es8311
+    id: dac_es8311
+    i2c_id: ${module.internal.i2c_bus}
+
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    i2s_audio_id: i2s_input
+    i2s_din_pin: ${pin.audio.i2s_din}
+    adc_type: external
+    pdm: false
+    # default i2s_mode: primary -> this bus masters the shared clock.
+    # 16-bit on purpose: as master the mic defines the frame's slot width, and
+    # the i2s_audio default is 32-bit. The ES8311/speaker are 16-bit, so a
+    # 32-bit frame doubles the bit clock they expect and playback comes out as
+    # noise. Matching 16-bit aligns the whole bus (the ES7210 is 16-bit too).
+    bits_per_sample: 16bit
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    i2s_mode: secondary          # slave to the mic bus's clock
+    dac_type: external
+    audio_dac: dac_es8311
+    timeout: never
+    buffer_duration: 250ms
+
+switch:
+  - platform: gpio
+    id: amp_enable
+    name: Amplifier
+    icon: "mdi:volume-high"
+    entity_category: config
+    pin:
+      tca9555: ioexp
+      number: ${pin.audio.amp}
+      inverted: false
+    # OFF at boot so the amp doesn't amplify the undriven DAC line as a hiss
+    # before the speaker's first playback. The media_player on_state turns it on
+    # the moment audio starts and leaves it on (the speaker then holds the line
+    # at silence, which is clean).
+    restore_mode: ALWAYS_OFF
+
+  - id: !extend mic_mute_switch
+    turn_on_action:
+#      - lambda: id(mic_is_muted) = true;
+#      - microphone.mute: i2s_mic
+      - script.execute: flash_ring
+    turn_off_action:
+#      - lambda: id(mic_is_muted) = false;
+#      - microphone.unmute: i2s_mic
+      - script.execute: flash_ring
+
+number:
+  - platform: template
+    id: mic_gain_db
+    name: "Mic gain (ES7210)"
+    icon: mdi:microphone-settings
+    entity_category: config
+    unit_of_measurement: dB
+    min_value: 0
+    # The ES7210 gain register moves in 3 dB steps up to 33 dB (then 34.5, 36
+    # and 37.5), so a finer slider step would leave every second position a
+    # no-op. 36 dB is the highest value that sits on the 3 dB grid.
+    max_value: 36
+    step: 3
+    restore_value: true
+    initial_value: 24
+    mode: slider
+    # Without `optimistic`, a template number with only a set_action never
+    # publishes the new value back: the slider snapped back to 24 dB in HA even
+    # though the ES7210 had already been reprogrammed. The restored value is
+    # applied to the codec in on_boot (-100), since TemplateNumber::setup() only
+    # publishes it and does not run set_action.
+    optimistic: true
+    set_action:
+      - lambda: |-
+          id(adc_es7210).set_mic_gain(x);
+      - logger.log:
+          format: "[MIC] ES7210 gain -> %.1f dB"
+          args: ["x"]
+
+binary_sensor:
+  - id: !extend btn_key1
+    on_press:
+      - media_player.volume_down: speaker_media_player
+
+  - id: !extend btn_key2
+    on_press:
+      - media_player.toggle: speaker_media_player
+
+  - id: !extend btn_key3
+    on_press:
+      - media_player.volume_up: speaker_media_player

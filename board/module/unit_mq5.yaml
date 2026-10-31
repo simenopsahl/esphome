@@ -26,7 +26,7 @@ sensor:
   - platform: m5stack_unit_mq
     i2c_id: ${module.mq5_i2c_bus}
     id: mq5_sensor
-    # heat_mode: SWITCH CONTINUOUS, "OFF"
+    # heat_mode: SWITCH, CONTINUOUS, "OFF"
     heat_mode: "OFF"
 #    high_level_time: 45  # Minimum/default is 30
 #    low_level_time: 5   # Minimum/default is 5
@@ -143,3 +143,88 @@ binary_sensor:
       
       // If the reading is valid, evaluate the gas threshold
       return id(mq5_mq_voltage).state > (id(mq5_dynamic_baseline) + 200.0);
+
+# Runtime Heater Controls
+select:
+  - platform: template
+    name: "MQ-5 Heat Mode"
+    id: mq5_heat_mode
+    icon: "mdi:radiator"
+    entity_category: "config"
+    options:
+      - "Off"
+      - "Cycle"
+      - "Continuous"
+    initial_option: "Off"
+    optimistic: true
+    restore_value: true
+    set_action:
+      - lambda: |-
+          if (x == "Continuous") {
+            id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::CONTINUOUS);
+            id(mq5_sensor).write_byte(0x00, 0x01);
+            id(mq5_heater).publish_state(true);
+            ESP_LOGI("unit_mq5", "MQ-5 Heat Mode set to Continuous");
+          } else if (x == "Cycle") {
+            id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::SWITCH);
+            id(mq5_sensor).write_byte(0x00, 0x10);
+            id(mq5_heater).publish_state(true);
+            ESP_LOGI("unit_mq5", "MQ-5 Heat Mode set to Cycle");
+          } else {
+            id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::OFF);
+            id(mq5_sensor).write_byte(0x00, 0x00);
+            id(mq5_heater).publish_state(false);
+            ESP_LOGI("unit_mq5", "MQ-5 Heat Mode set to Off");
+          }
+
+switch:
+  - platform: template
+    name: "MQ-5 Heater"
+    id: mq5_heater
+    icon: "mdi:radiator"
+    entity_category: "config"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    turn_on_action:
+      - lambda: |-
+          std::string mode = id(mq5_heat_mode).current_option().str();
+          if (mode == "Off" || mode.empty()) {
+            mode = "Cycle";
+            id(mq5_heat_mode).publish_state("Cycle");
+          }
+          if (mode == "Continuous") {
+            id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::CONTINUOUS);
+            id(mq5_sensor).write_byte(0x00, 0x01);
+          } else {
+            id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::SWITCH);
+            id(mq5_sensor).write_byte(0x00, 0x10);
+          }
+          ESP_LOGI("unit_mq5", "MQ-5 heater turned ON (%s)", mode.c_str());
+    turn_off_action:
+      - lambda: |-
+          id(mq5_heat_mode).publish_state("Off");
+          id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::OFF);
+          id(mq5_sensor).write_byte(0x00, 0x00);
+          ESP_LOGI("unit_mq5", "MQ-5 heater turned OFF");
+
+esphome:
+  on_boot:
+    - priority: -15.0
+      then:
+        - lambda: |-
+            std::string mode = id(mq5_heat_mode).current_option().str();
+            if (id(mq5_heater).state && mode != "Off") {
+              if (mode == "Continuous") {
+                id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::CONTINUOUS);
+                id(mq5_sensor).write_byte(0x00, 0x01);
+                ESP_LOGI("unit_mq5", "Boot: Restored Continuous heat mode");
+              } else {
+                id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::SWITCH);
+                id(mq5_sensor).write_byte(0x00, 0x10);
+                ESP_LOGI("unit_mq5", "Boot: Restored Cycle heat mode");
+              }
+            } else {
+              id(mq5_sensor).set_heat_mode(esphome::unit_mq::HeatMode::OFF);
+              id(mq5_sensor).write_byte(0x00, 0x00);
+              ESP_LOGI("unit_mq5", "Boot: MQ-5 heater dormant (OFF)");
+            }
