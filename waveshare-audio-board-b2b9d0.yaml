@@ -5,6 +5,9 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/waveshare_s3_audio_board.yaml
 
+  # --- FEATURE PACKAGES ---
+  media_player: !include features/media_player.yaml
+
 substitutions:
   common:
     log_level: DEBUG
