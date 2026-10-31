@@ -8,6 +8,7 @@ packages:
 #  display: !include board/module/display_dsi_43_800x480.yaml
 
   # --- FEATURE PACKAGES ---
+  media_player: !include features/media_player.yaml
 #  voice_assist: !include features/voice_assistant.yaml
 
   # --- LVGL WIDGET PACKAGES ---
