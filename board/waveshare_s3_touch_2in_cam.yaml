@@ -18,6 +18,7 @@ substitutions:
   screen_height: "320"
   device:
     model: "Waveshare 2in w Cam"
+    board: waveshare_s3_touch_2in_cam
     rmt_symbols_block: 48
     framework:
       type: esp-idf

@@ -31,6 +31,7 @@ substitutions:
       wb_mode: auto
   device:
     model: "M5Stack Atom S3R-M12"
+    board: m5stack_atom_s3r_m12
     rmt_symbols_block: 48
     framework:
       type: esp-idf

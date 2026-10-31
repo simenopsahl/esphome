@@ -19,6 +19,7 @@ substitutions:
   grove_shared: "false"
   device:
     model: "M5Stack StickS3"
+    board: m5stack_stick_s3
     rmt_symbols_block: 48
     framework:
       type: esp-idf

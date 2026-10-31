@@ -14,6 +14,7 @@ substitutions:
   screen_height: "128"
   device:
     model: "M5Stack Atom S3"
+    board: m5stack_atom_s3
     rmt_symbols_block: 48 
     framework:
       type: esp-idf

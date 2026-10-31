@@ -16,6 +16,7 @@ packages:
 substitutions:
   device:
     model: "Ulanzi TC001"
+    board: ulanzi_tc001
     rtc: "true"
     rmt_symbols_block: 64
     framework:

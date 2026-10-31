@@ -13,6 +13,7 @@ packages:
 substitutions:
   device:
     model: "ESP32-S3-Cam OTG"
+    board: esp32s3_cam_n16r8_usbotg
     rmt_symbols_block: 48
     framework:
       type: esp-idf

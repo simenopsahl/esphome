@@ -15,6 +15,7 @@ substitutions:
   home_page: page_content
   device:
     model: "Waveshare E-Paper"
+    board: waveshare_epaper_driver
     rmt_symbols_block: 64
     framework:
       type: arduino

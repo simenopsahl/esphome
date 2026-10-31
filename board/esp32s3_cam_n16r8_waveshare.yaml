@@ -13,6 +13,7 @@ packages:
 substitutions:
   device:
     model: "Waveshare S3-Cam"
+    board: esp32s3_cam_n16r8_waveshare
     rmt_symbols_block: 48
     framework:
       type: esp-idf

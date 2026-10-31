@@ -14,6 +14,7 @@ substitutions:
   screen_height: "240"
   device:
     model: "GeekMagic SmallTV S3"
+    board: geekmagic_smalltv_s3
     rmt_symbols_block: 48
     framework:
       type: esp-idf

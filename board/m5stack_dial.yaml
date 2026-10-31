@@ -23,6 +23,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack Dial"
+    board: m5stack_dial
     rtc: "true"
     rmt_symbols_block: 48
     framework:

@@ -13,6 +13,7 @@ packages:
 substitutions:
   device:
     model: "M5Stack Atom S3 Lite"
+    board: m5stack_atom_s3_lite
     rmt_symbols_block: 48
     framework:
       type: esp-idf

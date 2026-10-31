@@ -9,6 +9,7 @@ packages:
 substitutions:
   device:
     model: "Seeed XIAO ESP32S3 Plus"
+    board: seeed_xiao_esp32s3_plus
     rmt_symbols_block: 48
     framework:
       type: esp-idf

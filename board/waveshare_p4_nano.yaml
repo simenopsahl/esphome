@@ -236,12 +236,6 @@ audio_dac:
     use_microphone: false
     mic_gain: 30DB
 
-# No ADC?
-#audio_adc:
-#  - platform: es7210
-#    i2c_id: i2c_internal
-#    id: adc_es7210
-
 microphone:
   - platform: i2s_audio
     id: i2s_mic

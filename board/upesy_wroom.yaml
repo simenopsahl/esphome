@@ -11,6 +11,7 @@ packages:
 substitutions:
   device:
     model: "uPesy Wroom"
+    board: upesy_wroom
     rmt_symbols_block: 64
     framework:
       type: esp-idf

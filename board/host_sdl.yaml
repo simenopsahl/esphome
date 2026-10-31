@@ -20,6 +20,7 @@ substitutions:
   screen_height: "240"
   device:
     model: "Host SDL"
+    board: host_sdl
     # Locally administered MAC; must be unique per virtual device
     mac_address: "02:5D:1A:00:00:01"
     # Shown on the status page only (host has no wifi_info sensor)

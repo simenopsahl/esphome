@@ -1,14 +1,8 @@
-# https://esphome.io/components/i2s_audio/
-# https://esphome.io/components/media_player/speaker/
-# https://esphome.io/components/speaker/mixer/
-# https://esphome.io/components/speaker/resampler/
-# https://esphome.io/components/sensor/sound_level/
-
-# Media Player package for devices with a i2s_speaker and i2s_mic
-
-#--------------#
-# For AI AGENTS:
-#--------------#
+#----------------------------#
+# AGENTS: Supplementary info
+#----------------------------#
+#
+###
 # For esphome.on_boot, api.on_client_connected, media_player.on_state, switch.(amp_enable).on_turn_on
 # actions that can not be standardized it might work to have scripts in the board configuration files instead that are called from these events.
 # E.g
@@ -19,6 +13,44 @@
 #    - id: !extend amp_enable
 #      on_turn_on:
 #        - script.execute: enable_amplifier
+###
+#
+#
+# Even better solution proposed below:
+#
+###
+# To limit resource usage on configuartions where media_player is not needed,
+# it might be beneficial to have this media_player package include board-specific packages using jinja templates
+# containing 'i2s_audio', 'audio_dac', 'audio_adc' where applicable, 'microphone: i2s_mic',
+# 'speaker: i2s_speaker', 'switch: amp_enable' and possibly the scripts mentioned above
+# Example file layout:
+# /features/
+# -- media_player.yaml <- This file
+# /board/
+# -- m5stack_core_s3se.yaml <- Board configuration file, not containing audio configurations
+# -- /module/
+# -- -- /audio/
+# -- -- -- m5stack_core_s3se_audio.yaml <- Board-specific audio configuration file
+# -- -- -- waveshare_p4_wifi6_audio.yaml <- Board-specific audio configuration file
+###
+# https://esphome.io/components/packages/#including-packages-with-dynamic-filenames
+# < in this file >
+# packages:
+#   audio: !include ${device.board}_audio.yaml
+###
+# Some jinja template might be needed to get the atom boards to instead include the atomic_voice_base.yaml
+#
+#---------------------------#
+# END of supplementary info
+#---------------------------#
+
+# https://esphome.io/components/i2s_audio/
+# https://esphome.io/components/media_player/speaker/
+# https://esphome.io/components/speaker/mixer/
+# https://esphome.io/components/speaker/resampler/
+# https://esphome.io/components/sensor/sound_level/
+
+# Media Player package for devices with a i2s_speaker and i2s_mic
 
 
 esphome:

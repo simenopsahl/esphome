@@ -11,6 +11,7 @@ packages:
 substitutions:
   device:
     model: 'ttGo T-OI'
+    board: ttgo_t_oi_plus
     rmt_symbols_block: 48
     framework:
       type: esp-idf

@@ -11,6 +11,7 @@ packages:
 substitutions:
   device:
     model: "NullLab S3-Cam"
+    board: esp32s3_cam_n8r8_eye
     rmt_symbols_block: 48
     framework:
       type: esp-idf

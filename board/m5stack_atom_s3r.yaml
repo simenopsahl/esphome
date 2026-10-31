@@ -23,6 +23,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack Atom S3R"
+    board: m5stack_atom_s3r
     rmt_symbols_block: 48
     framework:
       type: esp-idf

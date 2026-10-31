@@ -22,6 +22,7 @@ substitutions:
       i2c_bus: i2c_internal
   device:
     model: "M5Stack Core S3 SE"
+    board: m5stack_core_s3se
     rmt_symbols_block: 48
     rtc: "true"
     psram: "true"

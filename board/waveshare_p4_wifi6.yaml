@@ -19,6 +19,7 @@ substitutions:
         frequency: 400kHz
   device:
     model: 'Waveshare P4-Wifi6'
+    board: waveshare_p4_wifi6
     rmt_symbols_block: 48
     framework:
       type: esp-idf
@@ -57,6 +58,7 @@ esphome:
               - microphone.stop_capture: i2s_mic
             else:
               - logger.log: "Mic enabled"
+              - microphone.capture: i2s_mic
 
 esp32:
 # ESP32-P4R32
@@ -175,7 +177,18 @@ update:
     source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
     update_interval: 6h
 
-# Audio - speaker/mic
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex (the mic and speaker each call i2s_new_channel on the port, and
+# the second fails with "Parent bus is busy"). So we use TWO buses (two I2S ports)
+# over the shared pins:
+#   - i2s_input  = the MIC bus, I2S MASTER. The mic is always capturing (wake
+#     word), so it drives BCLK/LRCLK/MCLK continuously. Using the ESP as master
+#     is what makes the mic get a correct-rate stream (a codec-mastered clock via
+#     force_master gave the mic garbage and killed wake word).
+#   - i2s_output = the SPEAKER bus, I2S SLAVE. It reads the mic's clock and only
+#     needs to output data, so it never contends for a port of its own.
+# The ES8311 (DAC) and (ADC) are stock and slave to the mic's clock; no
+# patched es8311 / force_master is needed.
 i2s_audio:
   - id: i2s_input
     i2s_mclk_pin: ${pin.audio.i2s_mclk}
@@ -198,20 +211,17 @@ audio_dac:
     i2c_id: i2c_internal
     id: dac_es8311
     address: 0x18
+    bits_per_sample: 16bit
+    sample_rate: 48000
     use_microphone: false
     mic_gain: 30DB
-
-# No ADC?
-#audio_adc:
-#  - platform: es7210
-#    i2c_id: i2c_internal
-#    id: adc_es7210
 
 microphone:
   - platform: i2s_audio
     id: i2s_mic
     i2s_audio_id: i2s_input
     i2s_din_pin: ${pin.audio.mic}
+    sample_rate: 48000
     bits_per_sample: 16bit
     adc_type: external
     channel: left
@@ -223,12 +233,12 @@ speaker:
     i2s_dout_pin: ${pin.audio.spk}
     i2s_mode: secondary
     dac_type: external
+    sample_rate: 48000
     audio_dac: dac_es8311
-    buffer_duration: 1000ms
+    channel: left
+    buffer_duration: 250ms
 
   # Mixes the announcement and media pipelines into the one physical output.
-  # Mono: the board has a single speaker (mono ES8311 + NS4150B), so a second
-  # channel would just be discarded.
   - platform: mixer
     id: mixing_speaker
     output_speaker: i2s_speaker
@@ -247,11 +257,11 @@ speaker:
     id: media_resampling_speaker
     output_speaker: media_mixing_input
 
-# media player and voice assist in features/voice_assistant.yaml
 media_player:
   - platform: speaker
-    name: "Speaker Media Player"
+    name: None
     id: speaker_media_player
+    internal: false
     task_stack_in_psram: ${device.psram}
     buffer_size: 1000000
     volume_initial: 50%
@@ -259,13 +269,13 @@ media_player:
     volume_max: ${feature.audio.volume_max}
     announcement_pipeline:
       speaker: announcement_resampling_speaker
-      format: FLAC              # cheapest codec for the S3
-      num_channels: 1           # stereo is pointless for announcements
+      format: FLAC
+      num_channels: 1
       sample_rate: 48000        # what Music Assistant serves
     media_pipeline:
       speaker: media_resampling_speaker
       format: FLAC
-      num_channels: 1           # mono hardware, one speaker
+      num_channels: 1
       sample_rate: 48000
     on_announcement:
       - mixer_speaker.apply_ducking:
@@ -362,10 +372,6 @@ switch:
     # Microphone hand every consumer a zero-filled buffer, so the wake word
     # literally hears silence. The stream keeps running, so there is no I2S
     # restart and no start/stop race.
-    #
-    # The previous implementation dropped the ES7210 gain to 0.0f - but 0 dB is
-    # UNITY gain, not silence. The mic kept hearing the room and only the wake
-    # word handler ignored it.
     turn_on_action:
       - lambda: id(mic_is_muted) = true;
       - microphone.mute: i2s_mic
@@ -441,6 +447,6 @@ script:
               .set_announcement(true)
               .perform();
           }
-          if ((id(speaker_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+          if ((id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
             id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }

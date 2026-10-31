@@ -14,6 +14,7 @@ substitutions:
   screen_height: "240"
   device:
     model: "M5Stack Fire"
+    board: m5stack_fire
     rmt_symbols_block: 64
     framework:
       type: esp-idf

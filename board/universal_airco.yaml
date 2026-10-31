@@ -13,6 +13,7 @@ packages:
 substitutions:
   device:
     model: 'Universal AirCo'
+    board: universal_airco
     rmt_symbols_block: 48
     framework:
       type: esp-idf

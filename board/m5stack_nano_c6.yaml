@@ -13,6 +13,7 @@ packages:
 substitutions:
   device:
     model: "M5Stack NanoC6"
+    board: m5stack_nano_c6
     rmt_symbols_block: 48
     framework:
       type: esp-idf

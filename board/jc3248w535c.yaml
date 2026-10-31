@@ -12,6 +12,7 @@ substitutions:
   screen_height: "480"
   device:
     model: 'Sunton 3,5"'
+    board: jc3248w535c
     rmt_symbols_block: 48
     framework:
       type: esp-idf

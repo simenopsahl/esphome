@@ -17,6 +17,7 @@ substitutions:
         frequency: 400kHz
   device:
     model: 'M5Stack Stamp-P4'
+    board: m5stack_stamp_p4
     rmt_symbols_block: 48
     framework:
       type: esp-idf
