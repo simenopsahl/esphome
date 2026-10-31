@@ -4,6 +4,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/jc4880p443ciwy.yaml
+  media_player: !include features/media_player.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
