@@ -33,6 +33,7 @@ packages:
       entity_id: sensor.ute_temperature
       unit: "°C"
       format: "%.1f"
+      click_page: page_temperature
   tile_t22_temp_sensor: !include
     file: gui/tiles/sensor/remote.yaml
     vars:
@@ -45,6 +46,7 @@ packages:
       entity_id: sensor.t22_temperature
       unit: "°C"
       format: "%.1f"
+      click_page: page_weather
   tile_flip_clock: !include
     file: gui/tiles/clock/flip_clock.yaml
     vars:
