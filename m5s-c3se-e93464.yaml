@@ -15,6 +15,7 @@ packages:
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
+  media_player: !include features/media_player.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
