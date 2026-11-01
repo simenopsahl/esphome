@@ -1,3 +1,31 @@
+#----------------------------#
+# AGENTS: Supplementary info
+#----------------------------#
+# Voice Assistant feature package (WIP).
+#
+# Architecture & Dependencies:
+# - This package automatically includes `features/media_player.yaml`, which sets
+#   `feature_audio_enabled: "true"` and activates the board's conditional audio
+#   hardware module (`board/module/audio/<board>_audio.yaml` or `atomic_voice_base.yaml`).
+# - When a root device configuration includes `features/voice_assistant.yaml`, it
+#   does NOT need to separately include `features/media_player.yaml`.
+# - Declare `board:` BEFORE `voice_assist:` in the root device's `packages:` block
+#   so ESPHome's reverse package evaluation processes `voice_assist` -> `media_player`
+#   first and sets `feature_audio_enabled: "true"` before evaluating `board:`.
+#
+# Remaining TODOs for Voice Assistant completion:
+# - Replace legacy `speaker_source.set_playlist_delay` in `enable_repeat_one` /
+#   `disable_repeat` with speaker media_player compatible repeat logic.
+# - Standardize `master_mute_switch` / `mic_mute_switch` references across
+#   `media_player.yaml` and `voice_assistant.yaml`.
+# - Verify `media_player` `on_announcement` / `on_state` `!extend` merging with
+#   `media_player.yaml` so ducking and amplifier control do not duplicate or conflict.
+# - Add optional hook scripts (or `!extend` points) for board-specific LED/display
+#   phase feedback (`voice_assistant_phase`).
+#---------------------------#
+# END of supplementary info
+#---------------------------#
+
 # https://github.com/esphome/home-assistant-voice-pe
 # https://esphome.io/components/voice_assistant/
 # https://esphome.io/components/micro_wake_word/
@@ -8,6 +36,9 @@
 #-----#
 # WIP
 #-----#
+
+packages:
+  media_player: !include media_player.yaml
 
 substitutions:
   feature:

@@ -10,6 +10,9 @@ labels: [esp32s3, psram, audio]
 packages:
   pins: !include pins/waveshare_s3_audio_board.yaml
   i2c: !include extension/internal_i2c.yaml
+  audio: !include
+    file: module/audio/${feature.audio.hardware_module | default("waveshare_s3_audio_board_audio.yaml")}
+    condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
   device:
@@ -36,8 +39,9 @@ substitutions:
         frequency: 100kHz
   feature:
     audio:
-      hardware_module: board/module/audio/waveshare_s3_audio_board_audio.yaml
+      hardware_module: waveshare_s3_audio_board_audio.yaml
       channels: "2"
+      mute_boot_chime_expr: "id(night_mode).state"
 
 esphome:
   project:
@@ -60,25 +64,6 @@ esphome:
             then:
               - lambda: id(init_in_progress) = false;
               - script.execute: control_leds
-    - priority: -100
-      then:
-        # Push the mic gain restored from flash into the ES7210. The codec boots
-        # with `mic_gain` from audio_adc, so without this a saved value would show
-        # in HA while the hardware sat at the default.
-        - lambda: |-
-            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
-            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
-        # Diagnostics: an explicit OFF switch that silences the mic completely.
-        # ON = microphone disabled. (This used to be inverted, so the mic was
-        # stopped on every boot with the switch in its default OFF position.)
-        - if:
-            condition:
-              switch.is_on: diag_disable_mic
-            then:
-              - logger.log: "Mic DISABLED for diagnostics"
-              - microphone.stop_capture: i2s_mic
-            else:
-              - logger.log: "Mic enabled"
 
 esp32:
 # esp32-s3r8
@@ -132,34 +117,6 @@ wifi:
 api:
   on_client_connected:
     - script.execute: control_leds
-    - if:
-        condition:
-          - lambda: return id(init_in_progress);
-          - switch.is_on: mic_mute_switch
-        then:
-          - switch.turn_off: mic_mute_switch
-    - lambda: id(init_in_progress) = false;
-    # One-shot "ready" chime. It MUST run after the mic is turned on: the
-    # speaker is a slave to the mic's I2S clock, so playing before the mic is
-    # capturing hangs the announcement and can interrupt mic operation. The
-    # flag is set first so an HA reconnect can't replay it.
-    - if:
-        condition:
-          - lambda: 'return !id(boot_chime_done);'
-        then:
-          - if:
-              condition:
-                - switch.is_on: boot_sound
-                - switch.is_off: night_mode
-                - switch.is_off: diag_disable_mic
-              then:
-                - delay: 1s            # let the mic-master clock settle
-                - script.execute:
-                    id: play_sound
-                    priority: true
-                    sound_file: !lambda return id(boot_sound_custom);
-                - delay: 2s            # wait for boot chime to finish playing!
-          - lambda: id(boot_chime_done) = true;
   on_client_disconnected:
     - script.execute: control_leds
 
@@ -222,22 +179,6 @@ tca9555:
   id: ioexp
   i2c_id: ${module.internal.i2c_bus}
   address: 0x20
-
-media_player:
-  - id: !extend speaker_media_player
-    on_mute:
-      - delay: 100ms            # debounce
-      - script.execute: control_leds_volume_changed
-    on_unmute:
-      - delay: 100ms
-      - script.execute: control_leds_volume_changed
-    on_volume:
-      if:
-        condition:
-          - lambda: return !id(init_in_progress);
-        then:
-          - delay: 100ms
-          - script.execute: control_leds_volume_changed
 
 light:
   - platform: esp32_rmt_led_strip
@@ -618,7 +559,7 @@ binary_sensor:
       then:
         - if:
             condition:
-              lambda: 'return strcmp("${enable_deep_sleep}", "true") == 0;'
+              lambda: 'return strcmp("${device.enable_deep_sleep}", "true") == 0;'
             then:
               - logger.log: "BOOT long-press: entering deep sleep"
               - deep_sleep.enter: deep_sleep_ctrl

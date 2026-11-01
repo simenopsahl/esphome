@@ -1,0 +1,68 @@
+labels: [es8311, audio]
+---
+# Audio hardware definitions for M5Stack StickS3
+# DAC / Codec: ES8311 on ${module.internal.i2c_bus}
+# Amplifier: AW8737 controlled via M5PM1 GPIO3
+
+packages:
+  mic_common: !include common_mic.yaml
+
+# I2S Bus Configuration
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_dac:
+  - platform: es8311
+    i2c_id: ${module.internal.i2c_bus}
+    id: dac_es8311
+    bits_per_sample: 16bit
+    use_microphone: false
+    mic_gain: 30DB
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_input
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    channel: left
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_output
+    i2s_mode: secondary
+    id: i2s_speaker
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    dac_type: external
+    audio_dac: dac_es8311
+    buffer_duration: 100ms
+
+switch:
+  # AW8737 Audio Amplifier
+  - platform: gpio
+    id: amp_enable
+    pin:
+      m5pm1: pmic_m5pm1
+      number: 3
+      mode:
+        output: true
+    restore_mode: ALWAYS_OFF
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+

@@ -76,11 +76,13 @@ Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI insta
    Call `call_mcp_tool` with `ServerName: "homeassistant"`, `ToolName: "esphome-device-builder__compile"`, and `configuration: "<device-config>.yaml"`.
 2. **Monitor Build Progress**:
    Poll status with `esphome-device-builder__get_job(job_id=...)` until completed.
-3. **Download Firmware & ELF via File Browser**:
-   The build server filesystem is exposed at `http://192.168.68.110:8080`:
-   - Authenticate: `POST http://192.168.68.110:8080/api/login` with body `{}` to obtain a JWT token.
-   - Files reside under `/root/config/.esphome/.remote_builds/<build_id>/.esphome/build/<short_name>/build/`.
-   - Download `firmware.factory.bin` (for initial/full USB flash at offset `0x0`) and `firmware.elf` (for `addr2line` crash decoding) via `GET /api/raw/<path>` using header `X-Auth: <token>`. Save to `C:\Users\simen\.esphome_build\<device>\`.
+3. **Download Firmware & ELF via Helper Script**:
+   Always use the standalone helper script [`tools/fetch_firmware.py`](file:///x:/esphome/tools/fetch_firmware.py) as a single command (no shell variables, pipes, or command chains) so Antigravity prefix-matching can auto-approve it:
+   ```powershell
+   python tools/fetch_firmware.py <device-name>
+   ```
+   - The script automatically inspects `<device-name>.yaml` to resolve `device.name` when the remote build directory name differs from the YAML filename (or you can pass `[remote-short-name]` and `[build-id]` explicitly).
+   - It authenticates against `http://192.168.68.110:8080/api/login` and downloads both `firmware.factory.bin` (for USB flashing at offset `0x0`) and `firmware.elf` (for `addr2line` crash decoding) into `C:\Users\simen\.esphome_build\<device-name>\`.
 
 ---
 

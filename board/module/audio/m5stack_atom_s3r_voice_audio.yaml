@@ -1,0 +1,64 @@
+labels: [es8311, audio]
+---
+# Audio hardware definitions for M5Stack Atom EchoS3R / Voice S3R
+# DAC / Codec: ES8311 on ${module.internal.i2c_bus}
+
+packages:
+  mic_common: !include common_mic.yaml
+
+# I2S Bus Configuration
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+      ignore_strapping_warning: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+      ignore_strapping_warning: true
+
+audio_dac:
+  - platform: es8311
+    i2c_id: ${module.internal.i2c_bus}
+    id: dac_es8311
+    use_microphone: false
+    mic_gain: 30DB
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_input
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    channel: left
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_output
+    i2s_mode: secondary
+    id: i2s_speaker
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    dac_type: external
+    audio_dac: dac_es8311
+    channel: left
+    buffer_duration: 500ms
+
+switch:
+  - platform: gpio
+    id: amp_enable
+    pin: ${pin.audio.amp}
+    restore_mode: ALWAYS_OFF
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+

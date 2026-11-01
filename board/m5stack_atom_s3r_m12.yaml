@@ -14,6 +14,9 @@ packages:
 #  i2c_int: !include extension/internal_i2c.yaml
 #  imu: !include module/chip_imu_bmi270.yaml
   camera: !include module/esp32_camera.yaml
+  audio: !include
+    file: module/audio/${feature.audio.hardware_module | default("atomic_voice_base.yaml")}
+    condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
   time_timezone: "Europe/Oslo"
@@ -35,6 +38,9 @@ substitutions:
     rmt_symbols_block: 48
     framework:
       type: esp-idf
+  feature:
+    audio:
+      hardware_module: atomic_voice_base.yaml
 
 esphome:
   project:

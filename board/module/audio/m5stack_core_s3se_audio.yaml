@@ -1,0 +1,149 @@
+labels: [aw88298, es7210, audio]
+---
+# Audio hardware definitions for M5Stack CoreS3 SE
+# DAC / Amplifier: AW88298 on ${module.internal.i2c_bus}
+# ADC: ES7210 on ${module.internal.i2c_bus}
+
+packages:
+  mic_common: !include common_mic.yaml
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        # Push the mic gain restored from flash into the ES7210. The codec boots
+        # with `mic_gain` from audio_adc, so without this a saved value would show
+        # in HA while the hardware sat at the default.
+        - lambda: |-
+            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
+            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [ aw88298 ]
+
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin:
+      number: ${pin.audio.i2s_mclk}
+      ignore_strapping_warning: true
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_dac:
+  - platform: aw88298
+    i2c_id: ${module.internal.i2c_bus}
+    id: dac_aw88298
+    sample_rate: 16000
+
+audio_adc:
+  - platform: es7210
+    i2c_id: ${module.internal.i2c_bus}
+    id: adc_es7210
+    mic_gain: 24dB
+
+microphone:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_input
+    id: i2s_mic
+    i2s_din_pin: ${pin.audio.mic}
+    bits_per_sample: 16bit
+    channel: left
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_output
+    i2s_mode: secondary
+    id: i2s_speaker
+    dac_type: external
+    i2s_dout_pin: ${pin.audio.i2s_dout}
+    audio_dac: dac_aw88298
+    buffer_duration: 100ms
+
+binary_sensor:
+  # AW9523B audio interrupts
+  - platform: gpio
+    name: "ES_INT P0_3"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 3
+    on_press:
+      then:
+        - logger.log: "ES7210 interrupt triggered"
+    internal: true
+  - platform: gpio
+    name: "AW_INT P1_3"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 11
+    on_press:
+      then:
+        - logger.log: "AW88298 interrupt triggered"
+    internal: true
+
+switch:
+  # Audio Amplifier (AW88298 via software mute)
+  - platform: template
+    id: amp_enable
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    turn_on_action:
+      - lambda: 'id(dac_aw88298).set_mute_off();'
+    turn_off_action:
+      - lambda: 'id(dac_aw88298).set_mute_on();'
+
+  - platform: gpio
+    id: sw_aw_rst
+    name: "AW RST P0_2"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 2
+    internal: true
+    restore_mode: ALWAYS_ON
+
+number:
+  - platform: template
+    id: mic_gain_db
+    name: "Mic gain (ES7210)"
+    icon: mdi:microphone-settings
+    entity_category: config
+    unit_of_measurement: dB
+    min_value: 0
+    # The ES7210 gain register moves in 3 dB steps up to 33 dB (then 34.5, 36
+    # and 37.5), so a finer slider step would leave every second position a
+    # no-op. 36 dB is the highest value that sits on the 3 dB grid.
+    max_value: 36
+    step: 3
+    restore_value: true
+    initial_value: 24
+    mode: slider
+    # Without `optimistic`, a template number with only a set_action never
+    # publishes the new value back: the slider snapped back to 24 dB in HA even
+    # though the ES7210 had already been reprogrammed. The restored value is
+    # applied to the codec in on_boot (-100), since TemplateNumber::setup() only
+    # publishes it and does not run set_action.
+    optimistic: true
+    set_action:
+      - lambda: |-
+          id(adc_es7210).set_mic_gain(x);
+      - logger.log:
+          format: "[MIC] ES7210 gain -> %.1f dB"
+          args: ["x"]
+

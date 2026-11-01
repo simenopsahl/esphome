@@ -1,0 +1,81 @@
+labels: [es8311, audio]
+---
+# Shared audio hardware definitions for Waveshare ESP32-P4 boards:
+# - Waveshare ESP32-P4-NANO (Rev 3.1)
+# - Waveshare ESP32-P4-WIFI6 (Rev 1.3)
+# DAC / Codec: ES8311 (addr 0x18 on i2c_internal)
+
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex (the mic and speaker each call i2s_new_channel on the port, and
+# the second fails with "Parent bus is busy"). So we use TWO buses (two I2S ports)
+# over the shared pins:
+#   - i2s_input  = the MIC bus, I2S MASTER. The mic is always capturing (wake
+#     word), so it drives BCLK/LRCLK/MCLK continuously. Using the ESP as master
+#     is what makes the mic get a correct-rate stream (a codec-mastered clock via
+#     force_master gave the mic garbage and killed wake word).
+#   - i2s_output = the SPEAKER bus, I2S SLAVE. It reads the mic's clock and only
+#     needs to output data, so it never contends for a port of its own.
+# The ES8311 is stock and slave to the mic's clock; no patched es8311 /
+# force_master is needed.
+packages:
+  mic_common: !include common_mic.yaml
+
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_dac:
+  - platform: es8311
+    i2c_id: i2c_internal
+    id: dac_es8311
+    address: 0x18
+    bits_per_sample: 16bit
+    sample_rate: 48000
+    use_microphone: false
+    mic_gain: 30DB
+
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    i2s_audio_id: i2s_input
+    i2s_din_pin: ${pin.audio.mic}
+    sample_rate: 48000
+    bits_per_sample: 16bit
+    adc_type: external
+    channel: left
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.spk}
+    i2s_mode: secondary
+    dac_type: external
+    sample_rate: 48000
+    audio_dac: dac_es8311
+    channel: left
+    buffer_duration: 250ms
+
+switch:
+  # Speaker Amplifier Enable
+  - platform: gpio
+    id: amp_enable
+    pin: ${pin.audio.amp}
+    restore_mode: ALWAYS_OFF
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+

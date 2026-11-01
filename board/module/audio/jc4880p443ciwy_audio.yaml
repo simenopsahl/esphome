@@ -1,0 +1,71 @@
+labels: [es8311, audio]
+---
+# Audio hardware definitions for Guition ESP32-P4 4.3" (JC4880P443C_I_W_Y)
+# DAC / Codec: ES8311 (addr 0x18 on i2c_internal)
+
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex (mutex contention). So we use TWO buses:
+#   - i2s_input  = the MIC bus, I2S MASTER. Continuous capture generates BCLK/LRCLK.
+#   - i2s_output = the SPEAKER bus, I2S SLAVE (secondary). Receives the mic clock.
+packages:
+  mic_common: !include common_mic.yaml
+
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_dac:
+  - platform: es8311
+    i2c_id: i2c_internal
+    id: dac_es8311
+    address: 0x18
+    bits_per_sample: 16bit
+    sample_rate: 48000
+    use_microphone: false
+    mic_gain: 30DB
+
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    i2s_audio_id: i2s_input
+    i2s_din_pin: ${pin.audio.mic}
+    sample_rate: 48000
+    bits_per_sample: 16bit
+    adc_type: external
+    channel: left
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.spk}
+    i2s_mode: secondary
+    dac_type: external
+    sample_rate: 48000
+    audio_dac: dac_es8311
+    channel: left
+    buffer_duration: 250ms
+
+switch:
+  # Speaker Amplifier Enable
+  - platform: gpio
+    id: amp_enable
+    pin: ${pin.audio.amp}
+    restore_mode: ALWAYS_OFF
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+

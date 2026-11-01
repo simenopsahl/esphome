@@ -19,50 +19,60 @@
 #
 ###
 # To limit resource usage on configuartions where media_player is not needed,
-# it might be beneficial to have this media_player package include board-specific packages using jinja templates
-# containing 'i2s_audio', 'audio_dac', 'audio_adc' where applicable, 'microphone: i2s_mic',
-# 'speaker: i2s_speaker', 'switch: amp_enable' and device specific scripts mentioned above
+# each board configuration file conditionally includes its audio hardware package
+# (`board/module/audio/<board>_audio.yaml`) only when `feature_audio_enabled` is "true".
+# Boards with a physical microphone also include `board/module/audio/common_mic.yaml`
+# inside their `<board>_audio.yaml` module, whereas speaker-only boards (such as
+# `jc3248w535c`) omit `common_mic.yaml` so no microphone or sound_level entities are created.
+#
 # Example file layout:
 # /features/
-# -- media_player.yaml <- This file
-# -- voice_assistant.yaml <- (WIP) will use the media_player in this file
+# -- media_player.yaml <- This file (sets feature_audio_enabled: "true")
+# -- voice_assistant.yaml <- (WIP) includes media_player.yaml
 # /board/
 # -- m5stack_core_s3se.yaml <- Board configuration file, not containing audio configurations
 # -- /module/
 # -- -- /audio/
-# -- -- -- m5stack_core_s3se_audio.yaml <- Example board-specific audio configuration file
-# -- -- -- waveshare_p4_wifi6_audio.yaml <- Audio hardware is only ever included as part of media_player.yaml or voice_assistant.yaml
-# -- -- -- waveshare_s3_audio_board_audio.yaml <- This file i personally created, might be incomplete
+# -- -- -- common_mic.yaml <- Shared mic switches (mic_mute_switch, diag_disable_mic, sound_level)
+# -- -- -- m5stack_core_s3se_audio.yaml <- Board-specific audio hardware (includes common_mic.yaml)
+# -- -- -- waveshare_p4_audio.yaml <- Shared Waveshare ESP32-P4 audio hardware (includes common_mic.yaml)
+# -- -- -- waveshare_s3_audio_board_audio.yaml <- Waveshare S3 Audio Board hardware (includes common_mic.yaml)
+# -- -- -- jc3248w535c_audio.yaml <- Speaker-only hardware (does NOT include common_mic.yaml)
 ###
 # < in a board configuration file >
 # substitutions:
 #   feature:
 #     audio:
-#       hardware_module: board/module/audio/waveshare_s3_audio_board_audio.yaml
+#       hardware_module: waveshare_s3_audio_board_audio.yaml
 #       channels: "2" <- overrides the default of 1
+# packages:
+#   audio: !include
+#     file: module/audio/${feature.audio.hardware_module | default("waveshare_s3_audio_board_audio.yaml")}
+#     condition: ${feature_audio_enabled | default("false")}
 #
 # < in all M5Stack Atom board configurations >
-# substitutions:
-#   feature:
-#     audio:
-#       hardware_module: board/module/atomic_voice_base.yaml
+# packages:
+#   audio: !include
+#     file: module/atomic_voice_base.yaml
+#     condition: ${feature_audio_enabled | default("false")}
 #
 # < in this file >
-# packages:
-#   audio_hw: !include ${feature.audio.hardware_module}
+# substitutions:
+#   feature_audio_enabled: "true"
 #
 # < in the future completed voice_assistant.yaml >
 # packages:
 #   media_player: !include media_player.yaml
 #
 # < in a device root configuration file >
+# Declare board BEFORE media_player / voice_assistant:
+# ESPHome processes packages in reverse order (later packages are evaluated first).
+# Listing media_player AFTER board ensures feature_audio_enabled: "true" is set before
+# board's conditional audio: !include is evaluated, while keeping the audio hardware
+# include path inside board/ so remote build bundling discovers it automatically.
 # packages:
+#   board: !include board/waveshare_s3_audio_board.yaml
 #   media_player: !include features/media_player.yaml
-#   OR
-#   voice_assistant: !include features/voice_assistant.yaml
-###
-# This does present unusual issues for future edge cases where a device has a speaker but no microphone.
-# Though no current devices fall into this category AFAIK.
 #---------------------------#
 # END of supplementary info
 #---------------------------#
@@ -73,14 +83,12 @@
 # https://esphome.io/components/speaker/resampler/
 # https://esphome.io/components/sensor/sound_level/
 
-# Media Player package for devices with a i2s_speaker and i2s_mic
+# Media Player package for devices with an i2s_speaker (and optional i2s_mic via common_mic.yaml)
 
 substitutions:
-  feature:
-    audio:
-      channels: "1"
-      sound_file_boot: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
-      sound_file_speaker_enable: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
+  feature_audio_enabled: "true"
+  sound_file_boot_default: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_triple_press.flac
+  sound_file_speaker_enable_default: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
 
 esphome:
   on_boot:
@@ -93,60 +101,22 @@ esphome:
               lambda: return id(init_in_progress);
             then:
               - lambda: id(init_in_progress) = false;
-    - priority: -100
-      then:
-        # Diagnostics: an explicit OFF switch that silences the mic completely.
-        # ON = microphone disabled. (This used to be inverted, so the mic was
-        # stopped on every boot with the switch in its default OFF position.)
-        - if:
-            condition:
-              switch.is_on: diag_disable_mic
-            then:
-              - logger.log: "Mic DISABLED for diagnostics"
-              - microphone.stop_capture: i2s_mic
-            else:
-              - logger.log: "Mic enabled"
 
 api:
   on_client_connected:
-    - if:
-        condition:
-          - lambda: return id(init_in_progress);
-          - switch.is_on: mic_mute_switch
-        then:
-          - switch.turn_off: mic_mute_switch
     - lambda: id(init_in_progress) = false;
-    # One-shot "ready" chime. It MUST run after the mic is turned on: the
-    # speaker is a slave to the mic's I2S clock, so playing before the mic is
-    # capturing hangs the announcement and can interrupt mic operation. The
-    # flag is set first so an HA reconnect can't replay it.
-    - if:
-        condition:
-          - lambda: 'return !id(boot_chime_done);'
-        then:
-          - if:
-              condition:
-                - switch.is_on: boot_sound
-                - switch.is_off: diag_disable_mic
-              then:
-                - delay: 1s            # let the mic-master clock settle
-                - script.execute:
-                    id: play_sound
-                    priority: true
-                    sound_file: !lambda return id(boot_sound_custom);
-                - delay: 2s            # wait for boot chime to finish playing!
-          - lambda: id(boot_chime_done) = true;
+    - script.execute: play_boot_chime
 
 globals:
-  - id: mic_is_muted
-    type: bool
-    restore_value: no          # the switch forces OFF at boot (see on_client_connected)
-    initial_value: 'false'
   - id: init_in_progress
     type: bool
     restore_value: no
     initial_value: 'true'
   - id: boot_chime_done
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: mic_disabled
     type: bool
     restore_value: no
     initial_value: 'false'
@@ -181,8 +151,8 @@ media_player:
     task_stack_in_psram: ${device.psram | default("false")}
     buffer_size: ${feature.audio.buffer_size | default("1000000")}
     volume_increment: 0.01
-    volume_min: ${feature.audio.volume_min}
-    volume_max: ${feature.audio.volume_max}
+    volume_min: ${feature.audio.volume_min | default("0.4")}
+    volume_max: ${feature.audio.volume_max | default("0.8")}
     announcement_pipeline:
       speaker: announcement_resampling_speaker
       format: FLAC
@@ -210,7 +180,11 @@ media_player:
               - media_player.is_announcing:
               - lambda: 'return id(speaker_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
           then:
-            - switch.turn_on: amp_enable
+            - if:
+                condition:
+                  switch.is_off: amp_enable
+                then:
+                  - switch.turn_on: amp_enable
       - if:
           condition:
             - not:
@@ -222,9 +196,9 @@ media_player:
                 duration: 1.0s
     files:
       - id: boot_sound_custom
-        file: ${feature.audio.sound_file_boot}
+        file: ${feature.audio.sound_file_boot | default(sound_file_boot_default)}
       - id: speaker_enable_sound
-        file: ${feature.audio.sound_file_speaker_enable}
+        file: ${feature.audio.sound_file_speaker_enable | default(sound_file_speaker_enable_default)}
 
 switch:
   - id: !extend amp_enable
@@ -234,7 +208,7 @@ switch:
             - lambda: 'return id(boot_chime_done);'
             - lambda: 'return !id(init_in_progress);'
             - switch.is_on: boot_sound
-            - switch.is_off: diag_disable_mic
+            - lambda: 'return !id(mic_disabled);'
             - not:
                 media_player.is_announcing: speaker_media_player
             - lambda: 'return id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
@@ -244,47 +218,6 @@ switch:
                 id: play_sound
                 priority: false
                 sound_file: !lambda return id(speaker_enable_sound);
-								
-  - platform: template
-    id: diag_disable_mic
-    name: "Diag: disable microphone"
-    icon: mdi:microphone-settings
-    internal: true                      # diagnostic-only, not shown in HA
-    optimistic: true
-    restore_mode: RESTORE_DEFAULT_OFF   # OFF = mic works as usual
-    on_turn_on:
-      - if:
-          condition:
-            lambda: return !id(init_in_progress);
-          then:
-            - microphone.stop_capture: i2s_mic
-    on_turn_off:
-      - if:
-          condition:
-            - lambda: return !id(init_in_progress);
-            - switch.is_off: mic_mute_switch
-          then:
-            - microphone.capture: i2s_mic
-
-  - platform: template
-    id: mic_mute_switch
-    name: "Microphone Mute"
-    icon: mdi:microphone-off
-    entity_category: config
-    # State comes from the lambda below, so restore_mode would be a no-op here.
-    # The mute is forced off at boot by the voice_assistant on_client_connected.
-    lambda: |-
-      return id(mic_is_muted);
-    # A real mute, via ESPHome's own primitive: microphone.mute makes the
-    # Microphone hand every consumer a zero-filled buffer, so the wake word
-    # literally hears silence. The stream keeps running, so there is no I2S
-    # restart and no start/stop race.
-    turn_on_action:
-      - lambda: id(mic_is_muted) = true;
-      - microphone.mute: i2s_mic
-    turn_off_action:
-      - lambda: id(mic_is_muted) = false;
-      - microphone.unmute: i2s_mic
 
   - platform: template
     id: boot_sound
@@ -294,19 +227,31 @@ switch:
     optimistic: true
     restore_mode: RESTORE_DEFAULT_ON
 
-  - platform: template
-    id: sound_level_enabled
-    optimistic: true
-    restore_mode: ALWAYS_ON
-    name: "Sound Level Tracking"
-    icon: "mdi:waveform"
-    entity_category: config
-    on_turn_off:
-        - sound_level.stop: sound_level_sensor
-    on_turn_on:
-        - sound_level.start: sound_level_sensor
-
 script:
+  # One-shot "ready" chime. On mic+speaker boards it runs after the mic is
+  # turned on: the speaker is a slave to the mic's I2S clock, so playing before
+  # the mic is capturing hangs the announcement.
+  - id: play_boot_chime
+    mode: single
+    then:
+      - if:
+          condition:
+            - lambda: 'return !id(boot_chime_done);'
+          then:
+            - if:
+                condition:
+                  - switch.is_on: boot_sound
+                  - lambda: 'return !id(mic_disabled);'
+                  - lambda: 'return !(${feature.audio.mute_boot_chime_expr | default("false")});'
+                then:
+                  - delay: 1s            # let the I2S clock settle
+                  - script.execute:
+                      id: play_sound
+                      priority: true
+                      sound_file: !lambda return id(boot_sound_custom);
+                  - delay: 2s            # wait for boot chime to finish playing!
+            - lambda: id(boot_chime_done) = true;
+
   # ESPHome 2026.10 made audio files const; 2026.8/2026.9 still take a mutable
   # pointer in play_file(). A const parameter accepts both, and the const_cast
   # below keeps play_file() compiling on either. The type is spelled with
@@ -327,16 +272,3 @@ script:
           if ((id(speaker_media_player)->state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
             id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(sound_file), true, false);
           }
-
-sensor:
-  - platform: sound_level
-    id: sound_level_sensor
-    passive: false
-    measurement_duration: 3000ms
-    rms:
-      name: "Noise Level"
-      id: average_loudness
-      filters:
-        - offset: 100.0
-        # Throttle to reduce Home Assistant DB writes
-        - throttle_average: 10s

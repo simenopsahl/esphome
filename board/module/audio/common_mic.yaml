@@ -1,0 +1,113 @@
+# Shared microphone controls and sound level sensor for boards with an i2s_mic.
+# Included by board/module/audio/<board>_audio.yaml when a physical microphone is present.
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        # Diagnostics: an explicit OFF switch that silences the mic completely.
+        # ON = microphone disabled.
+        - if:
+            condition:
+              switch.is_on: diag_disable_mic
+            then:
+              - lambda: id(mic_disabled) = true;
+              - logger.log: "Mic DISABLED for diagnostics"
+              - microphone.stop_capture: i2s_mic
+            else:
+              - lambda: id(mic_disabled) = false;
+              - logger.log: "Mic enabled"
+              - microphone.capture: i2s_mic
+
+api:
+  on_client_connected:
+    - if:
+        condition:
+          - lambda: return id(init_in_progress);
+          - switch.is_on: mic_mute_switch
+        then:
+          - switch.turn_off: mic_mute_switch
+
+globals:
+  - id: mic_is_muted
+    type: bool
+    restore_value: no          # the switch forces OFF at boot (see on_client_connected)
+    initial_value: 'false'
+
+switch:
+  - platform: template
+    id: diag_disable_mic
+    name: "Diag: disable microphone"
+    icon: mdi:microphone-settings
+    internal: true                      # diagnostic-only, not shown in HA
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF   # OFF = mic works as usual
+    on_turn_on:
+      - lambda: id(mic_disabled) = true;
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - microphone.stop_capture: i2s_mic
+    on_turn_off:
+      - lambda: id(mic_disabled) = false;
+      - if:
+          condition:
+            - lambda: return !id(init_in_progress);
+            - switch.is_off: mic_mute_switch
+          then:
+            - microphone.capture: i2s_mic
+
+  - platform: template
+    id: mic_mute_switch
+    name: "Microphone Mute"
+    icon: mdi:microphone-off
+    entity_category: config
+    # State comes from the lambda below, so restore_mode would be a no-op here.
+    # The mute is forced off at boot by on_client_connected.
+    lambda: |-
+      return id(mic_is_muted);
+    # A real mute, via ESPHome's own primitive: microphone.mute makes the
+    # Microphone hand every consumer a zero-filled buffer, so the wake word
+    # literally hears silence. The stream keeps running, so there is no I2S
+    # restart and no start/stop race.
+    turn_on_action:
+      - lambda: id(mic_is_muted) = true;
+      - microphone.mute: i2s_mic
+    turn_off_action:
+      - lambda: id(mic_is_muted) = false;
+      - microphone.unmute: i2s_mic
+
+  - platform: template
+    id: sound_level_enabled
+    optimistic: true
+    restore_mode: ALWAYS_ON
+    name: "Sound Level Tracking"
+    icon: "mdi:waveform"
+    entity_category: config
+    on_turn_off:
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - sound_level.stop: sound_level_sensor
+    on_turn_on:
+      - if:
+          condition:
+            lambda: return !id(init_in_progress);
+          then:
+            - sound_level.start: sound_level_sensor
+
+sensor:
+  - platform: sound_level
+    id: sound_level_sensor
+    passive: false
+    measurement_duration: 3000ms
+    rms:
+      name: "Noise Level"
+      id: average_loudness
+      filters:
+        - offset: 100.0
+        # Throttle to reduce Home Assistant DB writes
+        - throttle_average: 10s
+

@@ -1,0 +1,32 @@
+labels: [audio, speaker]
+---
+# Audio hardware definitions for Sunton / Guition 3.5" ESP32-S3 (JC3248W535C)
+# Speaker-only board (MAX98357A I2S amplifier, no microphone)
+
+i2s_audio:
+  - id: i2s_output
+    i2s_lrclk_pin: ${pin.audio.i2s_lrclk}
+    i2s_bclk_pin: ${pin.audio.i2s_bclk}
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.spk}
+    dac_type: external
+    buffer_duration: 500ms
+    timeout: never
+
+switch:
+  - platform: template
+    id: amp_enable
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    turn_on_action:
+      - lambda: 'id(i2s_speaker)->set_mute_state(false);'
+    turn_off_action:
+      - lambda: 'id(i2s_speaker)->set_mute_state(true);'
+
