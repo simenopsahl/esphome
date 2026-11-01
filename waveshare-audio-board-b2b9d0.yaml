@@ -6,7 +6,7 @@ packages:
   board: !include board/waveshare_s3_audio_board.yaml
 
   # --- FEATURE PACKAGES ---
-  media_player: !include features/media_player.yaml
+  voice_assist: !include features/voice_assistant.yaml
 
 substitutions:
   common:
