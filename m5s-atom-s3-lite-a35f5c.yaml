@@ -5,7 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3_lite.yaml
-  audio: !include board/module/atomic_voice_base.yaml
+  media_player: !include features/media_player.yaml
 
   # --- FEATURE PACKAGES ---
   nordpool_light_alert: !include { file: features/nordpool_light_alert.yaml, vars: {
