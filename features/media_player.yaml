@@ -120,6 +120,16 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+  # Global variable tracking the phase of the voice assistant (1=idle, 2=waiting, 3=listening, 4=thinking, 5=replying, 10=not_ready, 11=error).
+  - id: voice_assistant_phase
+    type: int
+    restore_value: no
+    initial_value: '10'
+  # Global variable storing if a timer is active
+  - id: is_timer_active
+    type: bool
+    restore_value: false
+    initial_value: 'false'
 
 speaker:
   - platform: mixer
@@ -151,6 +161,7 @@ media_player:
     task_stack_in_psram: ${device.psram | default("false")}
     buffer_size: ${feature.audio.buffer_size | default("1000000")}
     volume_increment: 0.01
+    volume_initial: ${feature.audio.volume_initial | default("0.6")}
     volume_min: ${feature.audio.volume_min | default("0.4")}
     volume_max: ${feature.audio.volume_max | default("0.8")}
     announcement_pipeline:
@@ -189,6 +200,7 @@ media_player:
           condition:
             - not:
                 media_player.is_announcing:
+            - lambda: 'return !(${feature.voice.ducking_guard_expr | default("false")});'
           then:
             - mixer_speaker.apply_ducking:
                 id: media_mixing_input
@@ -228,6 +240,14 @@ switch:
     restore_mode: RESTORE_DEFAULT_ON
 
 script:
+  # Optional hook executed whenever voice_assistant_phase or timer state changes.
+  # Boards with status LEDs or displays can !extend this script to update their UI.
+  - id: on_voice_assistant_phase_change
+    mode: restart
+    then:
+      - lambda: |-
+          ESP_LOGD("voice_assistant", "Phase -> %d", id(voice_assistant_phase));
+
   # One-shot "ready" chime. On mic+speaker boards it runs after the mic is
   # turned on: the speaker is a slave to the mic's I2S clock, so playing before
   # the mic is capturing hangs the announcement.

@@ -1,7 +1,7 @@
 #----------------------------#
 # AGENTS: Supplementary info
 #----------------------------#
-# Voice Assistant feature package (WIP).
+# Voice Assistant feature package.
 #
 # Architecture & Dependencies:
 # - This package automatically includes `features/media_player.yaml`, which sets
@@ -12,16 +12,9 @@
 # - Declare `board:` BEFORE `voice_assist:` in the root device's `packages:` block
 #   so ESPHome's reverse package evaluation processes `voice_assist` -> `media_player`
 #   first and sets `feature_audio_enabled: "true"` before evaluating `board:`.
-#
-# Remaining TODOs for Voice Assistant completion:
-# - Replace legacy `speaker_source.set_playlist_delay` in `enable_repeat_one` /
-#   `disable_repeat` with speaker media_player compatible repeat logic.
-# - Standardize `master_mute_switch` / `mic_mute_switch` references across
-#   `media_player.yaml` and `voice_assistant.yaml`.
-# - Verify `media_player` `on_announcement` / `on_state` `!extend` merging with
-#   `media_player.yaml` so ducking and amplifier control do not duplicate or conflict.
-# - Add optional hook scripts (or `!extend` points) for board-specific LED/display
-#   phase feedback (`voice_assistant_phase`).
+# - Boards with status LEDs or displays can `!extend on_voice_assistant_phase_change`
+#   (defined in `features/media_player.yaml`) to react to `voice_assistant_phase`
+#   and `is_timer_active` changes.
 #---------------------------#
 # END of supplementary info
 #---------------------------#
@@ -49,6 +42,7 @@ substitutions:
       mute_switch_off_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
     voice:
       output_speaker: i2s_speaker
+      ducking_guard_expr: "id(timer_ringing).state || id(va).is_running()"
       # Phases of the Voice Assistant
       # The voice assistant is ready to be triggered by a wake word
       assist_idle_phase_id: '1'
@@ -71,33 +65,10 @@ substitutions:
 
 ##### GLOBAL DEFINITIONS #####
 globals:
-  # Global variable tracking the phase of the voice assistant (defined above). Initialized to not_ready
-  - id: voice_assistant_phase
-    type: int
-    restore_value: no
-    initial_value: "10"
   # Global variable storing the first active timer
   - id: first_active_timer
     type: voice_assistant::Timer
     restore_value: false
-  # Global variable storing if a timer is active
-  - id: is_timer_active
-    type: bool
-    restore_value: false
-
-# In media_player.yaml, the speaker and resampler configuration is defined.
-#speaker:
-#  - platform: mixer
-#    id: mixing_speaker
-#    source_speakers:
-#      - id: announcement_mixing_input
-#      - id: media_mixing_input
-#  - platform: resampler
-#    id: announcement_resampling_speaker
-#    output_speaker: announcement_mixing_input
-#  - platform: resampler
-#    id: media_resampling_speaker
-#    output_speaker: media_mixing_input
 
 switch:
   # Wake Word Sound Switch.
@@ -132,6 +103,8 @@ switch:
           id: media_mixing_input
           decibel_reduction: 0
           duration: 1.0s
+      - script.execute: check_if_timers_active
+      - script.execute: on_voice_assistant_phase_change
     on_turn_on:
       # Duck audio
       - mixer_speaker.apply_ducking:
@@ -142,6 +115,8 @@ switch:
       - micro_wake_word.enable_model: stop
       # Ring timer
       - script.execute: ring_timer
+      - script.execute: check_if_timers_active
+      - script.execute: on_voice_assistant_phase_change
       # If 15 minutes have passed and the timer is still ringing, stop it.
       - delay: 15min
       - switch.turn_off: timer_ringing
@@ -188,31 +163,19 @@ script:
           priority: true
           sound_file: !lambda return id(timer_finished_sound);
 
-# YAML previously used speaker_source-media_player but has been updated to use speaker-media_player instead
-# repeat scripts need to be updated, I don't think speaker-media_player supports playlist
   # Script executed when the timer is ringing, to repeat the timer finished sound.
   - id: enable_repeat_one
     then:
-      # Turn on the repeat mode and pause for 500 ms between playlist items/repeats
       - media_player.repeat_one:
           id: speaker_media_player
           announcement: true
-      - speaker_source.set_playlist_delay:
-          id: speaker_media_player
-          pipeline: announcement
-          delay: 500ms
 
-  # Script execute when the timer is done ringing, to disable repeat mode.
+  # Script executed when the timer is done ringing, to disable repeat mode.
   - id: disable_repeat
     then:
-      # Turn off the repeat mode and pause for 0 ms between playlist items/repeats
       - media_player.repeat_off:
           id: speaker_media_player
           announcement: true
-      - speaker_source.set_playlist_delay:
-          id: speaker_media_player
-          pipeline: announcement
-          delay: 0ms
 
   # Script used to fetch the first active timer (Stored in global first_active_timer)
   - id: fetch_first_active_timer
@@ -270,26 +233,6 @@ script:
 
 media_player:
   - id: !extend speaker_media_player # in media_player.yaml
-    # Verify that on_* events are merging correctly
-    on_announcement:
-      - mixer_speaker.apply_ducking:
-          id: media_mixing_input
-          decibel_reduction: 20
-          duration: 0.0s
-    on_state:
-      if:
-        condition:
-          and:
-            - switch.is_off: timer_ringing
-            - not:
-                voice_assistant.is_running:
-            - not:
-                media_player.is_announcing: speaker_media_player
-        then:
-          - mixer_speaker.apply_ducking:
-              id: media_mixing_input
-              decibel_reduction: 0
-              duration: 1.0s
     files:
       - id: jack_connected_sound
         file: ${feature.audio.jack_connected_sound_file}
@@ -322,10 +265,10 @@ micro_wake_word:
       internal: true
   vad:
   on_wake_word_detected:
-    # If the wake word is detected when the device is muted (Possible with the software mute switch): Do nothing
+    # If the wake word is detected when the microphone is muted: Do nothing
     - if:
         condition:
-          switch.is_off: master_mute_switch
+          switch.is_off: mic_mute_switch
         then:
           # If a timer is ringing: Stop it, do not start the voice assistant (We can stop timer from voice!)
           - if:
@@ -377,9 +320,11 @@ voice_assistant:
     - lambda: id(init_in_progress) = false;
     - micro_wake_word.start:
     - lambda: id(voice_assistant_phase) = ${feature.voice.assist_idle_phase_id};
+    - script.execute: on_voice_assistant_phase_change
   on_client_disconnected:
     - voice_assistant.stop:
     - lambda: id(voice_assistant_phase) = ${feature.voice.assist_not_ready_phase_id};
+    - script.execute: on_voice_assistant_phase_change
   on_error:
     # Only set the error phase if the error code is different than duplicate_wake_up_detected or stt-no-text-recognized
     # These two are ignored for a better user experience
@@ -391,6 +336,7 @@ voice_assistant:
             - lambda: return code != "stt-no-text-recognized";
         then:
           - lambda: id(voice_assistant_phase) = ${feature.voice.assist_error_phase_id};
+          - script.execute: on_voice_assistant_phase_change
     # If the error code is cloud-auth-failed, serve a local audio file guiding the user.
     - if:
         condition:
@@ -408,10 +354,13 @@ voice_assistant:
         duration: 0.0s         # The duration of the transition (default is no transition)
   on_listening:
     - lambda: id(voice_assistant_phase) = ${feature.voice.assist_waiting_for_command_phase_id};
+    - script.execute: on_voice_assistant_phase_change
   on_stt_vad_start:
     - lambda: id(voice_assistant_phase) = ${feature.voice.assist_listening_for_command_phase_id};
+    - script.execute: on_voice_assistant_phase_change
   on_stt_vad_end:
     - lambda: id(voice_assistant_phase) = ${feature.voice.assist_thinking_phase_id};
+    - script.execute: on_voice_assistant_phase_change
   on_intent_progress:
     - if:
         condition:
@@ -419,6 +368,7 @@ voice_assistant:
           lambda: 'return !x.empty();'
         then:
           - lambda: id(voice_assistant_phase) = ${feature.voice.assist_replying_phase_id};
+          - script.execute: on_voice_assistant_phase_change
           # Start a script that would potentially enable the stop word if the response is longer than a second
           - script.execute: activate_stop_word_once
   on_tts_start:
@@ -428,6 +378,7 @@ voice_assistant:
           lambda: 'return id(voice_assistant_phase) != ${feature.voice.assist_replying_phase_id};'
         then:
           - lambda: id(voice_assistant_phase) = ${feature.voice.assist_replying_phase_id};
+          - script.execute: on_voice_assistant_phase_change
           # Start a script that would potentially enable the stop word if the response is longer than a second
           - script.execute: activate_stop_word_once
   # When the voice assistant ends ...
@@ -448,5 +399,15 @@ voice_assistant:
           - delay: 1s
     # Reset the voice assistant phase id and reset the LED animations.
     - lambda: id(voice_assistant_phase) = ${feature.voice.assist_idle_phase_id};
+    - script.execute: on_voice_assistant_phase_change
   on_timer_finished:
     - switch.turn_on: timer_ringing
+  on_timer_started:
+    - script.execute: check_if_timers_active
+    - script.execute: on_voice_assistant_phase_change
+  on_timer_cancelled:
+    - script.execute: check_if_timers_active
+    - script.execute: on_voice_assistant_phase_change
+  on_timer_updated:
+    - script.execute: check_if_timers_active
+    - script.execute: on_voice_assistant_phase_change

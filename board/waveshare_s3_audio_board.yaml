@@ -42,6 +42,7 @@ substitutions:
       hardware_module: waveshare_s3_audio_board_audio.yaml
       channels: "2"
       mute_boot_chime_expr: "id(night_mode).state"
+      volume_initial: "0.7"
 
 esphome:
   project:
@@ -363,6 +364,10 @@ script:
                       blue: !lambda 'return id(led_ring_color_b);'
                       effect: !lambda 'return effect;'
   
+  - id: !extend on_voice_assistant_phase_change
+    then:
+      - script.execute: control_leds
+
   # The single LED state machine. Everything that changes device state calls
   # this; nothing else paints the ring directly.
   - id: control_leds
@@ -372,10 +377,12 @@ script:
           const bool wifi_connected = id(component_wifi).is_connected();
           const bool api_connected  = id(component_api).is_connected();
           const bool init_progress  = id(init_in_progress);
+          const int  phase          = id(voice_assistant_phase);
+          const bool timer_active   = id(is_timer_active);
 
           ESP_LOGD("led",
-                   "control_leds: wifi=%d api=%d init=%d",
-                   (int)wifi_connected, (int)api_connected, (int)init_progress);
+                   "control_leds: wifi=%d api=%d init=%d phase=%d timer=%d",
+                   (int)wifi_connected, (int)api_connected, (int)init_progress, phase, (int)timer_active);
 
           auto set = [&](const std::string &effect, float r, float g, float b) {
             id(led_set_effect).execute(effect, r, g, b);
@@ -388,6 +395,31 @@ script:
           }
           if (!wifi_connected || !api_connected) {   // HA unreachable
             set("Pulse Medium", 1.0, 0.0, 0.0);
+            return;
+          }
+
+          switch (phase) {
+            case 2: // waiting for command
+              set("Breathe", 0.0, 0.7, 1.0);
+              return;
+            case 3: // listening for command
+              set("Pulse Fast", 0.0, 0.8, 1.0);
+              return;
+            case 4: // thinking
+              set("Spinner", 0.0, 0.5, 1.0);
+              return;
+            case 5: // replying
+              set("Pulse Medium", 0.1, 0.9, 0.4);
+              return;
+            case 11: // error
+              set("Pulse Fast", 1.0, 0.0, 0.0);
+              return;
+            default:
+              break;
+          }
+
+          if (timer_active) {
+            set("Pulse Slow", 1.0, 0.65, 0.0);
             return;
           }
 

@@ -37,6 +37,7 @@ substitutions:
   feature:
     audio:
       hardware_module: m5stack_core_s3se_audio.yaml
+      volume_initial: "0.8"
 
 esphome:
   project:

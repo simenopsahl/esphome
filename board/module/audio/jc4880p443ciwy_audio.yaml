@@ -33,7 +33,7 @@ audio_dac:
     id: dac_es8311
     address: 0x18
     bits_per_sample: 16bit
-    sample_rate: 48000
+    sample_rate: 16000
     use_microphone: false
     mic_gain: 30DB
 
@@ -42,7 +42,7 @@ microphone:
     id: i2s_mic
     i2s_audio_id: i2s_input
     i2s_din_pin: ${pin.audio.mic}
-    sample_rate: 48000
+    sample_rate: 16000
     bits_per_sample: 16bit
     adc_type: external
     channel: left
@@ -54,7 +54,7 @@ speaker:
     i2s_dout_pin: ${pin.audio.spk}
     i2s_mode: secondary
     dac_type: external
-    sample_rate: 48000
+    sample_rate: 16000
     audio_dac: dac_es8311
     channel: left
     buffer_duration: 250ms

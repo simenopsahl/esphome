@@ -41,6 +41,7 @@ substitutions:
   feature:
     audio:
       hardware_module: atomic_voice_base.yaml
+      volume_initial: "0.8"
 
 esphome:
   project:

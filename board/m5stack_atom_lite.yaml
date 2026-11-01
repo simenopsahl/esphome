@@ -24,6 +24,7 @@ substitutions:
     audio:
       hardware_module: atomic_voice_base.yaml
       buffer_size: '32000'
+      volume_initial: "0.8"
 
 esphome:
   project:
