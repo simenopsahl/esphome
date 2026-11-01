@@ -5,7 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
-  audio: !include board/module/atomic_voice_base.yaml
+  media_player: !include features/media_player.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
