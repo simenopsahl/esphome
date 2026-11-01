@@ -8,6 +8,9 @@ packages:
 #  grove: !include board/extension/grove_i2c.yaml
 #  disp: !include board/module/unit_oled.yaml
 
+  # --- FEATURE PACKAGES ---
+  media_player: !include features/media_player.yaml
+
 substitutions:
   common:
 #    log_level: WARN
