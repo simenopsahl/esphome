@@ -1,78 +1,85 @@
+labels: [media_player, speaker]
+---
+
 #----------------------------#
 # AGENTS: Supplementary info
 #----------------------------#
-###
-# For esphome.on_boot, api.on_client_connected, media_player.on_state, switch.(amp_enable).on_turn_on
-# actions that can not be standardized it might work to have scripts in the board configuration files instead that are called from these events.
-# E.g
-#  api:
-#    on_client_connected:
-#      - script.execute: play_boot_chime # script located in for example m5stack_core_s3se.yaml
-#  switch
-#    - id: !extend amp_enable
-#      on_turn_on:
-#        - script.execute: enable_amplifier
-###
+# Migration to speaker_source media_player for more advanced audio handling
 #
+# sendspin:
+#   id: sendspin_hub
+#   task_stack_in_psram: ${device.psram | default("false")}
+#   unpaired_access: true
 #
-# Even better solution proposed below:
+# media_source:
+#   - platform: audio_file
+#     id: audio_file_announcement_source
+#   - platform: audio_http
+#     id: http_announcement_source
+#     buffer_size: ${feature.audio.buffer_size | default("250000")}
+#   - platform: audio_http
+#     id: http_media_source
+#     buffer_size: ${feature.audio.buffer_size | default("500000")}
+#   - platform: sendspin
+#     id: sendspin_media_source
 #
-###
-# To limit resource usage on configuartions where media_player is not needed,
-# each board configuration file conditionally includes its audio hardware package
-# (`board/module/audio/<board>_audio.yaml`) only when `feature_audio_enabled` is "true".
-# Boards with a physical microphone also include `board/module/audio/common_mic.yaml`
-# inside their `<board>_audio.yaml` module, whereas speaker-only boards (such as
-# `jc3248w535c`) omit `common_mic.yaml` so no microphone or sound_level entities are created.
+# audio_file:
+#   - id: boot_sound_custom
+#     file: ${feature.audio.sound_file_boot | default(sound_file_boot_default)}
+#   - id: speaker_enable_sound
+#     file: ${feature.audio.sound_file_speaker_enable | default(sound_file_speaker_enable_default)}
 #
-# Example file layout:
-# /features/
-# -- media_player.yaml <- This file (sets feature_audio_enabled: "true")
-# -- voice_assistant.yaml <- (WIP) includes media_player.yaml
-# /board/
-# -- m5stack_core_s3se.yaml <- Board configuration file, not containing audio configurations
-# -- /module/
-# -- -- /audio/
-# -- -- -- common_mic.yaml <- Shared mic switches (mic_mute_switch, diag_disable_mic, sound_level)
-# -- -- -- m5stack_core_s3se_audio.yaml <- Board-specific audio hardware (includes common_mic.yaml)
-# -- -- -- waveshare_p4_audio.yaml <- Shared Waveshare ESP32-P4 audio hardware (includes common_mic.yaml)
-# -- -- -- waveshare_s3_audio_board_audio.yaml <- Waveshare S3 Audio Board hardware (includes common_mic.yaml)
-# -- -- -- jc3248w535c_audio.yaml <- Speaker-only hardware (does NOT include common_mic.yaml)
-###
-# < in a board configuration file >
-# substitutions:
-#   feature:
-#     audio:
-#       hardware_module: waveshare_s3_audio_board_audio.yaml
-#       channels: "2" <- overrides the default of 1
-# packages:
-#   audio: !include
-#     file: module/audio/${feature.audio.hardware_module | default("waveshare_s3_audio_board_audio.yaml")}
-#     condition: ${feature_audio_enabled | default("false")}
+#   # in voice_assistant.yaml
+#   - id: jack_connected_sound
+#     file: ${feature.audio.jack_connected_sound_file}
+#   - id: jack_disconnected_sound
+#     file: ${feature.audio.jack_disconnected_sound_file}
+#   - id: mute_switch_on_sound
+#     file: ${feature.audio.mute_switch_on_sound_file}
+#   - id: mute_switch_off_sound
+#     file: ${feature.audio.mute_switch_off_sound_file}
+#   - id: timer_finished_sound
+#     file: ${feature.voice.timer_finished_sound_file}
+#   - id: wake_word_triggered_sound
+#     file: ${feature.voice.wake_word_triggered_sound_file}
+#   - id: error_cloud_expired
+#     file: ${feature.voice.error_cloud_expired_sound_file}
 #
-# < in all M5Stack Atom board configurations >
-# packages:
-#   audio: !include
-#     file: module/atomic_voice_base.yaml
-#     condition: ${feature_audio_enabled | default("false")}
+# media_player:
+#   - platform: sendspin
+#     id: sendspin_group_media_player
+#   - platform: speaker_source # replaces speaker_media_player
+#     id: speaker_source_media_player
+#     announcement_pipeline:
+#       sources:
+#         - audio_file_announcement_source
+#         - http_announcement_source
+#     media_pipeline:
+#       sources:
+#         - http_media_source
+#         - sendspin_media_source
 #
-# < in this file >
-# substitutions:
-#   feature_audio_enabled: "true"
-#
-# < in the future completed voice_assistant.yaml >
-# packages:
-#   media_player: !include media_player.yaml
-#
-# < in a device root configuration file >
-# Declare board BEFORE media_player / voice_assistant:
-# ESPHome processes packages in reverse order (later packages are evaluated first).
-# Listing media_player AFTER board ensures feature_audio_enabled: "true" is set before
-# board's conditional audio: !include is evaluated, while keeping the audio hardware
-# include path inside board/ so remote build bundling discovers it automatically.
-# packages:
-#   board: !include board/waveshare_s3_audio_board.yaml
-#   media_player: !include features/media_player.yaml
+# script:
+#   - id: play_sound
+#     parameters:
+#       priority: bool
+#       sound_file: string
+#     then:
+#       - if:
+#           condition:
+#             lambda: return priority;
+#           then:
+#             - media_player.stop:
+#                 id: speaker_source_media_player
+#                 announcement: true
+#       - lambda: |-
+#           if ( (id(speaker_source_media_player).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING ) || priority) {
+#             id(speaker_source_media_player)
+#               ->make_call()
+#               .set_media_url("audio-file://" + sound_file)
+#               .set_announcement(true)
+#               .perform();
+#           }
 #---------------------------#
 # END of supplementary info
 #---------------------------#

@@ -1,0 +1,81 @@
+---
+# CrowPanel ESP32 E-paper 5.79-inch HMI Display
+# https://www.elecrow.com/wiki/CrowPanel_ESP32_E-paper_5.79-inch_HMI_Display.html
+# https://github.com/Elecrow-RD/CrowPanel-ESP32-5.79-E-paper-HMI-Display-with-272-792
+# Model:  ESP32-S3-WROOM-1-N8R8
+# Flash:  8MB
+# PSRAM:  8MB
+# Resolution: 272 x 792 (5.79-inch)
+#
+# CrowPanel ESP32 E-paper 4.2-inch HMI Display v1.2
+# https://www.elecrow.com/wiki/CrowPanel_ESP32_E-paper_4.2-inch_HMI_Display.html
+# https://github.com/Elecrow-RD/CrowPanel-ESP32-4.2-E-paper-HMI-Display-with-400-300
+# Model:  ESP32-S3-WROOM-1-N8R8
+# Flash:  8MB
+# PSRAM:  8MB
+# Resolution: 400 x 300 (4.2-inch)
+#
+# PINs for Elecrow CrowPanel series devices
+
+substitutions:
+  pin:
+    light:
+      led: GPIO41
+    int:
+      i2c:
+        sda: GPIOxx
+        scl: GPIOxx
+      spi:
+        clk: GPIO12
+        mosi: GPIO11
+        miso: GPIO13
+      disp:
+        clk: GPIO12
+        mosi: GPIO11
+        cs: GPIO45
+        dc: GPIO46
+        busy: GPIO48
+        reset: GPIO47
+        power: GPIO7
+      card:
+        clk: GPIO39
+        mosi: GPIO40
+        miso: GPIO13
+        cs: GPIO10
+        cmd: GPIOxx
+        d0: GPIOxx
+        d1: GPIOxx
+        d2: GPIOxx
+        d3: GPIOxx
+      bat_adc: nc
+    
+    btn:
+      stick:
+        up: GPIO6
+        press: GPIO5
+        down: GPIO4
+      menu: GPIO2
+      exit: GPIO1
+
+    ext:
+      bus_2x10p:
+        p1: GPIO3
+        p2: GPIO9
+        p3: GPIO15
+        p4: GPIO17
+        p5: GPIO19
+        p6: GPIO21
+        p7: GND
+        p8: GND
+        p9: GND
+        p10: GND
+        p11: 3v
+        p12: 3v
+        p13: 3v
+        p14: 3v
+        p15: GPIO38
+        p16: GPIO20
+        p17: GPIO18
+        p18: GPIO16
+        p19: GPIO14
+        p20: GPIO8
