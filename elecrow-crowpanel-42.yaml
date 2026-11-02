@@ -13,7 +13,7 @@ substitutions:
     log_level: debug
 #    log_baud_rate: "115200"
   device:
-    name: elecrow-crowpanel-42
+    name: elecrow-crowpanel-42-4dbf00
     location: "Storage"
     framework:
       type: esp-idf
