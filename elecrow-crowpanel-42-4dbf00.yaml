@@ -14,6 +14,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     model: "Elecrow CrowPanel 4,2in"
+    display_model: "4.20in-v1.2" # or "5.79in"
     name: elecrow-crowpanel-42-4dbf00
     location: "Storage"
     framework:
