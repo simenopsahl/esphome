@@ -69,13 +69,13 @@ display:
           it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_text_color), id(epaper_bg_color) );
 
           // NAME
-          it.printf( it.get_width()/4, (it.get_height()/10)*3, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
+          it.printf( it.get_width()/4, (it.get_height()/8)*2, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
           // SSID
-          it.printf( it.get_width()/4, (it.get_height()/10)*6, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( it.get_width()/4, (it.get_height()/8)*5, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( (it.get_width()/4)*3, (it.get_height()/10)*4, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( (it.get_width()/4)*3, (it.get_height()/8)*3, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( (it.get_width()/4)*3, (it.get_height()/10)*7, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( (it.get_width()/4)*3, (it.get_height()/8)*6, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
