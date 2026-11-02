@@ -56,27 +56,27 @@ display:
           it.fill( id(epaper_bg_color) );
 
           // NAV
-          it.image( it.get_width(), (it.get_height()/4), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/2), id(i_previous), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/2), id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/2), id(i_next), ImageAlign::TOP_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/4)*3, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), (it.get_height()/5), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), ((it.get_height()/8)*5)-32, id(i_previous), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), (it.get_height()/8)*5, id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), ((it.get_height()/8)*5)+32, id(i_next), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), (it.get_height()/6)*5, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           // PAGE
           it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_text_color), id(epaper_bg_color) );
 
           // DEVICE
-          //it.print( it.get_width()/2, (it.get_height()/7), id(f20), id(epaper_text_color), TextAlign::CENTER, "ESPHome" );
+          //it.print( it.get_width()/2, (it.get_height()/7), id(f22), id(epaper_text_color), TextAlign::CENTER, "ESPHome" );
           // NAME
-          it.printf( it.get_width()/2, (it.get_height()/7)*2, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*2, id(f22), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
 
           // NETWORK
-          //it.print( it.get_width()/2, (it.get_height()/7)*3, id(f20), id(epaper_text_color), TextAlign::CENTER, "Nettverk" );
+          //it.print( it.get_width()/2, (it.get_height()/7)*3, id(f22), id(epaper_text_color), TextAlign::CENTER, "Nettverk" );
           // SSID
-          it.printf( it.get_width()/2, (it.get_height()/7)*4, id(f20b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*4, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( it.get_width()/2, (it.get_height()/7)*5, id(f20b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*5, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( it.get_width()/2, (it.get_height()/7)*6, id(f20b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*6, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
@@ -84,7 +84,7 @@ display:
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+            it.image( 0, it.get_height()-32, id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           }
 
           // Refresh Timestamp
@@ -92,7 +92,7 @@ display:
           char str[17];
           time_t currTime = id(time_homeassistant).now().timestamp;
           strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f18), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
+          it.printf( it.get_width()/2, it.get_height(), id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
 
 # Check if person is home
 binary_sensor:
@@ -125,8 +125,8 @@ font:
       type: gfonts
       family: Noto Sans Display
       weight: 500
-    id: f16
-    size: 16
+    id: f18
+    size: 18
     glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
       'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
@@ -137,29 +137,29 @@ font:
       type: gfonts
       family: Noto Sans Display
       weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
     id: f20
     size: 20
     glyphs: *norwegian-glyphs
   - file:
       type: gfonts
       family: Noto Sans Display
+      weight: 500
+    id: f22
+    size: 22
+    glyphs: *norwegian-glyphs
+  - file:
+      type: gfonts
+      family: Noto Sans Display
       weight: 800
-    id: f20b
-    size: 20
+    id: f22b
+    size: 22
     glyphs: *norwegian-glyphs
   - file:
       type: gfonts
       family: Noto Sans Display
       weight: 700
-    id: f25b
-    size: 25
+    id: f26b
+    size: 26
     glyphs: *norwegian-glyphs
   - file:
       type: gfonts
