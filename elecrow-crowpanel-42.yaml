@@ -56,27 +56,27 @@ display:
           it.fill( id(epaper_bg_color) );
 
           // NAV
-          it.image( it.get_width(), (it.get_height()/4), id(i_home), ImageAlign::RIGHT_CENTER, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), (it.get_height()/4), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           it.image( it.get_width(), (it.get_height()/2), id(i_previous), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/2), id(i_refresh), ImageAlign::RIGHT_CENTER, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), (it.get_height()/2), id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           it.image( it.get_width(), (it.get_height()/2), id(i_next), ImageAlign::TOP_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/4)*3, id(i_exit), ImageAlign::RIGHT_CENTER, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width(), (it.get_height()/4)*3, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           // PAGE
           it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_text_color), id(epaper_bg_color) );
 
           // DEVICE
-          //it.print( it.get_width()/2, (it.get_height()/7), id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "ESPHome" );
+          //it.print( it.get_width()/2, (it.get_height()/7), id(f20), id(epaper_text_color), TextAlign::CENTER, "ESPHome" );
           // NAME
-          it.printf( it.get_width()/2, (it.get_height()/7)*2, id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", App.get_name().c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*2, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
 
           // NETWORK
-          //it.print( it.get_width()/2, (it.get_height()/7)*3, id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Nettverk" );
+          //it.print( it.get_width()/2, (it.get_height()/7)*3, id(f20), id(epaper_text_color), TextAlign::CENTER, "Nettverk" );
           // SSID
-          it.printf( it.get_width()/2, (it.get_height()/7)*4, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*4, id(f20b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( it.get_width()/2, (it.get_height()/7)*5, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*5, id(f20b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( it.get_width()/2, (it.get_height()/7)*6, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( it.get_width()/2, (it.get_height()/7)*6, id(f20b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
