@@ -56,11 +56,11 @@ display:
           it.fill( id(epaper_bg_color) );
 
           // NAV
-          it.image( it.get_width(), (it.get_height()/5), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), ((it.get_height()/8)*5)-32, id(i_previous), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/8)*5, id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), ((it.get_height()/8)*5)+32, id(i_next), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width(), (it.get_height()/6)*5, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+2, (it.get_height()/5), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+2, ((it.get_height()/10)*6)-29, id(i_previous), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+2, (it.get_height()/10)*6, id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+2, ((it.get_height()/10)*6)+29, id(i_next), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+2, (it.get_height()/7)*6, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           // PAGE
           it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_text_color), id(epaper_bg_color) );
 
@@ -84,7 +84,7 @@ display:
           }
           // Show HA icon.
           if ( id(component_api).is_connected() ) {
-            it.image( 0, it.get_height()-32, id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+            it.image( 0, it.get_height()-29, id(i_api), ImageAlign::BOTTOM_LEFT, id(epaper_text_color), id(epaper_bg_color) );
           }
 
           // Refresh Timestamp
@@ -173,7 +173,7 @@ image:
   - platform: file
     defaults:
       type: binary
-      resize: 34x34
+      resize: 30x30
     files:
       - id: i_wifi
         file: mdi:wifi
@@ -193,6 +193,8 @@ image:
     
       - id: i_info
         file: mdi:information
+        resize: 34x34
     
       - id: i_temp
         file: mdi:thermometer
+        resize: 34x34
