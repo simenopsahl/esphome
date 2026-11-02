@@ -15,7 +15,7 @@ substitutions:
   device:
     model: "Elecrow CrowPanel 5,79in"
     display_model: "5.79in" # or "4.20in-v1.2"
-    name: elecrow-crowpanel-579
+    name: elecrow-crowpanel-579-b89ddc
     location: "Storage"
     framework:
       type: esp-idf
@@ -60,22 +60,22 @@ display:
           it.fill( id(epaper_bg_color) );
 
           // NAV
-          it.image( it.get_width()+1, (it.get_height()/4), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+1, (it.get_height()/4)-2, id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           it.image( it.get_width()+1, (it.get_height()/2)-28, id(i_previous), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           it.image( it.get_width()+1, it.get_height()/2, id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           it.image( it.get_width()+1, (it.get_height()/2)+28, id(i_next), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width()+1, (it.get_height()/4)*3, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+1, ((it.get_height()/4)*3)+2, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           // PAGE
           it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_text_color), id(epaper_bg_color) );
 
           // NAME
-          it.printf( it.get_width()/4, (it.get_height()/10)*2, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
+          it.printf( it.get_width()/4, (it.get_height()/10)*3, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", App.get_name().c_str() );
           // SSID
-          it.printf( it.get_width()/4, (it.get_height()/10)*4, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
+          it.printf( it.get_width()/4, (it.get_height()/10)*6, id(f20), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ssid).state.c_str() );
           // IP
-          it.printf( (it.get_width()/4)*3, (it.get_height()/10)*6, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
+          it.printf( (it.get_width()/4)*3, (it.get_height()/10)*4, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_ip_address).state.c_str() );
           // MAC
-          it.printf( (it.get_width()/4)*3, (it.get_height()/10)*8, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
+          it.printf( (it.get_width()/4)*3, (it.get_height()/10)*7, id(f22b), id(epaper_text_color), TextAlign::CENTER, "%s", id(sensor_mac_address).state.c_str() );
 
           // Show wifi icon.
           if ( id(component_wifi).is_connected() ) {
