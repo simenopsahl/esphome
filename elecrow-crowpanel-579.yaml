@@ -1,0 +1,29 @@
+# Board: Generic ESP32-S3 Board (Generic)
+# Definition: definitions/boards/generic-esp32s3/manifest.yaml
+
+esphome:
+  name: elecrow-crowpanel-579
+  friendly_name: elecrow-crowpanel-579
+
+esp32:
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+  encryption:
+    key: "NUuA3atqQrhKrJm+T/1Nzd+LSx70C7x4T9pPfUr6yVI="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: elecrow-crowpan Fallback Hotspot
+    password: "GRweqD2cWH7K"
+
+captive_portal:
