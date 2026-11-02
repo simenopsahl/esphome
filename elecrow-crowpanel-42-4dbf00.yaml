@@ -57,9 +57,9 @@ display:
 
           // NAV
           it.image( it.get_width()+1, (it.get_height()/5), id(i_home), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width()+1, ((it.get_height()/12)*7)-28, id(i_previous), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width()+1, (it.get_height()/12)*7, id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( it.get_width()+1, ((it.get_height()/12)*7)+28, id(i_next), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+1, ((it.get_height()/13)*7)-28, id(i_previous), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+1, (it.get_height()/13)*7, id(i_refresh), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
+          it.image( it.get_width()+1, ((it.get_height()/13)*7)+28, id(i_next), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           it.image( it.get_width()+1, (it.get_height()/8)*7, id(i_exit), ImageAlign::CENTER_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
           // PAGE
           it.image( 0, 0, id(i_info), ImageAlign::TOP_LEFT, id(epaper_text_color), id(epaper_bg_color) );
