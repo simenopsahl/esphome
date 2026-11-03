@@ -6,7 +6,7 @@
 #   Default version matches the ESPHome CLI used for the real devices.
 set -euo pipefail
 
-VERSION="${1:-2026.9.1}"
+VERSION="${1:-2026.10.2}"
 VENV="${ESPHOME_VENV:-$HOME/.venvs/esphome}"
 
 need=()

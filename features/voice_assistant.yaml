@@ -32,34 +32,34 @@ packages:
   media_player: !include media_player.yaml
 
 substitutions:
+  ducking_guard_expr: "id(timer_ringing).state || id(va).is_running()"
   feature:
     audio:
-      jack_connected_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_connected.flac
-      jack_disconnected_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_disconnected.flac
-      mute_switch_on_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_on.flac
-      mute_switch_off_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
+      sound_file_jack_connected: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_connected.flac
+      sound_file_jack_disconnected: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/jack_disconnected.flac
+      sound_file_mute_switch_on: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_on.flac
+      sound_file_mute_switch_off: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
     voice:
       output_speaker: i2s_speaker
-      ducking_guard_expr: "id(timer_ringing).state || id(va).is_running()"
       # Phases of the Voice Assistant
       # The voice assistant is ready to be triggered by a wake word
-      assist_idle_phase_id: '1'
+      assist_phase_id_idle: '1'
       # The voice assistant is waiting for a voice command (after being triggered by the wake word)
-      assist_waiting_for_command_phase_id: '2'
+      assist_phase_id_waiting_for_command: '2'
       # The voice assistant is listening for a voice command
-      assist_listening_for_command_phase_id: '3'
+      assist_phase_id_listening_for_command: '3'
       # The voice assistant is currently processing the command
-      assist_thinking_phase_id: '4'
+      assist_phase_id_thinking: '4'
       # The voice assistant is replying to the command
-      assist_replying_phase_id: '5'
+      assist_phase_id_replying: '5'
       # The voice assistant is not ready
-      assist_not_ready_phase_id: '10'
+      assist_phase_id_not_ready: '10'
       # The voice assistant encountered an error
-      assist_error_phase_id: '11'
+      assist_phase_id_error: '11'
       # Substitutions for audio files
-      timer_finished_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
-      wake_word_triggered_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
-      error_cloud_expired_sound_file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
+      sound_file_timer_finished: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
+      sound_file_wake_word_triggered: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
+      sound_file_error_cloud_expired: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/error_cloud_expired.mp3
 
 ##### GLOBAL DEFINITIONS #####
 globals:
@@ -233,7 +233,7 @@ media_player:
   - id: !extend speaker_media_player # in media_player.yaml
     files:
       - id: jack_connected_sound
-        file: ${feature.audio.jack_connected_sound_file}
+        file: ${feature.audio.sound_file_jack_connected}
       - id: jack_disconnected_sound
         file: ${feature.audio.jack_disconnected_sound_file}
       - id: mute_switch_on_sound
@@ -241,7 +241,7 @@ media_player:
       - id: mute_switch_off_sound
         file: ${feature.audio.mute_switch_off_sound_file}
       - id: timer_finished_sound
-        file: ${feature.voice.timer_finished_sound_file}
+        file: ${feature.voice.sound_file_timer_finished}
       - id: wake_word_triggered_sound
         file: ${feature.voice.wake_word_triggered_sound_file}
       - id: error_cloud_expired
@@ -317,11 +317,11 @@ voice_assistant:
   on_client_connected:
     - lambda: id(init_in_progress) = false;
     - micro_wake_word.start:
-    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_idle_phase_id};
+    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_idle};
     - script.execute: on_voice_assistant_phase_change
   on_client_disconnected:
     - voice_assistant.stop:
-    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_not_ready_phase_id};
+    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_not_ready};
     - script.execute: on_voice_assistant_phase_change
   on_error:
     # Only set the error phase if the error code is different than duplicate_wake_up_detected or stt-no-text-recognized
@@ -333,7 +333,7 @@ voice_assistant:
             - lambda: return code != "duplicate_wake_up_detected";
             - lambda: return code != "stt-no-text-recognized";
         then:
-          - lambda: id(voice_assistant_phase) = ${feature.voice.assist_error_phase_id};
+          - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_error};
           - script.execute: on_voice_assistant_phase_change
     # If the error code is cloud-auth-failed, serve a local audio file guiding the user.
     - if:
@@ -351,13 +351,13 @@ voice_assistant:
         decibel_reduction: 20  # Number of dB quieter; higher implies more quiet, 0 implies full volume
         duration: 0.0s         # The duration of the transition (default is no transition)
   on_listening:
-    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_waiting_for_command_phase_id};
+    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_waiting_for_command};
     - script.execute: on_voice_assistant_phase_change
   on_stt_vad_start:
-    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_listening_for_command_phase_id};
+    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_listening_for_command};
     - script.execute: on_voice_assistant_phase_change
   on_stt_vad_end:
-    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_thinking_phase_id};
+    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_thinking};
     - script.execute: on_voice_assistant_phase_change
   on_intent_progress:
     - if:
@@ -365,7 +365,7 @@ voice_assistant:
           # A nonempty x variable means a streaming TTS url was sent to the media player
           lambda: 'return !x.empty();'
         then:
-          - lambda: id(voice_assistant_phase) = ${feature.voice.assist_replying_phase_id};
+          - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_replying};
           - script.execute: on_voice_assistant_phase_change
           # Start a script that would potentially enable the stop word if the response is longer than a second
           - script.execute: activate_stop_word_once
@@ -373,9 +373,9 @@ voice_assistant:
     - if:
         condition:
           # The intent_progress trigger didn't start the TTS Reponse
-          lambda: 'return id(voice_assistant_phase) != ${feature.voice.assist_replying_phase_id};'
+          lambda: 'return id(voice_assistant_phase) != ${feature.voice.assist_phase_id_replying};'
         then:
-          - lambda: id(voice_assistant_phase) = ${feature.voice.assist_replying_phase_id};
+          - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_replying};
           - script.execute: on_voice_assistant_phase_change
           # Start a script that would potentially enable the stop word if the response is longer than a second
           - script.execute: activate_stop_word_once
@@ -392,11 +392,11 @@ voice_assistant:
     # If the end happened because of an error, let the error phase on for a second
     - if:
         condition:
-          lambda: return id(voice_assistant_phase) == ${feature.voice.assist_error_phase_id};
+          lambda: return id(voice_assistant_phase) == ${feature.voice.assist_phase_id_error};
         then:
           - delay: 1s
     # Reset the voice assistant phase id and reset the LED animations.
-    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_idle_phase_id};
+    - lambda: id(voice_assistant_phase) = ${feature.voice.assist_phase_id_idle};
     - script.execute: on_voice_assistant_phase_change
   on_timer_finished:
     - switch.turn_on: timer_ringing

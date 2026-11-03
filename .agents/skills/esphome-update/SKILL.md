@@ -11,7 +11,7 @@ This skill defines the procedure for inspecting, upgrading, and verifying the lo
 ## When to Run
 
 Run this procedure whenever:
-- Home Assistant or your remote build server has updated to a newer ESPHome release (e.g. `2026.10.0`).
+- Home Assistant or your remote build server has updated to a newer ESPHome release (e.g. `2026.10.2`).
 - You encounter syntax schema differences or new features that are not yet recognized by your local CLI.
 - You need to pin or downgrade the local ESPHome version for troubleshooting.
 
@@ -26,17 +26,18 @@ There are two local ESPHome installations on this machine:
 - Package Manager: `python -m pip`
 - Invocation: `esphome <command>`
 
-### 2. WSL Ubuntu Environment
-- Virtualenv Directory: `/home/simen/virtualesphome`
-- Executable: `/home/simen/virtualesphome/bin/esphome`
-- Package Manager: `/home/simen/virtualesphome/bin/pip`
+### 2. WSL Ubuntu Environment (`host-sdl` toolchain)
+- Virtualenv Directory: `/home/simen/.venvs/esphome`
+- Executable: `/home/simen/.venvs/esphome/bin/esphome`
+- Package Manager: `/home/simen/.venvs/esphome/bin/pip`
+- Used by `tools/host_sdl/run.sh` and `tools/host_sdl/setup_wsl.sh`
 - Invocation from PowerShell:
   ```powershell
-  wsl --cd ~ -d Ubuntu bash -c "/home/simen/virtualesphome/bin/esphome <command>"
+  wsl --cd ~ -d Ubuntu bash -c "/home/simen/.venvs/esphome/bin/esphome <command>"
   ```
 - Invocation inside WSL bash:
   ```bash
-  source ~/virtualesphome/bin/activate
+  source ~/.venvs/esphome/bin/activate
   esphome <command>
   ```
 
@@ -52,7 +53,7 @@ python -m pip index versions esphome
 
 ### WSL Ubuntu
 ```powershell
-wsl --cd ~ -d Ubuntu bash -c "/home/simen/virtualesphome/bin/esphome version"
+wsl --cd ~ -d Ubuntu bash -c "/home/simen/.venvs/esphome/bin/esphome version"
 ```
 
 ---
@@ -62,7 +63,7 @@ wsl --cd ~ -d Ubuntu bash -c "/home/simen/virtualesphome/bin/esphome version"
 ### On Windows Host
 Pin to target version:
 ```powershell
-python -m pip install --upgrade esphome==2026.10.0
+python -m pip install --upgrade esphome==2026.10.2
 ```
 Or upgrade to latest:
 ```powershell
@@ -72,11 +73,11 @@ python -m pip install --upgrade esphome
 ### On WSL Ubuntu
 Pin to target version:
 ```powershell
-wsl --cd ~ -d Ubuntu bash -c "/home/simen/virtualesphome/bin/pip install --upgrade esphome==2026.10.0"
+wsl --cd ~ -d Ubuntu bash -c "/home/simen/.venvs/esphome/bin/pip install --upgrade esphome==2026.10.2"
 ```
 Or upgrade to latest:
 ```powershell
-wsl --cd ~ -d Ubuntu bash -c "/home/simen/virtualesphome/bin/pip install --upgrade esphome"
+wsl --cd ~ -d Ubuntu bash -c "/home/simen/.venvs/esphome/bin/pip install --upgrade esphome"
 ```
 
 ---
@@ -90,7 +91,7 @@ esphome version
 
 ### WSL Ubuntu
 ```powershell
-wsl --cd ~ -d Ubuntu bash -c "/home/simen/virtualesphome/bin/esphome version"
+wsl --cd ~ -d Ubuntu bash -c "/home/simen/.venvs/esphome/bin/esphome version"
 ```
 
 ---

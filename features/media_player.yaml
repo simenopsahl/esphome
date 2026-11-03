@@ -31,25 +31,26 @@ labels: [media_player, speaker]
 #
 #   # in voice_assistant.yaml
 #   - id: jack_connected_sound
-#     file: ${feature.audio.jack_connected_sound_file}
+#     file: ${feature.audio.sound_file_jack_connected}
 #   - id: jack_disconnected_sound
-#     file: ${feature.audio.jack_disconnected_sound_file}
+#     file: ${feature.audio.sound_file_jack_disconnected}
 #   - id: mute_switch_on_sound
-#     file: ${feature.audio.mute_switch_on_sound_file}
+#     file: ${feature.audio.sound_file_mute_switch_on}
 #   - id: mute_switch_off_sound
-#     file: ${feature.audio.mute_switch_off_sound_file}
+#     file: ${feature.audio.sound_file_mute_switch_off}
 #   - id: timer_finished_sound
-#     file: ${feature.voice.timer_finished_sound_file}
+#     file: ${feature.voice.sound_file_timer_finished}
 #   - id: wake_word_triggered_sound
-#     file: ${feature.voice.wake_word_triggered_sound_file}
+#     file: ${feature.voice.sound_file_wake_word_triggered}
 #   - id: error_cloud_expired
-#     file: ${feature.voice.error_cloud_expired_sound_file}
+#     file: ${feature.voice.sound_file_error_cloud_expired}
 #
 # media_player:
 #   - platform: sendspin
 #     id: sendspin_group_media_player
 #   - platform: speaker_source # replaces speaker_media_player
 #     id: speaker_source_media_player
+#     < other settings are the same >
 #     announcement_pipeline:
 #       sources:
 #         - audio_file_announcement_source
@@ -207,7 +208,7 @@ media_player:
           condition:
             - not:
                 media_player.is_announcing:
-            - lambda: 'return !(${feature.voice.ducking_guard_expr | default("false")});'
+            - lambda: 'return !(${ducking_guard_expr | default("false")});'
           then:
             - mixer_speaker.apply_ducking:
                 id: media_mixing_input

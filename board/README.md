@@ -7,6 +7,8 @@ Covers M5Stack, WaveShare, Sunton, GeekMagic and generic ESP32 boards
 ## Some devices covered
 
 - Freenove FNK0085 ESP32-S3 WROOM N16R8
+- Elecrow CrowPanel ESP32 E-paper 4.2-inch HMI Display
+- Elecrow CrowPanel ESP32 E-paper 5.79-inch HMI Display
 - Waveshare ESP32-S3-CAM
 - NullLab ESP32-S3-CAM
 - ESP32-S3 Universal AirCo
@@ -39,3 +41,4 @@ Covers M5Stack, WaveShare, Sunton, GeekMagic and generic ESP32 boards
 - Waveshare ESP32-P4-NANO
 - Waveshare ESP32-P4-WIFI6
 - Waveshare ESP32-S3-Touch-LCD-2
+- Waveshare ESP32-S3-Audio-Board

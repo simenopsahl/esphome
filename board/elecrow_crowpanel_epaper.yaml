@@ -105,28 +105,35 @@ binary_sensor:
   # Menu Button
   - platform: gpio
     id: button_menu
-    name: Menu Button
-    pin: ${pin.btn.menu}
+    pin:
+      number: ${pin.btn.menu}
+      inverted: true
     filters:
       - delayed_off: 10ms
     on_press:
       then:
         - logger.log: Menu Button Pressed
+    name: Menu Button
+    entity_category: diagnostic
   # Exit Button
   - platform: gpio
     id: button_exit
-    name: Exit Button
-    entity_category: diagnostic
-    pin: ${pin.btn.exit}
+    pin:
+      number: ${pin.btn.exit}
+      inverted: true
     filters:
       - delayed_off: 10ms
     on_press:
       - logger.log: Exit Button Pressed
+    name: Exit Button
+    entity_category: diagnostic
 
   # Stick Up
   - platform: gpio
     id: stick_up
-    pin: ${pin.btn.stick.up}
+    pin:
+      number: ${pin.btn.stick.up}
+      inverted: true
     filters:
       - delayed_off: 10ms
     on_press:
@@ -136,7 +143,9 @@ binary_sensor:
   # Stick Press
   - platform: gpio
     id: stick_press
-    pin: ${pin.btn.stick.press}
+    pin:
+      number: ${pin.btn.stick.press}
+      inverted: true
     filters:
       - delayed_off: 10ms
     on_press:
@@ -146,7 +155,9 @@ binary_sensor:
   # Stick Down
   - platform: gpio
     id: stick_down
-    pin: ${pin.btn.stick.down}
+    pin:
+      number: ${pin.btn.stick.down}
+      inverted: true
     filters:
       - delayed_off: 10ms
     on_press:
