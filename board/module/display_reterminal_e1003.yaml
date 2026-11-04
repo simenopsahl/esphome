@@ -10,11 +10,11 @@ labels: [SPI, display, ePaper]
 # =============================================================================
 #
 # Hardware list:
-#   1. 10.3" 16-level grayscale ePaper display (1872x1404, IT8951
+#   1. 10.3" 16-level grayscale ePaper display (1872x1404, IT8951)
 #   2. 3x buttons (GPIO3, GPIO4, GPIO5)
 #   3. Buzzer (GPIO45, PWM)
 #   4. Onboard LED (GPIO16)
-#   5. Battery voltage (GPIO1 ADC + GPIO21 EN)
+#   5. Battery voltage (GPIO1 ADC + GPIO40 EN)
 #   6. SHT4x temp & humidity sensor (I2C)
 #   7. PCF8563 RTC (I2C addr 0x51, CR1220 backup)
 #   8. PDM Microphone (CLK=42, DATA=41, EN=38)

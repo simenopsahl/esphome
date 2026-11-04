@@ -182,18 +182,6 @@ touchscreen:
 # #  vertical_flip: true
 # #  horizontal_mirror: true
 
-sensor:
-  # CPU Temperature
-  - platform: internal_temperature
-    name: "CPU Temperature"
-    id: cpu_temperature
-    accuracy_decimals: 1
-    device_class: temperature
-    state_class: measurement
-    icon: "mdi:thermometer"
-    update_interval: 5s
-    entity_category: diagnostic
-
 # Special LVGL settings required for this display
 lvgl:
   byte_order: little_endian

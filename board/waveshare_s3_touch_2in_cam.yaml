@@ -286,15 +286,6 @@ sensor:
     on_value:
       script.execute: update_motion
 
-  - platform: internal_temperature
-    name: "CPU Temperature"
-    id: cpu_temperature
-    accuracy_decimals: 1
-    device_class: temperature
-    state_class: measurement
-    icon: "mdi:thermometer"
-    update_interval: 5s
-    entity_category: diagnostic
 
 script:
   - id: update_motion

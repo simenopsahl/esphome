@@ -210,7 +210,7 @@ text_sensor:
 
   - platform: template
     id: combined_iaq_classification_bme688
-    name: "CombinedIAQ classification"
+    name: "Combined IAQ classification"
     icon: "mdi:checkbox-marked-circle-outline"
     entity_category: diagnostic
     lambda: |-

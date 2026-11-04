@@ -106,6 +106,7 @@ sensor:
     rms:
       name: "Noise Level"
       id: average_loudness
+      accuracy_decimals: 1
       filters:
         - offset: 100.0
         # Throttle to reduce Home Assistant DB writes

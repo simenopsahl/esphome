@@ -1,0 +1,738 @@
+labels: [es8311, speaker, i2s_audio, light]
+---
+# https://docs.m5stack.com/en/atom/Voice_Pyramid
+# https://github.com/m5stack/esphome-yaml/blob/main/examples/voice_assistant/echo_pyramid_example.yaml
+# Atomic Voice Pyramid
+#
+# Warning:
+# Do not use Voice Pyramid together with Atom S3R Voice, as this may result in device damage.
+#
+# Set the hardware module for the audio feature to atomic_voice_pyramid.yaml on Atom devices root config (defaults to atomic_voice_base.yaml)
+# substitutions:
+#   feature:
+#     audio:
+#       hardware_module: atomic_voice_pyramid.yaml
+#
+substitutions:
+  extension:
+    i2c:
+      hat:
+        frequency: 100kHz
+  pin:
+    ext:
+      i2c:
+        hat:
+          sda: ${pin.ext.base.p4.p2}
+          scl: ${pin.ext.base.p4.p1}
+    audio:
+      # Atomic Voice Pyramid I2S routing (Atom S3R header):
+      # G5 = MIC (DIN into ESP32 from ES7210 SDOUT)
+      # G6 = I2S_SCLK / BCLK (from ESP32 to ES7210 & ES8311 SCLK)
+      # G7 = SPK (DOUT from ESP32 to ES8311 DSDIN)
+      # G8 = I2S_LRCK (from ESP32 to ES7210 & ES8311 LRCK)
+      mic: ${pin.ext.base.p5.p2}
+      i2s_bclk: ${pin.ext.base.p5.p3}
+      spk: ${pin.ext.base.p5.p4}
+      i2s_lrclk: ${pin.ext.base.p5.p5}
+  feature:
+    audio:
+      volume_min: "0.1"
+      volume_initial: "0.5"
+      volume_max: "0.8"
+  sound_file_touch_default: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/center_button_press.flac
+
+
+packages:
+  hat_i2c: !include ../../extension/hat_i2c.yaml
+  mic_common: !include common_mic.yaml
+
+esphome:
+  on_boot:
+    # Paint the pyramid as early as we can, so the device shows life
+    - priority: 375
+      then:
+        - script.execute: control_leds
+    - priority: -100
+      then:
+        # Push the mic gain restored from flash into the ES7210. The codec boots
+        # with `mic_gain` from audio_adc, so without this a saved value would show
+        # in HA while the hardware sat at the default.
+        - lambda: |-
+            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
+            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
+
+api:
+  on_client_connected:
+    - script.execute: control_leds
+
+external_components:
+  - source: github://m5stack/esphome-yaml/components
+    components: [ aw87559, si5351, pyramidrgb, pyramidtouch]
+
+# Si5351 programmable clock generator
+# Hardware: 27 MHz crystal, CLK1 outputs 6.144 MHz to ES8311 & ES7210 MCLK
+si5351:
+  id: clock_si5351
+  i2c_id: i2c_hat
+  address: 0x60
+
+# I2S Bus Configuration
+i2s_audio:
+  - id: i2s_input
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+aw87559:
+  id: amp_aw87559
+  i2c_id: i2c_hat
+  address: 0x5B
+
+audio_dac:
+  - platform: es8311
+    i2c_id: i2c_hat
+    id: dac_es8311
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    use_microphone: false
+
+audio_adc:
+  - platform: es7210
+    i2c_id: i2c_hat
+    id: adc_es7210
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    mic_gain: 24dB
+
+microphone:
+  # LMA3729T381-0Y3S
+  - platform: i2s_audio
+    i2s_audio_id: i2s_input
+    id: i2s_mic
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    channel: left
+    adc_type: external
+    i2s_din_pin: ${pin.audio.mic}
+
+speaker:
+  - platform: i2s_audio
+    i2s_audio_id: i2s_output
+    i2s_mode: secondary
+    dac_type: external
+    audio_dac: dac_es8311
+    sample_rate: 16000
+    id: i2s_speaker
+    i2s_dout_pin: ${pin.audio.spk}
+    channel: mono
+    timeout: never
+    buffer_duration: 250ms
+
+media_player:
+  - id: !extend speaker_media_player
+    files:
+      - id: touch_sound
+        file: ${sound_file_touch_default}
+    on_mute:
+      - delay: 100ms            # debounce
+      - script.execute: control_leds_volume_changed
+    on_unmute:
+      - delay: 100ms
+      - script.execute: control_leds_volume_changed
+    on_volume:
+      if:
+        condition:
+          - lambda: return !id(init_in_progress);
+        then:
+          - delay: 100ms
+          - script.execute: control_leds_volume_changed
+
+switch:
+  # Amplifier Enable (AW87559 is initialized via I2C component amp_aw87559)
+  - platform: template
+    id: amp_enable
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - id: !extend mic_mute_switch
+    on_turn_on:
+      - script.execute: flash_ring
+    on_turn_off:
+      - script.execute: flash_ring
+
+  # Night mode: the LEDs uses "Night LED Brightness" and the wake sound and
+  # boot chime are skipped. Replies, timers and the alarm still play. Flip it
+  # from a Home Assistant automation (sunset/sunrise, a bedtime scene, ...).
+  - platform: template
+    id: night_mode
+    name: Night mode
+    icon: "mdi:weather-night"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    # Also fires during the restore in setup(), hence the init_in_progress gate.
+    on_turn_on: &repaint_if_ready
+      - if:
+          condition:
+            lambda: 'return !id(init_in_progress);'
+          then:
+            - script.execute: control_leds
+    on_turn_off: *repaint_if_ready
+
+sensor:
+  # Dual-side touch-slider zones with 4 touch detection points, 2 per side
+  - platform: pyramidtouch
+    id: pyramid_touch
+    i2c_id: i2c_hat
+    address: 0x1A
+    update_interval: 50ms
+    publish_swipe_event: true
+    swipe_timeout_ms: 500
+    touch1:
+      name: "Touch 1"
+      id: touch1
+      # Left lower touch point
+      entity_category: diagnostic
+    touch2:
+      name: "Touch 2"
+      id: touch2
+      # Left upper touch point
+      entity_category: diagnostic
+    touch3:
+      name: "Touch 3"
+      id: touch3
+      # Right upper touch point
+      entity_category: diagnostic
+    touch4:
+      name: "Touch 4"
+      id: touch4
+      # Right lower touch point
+      entity_category: diagnostic
+    swipe_event:
+      name: "Touch Swipe Event"
+      entity_category: diagnostic
+      on_value:
+        then:
+          - lambda: |-
+              // Swipe codes:
+              // 1 = Left Up   (volume up)
+              // 2 = Left Down (volume down)
+              // 3 = Right Up  (brightness up)
+              // 4 = Right Down (brightness down)
+              const int ev = (int) x;
+
+              if (ev == 1 || ev == 2) {
+                // Left side: control volume (0.0 - 1.0)
+                float v = id(speaker_media_player)->volume;
+                if (std::isnan(v)) v = 0.5f;
+                if (ev == 1) {
+                  v = std::min(1.0f, v + 0.05f);
+                } else {
+                  v = std::max(0.0f, v - 0.05f);
+                }
+
+                auto call = id(speaker_media_player)->make_call();
+                call.set_volume(v);
+                call.perform();
+                id(play_touch_sound).execute();
+              } else if (ev == 3 || ev == 4) {
+                // Right side: control LED brightness
+                const bool night = id(night_mode).state;
+                auto *num = night ? id(night_led_brightness) : id(pyramid_led_brightness);
+                float b = num->state;
+                if (std::isnan(b)) b = night ? 0.3f : 0.8f;
+                if (ev == 3) {
+                  b = std::min(1.0f, b + 0.05f);
+                } else {
+                  b = std::max(0.2f, b - 0.05f);
+                }
+
+                auto call = num->make_call();
+                call.set_value(b);
+                call.perform();
+                id(play_touch_sound).execute();
+              }
+
+globals:
+  # Transient pass-through for the current LED colour (set by led_set_effect
+  # from its params right before use), so no need to persist across reboots.
+  - id: pyramid_led_color_r
+    type: float
+    restore_value: no
+    initial_value: '1.0'
+  - id: pyramid_led_color_g
+    type: float
+    restore_value: no
+    initial_value: '0.0'
+  - id: pyramid_led_color_b
+    type: float
+    restore_value: no
+    initial_value: '1.0'
+  # Brightness for the current paint: the day slider, or the night one
+  # while Night mode is on. Set by led_set_effect alongside the colour.
+  - id: pyramid_led_level
+    type: float
+    restore_value: no
+    initial_value: '0.8'
+
+# 28 x WS2812 RGB LED (7 LEDs per RGB Bar strip) controlled by the STM32 co-processor
+pyramidrgb:
+  # RGB CH1 0-6 + 7-13 (Bottom Right + Top Right)
+  - id: pyramid_rgb1
+    i2c_id: i2c_hat
+    address: 0x1A
+    strip: 1
+    brightness: 100
+  # RGB CH2 0-6 + 7-13 (Bottom Left + Top Left)
+  - id: pyramid_rgb2
+    i2c_id: i2c_hat
+    address: 0x1A
+    strip: 2
+    brightness: 100
+
+number:
+  - platform: template
+    id: pyramid_led_brightness
+    name: "LED Brightness"
+    icon: mdi:brightness-6
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    min_value: 0.4
+    max_value: 1.0
+    step: 0.05
+    initial_value: 0.8
+    mode: slider
+    on_value: *repaint_if_ready
+
+  # LED brightness while Night mode is on.
+  - platform: template
+    id: night_led_brightness
+    name: "Night LED Ring Brightness"
+    icon: mdi:brightness-4
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    min_value: 0.1
+    max_value: 0.8
+    step: 0.05
+    initial_value: 0.3
+    mode: slider
+    on_value: *repaint_if_ready
+
+  - platform: template
+    id: mic_gain_db
+    name: "Mic gain (ES7210)"
+    icon: mdi:microphone-settings
+    entity_category: config
+    unit_of_measurement: dB
+    min_value: 0
+    # The ES7210 gain register moves in 3 dB steps up to 33 dB (then 34.5, 36
+    # and 37.5), so a finer slider step would leave every second position a
+    # no-op. 36 dB is the highest value that sits on the 3 dB grid.
+    max_value: 36
+    step: 3
+    restore_value: true
+    initial_value: 24
+    mode: slider
+    # Without `optimistic`, a template number with only a set_action never
+    # publishes the new value back: the slider snapped back to 24 dB in HA even
+    # though the ES7210 had already been reprogrammed. The restored value is
+    # applied to the codec in on_boot (-100), since TemplateNumber::setup() only
+    # publishes it and does not run set_action.
+    optimistic: true
+    set_action:
+      - lambda: |-
+          id(adc_es7210).set_mic_gain(x);
+      - logger.log:
+          format: "[MIC] ES7210 gain -> %.1f dB"
+          args: ["x"]
+
+output:
+  # Strip 1, Channel 0 (Group 1)
+  - platform: pyramidrgb
+    id: rgb1_ch0_red
+    pyramidrgb_id: pyramid_rgb1
+    channel: 0
+    color: red
+  - platform: pyramidrgb
+    id: rgb1_ch0_green
+    pyramidrgb_id: pyramid_rgb1
+    channel: 0
+    color: green
+  - platform: pyramidrgb
+    id: rgb1_ch0_blue
+    pyramidrgb_id: pyramid_rgb1
+    channel: 0
+    color: blue
+  # Strip 1, Channel 1 (Group 2)
+  - platform: pyramidrgb
+    id: rgb1_ch1_red
+    pyramidrgb_id: pyramid_rgb1
+    channel: 1
+    color: red
+  - platform: pyramidrgb
+    id: rgb1_ch1_green
+    pyramidrgb_id: pyramid_rgb1
+    channel: 1
+    color: green
+  - platform: pyramidrgb
+    id: rgb1_ch1_blue
+    pyramidrgb_id: pyramid_rgb1
+    channel: 1
+    color: blue
+
+  # Strip 2, Channel 2 (Group 1)
+  - platform: pyramidrgb
+    id: rgb2_ch2_red
+    pyramidrgb_id: pyramid_rgb2
+    channel: 2
+    color: red
+  - platform: pyramidrgb
+    id: rgb2_ch2_green
+    pyramidrgb_id: pyramid_rgb2
+    channel: 2
+    color: green
+  - platform: pyramidrgb
+    id: rgb2_ch2_blue
+    pyramidrgb_id: pyramid_rgb2
+    channel: 2
+    color: blue
+  # Strip 2, Channel 3 (Group 2)
+  - platform: pyramidrgb
+    id: rgb2_ch3_red
+    pyramidrgb_id: pyramid_rgb2
+    channel: 3
+    color: red
+  - platform: pyramidrgb
+    id: rgb2_ch3_green
+    pyramidrgb_id: pyramid_rgb2
+    channel: 3
+    color: green
+  - platform: pyramidrgb
+    id: rgb2_ch3_blue
+    pyramidrgb_id: pyramid_rgb2
+    channel: 3
+    color: blue
+
+light:
+# RGB LED lights not exposed for control directly, used internally for the combined addressable light entity
+# After testing (which light is on what side) it's possible to use them as feedback for touches
+  - platform: rgb
+    # 0-6 Bottom Right?
+    id: light_strip1_group1
+    internal: true
+    red: rgb1_ch0_red
+    green: rgb1_ch0_green
+    blue: rgb1_ch0_blue
+
+  - platform: rgb
+    # 7-13 Top Right?
+    id: light_strip1_group2
+    internal: true
+    red: rgb1_ch1_red
+    green: rgb1_ch1_green
+    blue: rgb1_ch1_blue
+
+  - platform: rgb
+    # 0-6 Bottom Left?
+    id: light_strip2_group1
+    internal: true
+    red: rgb2_ch2_red
+    green: rgb2_ch2_green
+    blue: rgb2_ch2_blue
+
+  - platform: rgb
+    # 7-13 Top Left?
+    id: light_strip2_group2
+    internal: true
+    red: rgb2_ch3_red
+    green: rgb2_ch3_green
+    blue: rgb2_ch3_blue
+
+  # Combined RGB LEDs into one addressable light entity
+  - platform: partition
+    id: pyramid_rgb_led
+    name: "Pyramid LED"
+    entity_category: config
+    default_transition_length: 250ms
+    segments:
+      - single_light_id: light_strip1_group1
+      - single_light_id: light_strip1_group2
+      - single_light_id: light_strip2_group1
+      - single_light_id: light_strip2_group2
+    effects:
+      # update_interval must be LONGER than transition_length: it is how often
+      # the pulse flips its brightness target (min<->max), not a frame rate. A
+      # 16ms interval flips faster than the transition can move, so the ring just
+      # sits at one brightness (looks solid). ~2x the transition pulses cleanly.
+      - pulse:
+          name: "Pulse Slow"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 2000ms
+          update_interval: 3000ms
+      - pulse:
+          name: "Pulse Medium"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 600ms
+          update_interval: 1200ms
+      - pulse:
+          name: "Pulse Fast"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 300ms
+          update_interval: 600ms
+      - addressable_rainbow:
+          name: "Rainbow Slow"
+          speed: 6
+          width: 7
+      - addressable_color_wipe:
+          name: "Wipe"
+      # Scan / Twinkle use the phase colour set by control_leds, so they still
+      # read as "listening/thinking/replying" while looking different.
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 120ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 8%
+          progress_interval: 40ms
+      - addressable_fireworks:
+          name: "Fireworks"
+          spark_probability: 12%
+          use_random_color: true
+      - addressable_random_twinkle:
+          name: "Random Twinkle"
+          twinkle_probability: 8%
+          progress_interval: 40ms
+      - addressable_rainbow:
+          name: "Rainbow Fast"
+          speed: 15
+          width: 7
+      # Custom effects. current_color is the phase colour set by control_leds,
+      # so these still read as the current assistant state.
+      - addressable_lambda:
+          name: "Comet"
+          update_interval: 70ms
+          lambda: |-
+            static int head = 0;
+            const int n = it.size();
+            for (int i = 0; i < n; i++) {
+              int d = (head - i + n) % n;                 // 0 at head, grows behind
+              float b = (d < 5) ? (1.0f / (1 << d)) : 0.0f;
+              it[i] = Color((uint8_t)(current_color.red   * b),
+                            (uint8_t)(current_color.green * b),
+                            (uint8_t)(current_color.blue  * b));
+            }
+            head = (head + 1) % n;
+      - addressable_lambda:
+          name: "Breathe"
+          update_interval: 32ms
+          lambda: |-
+            static uint16_t t = 0;
+            float b = (sinf(t * 3.14159265f / 128.0f) + 1.0f) * 0.5f;  // 0..1
+            b = 0.12f + b * 0.88f;                                     // floor 12%
+            it.all() = Color((uint8_t)(current_color.red   * b),
+                             (uint8_t)(current_color.green * b),
+                             (uint8_t)(current_color.blue  * b));
+            t = (t + 2) % 256;
+      - addressable_lambda:
+          name: "Spinner"
+          update_interval: 90ms
+          lambda: |-
+            static int pos = 0;
+            const int n = it.size();
+            it.all() = Color(0, 0, 0);
+            it[pos % n] = current_color;
+            it[(pos + 1) % n] = Color((uint8_t)(current_color.red   * 0.35f),
+                                      (uint8_t)(current_color.green * 0.35f),
+                                      (uint8_t)(current_color.blue  * 0.35f));
+            pos = (pos + 1) % n;
+      - addressable_lambda:
+          name: "Fire"
+          update_interval: 70ms
+          lambda: |-
+            const int n = it.size();
+            for (int i = 0; i < n; i++) {
+              uint8_t r = 160 + (esp_random() % 96);       // 160..255
+              uint8_t g = (uint8_t)(r * (0.20f + (esp_random() % 45) / 255.0f));
+              it[i] = Color(r, g, 0);
+            }
+
+script:
+  # Subtle touch/swipe audible feedback sound at night_led_brightness volume
+  - id: play_touch_sound
+    mode: restart
+    then:
+      - lambda: |-
+          if (id(speaker_media_player)->state == media_player::MEDIA_PLAYER_STATE_ANNOUNCING) {
+            return; // Don't interrupt active announcement/TTS
+          }
+          if (id(night_mode).state) {
+            return; // Silence UI clicks during night mode
+          }
+          // Set speaker hardware volume temporarily to night_led_brightness
+          float touch_vol = id(night_led_brightness).state;
+          if (std::isnan(touch_vol) || touch_vol <= 0.0f) touch_vol = 0.25f;
+          id(i2s_speaker).set_volume(touch_vol);
+          id(speaker_media_player)->play_file(const_cast<audio::AudioFile *>(id(touch_sound)), true, false);
+      - delay: 150ms
+      - lambda: |-
+          // Restore normal media player volume on the hardware DAC
+          float normal_vol = id(speaker_media_player)->volume;
+          if (std::isnan(normal_vol)) normal_vol = 0.5f;
+          float bounded_vol = remap<float, float>(normal_vol, 0.0f, 1.0f, 0.1f, 0.8f);
+          id(i2s_speaker).set_volume(bounded_vol);
+
+  - id: flash_ring
+    then:
+      - light.turn_on:
+          id: pyramid_rgb_led
+          brightness: 100%
+          red: 1.0
+          green: 0.0
+          blue: 0.0
+          effect: "None"
+      - delay: 250ms
+      # Return to the real state instead of going dark (e.g. if a timer is
+      # counting or the VA is active while the mic is muted/unmuted).
+      - script.execute: control_leds
+
+  # Minimal LED dispatcher: off / solid / a named built-in effect.
+  - id: led_set_effect
+    mode: restart
+    parameters:
+      effect: std::string
+      r: float
+      g: float
+      b: float
+    then:
+      - lambda: |-
+          const bool night = id(night_mode).state;
+          const float level = night ? id(night_led_brightness).state : id(pyramid_led_brightness).state;
+          // The pulse effects drive brightness themselves (30..100%) and ignore
+          // the level, so at night they are dimmed through the colour instead.
+          const float k = (night && effect.rfind("Pulse", 0) == 0) ? level : 1.0f;
+          id(pyramid_led_color_r) = r * k;
+          id(pyramid_led_color_g) = g * k;
+          id(pyramid_led_color_b) = b * k;
+          id(pyramid_led_level) = level;
+          ESP_LOGI("led", "led_set_effect: effect='%s' rgb(%.2f, %.2f, %.2f) brightness=%.2f night=%d",
+                   effect.c_str(), r * k, g * k, b * k, level, (int) night);
+      - if:
+          condition:
+            lambda: 'return effect == "off";'
+          then:
+            - light.turn_off: pyramid_rgb_led
+          else:
+            - if:
+                condition:
+                  lambda: 'return effect == "solid";'
+                then:
+                  - light.turn_on:
+                      id: pyramid_rgb_led
+                      effect: "None"    # clear any running effect so solid is steady
+                      brightness: !lambda 'return id(pyramid_led_level);'
+                      red: !lambda 'return id(pyramid_led_color_r);'
+                      green: !lambda 'return id(pyramid_led_color_g);'
+                      blue: !lambda 'return id(pyramid_led_color_b);'
+                else:
+                  - light.turn_on:
+                      id: pyramid_rgb_led
+                      brightness: !lambda 'return id(pyramid_led_level);'
+                      red: !lambda 'return id(pyramid_led_color_r);'
+                      green: !lambda 'return id(pyramid_led_color_g);'
+                      blue: !lambda 'return id(pyramid_led_color_b);'
+                      effect: !lambda 'return effect;'
+  
+  - id: !extend on_voice_assistant_phase_change
+    then:
+      - script.execute: control_leds
+
+  # The single LED state machine. Everything that changes device state calls
+  # this; nothing else paints the ring directly.
+  - id: control_leds
+    mode: single
+    then:
+      - lambda: |-
+          const bool wifi_connected = id(component_wifi).is_connected();
+          const bool api_connected  = id(component_api).is_connected();
+          const bool init_progress  = id(init_in_progress);
+          const int  phase          = id(voice_assistant_phase);
+          const bool timer_active   = id(is_timer_active);
+
+          ESP_LOGD("led",
+                   "control_leds: wifi=%d api=%d init=%d phase=%d timer=%d",
+                   (int)wifi_connected, (int)api_connected, (int)init_progress, phase, (int)timer_active);
+
+          auto set = [&](const std::string &effect, float r, float g, float b) {
+            id(led_set_effect).execute(effect, r, g, b);
+          };
+
+          if (init_progress) {                       // booting
+            if (wifi_connected) set("Rainbow Slow", 0.9, 0.1, 0.85);
+            else                set("Rainbow Slow", 1.0, 0.1, 0.1);
+            return;
+          }
+          if (!wifi_connected || !api_connected) {   // HA unreachable
+            set("Pulse Medium", 1.0, 0.0, 0.0);
+            return;
+          }
+
+          switch (phase) {
+            case 2: // waiting for command
+              set("Breathe", 0.0, 0.7, 1.0);
+              return;
+            case 3: // listening for command
+              set("Pulse Fast", 0.0, 0.8, 1.0);
+              return;
+            case 4: // thinking
+              set("Spinner", 0.0, 0.5, 1.0);
+              return;
+            case 5: // replying
+              set("Pulse Medium", 0.1, 0.9, 0.4);
+              return;
+            case 11: // error
+              set("Pulse Fast", 1.0, 0.0, 0.0);
+              return;
+            default:
+              break;
+          }
+
+          if (timer_active) {
+            set("Pulse Slow", 1.0, 0.65, 0.0);
+            return;
+          }
+
+          set("off", 0, 0, 0);                       // idle
+
+  # A short green pulse on a volume change, then back to the state machine.
+  - id: control_leds_volume_changed
+    mode: restart
+    then:
+      - light.turn_on:
+          id: pyramid_rgb_led
+          brightness: !lambda 'return id(pyramid_led_brightness).state;'
+          red: 0.0
+          # Pulse Fast sets its own brightness, so Night mode dims the colour.
+          green: !lambda 'return id(night_mode).state ? id(night_led_brightness).state : 1.0f;'
+          blue: 0.0
+          effect: "Pulse Fast"
+      - delay: 1.2s
+      - script.execute: control_leds

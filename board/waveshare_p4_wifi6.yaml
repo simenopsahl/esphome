@@ -113,14 +113,3 @@ update:
     source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
     update_interval: 6h
 
-sensor:
-  # CPU Temperature
-  - platform: internal_temperature
-    name: "CPU Temperature"
-    id: cpu_temperature
-    accuracy_decimals: 1
-    device_class: temperature
-    state_class: measurement
-    icon: "mdi:thermometer"
-    update_interval: 5s
-    entity_category: diagnostic
