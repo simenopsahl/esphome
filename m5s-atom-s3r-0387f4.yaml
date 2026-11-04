@@ -8,7 +8,7 @@ packages:
 #  i2c_int: !include extension/internal_i2c.yaml
 #  grove: !include board/extension/grove_i2c.yaml
 #  env: !include board/module/hat_env_iii.yaml
-#  media_player: !include features/media_player.yaml
+  media_player: !include features/media_player.yaml
 
   # --- FEATURE PACKAGES ---
 #  combined_env_sensors: !include features/combined_env_sensors.yaml
