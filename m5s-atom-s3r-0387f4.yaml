@@ -38,6 +38,7 @@ substitutions:
     page:
       temperature:
         area_label: T22
+  feature_audio_enabled: "false"
   feature:
     audio:
       hardware_module: atomic_voice_pyramid.yaml
