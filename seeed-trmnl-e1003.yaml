@@ -11,7 +11,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: seeed-trmnl-e1003
+    name: seeed-trmnl-e1003-190420
     location: "Storage"
     framework:
       type: esp-idf
