@@ -27,6 +27,7 @@ labels: [SPI, display, ePaper]
 
 packages:
   epaper: !include ../../features/epaper.yaml
+  mic: !include audio/common_mic.yaml
 
 substitutions:
   screen_width: "800"
@@ -94,6 +95,29 @@ esphome:
         - component.update: battery_level
         # Read RTC time on boot
         - pcf8563.read_time:
+    - priority: 375
+      then:
+        # Safety net: if HA never connects.
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(init_in_progress);
+            then:
+              - lambda: id(init_in_progress) = false;
+
+api:
+  on_client_connected:
+    - lambda: id(init_in_progress) = false;
+
+globals:
+  - id: init_in_progress
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+  - id: mic_disabled
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
 # =============================================================================
 # [1] ePaper display (7.5" B/W, 800x480)

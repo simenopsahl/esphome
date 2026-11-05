@@ -206,21 +206,25 @@ sensor:
       id: touch1
       # Left lower touch point
       entity_category: diagnostic
+      disabled_by_default: true
     touch2:
       name: "Touch 2"
       id: touch2
       # Left upper touch point
       entity_category: diagnostic
+      disabled_by_default: true
     touch3:
       name: "Touch 3"
       id: touch3
       # Right upper touch point
       entity_category: diagnostic
+      disabled_by_default: true
     touch4:
       name: "Touch 4"
       id: touch4
       # Right lower touch point
       entity_category: diagnostic
+      disabled_by_default: true
     swipe_event:
       name: "Touch Swipe Event"
       entity_category: diagnostic
