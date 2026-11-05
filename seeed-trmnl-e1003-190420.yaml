@@ -18,18 +18,18 @@ substitutions:
   display:
     home_page: page_info
     font:
-      text_sm: 24
-      text_md: 28
-      text_lg: 32
-      text_xl: 36
-      text_xxl: 46
-      text_hg: 54
-      text_fl: 66
-      icons_sm: 36
-      icons_md: 46
-      icons_lg: 54
-      icons_xl: 66
-      icons_xxl: 78
+      text_sm: 26
+      text_md: 30
+      text_lg: 34
+      text_xl: 38
+      text_xxl: 48
+      text_hg: 56
+      text_fl: 68
+      icons_sm: 38
+      icons_md: 48
+      icons_lg: 56
+      icons_xl: 68
+      icons_xxl: 80
 
 esphome:
   comment: ${device.model} @ ${device.location}
