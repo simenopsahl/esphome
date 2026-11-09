@@ -30,11 +30,11 @@ substitutions:
       text_xxl: 26
       text_hg: 28
       text_fl: 50
-      icons_sm: 38
-      icons_md: 46
-      icons_lg: 50
-      icons_xl: 64
-      icons_xxl: 90
+      icons_sm: 30
+      icons_md: 34
+      icons_lg: 40
+      icons_xl: 48
+      icons_xxl: 58
 
 
 esphome:
