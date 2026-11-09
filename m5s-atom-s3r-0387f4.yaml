@@ -5,7 +5,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
-  audio: !include board/module/audio/atomic_voice_pyramid.yaml
 #  i2c_int: !include extension/internal_i2c.yaml
 #  grove: !include board/extension/grove_i2c.yaml
 #  env: !include board/module/hat_env_iii.yaml
@@ -38,13 +37,9 @@ substitutions:
     page:
       temperature:
         area_label: T22
-  feature_audio_enabled: "false"
   feature:
     audio:
       hardware_module: atomic_voice_pyramid.yaml
-      volume_min: "0.1"
-      volume_initial: "0.5"
-      volume_max: "0.8"
 
 esphome:
 #  build_path: C:/Users/simen/.esphome_build/m5s-atom-s3r-0387f4
