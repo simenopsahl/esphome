@@ -1,29 +1,115 @@
-# Board: Generic ESP32-S3 Board (Generic)
-# Definition: definitions/boards/generic-esp32s3/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+#  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/zectrix_note4c.yaml
+
+substitutions:
+  screen_width: "400"
+  screen_height: "300"
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: zectrix-note4c
+    location: "Storage"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_info
+    font:
+      text_sm: 16
+      text_md: 18
+      text_lg: 20
+      text_xl: 24
+      text_xxl: 26
+      text_hg: 28
+      text_fl: 50
+      icons_sm: 38
+      icons_md: 46
+      icons_lg: 50
+      icons_xl: 64
+      icons_xxl: 90
+
 
 esphome:
-  name: zectrix-note4c
-  friendly_name: zectrix-note4c
-
-esp32:
-  variant: esp32s3
-  framework:
-    type: esp-idf
-
-logger:
-
-api:
-  encryption:
-    key: "kYpeqIcUWnzUhvkcRgpbklrUZneObkNKjZDFWt2h4rE="
-
-ota:
-  - platform: esphome
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: zectrix-note4c Fallback Hotspot
-    password: "ubz2iJ2fBMLv"
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.70.33
 
-captive_portal:
+display:
+  - id: !extend display_eink
+    rotation: 270°
+
+# Check if person is home
+binary_sensor:
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_occupancy
+    id: presence_detected
+
+  # Home
+  - id: !extend button_ok
+    on_press:
+      - display.page.show: ${display.home_page}
+      - script.execute: update_screen
+  # Stick Press
+  - id: !extend button_down
+    on_press:
+      - display.page.show_previous: display_eink
+      - script.execute: update_screen
+  # Stick Down
+  - id: !extend button_up
+    on_press:
+      - display.page.show_next: display_eink
+      - script.execute: update_screen
+
+sensor:
+  # Call sensors from HA
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_measured
+    id: temperature_ute
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_foran
+    id: temperature_foran
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: temp_bak
+    id: temperature_bak
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+
+# Strings from Home Assistant
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_now
+    id: weather_condition_now
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
+  - platform: homeassistant
+    entity_id: sensor.waveshare_display_data
+    attribute: weather_condition_0
+    id: weather_condition_next
+    on_value:
+      then:
+        - lambda: 'id(data_updated) = true;'
