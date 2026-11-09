@@ -5,6 +5,7 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/zectrix_note4c.yaml
+  media_player: !include features/media_player.yaml
 
 substitutions:
   screen_width: "400"
