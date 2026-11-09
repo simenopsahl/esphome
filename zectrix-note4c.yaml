@@ -1,0 +1,29 @@
+# Board: Generic ESP32-S3 Board (Generic)
+# Definition: definitions/boards/generic-esp32s3/manifest.yaml
+
+esphome:
+  name: zectrix-note4c
+  friendly_name: zectrix-note4c
+
+esp32:
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+  encryption:
+    key: "kYpeqIcUWnzUhvkcRgpbklrUZneObkNKjZDFWt2h4rE="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: zectrix-note4c Fallback Hotspot
+    password: "ubz2iJ2fBMLv"
+
+captive_portal:
