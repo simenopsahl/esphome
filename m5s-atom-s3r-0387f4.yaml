@@ -26,7 +26,7 @@ packages:
 
 substitutions:
   common:
-#    log_level: WARN
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3r-0387f4
