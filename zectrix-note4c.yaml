@@ -337,3 +337,5 @@ text_sensor:
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
+
+status_led: !remove
