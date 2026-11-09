@@ -341,6 +341,7 @@ sensor:
     id: battery_voltage
     update_interval: 60s
     attenuation: 12db
+    accuracy_decimals: 2
     entity_category: diagnostic
     disabled_by_default: true
     filters:
@@ -352,7 +353,6 @@ sensor:
     name: "Battery"
     id: battery_level
     unit_of_measurement: "%"
-    icon: "mdi:battery"
     device_class: battery
     state_class: measurement
     entity_category: diagnostic

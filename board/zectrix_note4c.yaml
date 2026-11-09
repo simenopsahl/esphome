@@ -1,0 +1,479 @@
+labels: [esp32s3, ePaper, display]
+---
+# https://github.com/itopinion/zectrix-note4-epd-demo/blob/main/components/zectrix_board/include/zectrix_board_config.h
+# https://github.com/LazyYoun/youn-ink-fourcolor-firmware
+# https://wiki.zectrix.com/en/hardware/note4c/quick-start
+
+# https://github.com/fiedoruk/emini-home/blob/main/docs/HARDWARE.md
+# Base functions for:
+# Zectrix Note4C
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/zectrix_note4.yaml
+  i2c: !include extension/internal_i2c.yaml
+  epaper: !include ../features/epaper.yaml
+  audio: !include
+    file: module/audio/${feature.audio.hardware_module | default("zectrix_note4_audio.yaml")}
+    condition: ${feature_audio_enabled | default("false")}
+
+substitutions:
+  screen_width: "400"
+  screen_height: "300"
+  time_timezone: "Europe/Oslo"
+  home_page: page_content
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  device:
+    model: "Zectrix Note4C"
+    board: zectrix_note4c
+    rmt_symbols_block: 48
+    rtc: "true"
+    psram: "true"
+    framework:
+      type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
+  display:
+    home_page: page_info
+    font:
+      text_sm: 16
+      text_md: 18
+      text_lg: 20
+      text_xl: 24
+      text_xxl: 26
+      text_hg: 28
+      text_fl: 50
+      icons_sm: 28
+      icons_md: 32
+      icons_lg: 36
+      icons_xl: 42
+      icons_xxl: 48
+  feature:
+    audio:
+      hardware_module: zectrix_note4_audio.yaml
+      volume_initial: "0.8"
+
+esp32:
+# ESP32-S3 N16R8
+  variant: esp32s3
+  flash_size: 16MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+    type: ${device.framework.type}
+
+esphome:
+  project:
+    name: "Zectrix.Note4C"
+    version: "1.0.0"
+  on_boot:
+    - priority: 800
+      then:
+        # Release any pad hold on GPIO17 (managed by sw_pwr_latch) and latch AVDD_3V3 audio/I2C rail (GPIO42)
+        - lambda: |-
+            gpio_hold_dis(GPIO_NUM_17);
+            gpio_hold_dis(GPIO_NUM_42);
+            gpio_set_direction(GPIO_NUM_42, GPIO_MODE_OUTPUT);
+            gpio_set_level(GPIO_NUM_42, 1);
+            gpio_hold_en(GPIO_NUM_42);
+            gpio_deep_sleep_hold_en();
+    - priority: 600
+      then:
+        - delay: 200ms
+        - pcf8563.read_time:
+
+psram:
+  mode: octal
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+globals:
+  - id: !extend epaper_bg_color
+    initial_value: 'Color(255, 255, 255, 0)' # Default to white background
+  - id: !extend epaper_text_color
+    initial_value: 'Color(0, 0, 0, 0)' # Default to black text
+  - id: !extend epaper_accent1_color
+    initial_value: 'Color(255, 255, 0, 0)' # Default to yellow accent
+  - id: !extend epaper_accent2_color
+    initial_value: 'Color(255, 0, 0, 0)' # Default to red accent
+
+time:
+  - platform: pcf8563
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    address: 0x51
+    update_interval: never
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - pcf8563.write_time:
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+
+display:
+  # 400 x 300 resolution B/W + Red/Yellow
+  - platform: epaper_spi
+    id: display_eink
+    model: jd79660
+    cs_pin: ${pin.display.cs}
+    dc_pin: ${pin.display.dc}
+    reset_pin: ${pin.display.reset}
+    busy_pin:
+      number: ${pin.display.busy}
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    enable_pin: ${pin.display.pwr}
+    init_sequence:
+      - [0xE9, 0x01]
+      - [0x04]
+    dimensions:
+      width: ${screen_width}
+      height: ${screen_height}
+    full_update_every: 1
+    update_interval: never
+    pages:
+      - id: page_black
+        lambda: |-
+          // Fill background.
+          it.fill( id(color_black) );
+      - id: page_white
+        lambda: |-
+          // Fill background.
+          it.fill( id(color_white) );
+      - id: page_info # Copied from display_reterminal_e1001.yaml coordinates after // Page is not yet correct
+        lambda: |-
+          ESP_LOGI("display", "Page: Info");
+          // Fill background.
+          it.fill( id(epaper_bg_color) );
+          
+          // Show wifi icon.
+          if ( id(component_wifi).is_connected() ) {
+            it.print( it.get_width() , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_RIGHT, "\U000F05A9");
+          }
+          // Show HA icon.
+          if ( id(component_api).is_connected() ) {
+            it.print( it.get_width()-36 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_RIGHT, "\U000F07D0");
+          }
+          // PAGE
+          it.print( 0 , 0, id(mdi_md), id(epaper_text_color), "\U000F02FC");
+          it.print( 36, 3, id(font_md), id(epaper_text_color), "Enhet");
+          it.line( 10, 36, it.get_width()-10, 36, id(epaper_accent_color));
+
+          
+          // DEVICE
+          it.filled_rectangle(20, (it.get_height()/50)*6, 15, (it.get_height()/50)*15, id(epaper_accent_color));
+          it.line(20, (it.get_height()/50)*21, it.get_width()-20, (it.get_height()/50)*21, id(epaper_accent_color));
+          // NAME
+          it.printf(40, (it.get_height()/50)*7, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
+          it.printf(40, (it.get_height()/50)*11, id(font_sm), id(epaper_text_color), "GPIO0: OK");
+          it.printf(40, (it.get_height()/50)*14, id(font_sm), id(epaper_text_color), "GPIO39: Opp");
+          it.printf(40, (it.get_height()/50)*17, id(font_sm), id(epaper_text_color), "GPIO18: Ned (3s -> Power off)");
+          
+          // NETWORK
+          it.filled_rectangle(20, (it.get_height()/50)*22, 15, (it.get_height()/50)*14, id(epaper_accent1_color));
+          it.line(20, (it.get_height()/50)*36, it.get_width()-20, (it.get_height()/50)*36, id(epaper_accent1_color));
+          // SSID
+          it.printf( 40, (it.get_height()/50)*23, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
+          // IP
+          it.printf( 40, (it.get_height()/50)*27, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
+          // MAC
+          it.printf( 40, (it.get_height()/50)*31, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
+
+          // SENSORS
+          it.filled_rectangle(20, (it.get_height()/50)*37, 15, (it.get_height()/50)*10, id(epaper_accent2_color));
+          it.line(20, (it.get_height()/50)*47, it.get_width()-20, (it.get_height()/50)*47, id(epaper_accent2_color));
+          // PERCENT
+          it.print( 40, (it.get_height()/50)*38, id(font_md), id(epaper_text_color), "Batteriprosent: " );
+          if (id(battery_level).has_state()) {
+            it.printf( it.get_width()-70, (it.get_height()/50)*38, id(font_lg), id(epaper_text_color), "%.0f%%", id(battery_level).state);
+          } else {
+            it.print( it.get_width()-70, (it.get_height()/50)*38, id(font_lg), id(epaper_text_color), "--%");
+          }
+          // VOLTAGE
+          it.print( 40, (it.get_height()/50)*42, id(font_md), id(epaper_text_color), "Batterispenning: " );
+          if (id(battery_voltage).has_state()) {
+            it.printf( it.get_width()-70, (it.get_height()/50)*42, id(font_lg), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
+          } else {
+            it.print( it.get_width()-70, (it.get_height()/50)*42, id(font_lg), id(epaper_text_color), "--V");
+          }
+          
+          // Refresh Timestamp
+          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+          char str[17];
+          time_t currTime = id(time_homeassistant).now().timestamp;
+          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
+          it.printf( it.get_width()/2, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
+
+binary_sensor:
+  # Stick Up
+  - platform: gpio
+    id: button_up
+    pin:
+      number: ${pin.btn.up}
+      inverted: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Button Up
+    name: Button Up
+    entity_category: diagnostic
+    disabled_by_default: true
+  # Button Press
+  - platform: gpio
+    id: button_ok
+    pin:
+      number: ${pin.btn.ok}
+      inverted: true
+      ignore_strapping_warning: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Button OK
+    name: Button OK
+    entity_category: diagnostic
+    disabled_by_default: true
+  # Button Down (SW1 - also hardware power button)
+  - platform: gpio
+    id: button_down
+    pin:
+      number: ${pin.btn.down}
+      inverted: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      - logger.log: Button Down
+    on_multi_click:
+      - timing:
+          - ON for at least 3s
+        then:
+          - logger.log: "Button Down held for 3s - releasing battery power latch"
+          - switch.turn_off: sw_pwr_latch
+    name: Button Down
+    entity_category: diagnostic
+    disabled_by_default: true
+  # Battery Charging (CHRG_L, active-low)
+  - platform: gpio
+    id: bat_charging
+    pin:
+      number: ${pin.int.bat_charging}
+      inverted: true
+    filters:
+      - delayed_on_off: 100ms
+    name: "Battery Charging"
+    device_class: battery_charging
+    entity_category: diagnostic
+    disabled_by_default: true
+  # Battery Full (STDBY_H, active-high)
+  - platform: gpio
+    id: bat_full
+    pin:
+      number: ${pin.int.bat_full}
+      inverted: false
+    filters:
+      - delayed_on_off: 100ms
+    name: "Battery Full"
+    entity_category: diagnostic
+    disabled_by_default: true
+  # NFC Field Detection (NT3H1101/NT3H2111 NTAG I2C @ 0x55, FD pin active-low)
+  - platform: gpio
+    id: nfc_field
+    pin:
+      number: ${pin.nfc.irq}
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 20ms
+      - delayed_off: 200ms
+    on_press:
+      - logger.log: "NFC RF field detected"
+    name: "NFC Field"
+    icon: "mdi:nfc-tap"
+    entity_category: diagnostic
+    disabled_by_default: true
+
+switch:
+  # Keep device powered on battery
+  - platform: gpio
+    pin: ${pin.int.bat_latch}
+    id: sw_pwr_latch
+    name: "Power Latch"
+    icon: "mdi:power"
+    entity_category: config
+    disabled_by_default: true
+    restore_mode: ALWAYS_ON
+  # Power VCC for onboard NT3H1101/NT3H2111 NTAG I2C tag (0x55)
+  - platform: gpio
+    pin: ${pin.nfc.pwr}
+    id: sw_nfc_pwr
+    name: "NFC Tag Power"
+    icon: "mdi:nfc"
+    entity_category: config
+    disabled_by_default: true
+    restore_mode: ALWAYS_OFF
+
+sensor:
+  # Battery voltage
+  - platform: adc
+    pin: ${pin.int.bat_feedback}
+    id: battery_voltage
+    attenuation: 12db
+    update_interval: 10s
+    samples: 10
+    accuracy_decimals: 2
+    filters:
+      - multiply: 2.0
+      - median:
+          window_size: 7
+          send_every: 7
+          send_first_at: 7
+    name: "Battery Voltage"
+    entity_category: diagnostic
+    disabled_by_default: true
+    device_class: voltage
+    unit_of_measurement: V
+  # Battery Percent
+  - platform: template
+    name: "Battery"
+    id: battery_level
+    unit_of_measurement: "%"
+    device_class: battery
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    lambda: 'return id(battery_voltage).state;'
+    filters:
+      - calibrate_linear:
+          - 4.15 -> 100.0
+          - 3.96 -> 90.0
+          - 3.91 -> 80.0
+          - 3.85 -> 70.0
+          - 3.80 -> 60.0
+          - 3.75 -> 50.0
+          - 3.68 -> 40.0
+          - 3.58 -> 30.0
+          - 3.49 -> 20.0
+          - 3.41 -> 10.0
+          - 3.30 -> 5.0
+          - 3.27 -> 0.0
+      - clamp:
+          min_value: 0
+          max_value: 100
+
+  - id: !extend recorded_display_refresh_sensor
+    # Alternate epaper colors
+    on_value:
+      - then:
+          - lambda: |-
+              // This C++ logic updates the color globals
+              if (((int)x) % 5 == 0) {
+                // On refreshes 0, 5, 10, etc., set Black background, White text
+                id(epaper_bg_color) = Color(0,0,0,0);
+                id(epaper_text_color) = Color(255,255,255,255);
+                id(epaper_accent_color) = Color(255, 255, 0, 0);
+                id(epaper_accent1_color) = Color(255, 0, 0, 0);
+                id(epaper_accent2_color) = Color(255, 255, 0, 0);
+              } else {
+                // On all other refreshes, set White background, Black text
+                id(epaper_bg_color) = Color(255,255,255,255);
+                id(epaper_text_color) = Color(0,0,0,0);
+                id(epaper_accent_color) = Color(255, 0, 0, 0);
+                id(epaper_accent1_color) = Color(255, 255, 0, 0);
+                id(epaper_accent2_color) = Color(255, 0, 0, 0);
+              }
+
+status_led:
+  pin:
+    number: ${pin.light.led}
+    ignore_strapping_warning: true
+
+font:
+  - id: font_sm
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_sm}
+    bpp: 2
+    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', '!', '#', '$', '&', '(', ')',
+      '*', '+', '=', '<', '>', '[', ']', '\', '|', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+  - id: font_md
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_md}
+    bpp: 2
+    glyphs: *norwegian-glyphs
+  - id: font_lg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_lg}
+    bpp: 2
+    glyphs: *norwegian-glyphs
+  - id: font_xl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_xl}
+    bpp: 2
+    glyphs: *norwegian-glyphs
+  - id: font_xxl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${display.font.text_xxl}
+    bpp: 2
+    glyphs: *norwegian-glyphs
+  - id: font_hg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    size: ${display.font.text_hg}
+    bpp: 2
+    glyphs: *norwegian-glyphs
+
+  - id: mdi_sm
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_sm}
+    bpp: 2
+    glyphs: !include ../gui/fonts/glyphs.yaml
+  - id: mdi_md
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_md}
+    bpp: 2
+    glyphs: !include ../gui/fonts/glyphs.yaml
+  - id: mdi_lg
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_lg}
+    bpp: 2
+    glyphs: !include ../gui/fonts/glyphs.yaml
+  - id: mdi_xl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xl}
+    bpp: 2
+    glyphs: !include ../gui/fonts/glyphs.yaml
+  - id: mdi_xxl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${display.font.icons_xxl}
+    bpp: 2
+    glyphs: !include ../gui/fonts/glyphs.yaml

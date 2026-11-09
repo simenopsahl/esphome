@@ -71,6 +71,12 @@ globals:
     max_restore_data_length: 16
     initial_value: 'COLOR_ON' # Default to black text
   
+  - id: epaper_accent_color
+    type: Color
+    restore_value: yes
+    max_restore_data_length: 16
+    initial_value: 'Color(255, 0, 0, 0)' # Default to red (Alternates to yellow)
+  
   - id: epaper_accent1_color
     type: Color
     restore_value: yes
@@ -143,6 +149,7 @@ sensor:
                 // On refreshes 0, 5, 10, etc., set Black background, White text
                 id(epaper_bg_color) = COLOR_ON;
                 id(epaper_text_color) = COLOR_OFF;
+                id(epaper_accent_color) = Color(255, 255, 0, 0);
                 id(epaper_accent1_color) = Color(255, 0, 0, 0);
                 id(epaper_accent2_color) = Color(255, 255, 0, 0);
                 id(epaper_accent3_color) = Color(0, 255, 0, 0);
@@ -150,6 +157,7 @@ sensor:
                 // On all other refreshes, set White background, Black text
                 id(epaper_bg_color) = COLOR_OFF;
                 id(epaper_text_color) = COLOR_ON;
+                id(epaper_accent_color) = Color(255, 0, 0, 0);
                 id(epaper_accent1_color) = Color(0, 255, 0, 0);
                 id(epaper_accent2_color) = Color(0, 0, 255, 0);
                 id(epaper_accent3_color) = Color(255, 0, 0, 0);

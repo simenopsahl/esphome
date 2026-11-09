@@ -409,7 +409,6 @@ sensor:
     name: "Battery"
     id: battery_level
     unit_of_measurement: "%"
-    icon: "mdi:battery"
     device_class: battery
     state_class: measurement
     entity_category: diagnostic

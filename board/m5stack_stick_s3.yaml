@@ -169,12 +169,14 @@ sensor:
     name: "M5PM1 Battery Voltage"
     entity_category: diagnostic
     update_interval: 30s
+    disabled_by_default: true
     force_update: true
   - platform: m5pm1
     type: vin_voltage
     name: "M5PM1 VIN Voltage"
     entity_category: diagnostic
     update_interval: 30s
+    disabled_by_default: true
     force_update: true
   - platform: m5pm1
     type: temperature

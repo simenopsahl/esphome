@@ -1,0 +1,130 @@
+---
+# https://docs.m5stack.com/en/core/Tab5
+# PINs for m5stack Tab5
+
+substitutions:
+  pin:
+    btn:
+      power: GPIOxx
+      side: GPIOxx
+      front: GPIOxx
+
+    int:
+      i2c:
+        sda: GPIO31
+        scl: GPIO32
+      spi:
+        clk: GPIO43
+        mosi: GPIO44
+        miso: GPIO39
+        disp:
+          cs: GPIOxx
+          dc: GPIOxx
+          rst: GPIOxx
+          bl: GPIO22
+        card:
+          cs: GPIO42
+          cmd: GPIO44
+          d0: GPIO39
+          d1: GPIO40
+          d2: GPIO41
+          d3: GPIO42
+      c6_hosted:
+        rst: GPIO15
+        cmd: GPIO13
+        clk: GPIO12
+        d0: GPIO11
+        d1: GPIO10
+        d2: GPIO9
+        d3: GPIO8
+
+    touch:
+      int: GPIO23
+    
+    light:
+      disp_bl: GPIO22
+    
+    audio:
+      i2s_lrclk: GPIO29
+      i2s_bclk: GPIO27
+      i2s_mclk: GPIO30
+      i2s_din: GPIO26 # es8311 (0x10)
+      i2s_dout: GPIO28 # es7210 (0x40)
+      spk: GPIOxx
+      mic: GPIOxx
+
+    cam:
+      y0: nc
+      y1: nc
+      y2: GPIOxx
+      y3: GPIOxx
+      y4: GPIOxx
+      y5: GPIOxx
+      y6: GPIOxx
+      y7: GPIOxx
+      y8: GPIOxx
+      y9: GPIOxx
+      vs: GPIOxx
+      hs: GPIOxx
+      p_clk: GPIOxx
+      m_clk: GPIO36
+      pwr: GPIOxx
+    
+    ext:
+      rs485:
+        tx: GPIO20
+        rx: GPIO21
+        dir: GPIO34
+      extPort1:
+        p1: GND
+        p2: HVIN
+        p3: GND
+        p4: GND
+        p5: 5v
+        p6: 3v
+        p7: GPIO0
+        p8: GPIO1
+        p9: GPIO49
+        p10: GPIO50
+      i2c:
+        grove:
+          sda: GPIO53
+          scl: GPIO54
+        mbus:
+          sda: GPIO3
+          scl: GPIO4
+      uart:
+        grove:
+          tx: GPIO54
+          rx: GPIO53
+        mbus:
+          tx: GPIO37
+          rx: GPIO38
+      gpio:
+        grove:
+          in: GPIO54
+          out: GPIO53
+        mbus:
+          in: GPIO17
+          out: GPIO52
+      mbus:
+        p2: GPIO16
+        p4: GPIO17
+        p7: GPIO18
+        p8: GPIO45
+        p9: GPIO19
+        p10: GPIO52
+        p11: GPIO5
+        p13: GPIO38
+        p14: GPIO37
+        p15: GPIO7
+        p16: GPIO6
+        p17: GPIO31
+        p18: GPIO32
+        p19: GPIO3
+        p20: GPIO4
+        p21: GPIO2
+        p22: GPIO48
+        p23: GPIO47
+        p24: GPIO35
+        p26: GPIO51

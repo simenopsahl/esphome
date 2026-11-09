@@ -1,7 +1,9 @@
 ---
-# https://github.com/itopinion/zectrix-note4-epd-demo/blob/main/components/zectrix_board/include/zectrix_board_config.h-
+# https://github.com/itopinion/zectrix-note4-epd-demo/blob/main/components/zectrix_board/include/zectrix_board_config.h
+# https://github.com/LazyYoun/youn-ink-fourcolor-firmware
 # https://wiki.zectrix.com/en/hardware/note4c/quick-start
 # PINs for Zectrix Note4 ESP32S3
+# For both Note4(B/W) and Note4C(B/W + Red/Yellow)
 # Model:  ESP32-S3N16R8
 # Flash:  16MB
 # PSRAM:  8MB
@@ -21,9 +23,10 @@ substitutions:
         tx: GPIO43
         rx: GPIO44
       pwr_mos: GPIO17
-      bat_feedback: GPIO2
-      bat_full: GPIO1
+      bat_feedback: GPIO4
       bat_latch: GPIO17
+      bat_charging: GPIO2
+      bat_full: GPIO1
       rtc_wakeup: GPIO5
     btn:
       ok: GPIO0
@@ -49,8 +52,6 @@ substitutions:
       busy: GPIO8
       pwr: GPIO6
     nfc:
-      sda: GPIO4
-      scl: GPIO5
       irq: GPIO7
       pwr: GPIO21
     
