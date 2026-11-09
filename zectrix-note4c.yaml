@@ -36,7 +36,6 @@ substitutions:
       icons_xl: 42
       icons_xxl: 48
 
-
 esphome:
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
