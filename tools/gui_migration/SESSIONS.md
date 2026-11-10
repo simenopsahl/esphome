@@ -348,7 +348,7 @@ ESPHome 2025.11 introduced the native `container` widget. Unlike `obj`, `contain
 | :--- | :--- | :--- | :--- | :--- |
 | **Pre-Work** | `/llm-council` Architecture Review, Fleet Replacement Mapping & Roadmap in `EPAPER.md` | ✅ **Done** | 2026-11-10 | `waveshare-display-board` to be replaced by `e1002` or `e1003`; `waveshare-weather-station` to be replaced by `e1001`, `zectrix-note4c`, or `crowpanel-42`; `m5s-coreink` tested on `2df58c` (or bypassed if unfeasible). |
 | **Session E1** | `host-sdl` C++ Lambda Reference Snapshots (`epaper_baseline/`) | ✅ **Done** | 2026-11-10 | Captured all 17 baseline PNGs across 10 e-Paper devices (`waveshare-display-board`, `waveshare-weather-station`, `e1002`, `e1003`, `e1001`, `zectrix-note4c`, `crowpanel-42/579`, `m5s-air-quality`, `m5s-coreink`) using `capture_epaper_baseline.py` + `snapshot.take`. |
-| **Session E2** | `gui/epaper/` Foundation, 4 Color Themes, `top_layer` Overlays & Standard `page_info` | ⏳ **Next Up** | — | Build `gui/epaper/{base,styles,fonts,themes,chrome,pages/info}.yaml` with `100ms` redraw-to-flush delay and `top_layer` repair scrubber. |
+| **Session E2** | `gui/epaper/` Foundation, 4 Color Themes, `top_layer` Overlays & Standard `page_info` | ⏳ **Next Up** | — | Build `gui/epaper/{base,styles,fonts,themes,chrome,pages/info}.yaml` with on-demand `paused: true` + `on_draw_end: lvgl.pause` and `top_layer` repair scrubber. |
 | **Session E3** | Replacing `waveshare-display-board` $\rightarrow$ `seeed-trmnl-e1002` (Spectra 6) & `e1003` (1872×1404) | ⬜ Pending | — | Build 5 reusable Bento sections (`weather_forecast`, `folloren`, `nordpool_graph`, `bus_departures`, `car_status`) + `pages/image.yaml`. |
 | **Session E4** | Replacing `waveshare-weather-station` $\rightarrow$ `e1001`, `zectrix-note4c` & `crowpanel-42/579` | ⬜ Pending | — | Build `weather_header.yaml` & `rolling_graph.yaml` (`Ute`, `Foran`, `Bak` 12h LVGL line graphs); migrate all 4 S3 replacement candidates. |
 | **Session E5** | 200×200 Active Fleet (`m5s-air-quality-b62db0` & `m5s-coreink` Spike) | ⬜ Pending | — | Migrate S3 `m5s-air-quality` to LVGL; test non-PSRAM `m5s-coreink-2df58c` (`bpp: 1`, small buffer) and either migrate `9fc390`/`9fc2c8` or apply 2-line C++ repair page skip fix. |
@@ -409,8 +409,8 @@ Build the shared `gui/epaper/` infrastructure, 4 color palettes, 1-bit/grayscale
 ### Tasks
 
 - [ ] **E2.1** Create `gui/epaper/base.yaml`:
-  - Configure `lvgl:` (`update_interval: never` / manual redraw, configurable `buffer_size`).
-  - Implement `script.update_screen` (`mode: single`, `lvgl.widget.redraw`, `delay: 100ms`, `component.update: display_eink`, refresh counter increment & timestamp publish).
+  - Configure `lvgl:` (`id: lvgl_comp`, `paused: true`, `resume_on_input: false`, `on_draw_end: - lvgl.pause:`, configurable `buffer_size`).
+  - Implement `script.update_screen` (`mode: single`, `lvgl.resume:`, `wait_until: { lambda: 'return id(lvgl_comp).is_paused();', timeout: 2s }`, `component.update: display_eink`, refresh counter increment & timestamp publish).
   - Implement `lvgl: top_layer:` overlays:
     1. **Repair scrubber overlay** (`epaper_scrubber_overlay`, hidden by default; toggled black/white by `repair_script` so `page_black`/`page_white` are removed from navigable `pages:`).
     2. **Waiting-for-data overlay** (`epaper_boot_overlay` showing `"Venter på data..."`, hidden automatically when `initial_data_received` becomes `true`).

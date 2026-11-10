@@ -58,21 +58,44 @@ All 14 devices currently implement [`features/epaper.yaml`](file:///x:/esphome/f
 
 ---
 
-### 2.2 LVGL Asynchronous Redraw vs. `component.update: display_eink` Race Condition ⚠️
-- **Council Discovery**: In C++ `display:` lambdas, `component.update: display_eink` immediately executes the lambda and pushes pixels over SPI. In LVGL, calling `lvgl.label.update` or `lvgl.style.update` only marks widgets as *dirty*; LVGL does not render pixels into `display_eink`'s buffer until its next `lv_timer_handler()` tick. Calling `component.update: display_eink` in the same script tick flushes the **old** buffer (one cycle behind)!
-- **Solution**: In `gui/epaper/base.yaml`, `script.update_screen` must trigger `lvgl.widget.redraw`, wait `100ms` so LVGL's timer flushes all dirty strips to `display_eink`, and *then* call `component.update: display_eink`:
+### 2.2 On-Demand LVGL Execution (`paused: true` + `lvgl.resume` + `on_draw_end: lvgl.pause`) ✅
+- **The Challenge**:
+  1. In C++ `display:` lambdas, `component.update: display_eink` immediately executes the lambda and pushes pixels over SPI. In LVGL, calling `lvgl.label.update` or `lvgl.style.update` only marks widgets as *dirty* in RAM; LVGL does not render pixels into `display_eink`'s buffer until its `lv_timer_handler()` runs in `loop()`.
+  2. Furthermore, on e-Paper devices that only refresh every few minutes (or on button press), running `lv_timer_handler()` every `16ms` wastes CPU cycles and risks premature screen updates on boot before Home Assistant data is ready.
+- **Verified C++ Behavior ([`lvgl_esphome.cpp`](file:///C:/Users/simen/AppData/Local/Programs/Python/Python312/Lib/site-packages/esphome/components/lvgl/lvgl_esphome.cpp))**:
+  - When `paused: true` is set on `lvgl:`, `LvglComponent::loop()` returns immediately without calling `lv_timer_handler()` (0% idle CPU overhead, and no boot screen flush while sensors are `NaN`).
+  - While paused, all `lvgl.*.update` and `lvgl.page.show` actions **still update the widget tree in RAM**.
+  - Calling `lvgl.resume:` (`set_paused(false, false)`) re-enables `loop()` **and automatically calls `lv_obj_invalidate(lv_screen_active())`**.
+  - On the next `loop()` tick, `lv_timer_handler()` renders all dirty strips into `display_eink`'s internal RAM buffer via `flush_cb_` (`display->draw_pixels_at(...)`) and fires `LV_EVENT_REFR_READY` $\rightarrow$ `on_draw_end:` at the exact millisecond the final strip is written.
+- **Solution (Hybrid Event-Driven Pause + Synchronous `update_screen` Script)**:
+  Configure `lvgl:` in `gui/epaper/base.yaml` with `paused: true`, `resume_on_input: false`, and `on_draw_end: - lvgl.pause:`. Then in `script.update_screen`, call `lvgl.resume:`, wait until `on_draw_end` pauses LVGL again (`id(lvgl_comp).is_paused()`), and call `component.update: display_eink`:
   ```yaml
+  lvgl:
+    id: lvgl_comp
+    displays:
+      - display_eink
+    paused: true
+    resume_on_input: false
+    on_draw_end:
+      then:
+        - lvgl.pause:
+
   script:
     - id: update_screen
       mode: single
       then:
         - lambda: 'id(data_updated) = false;'
-        - lvgl.widget.redraw:
-        - delay: 100ms   # Allow LVGL timer to flush dirty strips into display_eink buffer
+        - lvgl.resume:
+        - wait_until:
+            lambda: 'return id(lvgl_comp).is_paused();'
+            timeout: 2s
         - component.update: display_eink
         - lambda: 'id(recorded_display_refresh) += 1;'
         - lambda: 'id(display_last_update).publish_state(id(time_homeassistant).now().timestamp);'
   ```
+  - **Zero wasted CPU** between refreshes (LVGL stays paused 99.99% of the time).
+  - **Deterministic render completion** without arbitrary fixed delays (whether rendering takes `4ms` on a `200×200` CoreInk or `120ms` on the `1872×1404` E1003).
+  - **`script.wait: update_screen`** continues to work seamlessly in `repair_script` and button handlers.
 
 ---
 
@@ -118,7 +141,8 @@ features/
   └── epaper.yaml                 # Legacy C++ lambda support (kept for unmigrated/retired devices)
 gui/
   └── epaper/
-        ├── base.yaml             # Core LVGL e-Paper engine: lvgl config, update_screen script (with 100ms flush delay),
+        ├── base.yaml             # Core LVGL e-Paper engine: lvgl (paused: true, on_draw_end: lvgl.pause),
+        │                         # update_screen script (lvgl.resume -> wait_until paused -> component.update: display_eink),
         │                         # top_layer black/white repair scrubber overlay, "Venter på data..." boot overlay
         ├── fonts/
         │     ├── bw.yaml         # Crisp 1-bpp (bpp: 1) Noto Sans + MDI fonts for 1-bit B/W panels
@@ -165,7 +189,7 @@ Detailed checklists and handover logs are tracked in [`SESSIONS.md`](file:///x:/
 | Session | Title | Target Devices & Deliverables | Scope / Complexity |
 | :--- | :--- | :--- | :--- |
 | **Session E1** | **`host-sdl` C++ Lambda Reference Snapshots** | Add C++ `display:` e-Paper preview harness to `host-sdl`; capture reference PNGs of `waveshare-display-board` (`480×800`), `waveshare-weather-station` (`300×400`), `seeed-trmnl-e1002` (`800×480` 6-color), `zectrix-note4c` (`300×400` 4-color), `elecrow-crowpanel-42` (`400×300`), `m5s-air-quality` (`200×200`), and `m5s-coreink` (`200×200`) in `tools/gui_migration/epaper_baseline/`. | Low–Medium (Tooling + Reference screenshots) |
-| **Session E2** | **`gui/epaper/` Foundation, Themes, Overlays & `page_info`** | Build `gui/epaper/base.yaml` (`update_screen` with `100ms` flush delay, `top_layer` black/white repair scrubber + `"Venter på data..."` boot overlay), `fonts/{bw,color_gray}.yaml`, `styles/main.yaml`, `themes/{bw,bwry4,spectra6,gray16}.yaml`, `chrome/*`, and `pages/info.yaml`. Validate `page_info` in `host-sdl` across all 4 color modes. | Medium (Core toolkit) |
+| **Session E2** | **`gui/epaper/` Foundation, Themes, Overlays & `page_info`** | Build `gui/epaper/base.yaml` (`paused: true`, `on_draw_end: lvgl.pause`, `update_screen` with `lvgl.resume` $\rightarrow$ `wait_until: is_paused()`, `top_layer` black/white repair scrubber + `"Venter på data..."` boot overlay), `fonts/{bw,color_gray}.yaml`, `styles/main.yaml`, `themes/{bw,bwry4,spectra6,gray16}.yaml`, `chrome/*`, and `pages/info.yaml`. Validate `page_info` in `host-sdl` across all 4 color modes. | Medium (Core toolkit) |
 | **Session E3** | **Replacing `waveshare-display-board` $\rightarrow$ `e1002` (Spectra 6) & `e1003` (1872×1404)** | Build the 5 Bento sections (`weather_forecast`, `folloren`, `nordpool_graph`, `bus_departures`, `car_status`) + `pages/image.yaml`. Migrate `seeed-trmnl-e1002-ec2478.yaml` (`800×480` 6-color) and `seeed-trmnl-e1003-190420.yaml` (`1872×1404` 16-gray) to full LVGL Daily Info dashboards. Compare screenshots against `waveshare-display-board` & `e1002` baselines. | Medium–High (5 Bento sections + 2 flagship replacements) |
 | **Session E4** | **Replacing `waveshare-weather-station` $\rightarrow$ `e1001`, `zectrix-note4c` & `crowpanel-42/579`** | Build `sections/weather_header.yaml` and `sections/rolling_graph.yaml` (`Ute`, `Foran`, `Bak` 12h LVGL line graphs). Migrate `seeed-trmnl-e1001-85a7d0.yaml`, `zectrix-note4c.yaml` (4-color), `elecrow-crowpanel-42-4dbf00.yaml`, and `elecrow-crowpanel-579-b89ddc.yaml` so you can compare and pick your favorite physical replacement! | Medium (Rolling graph widget + 4 PSRAM S3 devices) |
 | **Session E5** | **200×200 Active Fleet (`m5s-air-quality` & `m5s-coreink` Spike)** | Build `pages/temp_single.yaml`. Migrate `m5s-air-quality-b62db0.yaml` (ESP32-S3, `200×200`) to LVGL (`page_local`, AQ table `page_info`, `page_room` with `rolling_graph`). Run LVGL memory spike on spare `m5s-coreink-2df58c.yaml` (`ESP32-PICO-D4`, `buffer_size: 10%`, `bpp: 1`); if stable, apply to `9fc390` & `9fc2c8` (otherwise leave CoreInks on C++ lambdas with the `is_repairing` button-skip fix). | Low–Medium (200×200 fleet) |
