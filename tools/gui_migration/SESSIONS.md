@@ -347,8 +347,8 @@ ESPHome 2025.11 introduced the native `container` widget. Unlike `obj`, `contain
 | Session | Focus Area | Status | Completed Date | Key Notes / Blockers |
 | :--- | :--- | :--- | :--- | :--- |
 | **Pre-Work** | `/llm-council` Architecture Review, Fleet Replacement Mapping & Roadmap in `EPAPER.md` | ✅ **Done** | 2026-11-10 | `waveshare-display-board` to be replaced by `e1002` or `e1003`; `waveshare-weather-station` to be replaced by `e1001`, `zectrix-note4c`, or `crowpanel-42`; `m5s-coreink` tested on `2df58c` (or bypassed if unfeasible). |
-| **Session E1** | `host-sdl` C++ Lambda Reference Snapshots (`epaper_baseline/`) | ⏳ **Next Up** | — | Render existing C++ `display:` lambdas in `host-sdl` with simulated HA data and capture reference PNGs before migrating. |
-| **Session E2** | `gui/epaper/` Foundation, 4 Color Themes, `top_layer` Overlays & Standard `page_info` | ⬜ Pending | — | Build `gui/epaper/{base,styles,fonts,themes,chrome,pages/info}.yaml` with `100ms` redraw-to-flush delay and `top_layer` repair scrubber. |
+| **Session E1** | `host-sdl` C++ Lambda Reference Snapshots (`epaper_baseline/`) | ✅ **Done** | 2026-11-10 | Captured all 17 baseline PNGs across 10 e-Paper devices (`waveshare-display-board`, `waveshare-weather-station`, `e1002`, `e1003`, `e1001`, `zectrix-note4c`, `crowpanel-42/579`, `m5s-air-quality`, `m5s-coreink`) using `capture_epaper_baseline.py` + `snapshot.take`. |
+| **Session E2** | `gui/epaper/` Foundation, 4 Color Themes, `top_layer` Overlays & Standard `page_info` | ⏳ **Next Up** | — | Build `gui/epaper/{base,styles,fonts,themes,chrome,pages/info}.yaml` with `100ms` redraw-to-flush delay and `top_layer` repair scrubber. |
 | **Session E3** | Replacing `waveshare-display-board` $\rightarrow$ `seeed-trmnl-e1002` (Spectra 6) & `e1003` (1872×1404) | ⬜ Pending | — | Build 5 reusable Bento sections (`weather_forecast`, `folloren`, `nordpool_graph`, `bus_departures`, `car_status`) + `pages/image.yaml`. |
 | **Session E4** | Replacing `waveshare-weather-station` $\rightarrow$ `e1001`, `zectrix-note4c` & `crowpanel-42/579` | ⬜ Pending | — | Build `weather_header.yaml` & `rolling_graph.yaml` (`Ute`, `Foran`, `Bak` 12h LVGL line graphs); migrate all 4 S3 replacement candidates. |
 | **Session E5** | 200×200 Active Fleet (`m5s-air-quality-b62db0` & `m5s-coreink` Spike) | ⬜ Pending | — | Migrate S3 `m5s-air-quality` to LVGL; test non-PSRAM `m5s-coreink-2df58c` (`bpp: 1`, small buffer) and either migrate `9fc390`/`9fc2c8` or apply 2-line C++ repair page skip fix. |
@@ -364,16 +364,39 @@ Capture pixel-accurate reference screenshots of all existing C++ `display: pages
 
 ### Tasks
 
-- [ ] **E1.1** Create a virtual e-Paper C++ lambda preview harness (or extend `tools/host_sdl/`) that renders existing `display:` page lambdas onto `display_sdl` + `display_snapshot` with populated sensor values (`initial_data_received = true`).
-- [ ] **E1.2** Capture reference PNGs in `tools/gui_migration/epaper_baseline/` for:
-  - `waveshare-display-board` (`480×800` B/W Daily Info)
-  - `waveshare-weather-station` (`300×400` B/W Weather + 3× Graphs)
-  - `seeed-trmnl-e1002-ec2478` (`800×480` Spectra 6-color `page_info` & `page_content`)
+- [x] **E1.1** Create a virtual e-Paper C++ lambda preview harness ([`tools/gui_migration/capture_epaper_baseline.py`](file:///x:/esphome/tools/gui_migration/capture_epaper_baseline.py)) that renders existing `display:` page lambdas onto `display_sdl` (`headless: true`) + `snapshot.take` with populated live HA sensor values (`initial_data_received = true`).
+- [x] **E1.2** Capture reference PNGs in [`tools/gui_migration/epaper_baseline/`](file:///x:/esphome/tools/gui_migration/epaper_baseline) for:
+  - `waveshare-display-board` (`480×800` B/W Daily Info `page_content`)
+  - `waveshare-weather-station` (`300×400` B/W Weather + 3× Graphs `page_content`)
+  - `seeed-trmnl-e1002-ec2478` (`800×480` Spectra 6-color `page_info`, `page_content`, `page_image`)
+  - `seeed-trmnl-e1003-190420` (`1872×1404` 16-grayscale `page_info`)
+  - `seeed-trmnl-e1001-85a7d0` (`800×480` B/W `page_info`)
   - `zectrix-note4c` (`300×400` 4-color BWRY `page_info`)
   - `elecrow-crowpanel-42-4dbf00` (`400×300` B/W `page_info`)
+  - `elecrow-crowpanel-579-b89ddc` (`792×272` B/W `page_info`)
   - `m5s-air-quality-b62db0` (`200×200` B/W `page_local`, `page_info`, `page_room`)
   - `m5s-coreink-9fc390` (`200×200` B/W `page_local`, `page_info`, `page_room`, `page_out`)
-- [ ] **E1.3** Record Session E1 completion report.
+- [x] **E1.3** Record Session E1 completion report.
+
+### Session E1 Completion Report
+
+- **Date**: 2026-11-10
+- **Summary of Changes**:
+  - Created [`tools/gui_migration/capture_epaper_baseline.py`](file:///x:/esphome/tools/gui_migration/capture_epaper_baseline.py), an automated `host-sdl` C++ lambda baseline snapshot runner that:
+    - Extracts `font:`, `image:`, `graph:`, `color:`, `sensor:`, `text_sensor:`, `binary_sensor:`, and `display: pages: lambda:` directly from each e-Paper device YAML and its board/module packages.
+    - Connects as the paired `host-sdl` node (`mac_address: "02:5D:1A:00:00:01"`) while pre-seeding live Home Assistant attributes from `sensor.waveshare_display_data`, `sensor.waveshare_nordpool_future_offset`, outdoor/indoor heatindex sensors, and local hardware diagnostics (`battery_level`, `battery_voltage`, `temperature_sht40`, `humidity_sht40`, `sensor_ssid`, `sensor_ip_address`, `sensor_mac_address`, `sd_card_detect`), plus full-width historical `graph:` trace points (`trace_nordpool`, `trace_temperature_ute`, `trace_temperature_foran`, `trace_temperature_bak`, `trace_temperature_room`).
+    - Renders at exact post-rotation logical dimensions (including `1872×1404` via SDL `headless: true` offscreen surface) with `bpp: 1` fonts and white-paper / black-ink polarity, captures `.bmp` snapshots via ESPHome's native `snapshot.take` action, and converts them to `.png`.
+  - Captured and visually inspected all **17 reference PNGs** across **10 e-Paper configurations** under [`tools/gui_migration/epaper_baseline/`](file:///x:/esphome/tools/gui_migration/epaper_baseline):
+    - [`epaper_baseline/waveshare-display-board/page_content.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/waveshare-display-board/page_content.png) (`480×800`)
+    - [`epaper_baseline/waveshare-weather-station/page_content.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/waveshare-weather-station/page_content.png) (`300×400`)
+    - [`epaper_baseline/seeed-trmnl-e1002-ec2478/page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/seeed-trmnl-e1002-ec2478/page_info.png), [`page_content.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/seeed-trmnl-e1002-ec2478/page_content.png), [`page_image.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/seeed-trmnl-e1002-ec2478/page_image.png) (`800×480` Spectra 6-color)
+    - [`epaper_baseline/seeed-trmnl-e1003-190420/page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/seeed-trmnl-e1003-190420/page_info.png) (`1872×1404` 16-gray)
+    - [`epaper_baseline/seeed-trmnl-e1001-85a7d0/page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/seeed-trmnl-e1001-85a7d0/page_info.png) (`800×480` B/W)
+    - [`epaper_baseline/zectrix-note4c/page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/zectrix-note4c/page_info.png) (`300×400` 4-color BWRY)
+    - [`epaper_baseline/elecrow-crowpanel-42-4dbf00/page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/elecrow-crowpanel-42-4dbf00/page_info.png) (`400×300` B/W)
+    - [`epaper_baseline/elecrow-crowpanel-579-b89ddc/page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/elecrow-crowpanel-579-b89ddc/page_info.png) (`792×272` B/W)
+    - [`epaper_baseline/m5s-air-quality-b62db0/page_local.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-air-quality-b62db0/page_local.png), [`page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-air-quality-b62db0/page_info.png), [`page_room.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-air-quality-b62db0/page_room.png) (`200×200` B/W)
+    - [`epaper_baseline/m5s-coreink-9fc390/page_local.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-coreink-9fc390/page_local.png), [`page_info.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-coreink-9fc390/page_info.png), [`page_room.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-coreink-9fc390/page_room.png), [`page_out.png`](file:///x:/esphome/tools/gui_migration/epaper_baseline/m5s-coreink-9fc390/page_out.png) (`200×200` B/W)
 
 ---
 
@@ -430,7 +453,7 @@ Build the reusable `rolling_graph.yaml` and `weather_header.yaml` sections and i
 - [ ] **E4.1** Create `gui/epaper/sections/weather_header.yaml` (single icon when `now == next`, or `now -> next` dual icons when changing) and `gui/epaper/sections/rolling_graph.yaml` (maintaining rolling 12h sensor samples in an auto-scaled LVGL `line` widget + large temperature readout).
 - [ ] **E4.2** Migrate [`zectrix-note4c.yaml`](file:///x:/esphome/zectrix-note4c.yaml) (`300×400` portrait 4-color BWRY) to `gui/epaper/` with `page_info` and `page_content` (Weather Station layout).
 - [ ] **E4.3** Migrate [`elecrow-crowpanel-42-4dbf00.yaml`](file:///x:/esphome/elecrow-crowpanel-42-4dbf00.yaml) (`400×300` / `300×400` B/W) and [`elecrow-crowpanel-579-b89ddc.yaml`](file:///x:/esphome/elecrow-crowpanel-579-b89ddc.yaml) (`792×272` B/W) to `gui/epaper/`.
-- [ ] **E4.4** Migrate [`seeed-trmnl-e1001-85a77d0.yaml`](file:///x:/esphome/seeed-trmnl-e1001-85a77d0.yaml) (`800×480` B/W) to `gui/epaper/` (`page_info`, `page_image`, and Weather Station / Daily Info `page_content`).
+- [ ] **E4.4** Migrate [`seeed-trmnl-e1001-85a7d0.yaml`](file:///x:/esphome/seeed-trmnl-e1001-85a7d0.yaml) (`800×480` B/W) to `gui/epaper/` (`page_info`, `page_image`, and Weather Station / Daily Info `page_content`).
 - [ ] **E4.5** Validate all 4 devices with `esphome config` and capture `host-sdl` comparison screenshots so the user can choose which device replaces `waveshare-weather-station`.
 
 ---
