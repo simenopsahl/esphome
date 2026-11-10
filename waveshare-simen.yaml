@@ -24,13 +24,12 @@ substitutions:
 #    components: [ waveshare_epaper ]
 
 esphome:
-  comment: "E-Ink Simen Display"
+  comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
 
 wifi:
-#  use_address: 192.168.69.78
   use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
