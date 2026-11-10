@@ -228,6 +228,7 @@ sensor:
     swipe_event:
       name: "Touch Swipe Event"
       entity_category: diagnostic
+      disabled_by_default: true
       on_value:
         then:
           - lambda: |-
@@ -259,9 +260,9 @@ sensor:
                 float b = num->state;
                 if (std::isnan(b)) b = night ? 0.3f : 0.8f;
                 if (ev == 3) {
-                  b = std::min(1.0f, b + 0.05f);
+                  b = std::min(num->traits.get_max_value(), b + 0.05f);
                 } else {
-                  b = std::max(0.2f, b - 0.05f);
+                  b = std::max(num->traits.get_min_value(), b - 0.05f);
                 }
 
                 auto call = num->make_call();
@@ -320,7 +321,12 @@ number:
     step: 0.05
     initial_value: 0.8
     mode: slider
-    on_value: *repaint_if_ready
+    on_value: &preview_brightness_if_ready
+      - if:
+          condition:
+            lambda: 'return !id(init_in_progress);'
+          then:
+            - script.execute: control_leds_brightness_changed
 
   # LED brightness while Night mode is on.
   - platform: template
@@ -335,7 +341,7 @@ number:
     step: 0.05
     initial_value: 0.3
     mode: slider
-    on_value: *repaint_if_ready
+    on_value: *preview_brightness_if_ready
 
   - platform: template
     id: mic_gain_db
@@ -433,39 +439,88 @@ output:
     color: blue
 
 light:
-# RGB LED lights not exposed for control directly, used internally for the combined addressable light entity
-# After testing (which light is on what side) it's possible to use them as feedback for touches
+  # RGB LED lights not exposed for control directly, used internally for the combined addressable light entity
+  # 0-6 Bottom Left
   - platform: rgb
-    # 0-6 Bottom Right?
     id: light_strip1_group1
     internal: true
+    entity_category: config
     red: rgb1_ch0_red
     green: rgb1_ch0_green
     blue: rgb1_ch0_blue
-
+  # 7-13 Top Left
   - platform: rgb
-    # 7-13 Top Right?
     id: light_strip1_group2
     internal: true
+    entity_category: config
     red: rgb1_ch1_red
     green: rgb1_ch1_green
     blue: rgb1_ch1_blue
-
+  # 0-6 Top Right
   - platform: rgb
-    # 0-6 Bottom Left?
     id: light_strip2_group1
     internal: true
+    entity_category: config
     red: rgb2_ch2_red
     green: rgb2_ch2_green
     blue: rgb2_ch2_blue
-
+  # 7-13 Bottom Right
   - platform: rgb
-    # 7-13 Top Left?
     id: light_strip2_group2
     internal: true
+    entity_category: config
     red: rgb2_ch3_red
     green: rgb2_ch3_green
     blue: rgb2_ch3_blue
+
+  # Left two LED groups
+  - platform: partition
+    id: rgb_led_left
+    internal: true
+    entity_category: config
+    default_transition_length: 150ms
+    segments:
+      - single_light_id: light_strip1_group1
+      - single_light_id: light_strip1_group2
+    effects:
+      - pulse:
+          name: "Pulse Fast"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 300ms
+          update_interval: 600ms
+  # Right two LED groups
+  - platform: partition
+    id: rgb_led_right
+    internal: true
+    entity_category: config
+    default_transition_length: 150ms
+    segments:
+      - single_light_id: light_strip2_group1
+      - single_light_id: light_strip2_group2
+    effects:
+      - pulse:
+          name: "Pulse Fast"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 300ms
+          update_interval: 600ms
+  # Top two LED groups
+  - platform: partition
+    id: rgb_led_top
+    internal: true
+    entity_category: config
+    segments:
+      - single_light_id: light_strip1_group2
+      - single_light_id: light_strip2_group1
+  # Bottom two LED groups
+  - platform: partition
+    id: rgb_led_bottom
+    internal: true
+    entity_category: config
+    segments:
+      - single_light_id: light_strip1_group1
+      - single_light_id: light_strip2_group2
 
   # Combined RGB LEDs into one addressable light entity
   - platform: partition
@@ -726,12 +781,18 @@ script:
 
           set("off", 0, 0, 0);                       // idle
 
-  # A short green pulse on a volume change, then back to the state machine.
+  # A short green pulse on the left side on a volume change, then back to the state machine.
   - id: control_leds_volume_changed
     mode: restart
     then:
-      - light.turn_on:
+      - light.turn_off:
           id: pyramid_rgb_led
+          transition_length: 0s
+      - light.turn_off:
+          id: rgb_led_right
+          transition_length: 0s
+      - light.turn_on:
+          id: rgb_led_left
           brightness: !lambda 'return id(pyramid_led_brightness).state;'
           red: 0.0
           # Pulse Fast sets its own brightness, so Night mode dims the colour.
@@ -739,4 +800,30 @@ script:
           blue: 0.0
           effect: "Pulse Fast"
       - delay: 1.2s
+      - light.turn_off:
+          id: rgb_led_left
+          transition_length: 0s
+      - script.execute: control_leds
+
+  # Preview brightness on the right side LEDs on a brightness change, then back to the state machine.
+  - id: control_leds_brightness_changed
+    mode: restart
+    then:
+      - light.turn_off:
+          id: pyramid_rgb_led
+          transition_length: 0s
+      - light.turn_off:
+          id: rgb_led_left
+          transition_length: 0s
+      - light.turn_on:
+          id: rgb_led_right
+          brightness: !lambda 'return id(night_mode).state ? id(night_led_brightness).state : id(pyramid_led_brightness).state;'
+          red: 1.0
+          green: 1.0
+          blue: 1.0
+          effect: "None"
+      - delay: 1.2s
+      - light.turn_off:
+          id: rgb_led_right
+          transition_length: 0s
       - script.execute: control_leds

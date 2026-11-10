@@ -87,6 +87,9 @@ sensor:
       state_class: "measurement"
       accuracy_decimals: 1
       filters:
+        - clamp:
+            max_value: 3500
+            ignore_out_of_range: true
         - sliding_window_moving_average:
             window_size: 10
             send_every: 10
@@ -96,6 +99,9 @@ sensor:
       device_class: "volatile_organic_compounds_parts"
       accuracy_decimals: 2
       filters:
+        - clamp:
+            max_value: 750
+            ignore_out_of_range: true
         - sliding_window_moving_average:
             window_size: 10
             send_every: 10
@@ -104,6 +110,7 @@ sensor:
       # Gas resistance in Ω
       name: "Gas resistance"
       entity_category: diagnostic
+      disabled_by_default: true
       filters:
         - sliding_window_moving_average:
             window_size: 10

@@ -336,3 +336,131 @@ ESPHome 2025.11 introduced the native `container` widget. Unlike `obj`, `contain
 | **Session 7** | Control Page, `gui/main.yaml` & Stubs | ✅ Done | Unified narrow-screen (`<180px`) support into single `page.yaml` files, created [`gui/main.yaml`](file:///x:/esphome/gui/main.yaml), and reduced all 10 `gui/<W>x<H>.yaml` files to 10–15 line compatibility stubs. |
 | **Session 8** | `obj` $\rightarrow$ `container` & Card Theme | ✅ Done | Migrated all invisible layout groupings to `container`, added `text_color: c_text_p` to `label:`, and restyled `obj:` in [`gui/themes/main.yaml`](file:///x:/esphome/gui/themes/main.yaml) as styled card/panel surfaces. |
 
+---
+
+# Phase 2: `epaper` Display Lambda $\rightarrow$ LVGL Migration (Sessions E1–E6)
+
+> **Architecture & Council Verdict**: See [`EPAPER.md`](file:///x:/esphome/tools/gui_migration/EPAPER.md), [`council-report-epaper.html`](file:///x:/esphome/tools/gui_migration/council-report-epaper.html), and [`council-transcript-epaper.md`](file:///x:/esphome/tools/gui_migration/council-transcript-epaper.md).
+
+## 📊 E-Paper Session Status Table
+
+| Session | Focus Area | Status | Completed Date | Key Notes / Blockers |
+| :--- | :--- | :--- | :--- | :--- |
+| **Pre-Work** | `/llm-council` Architecture Review, Fleet Replacement Mapping & Roadmap in `EPAPER.md` | ✅ **Done** | 2026-11-10 | `waveshare-display-board` to be replaced by `e1002` or `e1003`; `waveshare-weather-station` to be replaced by `e1001`, `zectrix-note4c`, or `crowpanel-42`; `m5s-coreink` tested on `2df58c` (or bypassed if unfeasible). |
+| **Session E1** | `host-sdl` C++ Lambda Reference Snapshots (`epaper_baseline/`) | ⏳ **Next Up** | — | Render existing C++ `display:` lambdas in `host-sdl` with simulated HA data and capture reference PNGs before migrating. |
+| **Session E2** | `gui/epaper/` Foundation, 4 Color Themes, `top_layer` Overlays & Standard `page_info` | ⬜ Pending | — | Build `gui/epaper/{base,styles,fonts,themes,chrome,pages/info}.yaml` with `100ms` redraw-to-flush delay and `top_layer` repair scrubber. |
+| **Session E3** | Replacing `waveshare-display-board` $\rightarrow$ `seeed-trmnl-e1002` (Spectra 6) & `e1003` (1872×1404) | ⬜ Pending | — | Build 5 reusable Bento sections (`weather_forecast`, `folloren`, `nordpool_graph`, `bus_departures`, `car_status`) + `pages/image.yaml`. |
+| **Session E4** | Replacing `waveshare-weather-station` $\rightarrow$ `e1001`, `zectrix-note4c` & `crowpanel-42/579` | ⬜ Pending | — | Build `weather_header.yaml` & `rolling_graph.yaml` (`Ute`, `Foran`, `Bak` 12h LVGL line graphs); migrate all 4 S3 replacement candidates. |
+| **Session E5** | 200×200 Active Fleet (`m5s-air-quality-b62db0` & `m5s-coreink` Spike) | ⬜ Pending | — | Migrate S3 `m5s-air-quality` to LVGL; test non-PSRAM `m5s-coreink-2df58c` (`bpp: 1`, small buffer) and either migrate `9fc390`/`9fc2c8` or apply 2-line C++ repair page skip fix. |
+| **Session E6** | Physical Hardware Verification, Legacy Retirement & Docs Handover | ⬜ Pending | — | Flash and verify chosen replacements, retire legacy `waveshare-*` configs, and update `gui/ARCHITECTURE.md` & `AGENTS.md`. |
+
+---
+
+## Session E1 — `host-sdl` C++ Lambda Reference Snapshots
+
+### Goal
+
+Capture pixel-accurate reference screenshots of all existing C++ `display: pages: lambda:` layouts using `host-sdl` and simulated sensor data (`waveshare_display_data`, `nordpool`, local temperatures) so we have a "Before" visual baseline in `tools/gui_migration/epaper_baseline/`.
+
+### Tasks
+
+- [ ] **E1.1** Create a virtual e-Paper C++ lambda preview harness (or extend `tools/host_sdl/`) that renders existing `display:` page lambdas onto `display_sdl` + `display_snapshot` with populated sensor values (`initial_data_received = true`).
+- [ ] **E1.2** Capture reference PNGs in `tools/gui_migration/epaper_baseline/` for:
+  - `waveshare-display-board` (`480×800` B/W Daily Info)
+  - `waveshare-weather-station` (`300×400` B/W Weather + 3× Graphs)
+  - `seeed-trmnl-e1002-ec2478` (`800×480` Spectra 6-color `page_info` & `page_content`)
+  - `zectrix-note4c` (`300×400` 4-color BWRY `page_info`)
+  - `elecrow-crowpanel-42-4dbf00` (`400×300` B/W `page_info`)
+  - `m5s-air-quality-b62db0` (`200×200` B/W `page_local`, `page_info`, `page_room`)
+  - `m5s-coreink-9fc390` (`200×200` B/W `page_local`, `page_info`, `page_room`, `page_out`)
+- [ ] **E1.3** Record Session E1 completion report.
+
+---
+
+## Session E2 — `gui/epaper/` Foundation, Themes, Overlays & `page_info`
+
+### Goal
+
+Build the shared `gui/epaper/` infrastructure, 4 color palettes, 1-bit/grayscale font sets, `top_layer` black/white repair scrubber + `"Venter på data..."` boot overlay, bezel nav-hint chrome bars, and the standard responsive `page_info`.
+
+### Tasks
+
+- [ ] **E2.1** Create `gui/epaper/base.yaml`:
+  - Configure `lvgl:` (`update_interval: never` / manual redraw, configurable `buffer_size`).
+  - Implement `script.update_screen` (`mode: single`, `lvgl.widget.redraw`, `delay: 100ms`, `component.update: display_eink`, refresh counter increment & timestamp publish).
+  - Implement `lvgl: top_layer:` overlays:
+    1. **Repair scrubber overlay** (`epaper_scrubber_overlay`, hidden by default; toggled black/white by `repair_script` so `page_black`/`page_white` are removed from navigable `pages:`).
+    2. **Waiting-for-data overlay** (`epaper_boot_overlay` showing `"Venter på data..."`, hidden automatically when `initial_data_received` becomes `true`).
+- [ ] **E2.2** Update [`gui/fonts/glyphs.yaml`](file:///x:/esphome/gui/fonts/glyphs.yaml) with any missing e-Paper nav/status MDI glyphs (`refresh` `\U000F0450`, `arrow-right-thick` `\U000F0055`, `arrow-left-thick` `\U000F004E`, `exit-to-app` `\U000F0206`) so all `image: file: mdi:*` blocks (`it.image`) across `crowpanel`, `coreink`, and `air-quality` are replaced by font glyphs. Create `gui/epaper/fonts/bw.yaml` (`bpp: 1` for crisp 1-bit monochrome text + `!include ../../fonts/glyphs.yaml`) and `gui/epaper/fonts/color_gray.yaml` (`bpp: 2` / `bpp: 4`).
+- [ ] **E2.3** Create `gui/epaper/styles/main.yaml` and `gui/epaper/themes/{bw,bwry4,spectra6,gray16}.yaml` with optional 5th-refresh `lvgl.style.update` color inversion (`epaper_invert_every_5th`).
+- [ ] **E2.4** Create `gui/epaper/chrome/{status_bar,nav_coreink,nav_reterminal,nav_crowpanel,nav_zectrix}.yaml` and `gui/epaper/pages/info.yaml`.
+- [ ] **E2.5** Verify `pages/info.yaml` in `host-sdl` across `400×300` (B/W & 4-color), `800×480` (B/W & Spectra 6), and `1872×1404` (16-gray).
+
+---
+
+## Session E3 — Replacing `waveshare-display-board` (`e1002` Spectra 6 & `e1003` 1872×1404)
+
+### Goal
+
+Build the 5 composable "Daily Info" Bento sections under `gui/epaper/sections/` and migrate `seeed-trmnl-e1002-ec2478.yaml` (`800×480` 6-color) and `seeed-trmnl-e1003-190420.yaml` (`1872×1404` 16-gray) to full LVGL dashboards ready to replace `waveshare-display-board`.
+
+### Tasks
+
+- [ ] **E3.1** Create reusable Bento section packages in `gui/epaper/sections/`:
+  - `weather_forecast.yaml` (Current weather icon + `Målt` / `Meldt` temperatures + 4/5-slot forecast row)
+  - `folloren.yaml` (FolloRen waste pickup next/restavfall/papir)
+  - `nordpool_graph.yaml` (LVGL `line` graph with runtime container measurement + `price_0`/`price_4`/`price_8` & `time_0`/`time_4`/`time_8`)
+  - `bus_departures.yaml` (Bregnefaret 510 Drøbak departure rows)
+  - `car_status.yaml` (EV battery `%` and range `km`)
+- [ ] **E3.2** Create `gui/epaper/pages/image.yaml` for the random/cycled full-screen image page (`i_selma_1..3`).
+- [ ] **E3.3** Migrate [`seeed-trmnl-e1002-ec2478.yaml`](file:///x:/esphome/seeed-trmnl-e1002-ec2478.yaml) and [` board/module/display_reterminal_e1002.yaml`](file:///x:/esphome/board/module/display_reterminal_e1002.yaml) to `gui/epaper/` (`page_info`, `page_image`, `page_content`).
+- [ ] **E3.4** Migrate [`seeed-trmnl-e1003-190420.yaml`](file:///x:/esphome/seeed-trmnl-e1003-190420.yaml) and [`board/module/display_reterminal_e1003.yaml`](file:///x:/esphome/board/module/display_reterminal_e1003.yaml) to `gui/epaper/` (`page_info`, `page_image`, `page_content`).
+- [ ] **E3.5** Validate both with `esphome config` and compare `host-sdl` screenshots against the Session E1 baseline.
+
+---
+
+## Session E4 — Replacing `waveshare-weather-station` (`e1001`, `zectrix-note4c` & `crowpanel-42/579`)
+
+### Goal
+
+Build the reusable `rolling_graph.yaml` and `weather_header.yaml` sections and implement the Weather Station layout (`Ute`, `Foran`, `Bak` temperature history graphs + weather condition header) across `seeed-trmnl-e1001`, `zectrix-note4c`, and `elecrow-crowpanel-42` (plus `crowpanel-579`).
+
+### Tasks
+
+- [ ] **E4.1** Create `gui/epaper/sections/weather_header.yaml` (single icon when `now == next`, or `now -> next` dual icons when changing) and `gui/epaper/sections/rolling_graph.yaml` (maintaining rolling 12h sensor samples in an auto-scaled LVGL `line` widget + large temperature readout).
+- [ ] **E4.2** Migrate [`zectrix-note4c.yaml`](file:///x:/esphome/zectrix-note4c.yaml) (`300×400` portrait 4-color BWRY) to `gui/epaper/` with `page_info` and `page_content` (Weather Station layout).
+- [ ] **E4.3** Migrate [`elecrow-crowpanel-42-4dbf00.yaml`](file:///x:/esphome/elecrow-crowpanel-42-4dbf00.yaml) (`400×300` / `300×400` B/W) and [`elecrow-crowpanel-579-b89ddc.yaml`](file:///x:/esphome/elecrow-crowpanel-579-b89ddc.yaml) (`792×272` B/W) to `gui/epaper/`.
+- [ ] **E4.4** Migrate [`seeed-trmnl-e1001-85a77d0.yaml`](file:///x:/esphome/seeed-trmnl-e1001-85a77d0.yaml) (`800×480` B/W) to `gui/epaper/` (`page_info`, `page_image`, and Weather Station / Daily Info `page_content`).
+- [ ] **E4.5** Validate all 4 devices with `esphome config` and capture `host-sdl` comparison screenshots so the user can choose which device replaces `waveshare-weather-station`.
+
+---
+
+## Session E5 — 200×200 Active Fleet (`m5s-air-quality` & `m5s-coreink` Spike)
+
+### Goal
+
+Migrate `m5s-air-quality-b62db0.yaml` (ESP32-S3, `200×200`) to LVGL, and run a real-hardware heap/flush spike on the spare `m5s-coreink-2df58c.yaml` (`ESP32-PICO-D4`, no PSRAM) to decide whether to migrate `m5s-coreink-9fc390` and `9fc2c8` to LVGL or keep them on C++ lambdas.
+
+### Tasks
+
+- [ ] **E5.1** Create `gui/epaper/pages/temp_single.yaml` (reusable `200×200` large temperature readout page with optional top `rolling_graph` strip).
+- [ ] **E5.2** Migrate [`m5s-air-quality-b62db0.yaml`](file:///x:/esphome/m5s-air-quality-b62db0.yaml) (`page_local`, SEN55/SCD40 AQ table `page_info`, `page_room` with `rolling_graph`) to `gui/epaper/` and verify in `host-sdl`.
+- [ ] **E5.3** Test [`m5s-coreink-2df58c.yaml`](file:///x:/esphome/m5s-coreink-2df58c.yaml) with `gui/epaper/` (`buffer_size: 10%`, `bpp: 1` fonts).
+  - If compilation and free heap on ESP32-PICO-D4 are healthy, migrate `m5s-coreink-9fc390.yaml` and `m5s-coreink-9fc2c8.yaml`.
+  - If heap is too tight, keep the 3 CoreInks on `features/epaper.yaml` and fix their button-navigation bug in C++ by removing `page_black`/`page_white` in favor of a boolean `is_repairing` check.
+
+---
+
+## Session E6 — Hardware Verification, Legacy Retirement & Documentation
+
+### Goal
+
+Complete physical flashing/testing of the new e-Paper fleet, retire replaced legacy configurations (`waveshare-display-board`, `waveshare-weather-station`, `waveshare-simen`), and update repository documentation (`AGENTS.md`, `gui/ARCHITECTURE.md`).
+
+### Tasks
+
+- [ ] **E6.1** Compile and verify physical flashing on the chosen production replacements.
+- [ ] **E6.2** Update [`gui/ARCHITECTURE.md`](file:///x:/esphome/gui/ARCHITECTURE.md) and [`AGENTS.md`](file:///x:/esphome/AGENTS.md) with the `gui/epaper/` architecture.
+- [ ] **E6.3** Record final handover summary in `SESSIONS.md`.
+
+

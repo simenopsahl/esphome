@@ -10,10 +10,11 @@ packages:
   pins: !include pins/m5stack_atom_s3_lite.yaml
   status_led: !include ../features/system_status_led.yaml
   audio: !include
-    file: module/audio/${feature.audio.hardware_module | default("atomic_voice_base.yaml")}
+    file: module/audio/${feature.audio.hardware_module | default(feature_audio_module)}
     condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
+  feature_audio_module: atomic_voice_base.yaml
   device:
     model: "M5Stack Atom S3 Lite"
     board: m5stack_atom_s3_lite
@@ -25,7 +26,6 @@ substitutions:
     audio:
       hardware_module: atomic_voice_base.yaml
       buffer_size: '32000'
-      volume_initial: "0.8"
 
 esphome:
   project:

@@ -6,6 +6,9 @@ labels: [es8311, msm381a3729h9bpc, speaker, microphone, sound_level, i2s_audio]
 # 
 
 substitutions:
+  feature:
+    audio:
+      volume_initial: "0.8"
   pin:
     ext:
       i2c:

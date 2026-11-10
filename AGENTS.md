@@ -195,7 +195,21 @@ riscv32-esp-elf-addr2line -pfiaC -e C:\Users\simen\.esphome_build\<device>\build
 
 ---
 
-## 5. Agent Skills Available
+## 5. MCP Server Integrations & Version Control
+
+The workspace is configured with MCP servers for **GitHub (`github-mcp-server`)** and **Home Assistant (`homeassistant`)**:
+
+1. **Git / GitHub Commits (`github-mcp-server` & Local Git)**:
+   - **Repository**: `owner: "simenopsahl"`, `repo: "esphome"`, `branch: "main"` (`https://github.com/simenopsahl/esphome.git`).
+   - After completing any significant edit, feature, or migration session (and verifying with `esphome config`), commit the changes to Git/GitHub with a clear, descriptive commit message (using `github-mcp-server` tools like `push_files` / `create_or_update_file` or local `git` commands with `BypassSandbox: true` since `X:\esphome` is an SMB share).
+   - Never stage or commit `secrets.yaml`, temporary `.host-sdl*` build artifacts, or local `build_path` overrides.
+2. **Home Assistant MCP (`homeassistant`)**:
+   - **Live Entity & Sensor Inspection**: Use `homeassistant` MCP tools to query live entity states, attributes (e.g., `sensor.waveshare_display_data`, `sensor.waveshare_nordpool_future_offset`, climate/light/sensor entities), and verify device connectivity after flashing.
+   - **Remote Compilation (`esphome-device-builder`)**: Use `esphome-device-builder__compile` and `esphome-device-builder__get_job` to offload firmware builds to `pve-esphome` (`192.168.68.110`), as detailed in Section 3.
+
+---
+
+## 6. Agent Skills Available
 
 Specialized multi-step procedures are located in `.agents/skills/`:
 

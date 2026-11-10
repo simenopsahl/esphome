@@ -13,7 +13,7 @@ packages:
   i2c_int: !include extension/internal_i2c.yaml
   imu: !include module/chip_imu_bmi270.yaml
   audio: !include
-    file: module/audio/${feature.audio.hardware_module | default("atomic_voice_base.yaml")}
+    file: module/audio/${feature.audio.hardware_module | default(feature_audio_module)}
     condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
@@ -21,6 +21,7 @@ substitutions:
   screen_height: "128"
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
+  feature_audio_module: atomic_voice_base.yaml
   module:
     internal:
       i2c_bus: i2c_internal
@@ -37,7 +38,6 @@ substitutions:
   feature:
     audio:
       hardware_module: atomic_voice_base.yaml
-      volume_initial: "0.8"
 
 esphome:
   project:
