@@ -64,7 +64,7 @@ Root Device YAML (e.g., m5s-fire-a70780.yaml, jc4880p443.yaml)
 
 Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI installed. In addition, a high-performance LXC remote build server and File Browser are integrated with Home Assistant.
 
-- **Fastest Compilation (Preferred)**: Offload compilation to the remote build server (`pve-esphome` @ `192.168.68.110`) via the Home Assistant MCP tool `esphome-device-builder__compile`. This compiles in **~15–30 seconds** on local NVMe storage, bypassing SMB network overhead and eliminating the need to set/unset local `build_path` overrides.
+- **Fastest Compilation (Preferred)**: Offload compilation to the remote build server (`pve-esphome` @ `192.168.68.110`) via the `homeassistant` MCP tool `compile` (or `esphome-device-builder__compile`). This compiles in **~15–30 seconds** on local NVMe storage, bypassing SMB network overhead and eliminating the need to set/unset local `build_path` overrides.
 - **Local Windows 11 CLI**: Use for fast syntax validation (`esphome config <device.yaml>`), direct USB serial flashing/logging (`COM<N>`), and fallback offline compilation.
 - **WSL ESPHome CLI**: Reserved for `host-sdl` virtual display builds and screenshot verification (`pwsh tools/host_sdl/host-sdl.ps1 ...`).
 
@@ -73,9 +73,9 @@ Both Windows 11 (native) and WSL (`~/.venvs/esphome`) have the ESPHome CLI insta
 ### Remote Compilation & Artifact Retrieval Workflow (Recommended)
 
 1. **Queue Build via Home Assistant MCP**:
-   Call `call_mcp_tool` with `ServerName: "homeassistant"`, `ToolName: "esphome-device-builder__compile"`, and `configuration: "<device-config>.yaml"`.
+   Call `call_mcp_tool` with `ServerName: "homeassistant"`, `ToolName: "compile"` (or `"esphome-device-builder__compile"`), and `configuration: "<device-config>.yaml"`.
 2. **Monitor Build Progress**:
-   Poll status with `esphome-device-builder__get_job(job_id=...)` until completed.
+   Poll status with `get_job(job_id=...)` until completed.
 3. **Download Firmware & ELF via Helper Script**:
    Always use the standalone helper script [`tools/fetch_firmware.py`](file:///x:/esphome/tools/fetch_firmware.py) as a single command (no shell variables, pipes, or command chains) so Antigravity prefix-matching can auto-approve it:
    ```powershell
@@ -197,15 +197,52 @@ riscv32-esp-elf-addr2line -pfiaC -e C:\Users\simen\.esphome_build\<device>\build
 
 ## 5. MCP Server Integrations & Version Control
 
-The workspace is configured with MCP servers for **GitHub (`github-mcp-server`)** and **Home Assistant (`homeassistant`)**:
+The workspace is configured with MCP servers for **Home Assistant (`ha-mcp` & `homeassistant`)**, **GitHub (`github-mcp-server`)**, and **Proxmox (`proxmox`)**:
 
-1. **Git / GitHub Commits (`github-mcp-server` & Local Git)**:
-   - **Repository**: `owner: "simenopsahl"`, `repo: "esphome"`, `branch: "main"` (`https://github.com/simenopsahl/esphome.git`).
-   - After completing any significant edit, feature, or migration session (and verifying with `esphome config`), commit the changes to Git/GitHub with a clear, descriptive commit message (using `github-mcp-server` tools like `push_files` / `create_or_update_file` or local `git` commands with `BypassSandbox: true` since `X:\esphome` is an SMB share).
-   - Never stage or commit `secrets.yaml`, temporary `.host-sdl*` build artifacts, or local `build_path` overrides.
-2. **Home Assistant MCP (`homeassistant`)**:
-   - **Live Entity & Sensor Inspection**: Use `homeassistant` MCP tools to query live entity states, attributes (e.g., `sensor.waveshare_display_data`, `sensor.waveshare_nordpool_future_offset`, climate/light/sensor entities), and verify device connectivity after flashing.
-   - **Remote Compilation (`esphome-device-builder`)**: Use `esphome-device-builder__compile` and `esphome-device-builder__get_job` to offload firmware builds to `pve-esphome` (`192.168.68.110`), as detailed in Section 3.
+### A. Home Assistant MCP Servers (`ha-mcp` & `homeassistant`)
+
+Two complementary Home Assistant MCP servers run side-by-side. Because most ESPHome diagnostic entities, internal sensors, and newly added device entities are **not exposed to Assist LLMs by default**, always prefer **`ha-mcp`** when inspecting entities or devices, and use **`homeassistant`** for ESPHome Device Builder compilation and Spook reference checks.
+
+#### 1. `ha-mcp` Server (Unrestricted Entity, Device & Registry Access — Preferred for Inspection)
+Powered by [`homeassistant-ai/ha-mcp`](https://github.com/homeassistant-ai/ha-mcp), providing full administrative access to **all** Home Assistant entities, devices, and registries regardless of Assist exposure:
+- **Entity Search & Live State Inspection**:
+  - `ha_search`: Fuzzy search across all entities, domains, and areas (finds non-exposed ESPHome sensors, diagnostic entities, buttons, and switches).
+  - `ha_get_state` / `ha_get_entity` / `ha_set_entity`: Read live states/attributes (e.g., `sensor.waveshare_display_data`, `sensor.waveshare_nordpool_future_offset`, local environmental sensors, RSSI/uptime diagnostics) or enable/update disabled-by-default ESPHome entities in the registry.
+- **Device & Area Registry Management**:
+  - `ha_get_device` / `ha_set_device` & `ha_list_floors_areas`: Inspect ESPHome device registry entries, verify connectivity after flashing, and assign nodes to rooms/areas.
+- **Service Calls, Templates, History & Logs**:
+  - `ha_call_service`: Trigger ESPHome buttons, switches, lights, or custom API services during testing.
+  - `ha_eval_template`: Render and test Jinja2 templates against live states.
+  - `ha_get_history` / `ha_get_logs`: Inspect sensor state history (e.g., verifying combined sensor smoothing) or check HA Core logs for `esphome` integration errors.
+
+#### 2. `homeassistant` Server (ESPHome Device Builder & Custom LLM API Bridge)
+Uses Home Assistant's built-in `mcp_server` integration to bridge custom LLM API providers not present in `ha-mcp`:
+- **ESPHome Device Builder (`compile`, `get_job`, `validate_config`, `install`, `list_devices`)**:
+  - Offload firmware compilation and validation to the `pve-esphome` build server (`192.168.68.110`), as detailed in Section 3.
+- **Spook Diagnostics (`spook__list_ghosts`, `spook__find_usages`, `spook__check_references`)**:
+  - Check where an ESPHome entity is referenced across Home Assistant automations, dashboards, and groups before renaming or removing it, or detect orphaned "ghost" entities after a config change.
+- **Assist Context (`homeassistant__GetLiveContext`)**:
+  - Restricted to Assist-exposed entities only; do **not** rely on it to verify whether an ESPHome entity exists.
+
+#### When to Use Which Home Assistant MCP Server
+| Task | Server to Use | Key Tool(s) |
+| :--- | :--- | :--- |
+| Find or inspect **any** ESPHome entity (including non-exposed/diagnostic) | **`ha-mcp`** | `ha_search`, `ha_get_state`, `ha_get_entity` |
+| Enable disabled-by-default ESPHome entities or update area/icon/labels | **`ha-mcp`** | `ha_set_entity`, `ha_get_device`, `ha_set_device` |
+| Trigger an ESPHome button/switch/light or test Jinja2 templates | **`ha-mcp`** | `ha_call_service`, `ha_eval_template` |
+| Check sensor history or HA Core logs for ESPHome connection issues | **`ha-mcp`** | `ha_get_history`, `ha_get_logs` |
+| Remote-compile, validate, or poll build jobs on `pve-esphome` | **`homeassistant`** | `compile`, `get_job`, `validate_config`, `list_devices` |
+| Check if renaming/removing an ESPHome entity breaks HA automations/dashboards | **`homeassistant`** | `spook__find_usages`, `spook__check_references`, `spook__list_ghosts` |
+
+---
+
+### B. Git / GitHub Commits (`github-mcp-server` & Local Git)
+- **Repository**: `owner: "simenopsahl"`, `repo: "esphome"`, `branch: "main"` (`https://github.com/simenopsahl/esphome.git`).
+- After completing any significant edit, feature, or migration session (and verifying with `esphome config`), commit the changes to Git/GitHub with a clear, descriptive commit message (using `github-mcp-server` tools like `push_files` / `create_or_update_file` or local `git` commands with `BypassSandbox: true` since `X:\esphome` is an SMB share).
+- Never stage or commit `secrets.yaml`, temporary `.host-sdl*` build artifacts, or local `build_path` overrides.
+
+### C. Proxmox MCP (`proxmox`)
+- Connects to the `thinkstation` Proxmox host (`192.168.68.101`). Can be used to inspect status, resource usage, or logs of the `pve-esphome` LXC container (`vmid: 110` @ `192.168.68.110`) if remote builds stall or fail.
 
 ---
 
