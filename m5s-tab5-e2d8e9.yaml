@@ -1,13 +1,13 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
-#  <<: !include_dir_named bluetooth
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_core_tab5.yaml
 
   # --- FEATURE PACKAGES ---
-#  media_player: !include features/media_player.yaml
+  media_player: !include features/media_player.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
@@ -91,6 +91,7 @@ wifi:
     static_ip: 192.168.71.79
 
 lvgl:
+  buffer_size: 50%
   pages:
     - <<: !include
         file: gui/pages/grid_dashboard/page.yaml
