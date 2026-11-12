@@ -1,0 +1,121 @@
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+#  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_core_tab5.yaml
+
+  # --- FEATURE PACKAGES ---
+  media_player: !include features/media_player.yaml
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/main.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  tile_climate: !include
+    file: gui/tiles/climate/remote.yaml
+    vars:
+      uid: heatpump
+      row: 0
+      col: 0
+      row_span: 2
+      col_span: 3          # e.g. span across both columns in row 0, or 1 for a single cell
+      entity_id: climate.faircon_norgespumpa12_proxy
+      title: "Varmepumpe"
+      icon: "\U000F1A43"
+  tile_outdoor_temp_sensor: !include
+    file: gui/tiles/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_outdoor_temp
+      row: 2
+      col: 0
+      icon: "\U000F0595"
+      title: "Ute"
+      entity_id: sensor.ute_temperature
+      unit: "°C"
+      format: "%.1f"
+      click_page: page_temperature
+  tile_t22_temp_sensor: !include
+    file: gui/tiles/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_t22_temp
+      row: 2
+      col: 2
+      icon: "\U000F050F"
+      title: "T22"
+      entity_id: sensor.t22_temperature
+      unit: "°C"
+      format: "%.1f"
+      click_page: page_weather
+  tile_flip_clock: !include
+    file: gui/tiles/clock/flip_clock.yaml
+    vars:
+      uid: flip_clock
+      row: 3
+      col: 0
+      row_span: 1
+      col_span: 3
+      show_date: true
+
+  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-tab5-e2d8e9
+    location: "Storage"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_dashboard
+
+esphome:
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.71.79
+
+lvgl:
+  pages:
+    - <<: !include
+        file: gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_title: "Kontrollpanel"
+          layout: 5x3
+    - <<: !include
+        file: gui/pages/climate/page.yaml
+        vars:
+          page_title: "Varmepumpe"
+
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: presence1
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: presence2
+  # Turn on display while room is occupied
+  - id: !extend presence_detected
+    lambda: !lambda |-
+      if ( (id(presence1).state) or (id(presence2).state) ) {
+        return true;
+      } else {
+        return false;
+      }
+  
