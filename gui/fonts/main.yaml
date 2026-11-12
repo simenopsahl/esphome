@@ -17,24 +17,24 @@ substitutions:
     ${ 12 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (14 if ([screen_width|int, screen_height|int]|max) <= 320 else
        (16 if ([screen_width|int, screen_height|int]|max) <= 480 else
-       (24 if ([screen_width|int, screen_height|int]|max) <= 800 else 30))) }
+       (24 if ([screen_width|int, screen_height|int]|max) <= 800 else 32))) }
   text_md: >-
     ${ 14 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (16 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
        (20 if ([screen_width|int, screen_height|int]|max) <= 480 else
-       (28 if ([screen_width|int, screen_height|int]|max) <= 800 else 36)))) }
+       (28 if ([screen_width|int, screen_height|int]|max) <= 800 else 38)))) }
   text_lg: >-
     ${ 18 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (22 if ([screen_width|int, screen_height|int]|max) <= 320 else
        (24 if ([screen_width|int, screen_height|int]|max) <= 480 else
-       (32 if ([screen_width|int, screen_height|int]|max) <= 800 else 40))) }
+       (32 if ([screen_width|int, screen_height|int]|max) <= 800 else 42))) }
   text_xl: >-
     ${ 24 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (22 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (26 if ([screen_width|int, screen_height|int]|max) <= 320 else
        (32 if ([screen_width|int, screen_height|int]|max) <= 480 else
-       (40 if ([screen_width|int, screen_height|int]|max) <= 800 else 50)))) }
+       (40 if ([screen_width|int, screen_height|int]|max) <= 800 else 52)))) }
   text_xxl: >-
     ${ 32 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (26 if ([screen_width|int, screen_height|int]|max) <= 240 else

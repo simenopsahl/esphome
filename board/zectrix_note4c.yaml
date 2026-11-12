@@ -1,10 +1,12 @@
 labels: [esp32s3, ePaper, display]
 ---
+# https://wiki.zectrix.com/en/hardware/note4c/quick-start
+# ESP-IDF Firmwares
 # https://github.com/itopinion/zectrix-note4-epd-demo/blob/main/components/zectrix_board/include/zectrix_board_config.h
 # https://github.com/LazyYoun/youn-ink-fourcolor-firmware
-# https://wiki.zectrix.com/en/hardware/note4c/quick-start
 
 # https://github.com/fiedoruk/emini-home/blob/main/docs/HARDWARE.md
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 Zectrix Note4.pdf"
 # Base functions for:
 # Zectrix Note4C
 #

@@ -1,6 +1,7 @@
 labels: [esp32p4, psram, JC4880P443, display, i2c]
 ---
 # https://github.com/agillis/esphome-modular-lvgl-buttons/blob/main/hardware/guition-esp32-p4-jc4880p443.yaml
+# Schematic reference: "esphome/pinmap/schematics/esp32p4 jc4880p443.pdf"
 # Base functions for:
 # Guition module ESP32-P4 & ESP32-C6 with 4.3" display and camera (JC4880P443C_I_W_Y)
 #

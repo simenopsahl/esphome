@@ -1,7 +1,7 @@
 labels: [esp32, ePaper, display]
 ---
 # https://docs.m5stack.com/en/core/coreink
-# https://www.reddit.com/r/Esphome/comments/1hznwxf/esphome_with_m5_coreink/
+# Schematic reference: "esphome/pinmap/schematics/esp32 M5Stack CoreInk.png"
 # Base functions for:
 # M5Stack CoreInk
 #

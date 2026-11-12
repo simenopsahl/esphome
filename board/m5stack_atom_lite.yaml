@@ -1,6 +1,7 @@
 labels: [esp32, SK6812, RGB]
 ---
 # https://docs.m5stack.com/en/core/ATOM%20Lite
+# Schematic reference: "esphome/pinmap/schematics/esp32 M5Stack Atom Lite.webp"
 # Base functions for:
 # M5Stack Atom Lite
 #

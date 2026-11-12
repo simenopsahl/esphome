@@ -3,6 +3,7 @@ labels: [esp32s3, ePaper, display]
 # CrowPanel ESP32 E-paper 5.79-inch HMI Display
 # https://www.elecrow.com/wiki/CrowPanel_ESP32_E-paper_5.79-inch_HMI_Display.html
 # https://github.com/Elecrow-RD/CrowPanel-ESP32-5.79-E-paper-HMI-Display-with-272-792
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 Elecrow CrowPanel-5.79in.pdf"
 # Model:  ESP32-S3-WROOM-1-N8R8
 # Flash:  8MB
 # PSRAM:  8MB
@@ -11,15 +12,16 @@ labels: [esp32s3, ePaper, display]
 # CrowPanel ESP32 E-paper 4.2-inch HMI Display v1.2
 # https://www.elecrow.com/wiki/CrowPanel_ESP32_E-paper_4.2-inch_HMI_Display.html
 # https://github.com/Elecrow-RD/CrowPanel-ESP32-4.2-E-paper-HMI-Display-with-400-300
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 Elecrow CrowPanel-4.2in.pdf"
 # Model:  ESP32-S3-WROOM-1-N8R8
 # Flash:  8MB
 # PSRAM:  8MB
 # Resolution: 400 x 300 (4.2-inch)
+#
 # Base functions for:
 # Elecrow CrowPanel epaper series
 #
 
-# Pins for this model
 packages:
   pins: !include pins/elecrow_crowpanel_epaper.yaml
   epaper: !include ../features/epaper.yaml

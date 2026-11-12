@@ -1,6 +1,7 @@
 labels: [esp32s3, WS2812, RGB]
 ---
 # https://docs.m5stack.com/en/core/AtomS3%20Lite
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 M5Stack Atom S3 Lite.png"
 # Base functions for:
 # M5Stack AtomS3 Lite
 #

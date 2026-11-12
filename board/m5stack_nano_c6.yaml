@@ -1,6 +1,7 @@
 labels: [esp32c6, WS2812, RGB]
 ---
 # https://docs.m5stack.com/en/core/M5NanoC6
+# Schematic reference: "esphome/pinmap/schematics/esp32c6 M5Stack NanoC6.png"
 # Base functions for:
 # M5Stack NanoC6
 #

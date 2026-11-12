@@ -1,8 +1,12 @@
 labels: [es8311, speaker, i2s_audio, light]
 ---
 # https://docs.m5stack.com/en/atom/Voice_Pyramid
-# https://github.com/m5stack/esphome-yaml/blob/main/examples/voice_assistant/echo_pyramid_example.yaml
+# Audio functions for:
 # Atomic Voice Pyramid
+# Schematic reference: "esphome/pinmap/schematics/M5Stack Atomic Voice Pyramid.pdf"
+
+# YAML example configuration
+# https://github.com/m5stack/esphome-yaml/blob/main/examples/voice_assistant/echo_pyramid_example.yaml
 #
 # Warning:
 # Do not use Voice Pyramid together with Atom S3R Voice, as this may result in device damage.

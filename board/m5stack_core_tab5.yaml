@@ -1,0 +1,398 @@
+labels: [esp32s3, psram, ILI9342, display, BM8563, microphone, speaker]
+---
+# https://docs.m5stack.com/en/core/Tab5
+# Schematic reference: "esphome/pinmap/schematics/esp32p4 M5Stack Core Tab5.pdf"
+# + "esphome/pinmap/schematics/esp32p4 M5Stack Core Tab5 design block diagram.pdf"
+# Base functions for:
+# M5Stack Core Tab5 (v2026.4.28)
+#
+# 2026.4.28   Screen driver IC model changed from ST7123 to ST7121
+# 2025.10.14  Tab5 screen driver solution optimized: the original independent ILI9881C display driver and GT911 touch driver were changed to an ST7123 integrated display-touch driver.
+# 2025.5.9    Initial product release
+#
+# YAML Example configurations
+# https://github.com/m5stack/esphome-yaml/blob/main/common/tab5-ha-hmi.yaml
+# https://devices.esphome.io/devices/m5stack-tab5/#example-configuration
+
+packages:
+  pins: !include pins/m5stack_core_tab5.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+  imu: !include module/chip_imu_bmi270.yaml
+  audio: !include
+    file: module/audio/${feature.audio.hardware_module | default("m5stack_core_tab5_audio.yaml")}
+    condition: ${feature_audio_enabled | default("false")}
+
+substitutions:
+  screen_width: "720"
+  screen_height: "1280"
+  time_timezone: "Europe/Oslo"
+  mbus_i2c_shared: "false"
+  module:
+    internal:
+      i2c_bus: i2c_internal
+  extension:
+    i2c:
+      internal:
+        frequency: 400kHz
+  device:
+    model: "M5Stack Core Tab5"
+    board: m5stack_core_tab5
+    rmt_symbols_block: 48
+    rtc: "true"
+    psram: "true"
+    framework:
+      type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
+  feature:
+    audio:
+      hardware_module: m5stack_core_tab5_audio.yaml
+      volume_initial: "0.8"
+      volume_max: "1.0"
+
+esphome:
+  project:
+    name: "M5Stack.Core Tab5"
+    version: "1.0.0"
+  on_boot:
+    - priority: 800
+      then:
+        - rx8130.read_time:
+
+esp32:
+# ESP32-P4NRW32@RISC-V 32-bit Dual-core 360MHz + LP Single-core 40MHz
+# PSRAM: 32MB Octal
+  variant: esp32p4
+  flash_size: 16MB
+  cpu_frequency: 360MHz
+  engineering_sample: true # rev1.3
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+      enable_idf_experimental_features: true
+    sdkconfig_options:
+      # Cache optimizations for display graphics
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation rules for graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
+
+psram:
+  speed: 200MHz
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+esp_ldo:
+  - channel: 3
+    voltage: 2.5V
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+preferences:
+  flash_write_interval: 5min
+
+http_request: # Needed by esp32_hosted-update and any JSON stuff
+  buffer_size_rx: 2048
+
+# Network hardware
+esp32_hosted:
+  variant: ESP32C6
+  active_high: true
+  reset_pin: ${pin.int.c6_hosted.rst}
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  use_psram: true
+
+pi4ioe5v6408:
+  # PI4IOE5V6408-1
+  - id: hub_pi4ioe1
+    address: 0x43
+    # 0: O - wifi_antenna_int_ext - Used to switch between the internal Wi-Fi antenna and the external SMA antenna. Low level selects the internal antenna, while high level selects the external antenna.
+    # 1: O - speaker_enable
+    # 2: O - external_5v_power - Provides 5V power to the Tab5 rear M5-Bus, the side 2.54-10P expansion port, and the HY2.0-4P interface. The power output can be controlled via EXT5V_EN.
+    # 3: NC
+    # 4: O - lcd reset
+    # 5: O - touch panel reset
+    # 6: O - camera reset
+    # 7: I - headphone detect
+  # PI4IOE5V6408-2
+  - id: hub_pi4ioe2
+    address: 0x44
+    # 0: O - wifi_power - Enables power supply for the internal ESP32-C6 (Wi-Fi SoC)
+    # 1: NC
+    # 2: NC
+    # 3: O - usb_5v_power
+    # 4: O - poweroff pulse
+    # 5: O - quick charge enable (inverted)
+    # 6: I - charging status
+    # 7: O - charge enable
+
+time:
+  - platform: rx8130
+    i2c_id: ${module.internal.i2c_bus}
+    address: 0x32
+    id: time_rtc
+    update_interval: never
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - rx8130.write_time:
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: ${pin.int.spi.miso}
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: ${pin.light.disp_bl}
+    frequency: 1000Hz
+
+light:
+  # White
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 250ms
+    restore_mode: RESTORE_AND_ON
+    name: "Backlight"
+    entity_category: config
+    # on_state:
+    #   - lambda: |-
+    #       uint8_t light;
+    #       if (id(axp2101).read_byte(0x99, &light))
+    #         id(backlight).turn_on().set_brightness( (( light << 5 ) - 641 ) /255 );
+
+display:
+  - platform: mipi_dsi
+    id: display_lcd
+    # model: M5STACK-TAB5        # V1
+    # model: M5STACK-TAB5-ST7123 # V2 ST7123
+    model: M5STACK-TAB5-ST7121   # V2 ST7121 (this file)
+    reset_pin:
+      pi4ioe5v6408: hub_pi4ioe1
+      number: 4
+    dimensions:
+      height: ${device.screen.height}
+      width: ${device.screen.width}
+    transform:
+      mirror_x: false
+      mirror_y: false
+    auto_clear_enabled: false
+    update_interval: 10s
+
+# Tab5 has 3 panel variants: V1 = ILI9881C + GT911, V2 = ST7123 or ST7121 (TDDI).
+# Default below is ST7121 - switch the marked lines (and the display model) for the others.
+# Requires ESPHome >= 2026.7.0.
+touchscreen:
+  - platform: st7123          # V1: gt911
+    i2c_id: ${module.internal.i2c_bus}
+    address: 0x55
+    id: touchscreen_st7123
+    update_interval: 50ms     # V1: never
+    reset_pin:
+      pi4ioe5v6408: hub_pi4ioe1
+      number: 5
+    calibration:              # native 720x1280
+      x_min: 0
+      x_max: 720              # V1: 1280
+      y_min: 0
+      y_max: 1280             # V1: 720
+    on_touch:
+      - then:
+          - lambda: |-
+                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                    touch.x,
+                    touch.y,
+                    touch.x_raw,
+                    touch.y_raw
+                    );  
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
+#    on_update:
+#      - logger.log:
+#          format: Touch %d at (%d, %d)
+#          args: [ 'touch->id', 'touch->x', 'touch->y' ]
+
+binary_sensor:
+  - platform: touchscreen
+    id: touch
+    name: Touchscreen
+    entity_category: diagnostic
+    x_min: 0
+    x_max: 1280
+    y_min: 0
+    y_max: 720
+    disabled_by_default: true
+
+  - platform: gpio
+    id: charging
+    name: "Charging Status"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe2
+      number: 6
+      mode: INPUT_PULLDOWN
+    entity_category: diagnostic
+    disabled_by_default: true
+  - platform: gpio
+    id: headphone_detect
+    name: "Headphone Plugged"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe1
+      number: 7
+    entity_category: diagnostic
+    disabled_by_default: true
+
+switch:
+  - platform: gpio
+    id: wifi_power
+    name: "WiFi Power"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe2
+      number: 0
+    restore_mode: ALWAYS_ON
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: usb_5v_power
+    name: "USB Power"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe2
+      number: 3
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: quick_charge
+    name: "Quick Charge"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe2
+      number: 5
+      inverted: true
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: charge_enable
+    name: "Charge Enable"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe2
+      number: 7
+    restore_mode: ALWAYS_ON
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: wifi_antenna_int_ext
+    internal: true
+    pin:
+      pi4ioe5v6408: hub_pi4ioe1
+      number: 0
+    restore_mode: ALWAYS_ON
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: external_5v_power
+    name: "External 5V Power"
+    pin:
+      pi4ioe5v6408: hub_pi4ioe1
+      number: 2
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    disabled_by_default: true
+
+sensor:
+  - platform: ina226
+    i2c_id: ${module.internal.i2c_bus}
+    address: 0x41
+    id: sensor_ina226
+    adc_averaging: 16
+    max_current: 8.192A
+    shunt_resistance: 0.006ohm
+    bus_voltage:
+      id: battery_voltage
+      name: "Battery Voltage"
+      entity_category: diagnostic
+      disabled_by_default: true
+    current:
+      id: battery_current
+      name: "Battery Current"
+      entity_category: diagnostic
+      disabled_by_default: true
+      # Positive means discharging
+      # Negative means charging
+  - platform: template
+    name: "Battery Percentage"
+    lambda: |-
+      float voltage = id(battery_voltage).state;
+      // Adjust these values based on your battery's actual min/max voltage
+      float min_voltage = 6.0;  // Discharged voltage
+      float max_voltage = 8.23;  // Fully charged voltage
+      float percentage = (voltage - min_voltage) / (max_voltage - min_voltage) * 100.0;
+      if (percentage > 100.0) return 100.0;
+      if (percentage < 0.0) return 0.0;
+      return percentage;
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    entity_category: diagnostic
+    disabled_by_default: true
+
+# A friendlier UI on top of the `wifi_antenna_int_ext` GPIO switch defined in
+# config.yaml. Lets the user pick "Internal" / "External" rather than toggling
+# a raw on/off switch.
+select:
+  - platform: template
+    id: wifi_antenna_select
+    name: "WiFi Antenna"
+    entity_category: config
+    disabled_by_default: true
+    options:
+      - "Internal"
+      - "External"
+    optimistic: true
+    on_value:
+      - if:
+          condition:
+            lambda: return i == 0;
+          then:
+            - switch.turn_off: wifi_antenna_int_ext
+          else:
+            - switch.turn_on: wifi_antenna_int_ext
+
+motion:
+  - id: !extend motion_bmi270
+    axis_map:
+      x: y
+      y: "-x"
+      z: "-z"
+
+# Firmware update for esp32_hosted ESP32-C6
+update:
+  - platform: esp32_hosted
+    name: "C6 CoProcessor Update"
+    icon: mdi:chip
+    type: http
+    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
+    update_interval: 6h

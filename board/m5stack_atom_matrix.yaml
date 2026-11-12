@@ -1,6 +1,8 @@
 labels: [esp32, WS2812, RGB, RMT_LED, display]
 ---
 # https://docs.m5stack.com/en/core/Atom-Matrix_v1.1
+# Schematic reference: "esphome/pinmap/schematics/esp32 M5Stack Atom Matrix.png"
+# + "esphome/pinmap/schematics/esp32 M5Stack Atom Matrix KeyPad.png"
 # Base functions for:
 # M5Stack Atom Matrix v1.1
 #

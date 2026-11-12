@@ -1,0 +1,169 @@
+labels: [es8311, audio]
+---
+# Shared audio hardware definitions for M5Stack Core Tab5:
+# DAC / Codec: ES8388 (addr 0x10 on i2c_internal)
+# ADC: ES7210 (addr 0x40 on i2c_internal)
+
+# The DAC and ADC share BCLK/LRCLK pins, but ESPHome's i2s_audio cannot run one
+# bus full-duplex (the mic and speaker each call i2s_new_channel on the port, and
+# the second fails with "Parent bus is busy"). So we use TWO buses (two I2S ports)
+# over the shared pins:
+#   - i2s_input  = the MIC bus, I2S MASTER. The mic is always capturing (wake
+#     word), so it drives BCLK/LRCLK/MCLK continuously. Using the ESP as master
+#     is what makes the mic get a correct-rate stream (a codec-mastered clock via
+#     force_master gave the mic garbage and killed wake word).
+#   - i2s_output = the SPEAKER bus, I2S SLAVE. It reads the mic's clock and only
+#     needs to output data, so it never contends for a port of its own.
+# The ES8388 is stock and slave to the mic's clock; no patched es8388 /
+# force_master is needed.
+packages:
+  mic_common: !include common_mic.yaml
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        # Route ES8388 DAC output to LINE1 for the onboard speaker
+        - select.set:
+            id: dac_output
+            option: "LINE1"
+        # Push the mic gain restored from flash into the ES7210. The codec boots
+        # with `mic_gain` from audio_adc, so without this a saved value would show
+        # in HA while the hardware sat at the default.
+        - lambda: |-
+            id(adc_es7210).set_mic_gain(id(mic_gain_db).state);
+            ESP_LOGI("mic", "[MIC] restored ES7210 gain -> %.1f dB", id(mic_gain_db).state);
+
+i2s_audio:
+  - id: i2s_input
+    i2s_mclk_pin: ${pin.audio.i2s_mclk}
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+  - id: i2s_output
+    i2s_bclk_pin:
+      number: ${pin.audio.i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${pin.audio.i2s_lrclk}
+      allow_other_uses: true
+
+audio_adc:
+  - platform: es7210
+    i2c_id: i2c_internal
+    address: 0x40
+    id: adc_es7210
+    bits_per_sample: 16bit
+    sample_rate: 16000
+    # Runtime gain lives on the `mic_gain_db` number below (3 dB steps, the
+    # resolution of the ES7210 gain register).
+    mic_gain: 24db
+
+audio_dac:
+  - platform: es8388
+    i2c_id: i2c_internal
+    address: 0x10
+    id: dac_es8388
+
+# DAC Output is routed to `LINE1` at boot (priority -100) for the onboard speaker
+select:
+  - platform: es8388
+    id: select_es8388
+    dac_output:
+      id: dac_output
+      name: "DAC Output"
+      entity_category: config
+      disabled_by_default: true
+    adc_input_mic:
+      id: adc_input_mic
+      name: "ADC Input Mic"
+      entity_category: config
+      disabled_by_default: true
+
+microphone:
+  - platform: i2s_audio
+    id: i2s_mic
+    i2s_audio_id: i2s_input
+    i2s_din_pin: ${pin.audio.mic}
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    adc_type: external
+
+speaker:
+  - platform: i2s_audio
+    id: i2s_speaker
+    i2s_audio_id: i2s_output
+    i2s_dout_pin: ${pin.audio.spk}
+    i2s_mode: secondary
+    dac_type: external
+    sample_rate: 16000
+    audio_dac: dac_es8388
+    channel: mono
+    buffer_duration: 250ms
+
+binary_sensor:
+  # Mute internal speaker while a 3.5mm jack is plugged in (LOUT1/LINE1 feeds both)
+  - id: !extend headphone_detect
+    filters:
+      - delayed_on_off: 150ms
+    on_press:
+      - switch.turn_off: amp_enable
+    on_release:
+      - if:
+          condition:
+            or:
+              - media_player.is_announcing: speaker_media_player
+              - lambda: 'return id(speaker_media_player)->state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;'
+          then:
+            - switch.turn_on: amp_enable
+
+switch:
+  # Speaker Enable
+  - platform: gpio
+    id: amp_enable
+    pin:
+      pi4ioe5v6408: hub_pi4ioe1
+      number: 1
+    restore_mode: ALWAYS_OFF
+    name: "Amplifier"
+    icon: "mdi:volume-high"
+    entity_category: config
+    disabled_by_default: true
+    on_turn_on:
+      - if:
+          condition:
+            binary_sensor.is_on: headphone_detect
+          then:
+            - switch.turn_off: amp_enable
+
+number:
+  - platform: template
+    id: mic_gain_db
+    name: "Mic gain (ES7210)"
+    icon: mdi:microphone-settings
+    entity_category: config
+    unit_of_measurement: dB
+    min_value: 0
+    # The ES7210 gain register moves in 3 dB steps up to 33 dB (then 34.5, 36
+    # and 37.5), so a finer slider step would leave every second position a
+    # no-op. 36 dB is the highest value that sits on the 3 dB grid.
+    max_value: 36
+    step: 3
+    restore_value: true
+    initial_value: 24
+    mode: slider
+    # Without `optimistic`, a template number with only a set_action never
+    # publishes the new value back: the slider snapped back to 24 dB in HA even
+    # though the ES7210 had already been reprogrammed. The restored value is
+    # applied to the codec in on_boot (-100), since TemplateNumber::setup() only
+    # publishes it and does not run set_action.
+    optimistic: true
+    set_action:
+      - lambda: |-
+          id(adc_es7210).set_mic_gain(x);
+      - logger.log:
+          format: "[MIC] ES7210 gain -> %.1f dB"
+          args: ["x"]

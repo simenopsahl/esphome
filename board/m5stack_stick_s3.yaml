@@ -2,9 +2,10 @@ labels: [esp32s3, psram, ST7789P3, microphone]
 ---
 # Base functions for:
 # M5Stack StickS3
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 M5Stack StickS3 page1.png"
+# + "*S3 page2.png", "*S3 page3.png", "*S3 Power.png"
 #
 
-# Pins for this model
 packages:
   pins: !include pins/m5stack_stick_s3.yaml
 # Limit of 2 i2c buses on ESP32-S3, one already used for M5PM1 (and IMU)

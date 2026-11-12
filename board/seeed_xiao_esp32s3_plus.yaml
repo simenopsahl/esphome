@@ -1,7 +1,10 @@
 labels: [esp32s3, psram]
 ---
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 seeed_xiao_esp32-s3-plus.pdf"
+# + "esphome/pinmap/schematics/esp32s3 seeed_xiao_esp32-s3 - sense.pdf" if HAT is included
+# Base functions for:
+# Seeed XIAO ESP32-S3-Plus
 
-# Pins for this model
 packages:
   pins: !include pins/seeed_xiao_esp32s3_plus.yaml
   i2c: !include extension/internal_i2c.yaml

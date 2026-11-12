@@ -1,6 +1,8 @@
 labels: [SPI, display, ePaper]
 ---
+# Schematic reference: "esphome/pinmap/schematics/Seeed reTerminal diy.pdf"
 # https://wiki.seeedstudio.com/ogdiy_kit_works_with_esphome/#demo-3-comprehensive-example
+# YAML example configuration
 # https://github.com/unreal4u/esphome-devices/blob/main/config/trmnl--e-ink-display.yaml
 # https://esphome.io/components/display/waveshare_epaper/
 

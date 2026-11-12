@@ -17,11 +17,6 @@ substitutions:
         clk: GPIO43
         mosi: GPIO44
         miso: GPIO39
-        disp:
-          cs: GPIOxx
-          dc: GPIOxx
-          rst: GPIOxx
-          bl: GPIO22
         card:
           cs: GPIO42
           cmd: GPIO44
@@ -38,6 +33,9 @@ substitutions:
         d2: GPIO9
         d3: GPIO8
 
+    disp:
+      bl: GPIO22
+
     touch:
       int: GPIO23
     
@@ -48,10 +46,10 @@ substitutions:
       i2s_lrclk: GPIO29
       i2s_bclk: GPIO27
       i2s_mclk: GPIO30
-      i2s_din: GPIO26 # es8311 (0x10)
-      i2s_dout: GPIO28 # es7210 (0x40)
-      spk: GPIOxx
-      mic: GPIOxx
+      ds_din: GPIO26 # es8311 (0x10)
+      as_dout: GPIO28 # es7210 (0x40)
+      spk: GPIO26
+      mic: GPIO28
 
     cam:
       y0: nc

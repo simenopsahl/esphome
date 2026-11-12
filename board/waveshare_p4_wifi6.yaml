@@ -1,6 +1,7 @@
 labels: [esp32p4, psram, i2c, mipi_csi, mipi_dsi]
 ---
 # https://docs.waveshare.com/ESP32-P4-WIFI6
+# Schematic reference: "esphome/pinmap/schematics/esp32p4 waveshare-p4-wifi6.pdf"
 # Base functions for:
 # Waveshare ESP32-P4-Wifi6
 # --

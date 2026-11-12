@@ -1,9 +1,11 @@
 labels: [esp32s3, psram, display, i2c]
 ---
-# PINs for Sunton module ESP32-S3 with 4.3" display
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 8048s043 main.png"
+# + "esphome/pinmap/schematics/esp32s3 4827s043 peripherals.png"
+# Base functions for:
+# Sunton module ESP32-S3 with 4.3" display
 #
 
-# Pins for this model
 packages:
   pins: !include pins/sunton-8048s043c.yaml
 

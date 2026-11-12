@@ -1,14 +1,15 @@
 labels: [esp32s3, psram, ILI9342, display, BM8563, microphone, speaker]
 ---
 # https://docs.m5stack.com/en/core/M5CoreS3%20SE
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 M5Stack Core S3-SE.pdf"
 # Base functions for:
 # M5Stack Core S3SE
 #
+# YAML example configurations
 # https://community.home-assistant.io/t/m5stack-m5cores3-se-with-microwakeword/761965/5
 # https://github.com/luka6000/wake-word-voice-assistants/blob/main/m5stack-coreS3-se/m5stack-coreS3-se-spk.yaml
 # https://github.com/m5stack/esphome-yaml/blob/main/common/cores3-satellite-base.yaml
 
-# Pins for this model
 packages:
   pins: !include pins/m5stack_core_s3se.yaml
   audio: !include

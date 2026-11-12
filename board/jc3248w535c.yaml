@@ -1,9 +1,11 @@
 labels: [esp32s3, psram, JC4832W535, display, i2c, audio, speaker]
 ---
-# PINs for Sunton module ESP32-S3 with Guition 3.5" display
+# Base functions for:
+# Sunton module ESP32-S3 with Guition 3.5" display
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 jc3248w535 main.png"
+# + "esphome/pinmap/schematics/esp32s3 jc3248w535 peripherals.png"
 #
 
-# Pins for this model
 packages:
   pins: !include pins/jc3248w535c.yaml
   audio: !include

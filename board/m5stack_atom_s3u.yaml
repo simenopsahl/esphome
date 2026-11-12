@@ -1,11 +1,11 @@
 labels: [esp32s3, WS2812, RGB, microphone]
 ---
 # https://docs.m5stack.com/en/core/AtomS3U
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 M5Stack Atom S3U.png"
 # Base functions for:
 # M5Stack AtomS3U
 #
 
-# Pins for this model
 packages:
   pins: !include pins/m5stack_atom_s3u.yaml
   status_led: !include ../features/system_status_led.yaml

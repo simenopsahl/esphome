@@ -30,7 +30,7 @@ substitutions:
        (30 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (32 if ([screen_width|int, screen_height|int]|max) <= 320 else
        (40 if ([screen_width|int, screen_height|int]|max) <= 480 else
-       (44 if ([screen_width|int, screen_height|int]|max) <= 800 else 52)))))) }
+       (44 if ([screen_width|int, screen_height|int]|max) <= 800 else 56)))))) }
 
   # Horizontal padding between status icons and title/clock in the header bar
   chrome_pad: >-

@@ -1,11 +1,11 @@
 labels: [esp32s3, psram, ST7789V, display, MPU6886]
 ---
 # https://docs.m5stack.com/en/core/AtomS3
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 M5Stack Atom S3.png"
 # Base functions for:
 # M5Stack AtomS3
 #
 
-# Pins for this model
 packages:
   pins: !include pins/m5stack_atom_s3.yaml
   audio: !include

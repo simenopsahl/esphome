@@ -2,6 +2,7 @@ labels: [esp32p4, psram, i2c, ethernet, mipi_csi, mipi_dsi]
 ---
 # https://docs.waveshare.com/ESP32-P4-NANO
 # https://www.waveshare.com/wiki/ESP32-P4-Nano-StartPage
+# Schematic reference: "esphome/pinmap/schematics/esp32p4 waveshare-p4-nano.pdf"
 # Base functions for:
 # Waveshare ESP32-P4-NANO
 # --
