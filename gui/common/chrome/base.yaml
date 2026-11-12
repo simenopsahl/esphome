@@ -30,7 +30,7 @@ substitutions:
        (30 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (32 if ([screen_width|int, screen_height|int]|max) <= 320 else
        (40 if ([screen_width|int, screen_height|int]|max) <= 480 else
-       (44 if ([screen_width|int, screen_height|int]|max) <= 600 else 52)))))) }
+       (44 if ([screen_width|int, screen_height|int]|max) <= 800 else 52)))))) }
 
   # Horizontal padding between status icons and title/clock in the header bar
   chrome_pad: >-
@@ -39,12 +39,13 @@ substitutions:
        (12 if (screen_width|int) <= 320 else 14)) }
 
   # Font used for `lbl_page_title` in the header (`mdi_md` for icon mode, `font_md` for text mode)
+  # Reference `screen_width|int` / `screen_height|int` so ESPHome defers evaluation until after `board:` loads dimensions.
   chrome_use_icon_title: ${ 'true' if (chrome_title_mode == 'icon' or (chrome_title_mode == 'auto' and screen_width|int < 180)) else 'false' }
-  chrome_title_font: ${ 'mdi_md' if chrome_use_icon_title == 'true' else 'font_md' }
+  chrome_title_font: ${ 'mdi_md' if (screen_width|int and chrome_use_icon_title == 'true') else 'font_md' }
 
   # Top and bottom padding reserved by `page_style` so page content never overlaps header/footer
-  page_pad_top: ${ chrome_h|int if chrome_header == 'true' else 0 }
-  page_pad_bottom: ${ chrome_h|int if chrome_footer == 'true' else 0 }
+  page_pad_top: ${ chrome_h|int if (screen_width|int and screen_height|int and chrome_header == 'true') else 0 }
+  page_pad_bottom: ${ chrome_h|int if (screen_width|int and screen_height|int and chrome_footer == 'true') else 0 }
 
   # Default inner container padding
   container_pad_top: ${ 0 if (screen_height|int) <= 128 else (1 if (screen_height|int) <= 240 else 2) }
