@@ -1,26 +1,42 @@
 packages:
-  <<: !include_dir_named common
-  board: !include board/m5stack_core_tab5.yaml
+  api: !include common/api.yaml
+  logger: !include common/logger.yaml
+  ota: !include common/ota.yaml
+  restart: !include common/restart.yaml
+  status: !include common/status.yaml
+  time: !include common/time.yaml
+
+  board: !include board/host_sdl.yaml
+  sim_env: !include board/module/host_simulated_env.yaml
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/main.yaml
 
-  tile_imu_default: !include
+  combined_env_sensors: !include features/combined_env_sensors.yaml
+  tile_flip_clock: !include
+    file: gui/tiles/clock/flip_clock.yaml
+    vars:
+      uid: flip_clock
+      row: 3
+      col: 0
+      row_span: 1
+      col_span: 2
+      show_date: true
+  tile_imu_level: !include
     file: gui/tiles/imu/local.yaml
     vars:
+      uid: tile_imu
       row: 4
       col: 0
-
-  tile_imu_custom: !include
+  tile_imu_tilted: !include
     file: gui/tiles/imu/local.yaml
     vars:
       uid: tile_imu_2
-      page_id: page_dashboard
       row: 4
       col: 1
       title: "Vater"
-      max_angle: "15"
-      level_threshold: "1.5"
-      click_page: page_status
+      roll_sensor_id: sim_roll_2
+      pitch_sensor_id: sim_pitch_2
+      max_angle: "20.0"
 
   room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
@@ -28,17 +44,63 @@ packages:
   }}
 
 substitutions:
+  screen_width: "720"
+  screen_height: "1280"
+  common:
+    log_level: INFO
   device:
     name: tmp-imu-test
-    location: "Test"
+    location: "Virtual"
+    ip_address: "127.0.0.1"
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
   display:
     home_page: page_dashboard
 
 esphome:
-  name: ${device.name}
+  name: tmp-imu-test
+  on_boot:
+    - priority: -100
+      then:
+        - lvgl.widget.show: lbl_wifi_status
+        - lvgl.widget.hide: boot_screen
+        - script.execute: lvgl_time_update
+        - sensor.template.publish:
+            id: motion_roll
+            state: 0.3
+        - sensor.template.publish:
+            id: motion_pitch
+            state: -0.2
+        - sensor.template.publish:
+            id: sim_roll_2
+            state: 14.0
+        - sensor.template.publish:
+            id: sim_pitch_2
+            state: -9.0
 
-wifi:
-  use_address: ${device.name}.local
+wifi: !remove
+
+api:
+  reboot_timeout: 0s
+
+sensor:
+  - platform: template
+    id: motion_roll
+    name: "Motion Roll"
+    update_interval: never
+  - platform: template
+    id: motion_pitch
+    name: "Motion Pitch"
+    update_interval: never
+  - platform: template
+    id: sim_roll_2
+    name: "Sim Roll 2"
+    update_interval: never
+  - platform: template
+    id: sim_pitch_2
+    name: "Sim Pitch 2"
+    update_interval: never
 
 lvgl:
   pages:
