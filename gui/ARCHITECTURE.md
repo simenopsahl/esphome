@@ -53,6 +53,7 @@ gui/
         ├── button/           # `local.yaml` & `remote.yaml` (stateless action/service trigger tile)
         ├── climate/          # `local.yaml` & `remote.yaml` (live setpoint/action tile -> opens `page_climate`)
         ├── clock/            # `flip_clock.yaml` & `time_button.yaml` (24h digital clock tiles -> opens `page_analog_clock`)
+        ├── imu/              # `local.yaml` (responsive IMU bubble-level crosshair tile)
         ├── light/            # `local.yaml` & `remote.yaml` (toggle + brightness % tile)
         ├── sensor/           # `local.yaml` & `remote.yaml` (numeric sensor readout tile)
         ├── switch/           # `local.yaml` & `remote.yaml` (stateful toggle tile)

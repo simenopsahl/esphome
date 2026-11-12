@@ -1,0 +1,190 @@
+# Modular Local IMU Bubble-Level Tile
+#
+# Visualizes live tilt (roll & pitch) from an on-device ESPHome motion/IMU sensor
+# as a centered crosshair circle with a green (level) / red (tilted) bubble indicator.
+# Automatically sizes the circle square to fit the tile across any resolution or grid layout.
+#
+# Defaults assume standard IMU sensor IDs from `board/module/chip_imu_bmi270.yaml`
+# (`motion_roll`, `motion_pitch`), which can be overridden via `vars:`.
+#
+# Usage via packages:
+#   tile_imu: !include
+#     file: gui/tiles/imu/local.yaml
+#     vars:
+#       page_id: page_dashboard
+#       uid: tile_imu
+#       row: 4
+#       col: 0
+#       title: "Vater"                 # optional (hidden when empty)
+#       roll_sensor_id: motion_roll    # optional
+#       pitch_sensor_id: motion_pitch  # optional
+#       max_angle: "20.0"              # optional degrees at circle rim
+#       level_threshold: "1.0"         # optional degrees for green level state
+#       click_page: ""                 # optional page ID to open on tap
+
+substitutions:
+  # Responsive stroke/dash widths (prefixed to avoid polluting sibling package vars)
+  imu_outline_width: ${ 1 if ([screen_width|int, screen_height|int]|max) <= 480 else 2 }
+  imu_dash_size: ${ 4 if ([screen_width|int, screen_height|int]|max) <= 480 else 5 }
+
+lvgl:
+  style_definitions:
+    - id: ${uid | default("tile_imu")}_circle_style
+      radius: circle
+      outline_width: ${imu_outline_width}
+      outline_color: ${outline_color | default("c_yellow")}
+      align: CENTER
+    - id: ${uid | default("tile_imu")}_dashline_style
+      width: 100%
+      height: 100%
+      line_width: ${imu_outline_width}
+      line_dash_width: ${imu_dash_size}
+      line_dash_gap: ${imu_dash_size}
+      line_color: ${line_color | default("c_yellow")}
+
+  pages:
+    - id: !extend ${page_id | default("page_dashboard")}
+      on_load:
+        - script.execute: ${uid | default("tile_imu")}_update
+      widgets:
+        - obj:
+            id: ${uid | default("tile_imu")}_card
+            radius: 12
+            grid_cell_column_pos: ${col}
+            grid_cell_row_pos: ${row}
+            grid_cell_column_span: ${col_span | default("1")}
+            grid_cell_row_span: ${row_span | default("1")}
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            width: 100%
+            height: 100%
+            pad_all: 6
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: CENTER
+              flex_align_cross: CENTER
+              pad_row: 2
+            clickable: ${ "true" if (click_page | default("")) != "" else "false" }
+            on_short_click:
+              - lvgl.page.show:
+                  id: ${ click_page if (click_page | default("")) != "" else (page_id | default("page_dashboard")) }
+                  animation: OUT_LEFT
+                  time: 200ms
+            widgets:
+              - label:
+                  id: ${uid | default("tile_imu")}_title
+                  text: "${title | default('')}"
+                  text_font: ${title_font | default("font_sm")}
+                  text_color: c_text_s
+                  hidden: ${ "false" if (title | default("")) != "" else "true" }
+              - container:
+                  id: ${uid | default("tile_imu")}_area
+                  width: 100%
+                  flex_grow: 1
+                  widgets:
+                    - container:
+                        id: ${uid | default("tile_imu")}_circle
+                        styles: ${uid | default("tile_imu")}_circle_style
+                        width: ${ (circle_size | int) if (circle_size | default("")) != "" else (([screen_width|int, screen_height|int]|min) * 28 // 100) }
+                        height: ${ (circle_size | int) if (circle_size | default("")) != "" else (([screen_width|int, screen_height|int]|min) * 28 // 100) }
+                        bg_color: c_bg_p
+                        bg_opa: COVER
+                        widgets:
+                          - line:
+                              styles: ${uid | default("tile_imu")}_dashline_style
+                              points:
+                                - [50%, 0]
+                                - [50%, 100%]
+                          - line:
+                              styles: ${uid | default("tile_imu")}_dashline_style
+                              points:
+                                - [0, 50%]
+                                - [100%, 50%]
+                          - container:
+                              id: ${uid | default("tile_imu")}_center
+                              radius: circle
+                              align: CENTER
+                              width: 10%
+                              height: 10%
+                              bg_color: c_gray
+                              bg_opa: 50%
+                          - container:
+                              id: ${uid | default("tile_imu")}_indicator
+                              radius: circle
+                              align: CENTER
+                              width: 12%
+                              height: 12%
+                              bg_color: c_red
+                              bg_opa: 100%
+                              x: 0
+                              y: 0
+
+script:
+  - id: ${uid | default("tile_imu")}_update
+    mode: single
+    then:
+      - lambda: |-
+          lv_obj_t *area = id(${uid | default("tile_imu")}_area);
+          lv_obj_t *circle = id(${uid | default("tile_imu")}_circle);
+          lv_obj_t *indicator = id(${uid | default("tile_imu")}_indicator);
+          if (std::string("${circle_size | default('')}").empty()) {
+            lv_obj_update_layout(lv_obj_get_screen(id(${uid | default("tile_imu")}_card)));
+            int cw = lv_obj_get_content_width(area);
+            int ch = lv_obj_get_content_height(area);
+            int target = std::min(cw, ch) - (${imu_outline_width} * 2 + 4);
+            if (target >= 24 && (lv_obj_get_width(circle) != target || lv_obj_get_height(circle) != target)) {
+              lv_obj_set_size(circle, target, target);
+            }
+          }
+          lv_obj_update_layout(circle);
+
+          float roll = id(${roll_sensor_id | default("motion_roll")}).state;
+          float pitch = id(${pitch_sensor_id | default("motion_pitch")}).state;
+          if (std::isnan(roll) || std::isnan(pitch)) return;
+
+          int circle_w = lv_obj_get_content_width(circle);
+          int ind_w = lv_obj_get_width(indicator);
+          float max_r = static_cast<float>(std::max(1, (circle_w - ind_w) / 2));
+          const float max_angle = static_cast<float>(${max_angle | default("20.0")});
+          float nx = clamp(roll, -max_angle, max_angle) / max_angle;
+          float ny = clamp(pitch, -max_angle, max_angle) / max_angle;
+          float mag = std::sqrt(nx * nx + ny * ny);
+          if (mag > 1.0f) {
+            nx /= mag;
+            ny /= mag;
+          }
+          int px = static_cast<int>(std::lround(nx * max_r));
+          int py = static_cast<int>(std::lround(ny * max_r));
+          lv_obj_set_pos(indicator, px, py);
+      - if:
+          condition:
+            lambda: |-
+              float roll = id(${roll_sensor_id | default("motion_roll")}).state;
+              float pitch = id(${pitch_sensor_id | default("motion_pitch")}).state;
+              const float thresh = static_cast<float>(${level_threshold | default("1.0")});
+              return !std::isnan(roll) && !std::isnan(pitch) && std::abs(roll) < thresh && std::abs(pitch) < thresh;
+          then:
+            - lvgl.widget.update:
+                id: ${uid | default("tile_imu")}_indicator
+                bg_color: c_green
+          else:
+            - lvgl.widget.update:
+                id: ${uid | default("tile_imu")}_indicator
+                bg_color: c_red
+
+sensor:
+  - id: !extend ${roll_sensor_id | default("motion_roll")}
+    on_value:
+      - if:
+          condition:
+            lvgl.page.is_showing: ${page_id | default("page_dashboard")}
+          then:
+            - script.execute: ${uid | default("tile_imu")}_update
+  - id: !extend ${pitch_sensor_id | default("motion_pitch")}
+    on_value:
+      - if:
+          condition:
+            lvgl.page.is_showing: ${page_id | default("page_dashboard")}
+          then:
+            - script.execute: ${uid | default("tile_imu")}_update
