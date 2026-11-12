@@ -97,8 +97,8 @@
                       id: climate_swing_corner_btn
                       hidden: true
                       align: TOP_LEFT
-                      x: 2
-                      y: 2
+                      x: ${container_pad_left}
+                      y: ${container_pad_left}
                       width: ${climate_corner_btn_size}
                       height: ${climate_corner_btn_size}
                       radius: ${climate_corner_btn_radius}
@@ -125,8 +125,8 @@
                       id: climate_back_corner_btn
                       hidden: ${ "false" if (show_back_btn | default("false") == "true") else "true" }
                       align: TOP_RIGHT
-                      x: -2
-                      y: 2
+                      x: ${ -(container_pad_left|int) }
+                      y: ${container_pad_left}
                       width: ${climate_corner_btn_size}
                       height: ${climate_corner_btn_size}
                       radius: ${climate_corner_btn_radius}
@@ -157,8 +157,8 @@
                   - button:
                       id: climate_mode_corner_btn
                       align: BOTTOM_LEFT
-                      x: 2
-                      y: -2
+                      x: ${container_pad_left}
+                      y: ${ -(container_pad_left|int) }
                       width: ${climate_corner_btn_size}
                       height: ${climate_corner_btn_size}
                       radius: ${climate_corner_btn_radius}
@@ -185,8 +185,8 @@
                       id: climate_fan_corner_btn
                       hidden: true
                       align: BOTTOM_RIGHT
-                      x: -2
-                      y: -2
+                      x: ${ -(container_pad_left|int) }
+                      y: ${ -(container_pad_left|int) }
                       width: ${climate_corner_btn_size}
                       height: ${climate_corner_btn_size}
                       radius: ${climate_corner_btn_radius}
