@@ -32,7 +32,7 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
   # --- LVGL WIDGET PACKAGES ---
-  room_temperature_widget_sensors: !include { file: gui/widgets/labels/number_sensor.yaml, vars: {
+  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
@@ -98,6 +98,7 @@ time:
           - script.execute: lvgl_time_update
 
 sensor:
+  - id: !remove cpu_temperature
   # Combine sensors
   - id: !extend temperature_local
     sources:

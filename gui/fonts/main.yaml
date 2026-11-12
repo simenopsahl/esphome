@@ -16,26 +16,31 @@ substitutions:
   text_sm: >-
     ${ 12 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (14 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (16 if ([screen_width|int, screen_height|int]|max) <= 480 else 26)) }
+       (16 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 800 else 30))) }
   text_md: >-
     ${ 14 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (16 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 30))) }
+       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (28 if ([screen_width|int, screen_height|int]|max) <= 800 else 36)))) }
   text_lg: >-
     ${ 18 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (22 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (24 if ([screen_width|int, screen_height|int]|max) <= 480 else 34)) }
+       (24 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (32 if ([screen_width|int, screen_height|int]|max) <= 800 else 40))) }
   text_xl: >-
     ${ 24 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (22 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (26 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (32 if ([screen_width|int, screen_height|int]|max) <= 480 else 48))) }
+       (32 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 800 else 50)))) }
   text_xxl: >-
     ${ 32 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (26 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (30 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else 64))) }
+       (48 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (58 if ([screen_width|int, screen_height|int]|max) <= 800 else 66)))) }
   text_hg: >-
     ${ 42 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (36 if ([screen_width|int, screen_height|int]|max) <= 240 else
@@ -50,32 +55,36 @@ substitutions:
   icons_sm: >-
     ${ 16 if ([screen_width|int, screen_height|int]|min) <= 128 else
        (18 if ([screen_width|int, screen_height|int]|min) <= 160 else
-       (20 if ([screen_width|int, screen_height|int]|max) <= 240 else
-       (18 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (20 if ([screen_width|int, screen_height|int]|max) <= 480 else 26)))) }
+       (20 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 800 else 30)))) }
   icons_md: >-
     ${ 18 if ([screen_width|int, screen_height|int]|min) <= 128 else
        (20 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (24 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (26 if ([screen_width|int, screen_height|int]|max) <= 480 else 32))) }
+       (26 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 800 else 34)))) }
   icons_lg: >-
     ${ 22 if ([screen_width|int, screen_height|int]|min) <= 128 else
        (24 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (28 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (30 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (34 if ([screen_width|int, screen_height|int]|max) <= 480 else 40)))) }
+       (34 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (38 if ([screen_width|int, screen_height|int]|max) <= 800 else 42))))) }
   icons_xl: >-
     ${ 28 if ([screen_width|int, screen_height|int]|min) <= 128 else
        (30 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (34 if ([screen_width|int, screen_height|int]|max) <= 240 else
-       (38 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (42 if ([screen_width|int, screen_height|int]|max) <= 480 else 48)))) }
+       (34 if ([screen_width|int, screen_height|int]|max) <= 320 else
+       (42 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (46 if ([screen_width|int, screen_height|int]|max) <= 800 else 50))))) }
   icons_xxl: >-
     ${ 36 if ([screen_width|int, screen_height|int]|min) <= 128 else
        (38 if ([screen_width|int, screen_height|int]|min) <= 160 else
        (42 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (48 if ([screen_width|int, screen_height|int]|max) <= 320 else
-       (50 if ([screen_width|int, screen_height|int]|max) <= 480 else 56)))) }
+       (52 if ([screen_width|int, screen_height|int]|max) <= 480 else
+       (56 if ([screen_width|int, screen_height|int]|max) <= 800 else 60))))) }
 
 font:
   - id: font_sm
