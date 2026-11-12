@@ -60,6 +60,20 @@ packages:
       row_span: 1
       col_span: 2
       show_date: true
+  tile_imu: !include
+    file: gui/tiles/imu/local.yaml
+    vars:
+      row: 4
+      col: 0
+      # Optional:
+      # uid: tile_imu
+      # page_id: page_dashboard
+      # title: "Vater"
+      # roll_sensor_id: motion_roll
+      # pitch_sensor_id: motion_pitch
+      # max_angle: "20.0"
+      # level_threshold: "1.0"
+      # click_page: page_status
 
   room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
