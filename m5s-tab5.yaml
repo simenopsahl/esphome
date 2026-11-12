@@ -71,7 +71,7 @@ substitutions:
     log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
-    name: m5s-tab5
+    name: m5s-tab5-e2d8e9
     location: "Storage"
     framework:
       type: esp-idf
