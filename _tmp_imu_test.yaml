@@ -84,7 +84,30 @@ wifi: !remove
 api:
   reboot_timeout: 0s
 
+time:
+  - id: !remove time_homeassistant
+  - platform: host
+    id: time_homeassistant
+    timezone: "${time_timezone}"
+    on_time_sync:
+      - script.execute: lvgl_time_update
+    on_time:
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: lvgl_time_update
+
 sensor:
+  - id: !remove cpu_temperature
+  - id: !extend temperature_local
+    sources:
+      - source: temperature_simulated
+  - id: !extend humidity_local
+    sources:
+      - source: humidity_simulated
+  - id: !extend pressure_local
+    sources:
+      - source: pressure_simulated
   - platform: template
     id: motion_roll
     name: "Motion Roll"
