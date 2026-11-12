@@ -21,7 +21,7 @@ packages:
       row: 0
       col: 0
       row_span: 2
-      col_span: 2          # e.g. span across both columns in row 0, or 1 for a single cell
+      col_span: 3          # e.g. span across both columns in row 0, or 1 for a single cell
       entity_id: climate.faircon_norgespumpa12_proxy
       title: "Varmepumpe"
       icon: "\U000F1A43"
@@ -38,13 +38,18 @@ packages:
       unit: "°C"
       format: "%.1f"
       click_page: page_temperature
+  tile_imu: !include
+    file: gui/tiles/imu/local.yaml
+    vars:
+      row: 2
+      col: 1
   tile_t22_temp_sensor: !include
     file: gui/tiles/sensor/remote.yaml
     vars:
       page_id: page_dashboard
       uid: tile_t22_temp
       row: 2
-      col: 1
+      col: 2
       icon: "\U000F050F"
       title: "T22"
       entity_id: sensor.t22_temperature
@@ -58,22 +63,8 @@ packages:
       row: 3
       col: 0
       row_span: 1
-      col_span: 2
+      col_span: 3
       show_date: true
-  tile_imu: !include
-    file: gui/tiles/imu/local.yaml
-    vars:
-      row: 4
-      col: 0
-      # Optional:
-      # uid: tile_imu
-      # page_id: page_dashboard
-      # title: "Vater"
-      # roll_sensor_id: motion_roll
-      # pitch_sensor_id: motion_pitch
-      # max_angle: "20.0"
-      # level_threshold: "1.0"
-      # click_page: page_status
 
   room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
@@ -111,7 +102,7 @@ lvgl:
         file: gui/pages/grid_dashboard/page.yaml
         vars:
           page_title: "Kontrollpanel"
-          layout: 5x2
+          layout: 6x3
     - <<: !include
         file: gui/pages/climate/page.yaml
         vars:
