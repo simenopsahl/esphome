@@ -1,0 +1,49 @@
+packages:
+  <<: !include_dir_named common
+  board: !include board/m5stack_core_tab5.yaml
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/main.yaml
+
+  tile_imu_default: !include
+    file: gui/tiles/imu/local.yaml
+    vars:
+      row: 4
+      col: 0
+
+  tile_imu_custom: !include
+    file: gui/tiles/imu/local.yaml
+    vars:
+      uid: tile_imu_2
+      page_id: page_dashboard
+      row: 4
+      col: 1
+      title: "Vater"
+      max_angle: "15"
+      level_threshold: "1.5"
+      click_page: page_status
+
+  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+substitutions:
+  device:
+    name: tmp-imu-test
+    location: "Test"
+  display:
+    home_page: page_dashboard
+
+esphome:
+  name: ${device.name}
+
+wifi:
+  use_address: ${device.name}.local
+
+lvgl:
+  pages:
+    - <<: !include
+        file: gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_title: "Kontrollpanel"
+          layout: 5x2
