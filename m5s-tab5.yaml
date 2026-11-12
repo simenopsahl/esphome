@@ -1,0 +1,18 @@
+# Board: M5STACK Tab5 esp32-p4 Board (ES pre rev.300)
+# Definition: definitions/boards/m5stack-tab5-p4/manifest.yaml
+
+esphome:
+  name: m5s-tab5
+  friendly_name: m5s-tab5
+
+esp32:
+  variant: esp32p4
+  engineering_sample: true
+
+logger:
+
+# This board has no native Wi-Fi. ESPHome's ``api:`` and
+# ``ota:`` components both require a ``network``
+# component — configure ``openthread:`` / ``ethernet:`` /
+# ``esp32_hosted:`` to suit your setup, then add ``api:``
+# and ``ota:`` blocks once the network is ready.
