@@ -258,20 +258,20 @@ font:
 # Check if person is home
 binary_sensor:
   - platform: homeassistant
-    entity_id: binary_sensor.waveshare_display_motion
+    entity_id: binary_sensor.etg1_occupancy
     id: presence_detected
 
 sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: car_battery_percent
     id: car_battery_percent
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: car_battery_range
     id: car_battery_range
     on_value:
@@ -279,49 +279,49 @@ sensor:
         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: temp_forecast
     id: weather_temperature_forecast
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: temp_measured
     id: weather_temperature_actual
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_0
     id: weather_temperature_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_1
     id: weather_temperature_1
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_2
     id: weather_temperature_2
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_3
     id: weather_temperature_3
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_4
     id: weather_temperature_4
     on_value:
@@ -329,69 +329,69 @@ sensor:
         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     id: nordpool_sensor
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     attribute: price0
     id: nordpool_price_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: price1
 #    id: nordpool_price_1
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: price2
 #    id: nordpool_price_2
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: price3
 #    id: nordpool_price_3
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     attribute: price4
     id: nordpool_price_4
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: price5
 #    id: nordpool_price_5
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: price6
 #    id: nordpool_price_6
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: price7
 #    id: nordpool_price_7
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     attribute: price8
     id: nordpool_price_8
     on_value:
@@ -415,56 +415,56 @@ graph:
 # Strings from Home Assistant
 text_sensor:
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: bus_bregnefaret_time_0
     id: bus_bregnefaret_due_at_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: bus_bregnefaret_line_0
     id: bus_bregnefaret_line_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: bus_bregnefaret_time_1
     id: bus_bregnefaret_due_at_1
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: bus_bregnefaret_line_1
     id: bus_bregnefaret_line_1
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: bus_bregnefaret_line_2
     id: bus_bregnefaret_line_2
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: bus_bregnefaret_time_2
     id: bus_bregnefaret_due_at_2
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_display_data
+#    entity_id: sensor.epaper_data_general
 #    attribute: bus_bregnefaret_line_3
 #    id: bus_bregnefaret_line_3
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_display_data
+#    entity_id: sensor.epaper_data_general
 #    attribute: bus_bregnefaret_time_3
 #    id: bus_bregnefaret_due_at_3
 #    on_value:
@@ -479,7 +479,7 @@ text_sensor:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_display_data
+#    entity_id: sensor.epaper_data_general
 #    attribute: bus_jettegryta_line_0
 #    id: bus_jettegryta_line_0
 #    on_value:
@@ -493,7 +493,7 @@ text_sensor:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_display_data
+#    entity_id: sensor.epaper_data_general
 #    attribute: bus_jettegryta_line_1
 #    id: bus_jettegryta_line_1
 #    on_value:
@@ -501,21 +501,21 @@ text_sensor:
 #        - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: folloren_next
     id: folloren_next
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: folloren_restavfall
     id: folloren_restavfall
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: folloren_papir
     id: folloren_papir
     on_value:
@@ -529,63 +529,63 @@ text_sensor:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_now
     id: weather_condition_now
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_0
     id: weather_condition_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_0
     id: weather_timestamp_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_1
     id: weather_condition_1
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_1
     id: weather_timestamp_1
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_2
     id: weather_condition_2
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_2
     id: weather_timestamp_2
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_3
     id: weather_condition_3
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_3
     id: weather_timestamp_3
     on_value:
@@ -593,14 +593,14 @@ text_sensor:
         - lambda: 'id(data_updated) = true;'
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_4
     id: weather_condition_4
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_4
     id: weather_timestamp_4
     on_value:
@@ -608,63 +608,63 @@ text_sensor:
         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     attribute: time0
     id: nordpool_time_0
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: time1
 #    id: nordpool_time_1
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: time2
 #    id: nordpool_time_2
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: time3
 #    id: nordpool_time_3
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     attribute: time4
     id: nordpool_time_4
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: time5
 #    id: nordpool_time_5
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: time6
 #    id: nordpool_time_6
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
 #  - platform: homeassistant
-#    entity_id: sensor.waveshare_nordpool_future_offset
+#    entity_id: sensor.epaper_data_nordpool_future_offset
 #    attribute: time7
 #    id: nordpool_time_7
 #    on_value:
 #      then:
 #        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_nordpool_future_offset
+    entity_id: sensor.epaper_data_nordpool_future_offset
     attribute: time8
     id: nordpool_time_8
     on_value:
