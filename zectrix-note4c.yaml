@@ -11,8 +11,6 @@ packages:
   media_player: !include features/media_player.yaml
 
 substitutions:
-  screen_width: "300"
-  screen_height: "400"
   epaper_home_page: page_content
   epaper_rotation: "270"
   common:
