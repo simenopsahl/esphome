@@ -10,8 +10,8 @@ packages:
   epaper_content: !include gui/epaper/pages/weather_station_sensors.yaml
 
 substitutions:
-  screen_width: "400"
-  screen_height: "300"
+  panel_width: "400"
+  panel_height: "300"
   epaper_home_page: page_content
   common:
     log_level: debug
