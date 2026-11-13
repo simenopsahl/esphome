@@ -21,6 +21,7 @@ substitutions:
     framework:
       type: esp-idf
   epaper_home_page: page_content
+  epaper_image_type: RGB
 
 esphome:
   comment: ${device.model} @ ${device.location}
