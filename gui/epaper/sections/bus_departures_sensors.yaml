@@ -1,7 +1,7 @@
 # Companion sensor bindings for `gui/epaper/sections/bus_departures.yaml`
 
 substitutions:
-  epaper_data_entity: "sensor.waveshare_display_data"
+  epaper_data_entity: "sensor.epaper_data_general"
 
 text_sensor:
   - platform: homeassistant

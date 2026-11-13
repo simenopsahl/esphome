@@ -2,7 +2,7 @@
 # Tracks `weather_condition_now` and `weather_condition_0` from `${epaper_data_entity}`.
 
 substitutions:
-  epaper_data_entity: "sensor.waveshare_display_data"
+  epaper_data_entity: "sensor.epaper_data_general"
 
 globals:
   - id: ep_wh_cond_now

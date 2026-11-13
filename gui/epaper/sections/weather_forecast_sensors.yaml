@@ -1,7 +1,7 @@
 # Companion sensor & script bindings for `gui/epaper/sections/weather_forecast.yaml`
 
 substitutions:
-  epaper_data_entity: "sensor.waveshare_display_data"
+  epaper_data_entity: "sensor.epaper_data_general"
 
 script:
   - id: epaper_set_weather_icon

@@ -3,25 +3,32 @@
 # from `${epaper_data_entity}` attributes.
 
 substitutions:
-  epaper_data_entity: "sensor.waveshare_display_data"
+  epaper_data_entity: "sensor.epaper_data_general"
+  epaper_temperatures_entity: "sensor.epaper_data_temperatures"
 
 packages:
   weather_header: !include ../sections/weather_header_sensors.yaml
   graph_ute: !include
-    file: ../sections/rolling_graph_ha_attr.yaml
+    file: ../sections/rolling_graph_ha_series.yaml
     vars:
       uid: graph_temp_ute
       entity_id: ${epaper_data_entity}
       attribute: temp_measured
+      history_entity_id: ${epaper_temperatures_entity}
+      history_attribute: temp_measured_history
   graph_foran: !include
-    file: ../sections/rolling_graph_ha_attr.yaml
+    file: ../sections/rolling_graph_ha_series.yaml
     vars:
       uid: graph_temp_foran
       entity_id: ${epaper_data_entity}
       attribute: temp_foran
+      history_entity_id: ${epaper_temperatures_entity}
+      history_attribute: temp_foran_history
   graph_bak: !include
-    file: ../sections/rolling_graph_ha_attr.yaml
+    file: ../sections/rolling_graph_ha_series.yaml
     vars:
       uid: graph_temp_bak
       entity_id: ${epaper_data_entity}
       attribute: temp_bak
+      history_entity_id: ${epaper_temperatures_entity}
+      history_attribute: temp_bak_history

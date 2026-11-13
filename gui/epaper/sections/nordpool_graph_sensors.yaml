@@ -2,13 +2,17 @@
 # Measures `ep_np_plot_box` at runtime (`lv_obj_get_content_width/height`) to plot 9 hourly stepped bars (18 points).
 
 substitutions:
-  epaper_nordpool_entity: "sensor.waveshare_nordpool_future_offset"
+  epaper_nordpool_entity: "sensor.epaper_data_nordpool_future_offset"
 
 globals:
   - id: ep_np_prices
     type: std::array<float, 9>
     restore_value: no
     initial_value: '{0, 0, 0, 0, 0, 0, 0, 0, 0}'
+  - id: ep_np_count
+    type: int
+    restore_value: no
+    initial_value: '0'
   - id: ep_np_px
     type: std::array<int, 18>
     restore_value: no
@@ -25,6 +29,8 @@ script:
       - lambda: |-
           lv_obj_t *box = id(ep_np_plot_box);
           if (box == nullptr) return;
+          int n = id(ep_np_count);
+          if (n <= 0) return;
           lv_obj_update_layout(box);
           int box_w = lv_obj_get_content_width(box);
           int box_h = lv_obj_get_content_height(box);
@@ -32,7 +38,7 @@ script:
 
           float p_min = id(ep_np_prices)[0];
           float p_max = id(ep_np_prices)[0];
-          for (int i = 1; i < 9; i++) {
+          for (int i = 1; i < n; i++) {
             if (id(ep_np_prices)[i] < p_min) p_min = id(ep_np_prices)[i];
             if (id(ep_np_prices)[i] > p_max) p_max = id(ep_np_prices)[i];
           }
@@ -51,9 +57,10 @@ script:
           if (plot_w <= 4 || plot_h <= 4) return;
 
           for (int i = 0; i < 9; i++) {
+            int idx = (i < n) ? i : (n - 1);
             int x0 = pad_x + (plot_w * i) / 9;
             int x1 = pad_x + (plot_w * (i + 1)) / 9;
-            float norm = (p_max - id(ep_np_prices)[i]) / span;
+            float norm = (p_max - id(ep_np_prices)[idx]) / span;
             int y = pad_y + (int) lroundf(norm * plot_h);
             id(ep_np_px)[i * 2] = x0;
             id(ep_np_py)[i * 2] = y;
@@ -100,19 +107,37 @@ script:
             - x: !lambda 'return id(ep_np_px)[17];'
               y: !lambda 'return id(ep_np_py)[17];'
 
-sensor:
+text_sensor:
   - platform: homeassistant
     entity_id: ${epaper_nordpool_entity}
-    attribute: price0
-    id: ep_np_price_0
+    attribute: prices
+    id: ep_np_prices_text
     internal: true
     on_value:
       - lambda: |-
-          if (!isnan(x)) {
-            id(ep_np_prices)[0] = x;
-            char buf[16];
-            snprintf(buf, sizeof(buf), "%d Øre", (int) lroundf(x));
-            lv_label_set_text(id(lbl_ep_np_p0), buf);
+          const char *p = x.c_str();
+          int count = 0;
+          while (*p && count < 9) {
+            while (*p && (*p == ' ' || *p == ',' || *p == '[' || *p == ']')) p++;
+            if (!*p) break;
+            char *end = nullptr;
+            float v = strtof(p, &end);
+            if (end == p) { p++; continue; }
+            id(ep_np_prices)[count++] = v;
+            p = end;
+          }
+          if (count <= 0) return;
+          id(ep_np_count) = count;
+          char buf[16];
+          snprintf(buf, sizeof(buf), "%d Øre", (int) lroundf(id(ep_np_prices)[0]));
+          if (id(lbl_ep_np_p0) != nullptr) lv_label_set_text(id(lbl_ep_np_p0), buf);
+          if (count > 4 && id(lbl_ep_np_p4) != nullptr) {
+            snprintf(buf, sizeof(buf), "%d Øre", (int) lroundf(id(ep_np_prices)[4]));
+            lv_label_set_text(id(lbl_ep_np_p4), buf);
+          }
+          if (count > 8 && id(lbl_ep_np_p8) != nullptr) {
+            snprintf(buf, sizeof(buf), "%d Øre", (int) lroundf(id(ep_np_prices)[8]));
+            lv_label_set_text(id(lbl_ep_np_p8), buf);
           }
           id(data_updated) = true;
       - script.execute: epaper_update_nordpool_chart
@@ -120,120 +145,25 @@ sensor:
 
   - platform: homeassistant
     entity_id: ${epaper_nordpool_entity}
-    attribute: price1
-    id: ep_np_price_1
-    internal: true
-    on_value:
-      - lambda: 'if (!isnan(x)) id(ep_np_prices)[1] = x; id(data_updated) = true;'
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price2
-    id: ep_np_price_2
-    internal: true
-    on_value:
-      - lambda: 'if (!isnan(x)) id(ep_np_prices)[2] = x; id(data_updated) = true;'
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price3
-    id: ep_np_price_3
-    internal: true
-    on_value:
-      - lambda: 'if (!isnan(x)) id(ep_np_prices)[3] = x; id(data_updated) = true;'
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price4
-    id: ep_np_price_4
+    attribute: times
+    id: ep_np_times_text
     internal: true
     on_value:
       - lambda: |-
-          if (!isnan(x)) {
-            id(ep_np_prices)[4] = x;
-            char buf[16];
-            snprintf(buf, sizeof(buf), "%d Øre", (int) lroundf(x));
-            lv_label_set_text(id(lbl_ep_np_p4), buf);
+          if (x.empty() || x == "unavailable" || x == "unknown") return;
+          std::vector<std::string> times;
+          size_t start = 0;
+          while (start < x.size() && times.size() < 9) {
+            size_t comma = x.find(',', start);
+            std::string tok = (comma == std::string::npos) ? x.substr(start) : x.substr(start, comma - start);
+            size_t a = tok.find_first_not_of(" \t\r\n[]'\"");
+            size_t b = tok.find_last_not_of(" \t\r\n[]'\"");
+            if (a != std::string::npos) times.push_back(tok.substr(a, b - a + 1));
+            if (comma == std::string::npos) break;
+            start = comma + 1;
           }
+          if (times.empty()) return;
+          if (id(lbl_ep_np_t0) != nullptr) lv_label_set_text(id(lbl_ep_np_t0), times[0].c_str());
+          if (times.size() > 4 && id(lbl_ep_np_t4) != nullptr) lv_label_set_text(id(lbl_ep_np_t4), times[4].c_str());
+          if (times.size() > 8 && id(lbl_ep_np_t8) != nullptr) lv_label_set_text(id(lbl_ep_np_t8), times[8].c_str());
           id(data_updated) = true;
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price5
-    id: ep_np_price_5
-    internal: true
-    on_value:
-      - lambda: 'if (!isnan(x)) id(ep_np_prices)[5] = x; id(data_updated) = true;'
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price6
-    id: ep_np_price_6
-    internal: true
-    on_value:
-      - lambda: 'if (!isnan(x)) id(ep_np_prices)[6] = x; id(data_updated) = true;'
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price7
-    id: ep_np_price_7
-    internal: true
-    on_value:
-      - lambda: 'if (!isnan(x)) id(ep_np_prices)[7] = x; id(data_updated) = true;'
-      - script.execute: epaper_update_nordpool_chart
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: price8
-    id: ep_np_price_8
-    internal: true
-    on_value:
-      - lambda: |-
-          if (!isnan(x)) {
-            id(ep_np_prices)[8] = x;
-            char buf[16];
-            snprintf(buf, sizeof(buf), "%d Øre", (int) lroundf(x));
-            lv_label_set_text(id(lbl_ep_np_p8), buf);
-          }
-          id(data_updated) = true;
-      - script.execute: epaper_update_nordpool_chart
-
-text_sensor:
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: time0
-    id: ep_np_time_0
-    internal: true
-    on_value:
-      - lvgl.label.update:
-          id: lbl_ep_np_t0
-          text: !lambda 'return x;'
-      - lambda: 'id(data_updated) = true;'
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: time4
-    id: ep_np_time_4
-    internal: true
-    on_value:
-      - lvgl.label.update:
-          id: lbl_ep_np_t4
-          text: !lambda 'return x;'
-      - lambda: 'id(data_updated) = true;'
-
-  - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
-    attribute: time8
-    id: ep_np_time_8
-    internal: true
-    on_value:
-      - lvgl.label.update:
-          id: lbl_ep_np_t8
-          text: !lambda 'return x;'
-      - lambda: 'id(data_updated) = true;'

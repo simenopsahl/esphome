@@ -1,5 +1,5 @@
 # Bind a remote Home Assistant entity attribute (`entity_id` + `attribute`) to `rolling_graph.yaml` (`uid`).
-# Useful for multi-attribute display helpers such as `sensor.waveshare_display_data`.
+# Useful for multi-attribute display helpers such as `sensor.epaper_data_general`.
 #
 # Required vars: `uid`, `entity_id`, `attribute`
 # Optional vars: `min_span`, `value_fmt`, `sample_interval`

@@ -3,7 +3,7 @@
 # Combines instant full history on boot from Home Assistant with live value + interval sampling.
 #
 # Required vars: `uid`, `entity_id`, `attribute`, `history_attribute`
-# Optional vars: `min_span`, `value_fmt`, `sample_interval`
+# Optional vars: `history_entity_id` (defaults to `entity_id`), `min_span`, `value_fmt`, `sample_interval`
 
 packages:
   core: !include
@@ -27,7 +27,7 @@ sensor:
 
 text_sensor:
   - platform: homeassistant
-    entity_id: ${entity_id}
+    entity_id: ${history_entity_id | default(entity_id)}
     attribute: ${history_attribute}
     id: ${uid}_history
     internal: true

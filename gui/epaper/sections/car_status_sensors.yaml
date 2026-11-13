@@ -2,7 +2,7 @@
 # Uses `text_sensor` to gracefully handle `"?"` / unavailable strings from Home Assistant templates.
 
 substitutions:
-  epaper_data_entity: "sensor.waveshare_display_data"
+  epaper_data_entity: "sensor.epaper_data_general"
 
 text_sensor:
   - platform: homeassistant

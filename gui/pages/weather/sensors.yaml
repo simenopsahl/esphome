@@ -66,7 +66,7 @@ text_sensor:
                 args: [ 'id(ha_weather_temperature).state.c_str()' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_now_string
     id: ha_condition_today
     on_value:
@@ -79,14 +79,14 @@ text_sensor:
 
   # --- Forecast Conditions & Timestamps (0..3) ---
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_0
     id: ha_condition_0
     on_value:
       - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_0, input_id: ha_condition_0 } }
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_0
     id: ha_weather_timestamp_0
     on_value:
@@ -98,14 +98,14 @@ text_sensor:
                 args: [ 'id(ha_weather_timestamp_0).state.c_str()' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_1
     id: ha_condition_1
     on_value:
       - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_1, input_id: ha_condition_1 } }
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_1
     id: ha_weather_timestamp_1
     on_value:
@@ -117,14 +117,14 @@ text_sensor:
                 args: [ 'id(ha_weather_timestamp_1).state.c_str()' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_2
     id: ha_condition_2
     on_value:
       - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_2, input_id: ha_condition_2 } }
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_2
     id: ha_weather_timestamp_2
     on_value:
@@ -136,14 +136,14 @@ text_sensor:
                 args: [ 'id(ha_weather_timestamp_2).state.c_str()' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_3
     id: ha_condition_3
     on_value:
       - then: !include { file: icons_update.yaml, vars: { suffix: forecast, id: forecast_condition_icon_3, input_id: ha_condition_3 } }
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_timestamp_3
     id: ha_weather_timestamp_3
     on_value:
@@ -157,7 +157,7 @@ text_sensor:
 sensor:
   # --- Forecast Temperatures (0..3) ---
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_0
     id: ha_weather_temperature_0
     on_value:
@@ -169,7 +169,7 @@ sensor:
                 args: [ 'x' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_1
     id: ha_weather_temperature_1
     on_value:
@@ -181,7 +181,7 @@ sensor:
                 args: [ 'x' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_2
     id: ha_weather_temperature_2
     on_value:
@@ -193,7 +193,7 @@ sensor:
                 args: [ 'x' ]
 
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_temperature_3
     id: ha_weather_temperature_3
     on_value:

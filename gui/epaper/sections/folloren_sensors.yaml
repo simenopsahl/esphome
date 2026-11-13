@@ -2,7 +2,7 @@
 # Binds `folloren_next`, `folloren_today_types`, `folloren_next_types`, and the 4 bin date attributes.
 
 substitutions:
-  epaper_data_entity: "sensor.waveshare_display_data"
+  epaper_data_entity: "sensor.epaper_data_general"
 
 globals:
   - id: ep_fl_next_text

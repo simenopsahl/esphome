@@ -1,6 +1,7 @@
 # Functions to update the NordPool LVGL page
 
 substitutions:
+  nordpool_entity: "sensor.epaper_data_nordpool_future_offset"
   nordpool_line_width: >-
     ${2 if ( [screen_width|int, screen_height|int]|min <= 128 )
       else (4 if ( [screen_width|int, screen_height|int]|min <= 160 )
@@ -10,7 +11,15 @@ substitutions:
       else 10))))}
 
 globals:
-  # These arrays will store the coordinates for the line graph's points.
+  # These arrays store the coordinates and values for the line graph's points.
+  - id: nordpool_prices
+    type: std::array<float, 9>
+    restore_value: no
+    initial_value: '{0, 0, 0, 0, 0, 0, 0, 0, 0}'
+  - id: nordpool_price_count
+    type: int
+    restore_value: no
+    initial_value: '0'
   - id: nordpool_points_y
     type: int[9]
     restore_value: no
@@ -58,6 +67,8 @@ script:
       - lambda: |-
           // STEP 1: Measure the graph container and calculate all X and Y coordinates.
           if (id(nordpool_graph_area) == nullptr) { return; }
+          const int n = id(nordpool_price_count);
+          if (n <= 0) { return; }
           lv_obj_update_layout(id(nordpool_graph_area));
           const float graph_container_w = lv_obj_get_content_width(id(nordpool_graph_area));
           const float graph_container_h = lv_obj_get_content_height(id(nordpool_graph_area));
@@ -73,30 +84,19 @@ script:
             id(nordpool_points_x)[i] = (int)round(inset + x_coord);
           }
 
-          float prices[9];
-          prices[0] = id(nordpool_price_0).state;
-          prices[1] = id(nordpool_price_1).state;
-          prices[2] = id(nordpool_price_2).state;
-          prices[3] = id(nordpool_price_3).state;
-          prices[4] = id(nordpool_price_4).state;
-          prices[5] = id(nordpool_price_5).state;
-          prices[6] = id(nordpool_price_6).state;
-          prices[7] = id(nordpool_price_7).state;
-          prices[8] = id(nordpool_price_8).state;
-
-          float min_p = id(nordpool_price_min).state;
-          float max_p = id(nordpool_price_max).state;
-
-          if (isnan(min_p) || isnan(max_p)) { return; }
-          for (int i = 0; i < 9; ++i) {
-            if (isnan(prices[i])) { return; }
+          float min_p = id(nordpool_prices)[0];
+          float max_p = id(nordpool_prices)[0];
+          for (int i = 1; i < n; ++i) {
+            if (id(nordpool_prices)[i] < min_p) min_p = id(nordpool_prices)[i];
+            if (id(nordpool_prices)[i] > max_p) max_p = id(nordpool_prices)[i];
           }
 
           for (int i = 0; i < 9; ++i) {
+            int idx = (i < n) ? i : (n - 1);
             if (max_p == min_p) {
               id(nordpool_points_y)[i] = (int)round(graph_container_h / 2.0f);
             } else {
-              float scaled_y = graph_drawable_h - ((prices[i] - min_p) / (max_p - min_p) * graph_drawable_h);
+              float scaled_y = graph_drawable_h - ((id(nordpool_prices)[idx] - min_p) / (max_p - min_p) * graph_drawable_h);
               id(nordpool_points_y)[i] = (int)round(inset + scaled_y);
             }
           }
@@ -128,158 +128,69 @@ script:
             - x: !lambda return id(nordpool_points_x)[8];
               y: !lambda return id(nordpool_points_y)[8];
 
-sensor:
-  # All your homeassistant sensors for prices 0 through 8 go here
-  # This setup ensures each widget is updated when its corresponding sensor value changes.
-  - platform: homeassistant
-    id: nordpool_price_0
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price0
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_price_0
-              text:
-                format: "%.0f"
-                args: [ 'x' ]
-  - platform: homeassistant
-    id: nordpool_price_1
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price1
-  - platform: homeassistant
-    id: nordpool_price_2
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price2
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_price_2
-              text:
-                format: "%.0f"
-                args: [ 'x' ]
-  - platform: homeassistant
-    id: nordpool_price_3
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price3
-  - platform: homeassistant
-    id: nordpool_price_4
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price4
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_price_4
-              text:
-                format: "%.0f"
-                args: [ 'x' ]
-  - platform: homeassistant
-    id: nordpool_price_5
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price5
-  - platform: homeassistant
-    id: nordpool_price_6
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price6
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_price_6
-              text:
-                format: "%.0f"
-                args: [ 'x' ]
-  - platform: homeassistant
-    id: nordpool_price_7
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price7
-  - platform: homeassistant
-    id: nordpool_price_8
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: price8
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_price_8
-              text:
-                format: "%.0f"
-                args: [ 'x' ]
-
-  # Combination sensors to find the min and max price across all points
-  - platform: combination
-    id: nordpool_price_min
-    type: min
-    sources:
-      - source: nordpool_price_0
-      - source: nordpool_price_1
-      - source: nordpool_price_2
-      - source: nordpool_price_3
-      - source: nordpool_price_4
-      - source: nordpool_price_5
-      - source: nordpool_price_6
-      - source: nordpool_price_7
-      - source: nordpool_price_8
-  - platform: combination
-    id: nordpool_price_max
-    type: max
-    sources:
-      - source: nordpool_price_0
-      - source: nordpool_price_1
-      - source: nordpool_price_2
-      - source: nordpool_price_3
-      - source: nordpool_price_4
-      - source: nordpool_price_5
-      - source: nordpool_price_6
-      - source: nordpool_price_7
-      - source: nordpool_price_8
-    on_value:
-      - then:
-          # When the max price changes (meaning any price has changed), run the update script.
-          - script.execute:
-              id: nordpool_update_chart
-
 text_sensor:
-  # All your homeassistant text_sensors for the time labels go here
   - platform: homeassistant
-    id: nordpool_time_0
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: time0
+    id: nordpool_prices_text
+    entity_id: ${nordpool_entity}
+    attribute: prices
+    internal: true
     on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_time_0
-              text: !lambda return id(nordpool_time_0).state;
+      - lambda: |-
+          const char *p = x.c_str();
+          int count = 0;
+          while (*p && count < 9) {
+            while (*p && (*p == ' ' || *p == ',' || *p == '[' || *p == ']')) p++;
+            if (!*p) break;
+            char *end = nullptr;
+            float v = strtof(p, &end);
+            if (end == p) { p++; continue; }
+            id(nordpool_prices)[count++] = v;
+            p = end;
+          }
+          if (count <= 0) return;
+          id(nordpool_price_count) = count;
+          char buf[16];
+          auto set_price = [&](lv_obj_t *lbl, int idx) {
+            if (lbl != nullptr && count > idx) {
+              snprintf(buf, sizeof(buf), "%.0f", id(nordpool_prices)[idx]);
+              lv_label_set_text(lbl, buf);
+            }
+          };
+          set_price(id(lbl_nordpool_price_0), 0);
+          set_price(id(lbl_nordpool_price_2), 2);
+          set_price(id(lbl_nordpool_price_4), 4);
+          set_price(id(lbl_nordpool_price_6), 6);
+          set_price(id(lbl_nordpool_price_8), 8);
+      - script.execute:
+          id: nordpool_update_chart
+
   - platform: homeassistant
-    id: nordpool_time_2
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: time2
+    id: nordpool_times_text
+    entity_id: ${nordpool_entity}
+    attribute: times
+    internal: true
     on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_time_2
-              text: !lambda return id(nordpool_time_2).state;
-  - platform: homeassistant
-    id: nordpool_time_4
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: time4
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_time_4
-              text: !lambda return id(nordpool_time_4).state;
-  - platform: homeassistant
-    id: nordpool_time_6
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: time6
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_time_6
-              text: !lambda return id(nordpool_time_6).state;
-  - platform: homeassistant
-    id: nordpool_time_8
-    entity_id: sensor.waveshare_nordpool_future_offset
-    attribute: time8
-    on_value:
-      - then:
-          - lvgl.label.update:
-              id: lbl_nordpool_time_8
-              text: !lambda return id(nordpool_time_8).state;
+      - lambda: |-
+          if (x.empty() || x == "unavailable" || x == "unknown") return;
+          std::vector<std::string> times;
+          size_t start = 0;
+          while (start < x.size() && times.size() < 9) {
+            size_t comma = x.find(',', start);
+            std::string tok = (comma == std::string::npos) ? x.substr(start) : x.substr(start, comma - start);
+            size_t a = tok.find_first_not_of(" \t\r\n[]'\"");
+            size_t b = tok.find_last_not_of(" \t\r\n[]'\"");
+            if (a != std::string::npos) times.push_back(tok.substr(a, b - a + 1));
+            if (comma == std::string::npos) break;
+            start = comma + 1;
+          }
+          if (times.empty()) return;
+          auto set_time = [&](lv_obj_t *lbl, size_t idx) {
+            if (lbl != nullptr && times.size() > idx) {
+              lv_label_set_text(lbl, times[idx].c_str());
+            }
+          };
+          set_time(id(lbl_nordpool_time_0), 0);
+          set_time(id(lbl_nordpool_time_2), 2);
+          set_time(id(lbl_nordpool_time_4), 4);
+          set_time(id(lbl_nordpool_time_6), 6);
+          set_time(id(lbl_nordpool_time_8), 8);
