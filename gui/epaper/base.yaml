@@ -30,7 +30,9 @@ substitutions:
        (8 if ([screen_width|int, screen_height|int]|max) <= 400 else
        (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
 
-  # Overridden by bezel nav packages (e.g. nav_crowpanel sets nav_pad_right)
+  # Overridden by bezel nav packages (e.g. nav_crowpanel / rotated nav_reterminal)
+  epaper_nav_pad_top: "0"
+  epaper_nav_pad_bottom: "0"
   epaper_nav_pad_right: "0"
   epaper_nav_pad_left: "0"
   epaper_status_in_footer: "false"

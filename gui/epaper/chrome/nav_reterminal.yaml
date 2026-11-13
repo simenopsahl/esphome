@@ -1,9 +1,17 @@
 # Bezel navigation hints for Seeed reTerminal E1001 (800x480), E1002 (800x480), & E1003 (1872x1404).
-# Places Left / Right / Home icons in the header aligned beneath the top hardware keys.
+# Anchors the Left / Right / Home icons to the physical top hardware keys across all
+# LVGL display rotations (`epaper_rotation`: 0, 90, 180, 270) while keeping glyphs upright.
 
 substitutions:
   epaper_status_in_footer: "false"
-  epaper_nav_pad_right: "0"
+  epaper_nav_pad_top: "0"
+  epaper_nav_pad_bottom: "0"
+  epaper_nav_pad_left: >-
+    ${ (64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+       if (epaper_rotation|string) == "90" else "0" }
+  epaper_nav_pad_right: >-
+    ${ (64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+       if (epaper_rotation|string) == "270" else "0" }
 
 script:
   - id: !extend epaper_hide_chrome
@@ -20,23 +28,50 @@ lvgl:
       - container:
           id: ep_nav_reterminal
           styles: epaper_fg_text_style
-          align: TOP_RIGHT
-          x: ${ -(360 if ([screen_width|int, screen_height|int]|max) > 960 else 160) }
-          y: 0
-          width: SIZE_CONTENT
-          height: ${epaper_header_h}
+          align: >-
+            ${ "TOP_LEFT" if (epaper_rotation|string) == "90"
+               else ("BOTTOM_LEFT" if (epaper_rotation|string) == "180"
+               else ("BOTTOM_RIGHT" if (epaper_rotation|string) == "270"
+               else "TOP_RIGHT")) }
+          x: >-
+            ${ (360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+               if (epaper_rotation|string) == "180"
+               else (-(360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+               if (epaper_rotation|string) == "0" else 0) }
+          y: >-
+            ${ (360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+               if (epaper_rotation|string) == "90"
+               else (-(360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+               if (epaper_rotation|string) == "270" else 0) }
+          width: >-
+            ${ (64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+               if (epaper_rotation|string) in ["90", "270"] else "SIZE_CONTENT" }
+          height: >-
+            ${ epaper_header_h if (epaper_rotation|string) == "0"
+               else (epaper_footer_h if (epaper_rotation|string) == "180"
+               else "SIZE_CONTENT") }
+          pad_all: 0
           layout:
             type: FLEX
-            flex_flow: ROW
+            flex_flow: >-
+              ${ "COLUMN_REVERSE" if (epaper_rotation|string) == "90"
+                 else ("ROW_REVERSE" if (epaper_rotation|string) == "180"
+                 else ("COLUMN" if (epaper_rotation|string) == "270"
+                 else "ROW")) }
             flex_align_main: CENTER
             flex_align_cross: CENTER
-            pad_column: ${ 36 if ([screen_width|int, screen_height|int]|max) > 960 else 18 }
+            pad_column: >-
+              ${ (36 if ([screen_width|int, screen_height|int]|max) > 960 else 18)
+                 if (epaper_rotation|string) in ["0", "180"] else 0 }
+            pad_row: >-
+              ${ (36 if ([screen_width|int, screen_height|int]|max) > 960 else 18)
+                 if (epaper_rotation|string) in ["90", "270"] else 0 }
           widgets:
             - label:
-                text: "\U000F0141" # chevron-left
+                text: "\U000F004E" # arrow-left-thick
                 text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|min) > 300 else "mdi_sm" }
             - label:
-                text: "\U000F0142" # chevron-right
+                text: "\U000F0055" # arrow-right-thick
                 text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|min) > 300 else "mdi_sm" }
             - label:
                 text: "\U000F02DC" # home

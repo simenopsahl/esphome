@@ -11,8 +11,8 @@
 
 id: ${epaper_ws_page_id | default("page_content")}
 styles: epaper_page_style
-pad_top: ${ (epaper_header_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) }
-pad_bottom: ${ (epaper_footer_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) }
+pad_top: ${ (epaper_header_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) + (epaper_nav_pad_top|int) }
+pad_bottom: ${ (epaper_footer_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) + (epaper_nav_pad_bottom|int) }
 pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
 pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
 scrollbar_mode: "OFF"

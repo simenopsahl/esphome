@@ -16,8 +16,8 @@
 
 id: page_info
 styles: epaper_page_style
-pad_top: ${ (epaper_header_h|int) + (epaper_pad_y|int) }
-pad_bottom: ${ (epaper_footer_h|int) + (4 if ([screen_width|int, screen_height|int]|max) <= 240 else (epaper_pad_y|int)) }
+pad_top: ${ (epaper_header_h|int) + (epaper_pad_y|int) + (epaper_nav_pad_top|int) }
+pad_bottom: ${ (epaper_footer_h|int) + (4 if ([screen_width|int, screen_height|int]|max) <= 240 else (epaper_pad_y|int)) + (epaper_nav_pad_bottom|int) }
 pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
 pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
 on_load:

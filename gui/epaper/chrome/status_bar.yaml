@@ -107,10 +107,10 @@ lvgl:
           id: ep_header_bar
           styles: epaper_fg_text_style
           x: 0
-          y: 0
+          y: ${epaper_nav_pad_top}
           width: 100%
           height: ${epaper_header_h}
-          pad_left: ${epaper_pad_x}
+          pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
           pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
           layout:
             type: FLEX
@@ -178,9 +178,9 @@ lvgl:
       # Header bottom divider line
       - obj:
           id: ep_header_divider
-          x: ${epaper_pad_x}
-          y: ${epaper_header_h}
-          width: ${ (screen_width|int) - (2 * (epaper_pad_x|int)) - (epaper_nav_pad_right|int) }
+          x: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
+          y: ${ (epaper_header_h|int) + (epaper_nav_pad_top|int) }
+          width: ${ (screen_width|int) - (2 * (epaper_pad_x|int)) - (epaper_nav_pad_left|int) - (epaper_nav_pad_right|int) }
           height: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
           styles: epaper_divider_style
           hidden: ${ "true" if ([screen_width|int, screen_height|int]|max) <= 240 else "false" }
@@ -190,9 +190,10 @@ lvgl:
           id: ep_footer_bar
           styles: epaper_fg_text_style
           align: BOTTOM_LEFT
+          y: ${ -(epaper_nav_pad_bottom|int) }
           width: 100%
           height: ${epaper_footer_h}
-          pad_left: ${epaper_pad_x}
+          pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
           pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
           widgets:
             - label:

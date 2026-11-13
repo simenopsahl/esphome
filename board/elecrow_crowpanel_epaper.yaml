@@ -32,8 +32,10 @@ packages:
   epaper_info: !include ../gui/epaper/pages/info_sensors.yaml
 
 substitutions:
-  screen_width: "400"
-  screen_height: "300"
+  panel_width: "400"
+  panel_height: "300"
+  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
+  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
   epaper_home_page: "page_info"
   hint_1: "Meny: Hjem | Exit: Info"
   hint_2: "Pinne: Side / Oppdater"

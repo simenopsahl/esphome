@@ -26,8 +26,11 @@ packages:
     condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
-  screen_width: "300"
-  screen_height: "400"
+  panel_width: "400"
+  panel_height: "300"
+  epaper_rotation: "270"
+  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
+  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
   epaper_home_page: "page_info"
   epaper_time_id: "time_rtc"
   hint_1: "GPIO0: OK (Hjem)"
