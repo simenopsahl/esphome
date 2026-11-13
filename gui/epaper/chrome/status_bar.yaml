@@ -1,0 +1,205 @@
+# Persistent e-Paper header/footer status bar (`top_layer`).
+#
+# Displays page icon & title, Wi-Fi / Home Assistant connection badges,
+# divider rule, and `@ HH:MM` last-refresh timestamp aligned to the active
+# bezel layout (`epaper_status_in_footer`, `epaper_nav_pad_right`).
+
+substitutions:
+  epaper_header_show_title: ${ "false" if ([screen_width|int, screen_height|int]|max) <= 240 else "true" }
+  epaper_header_page_right: ${ "true" if ([screen_width|int, screen_height|int]|max) <= 240 else "false" }
+  epaper_footer_ts_align: ${ "LEFT_MID" if ((screen_width|int) >= 600 and epaper_status_in_footer == "false") else "CENTER" }
+  epaper_icon_font: ${ "mdi_sm" if ([screen_width|int, screen_height|int]|min) <= 300 else "mdi_md" }
+
+script:
+  - id: !extend set_page_title
+    then:
+      - lvgl.label.update:
+          id: lbl_ep_page_title
+          text: !lambda 'return title;'
+      - lvgl.label.update:
+          id: lbl_ep_page_icon_left
+          text: !lambda 'return icon;'
+      - lvgl.label.update:
+          id: lbl_ep_page_icon_right
+          text: !lambda 'return icon;'
+
+  - id: !extend epaper_refresh_status
+    then:
+      - lambda: |-
+          auto t = id(${epaper_time_id}).now();
+          char buf[16];
+          if (t.is_valid()) {
+            t.strftime(buf, sizeof(buf), "@ %H:%M");
+          } else {
+            snprintf(buf, sizeof(buf), "@ --:--");
+          }
+          lv_label_set_text(id(lbl_ep_refresh_time), buf);
+      - if:
+          condition:
+            lambda: |-
+              #ifdef USE_WIFI
+                return (wifi::global_wifi_component != nullptr && wifi::global_wifi_component->is_connected());
+              #else
+                return true;
+              #endif
+          then:
+            - if:
+                condition:
+                  lambda: 'return (std::string("${epaper_status_in_footer}") == "true");'
+                then:
+                  - lvgl.widget.show: lbl_ep_wifi_ftr
+                  - lvgl.widget.hide: lbl_ep_wifi_left
+                  - lvgl.widget.hide: lbl_ep_wifi_hdr
+                else:
+                  - lvgl.widget.hide: lbl_ep_wifi_ftr
+                  - if:
+                      condition:
+                        lambda: 'return (${screen_width|int} >= 600);'
+                      then:
+                        - lvgl.widget.show: lbl_ep_wifi_left
+                        - lvgl.widget.hide: lbl_ep_wifi_hdr
+                      else:
+                        - lvgl.widget.hide: lbl_ep_wifi_left
+                        - lvgl.widget.show: lbl_ep_wifi_hdr
+          else:
+            - lvgl.widget.hide: lbl_ep_wifi_ftr
+            - lvgl.widget.hide: lbl_ep_wifi_left
+            - lvgl.widget.hide: lbl_ep_wifi_hdr
+      - if:
+          condition:
+            lambda: |-
+              #ifdef USE_API
+                return (api::global_api_server != nullptr && api::global_api_server->is_connected());
+              #else
+                return true;
+              #endif
+          then:
+            - if:
+                condition:
+                  lambda: 'return (std::string("${epaper_status_in_footer}") == "true");'
+                then:
+                  - lvgl.widget.show: lbl_ep_ha_ftr
+                  - lvgl.widget.hide: lbl_ep_ha_hdr
+                else:
+                  - lvgl.widget.hide: lbl_ep_ha_ftr
+                  - lvgl.widget.show: lbl_ep_ha_hdr
+          else:
+            - lvgl.widget.hide: lbl_ep_ha_ftr
+            - lvgl.widget.hide: lbl_ep_ha_hdr
+
+lvgl:
+  top_layer:
+    widgets:
+      # Top header bar
+      - container:
+          id: ep_header_bar
+          styles: epaper_fg_text_style
+          x: 0
+          y: 0
+          width: 100%
+          height: ${epaper_header_h}
+          pad_left: ${epaper_pad_x}
+          pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
+          layout:
+            type: FLEX
+            flex_flow: ROW
+            flex_align_main: SPACE_BETWEEN
+            flex_align_cross: CENTER
+          widgets:
+            # Left cluster: optional Wi-Fi badge + Page icon + Page title
+            - container:
+                width: SIZE_CONTENT
+                height: 100%
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: START
+                  flex_align_cross: CENTER
+                  pad_column: ${ 14 if ([screen_width|int, screen_height|int]|max) > 960 else 8 }
+                widgets:
+                  - label:
+                      id: lbl_ep_wifi_left
+                      text: "\U000F05A9"
+                      text_font: ${epaper_icon_font}
+                      styles: epaper_wifi_style
+                      hidden: ${ "false" if (epaper_status_in_footer == "false" and (screen_width|int) >= 600) else "true" }
+                  - label:
+                      id: lbl_ep_page_icon_left
+                      text: "\U000F02FC"
+                      text_font: ${epaper_icon_font}
+                      hidden: ${ "true" if epaper_header_page_right == "true" else "false" }
+                  - label:
+                      id: lbl_ep_page_title
+                      text: "Enhet"
+                      text_font: font_md
+                      hidden: ${ "false" if epaper_header_show_title == "true" else "true" }
+
+            # Right cluster: optional right page icon + HA / Wi-Fi header badges
+            - container:
+                width: SIZE_CONTENT
+                height: 100%
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: END
+                  flex_align_cross: CENTER
+                  pad_column: ${ 14 if ([screen_width|int, screen_height|int]|max) > 960 else 8 }
+                widgets:
+                  - label:
+                      id: lbl_ep_page_icon_right
+                      text: "\U000F02FC"
+                      text_font: ${epaper_icon_font}
+                      hidden: ${ "false" if epaper_header_page_right == "true" else "true" }
+                  - label:
+                      id: lbl_ep_ha_hdr
+                      text: "\U000F07D0"
+                      text_font: ${epaper_icon_font}
+                      styles: epaper_ha_style
+                      hidden: ${ "false" if epaper_status_in_footer == "false" else "true" }
+                  - label:
+                      id: lbl_ep_wifi_hdr
+                      text: "\U000F05A9"
+                      text_font: ${epaper_icon_font}
+                      styles: epaper_wifi_style
+                      hidden: ${ "false" if (epaper_status_in_footer == "false" and (screen_width|int) < 600) else "true" }
+
+      # Header bottom divider line
+      - obj:
+          id: ep_header_divider
+          x: ${epaper_pad_x}
+          y: ${epaper_header_h}
+          width: ${ (screen_width|int) - (2 * (epaper_pad_x|int)) - (epaper_nav_pad_right|int) }
+          height: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
+          styles: epaper_divider_style
+          hidden: ${ "true" if ([screen_width|int, screen_height|int]|max) <= 240 else "false" }
+
+      # Bottom footer bar
+      - container:
+          id: ep_footer_bar
+          styles: epaper_fg_text_style
+          align: BOTTOM_LEFT
+          width: 100%
+          height: ${epaper_footer_h}
+          pad_left: ${epaper_pad_x}
+          pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
+          widgets:
+            - label:
+                id: lbl_ep_wifi_ftr
+                align: LEFT_MID
+                text: "\U000F05A9"
+                text_font: ${epaper_icon_font}
+                styles: epaper_wifi_style
+                hidden: ${ "false" if epaper_status_in_footer == "true" else "true" }
+            - label:
+                id: lbl_ep_ha_ftr
+                align: ${ "LEFT_MID" if (screen_width|int) >= 360 else "RIGHT_MID" }
+                x: ${ 28 if (screen_width|int) >= 360 else 0 }
+                text: "\U000F07D0"
+                text_font: ${epaper_icon_font}
+                styles: epaper_ha_style
+                hidden: ${ "false" if epaper_status_in_footer == "true" else "true" }
+            - label:
+                id: lbl_ep_refresh_time
+                align: ${epaper_footer_ts_align}
+                text: "@ --:--"
+                text_font: font_sm

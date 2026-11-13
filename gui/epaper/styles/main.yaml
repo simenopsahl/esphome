@@ -1,0 +1,123 @@
+# Shared LVGL style definitions for all e-Paper dashboards and overlays.
+# Color IDs (`c_ep_*`) are supplied by the active theme package:
+#   gui/epaper/themes/{bw,bwry4,spectra6,gray16}.yaml
+
+- id: epaper_page_style
+  bg_color: c_ep_bg
+  bg_opa: COVER
+  text_color: c_ep_fg
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_overlay_style
+  bg_color: c_ep_bg
+  bg_opa: COVER
+  text_color: c_ep_fg
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_scrubber_style
+  bg_color: c_black
+  bg_opa: COVER
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_divider_style
+  bg_color: c_ep_divider
+  bg_opa: COVER
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_fg_text_style
+  bg_opa: TRANSP
+  text_color: c_ep_fg
+
+- id: epaper_muted_style
+  text_color: c_ep_muted
+
+- id: epaper_wifi_style
+  text_color: c_ep_wifi
+
+- id: epaper_ha_style
+  text_color: c_ep_ha
+
+- id: epaper_home_style
+  text_color: c_ep_home
+
+- id: epaper_accent1_style
+  bg_color: c_ep_accent_1
+  bg_opa: COVER
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_accent2_style
+  bg_color: c_ep_accent_2
+  bg_opa: COVER
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_accent3_style
+  bg_color: c_ep_accent_3
+  bg_opa: COVER
+  border_width: 0
+  radius: 0
+  pad_all: 0
+
+- id: epaper_stripe_1_style
+  bg_opa: TRANSP
+  border_side: LEFT
+  border_width: ${ 0 if ([screen_width|int, screen_height|int]|max) <= 240 else (8 if ([screen_width|int, screen_height|int]|max) <= 400 else (12 if ([screen_width|int, screen_height|int]|max) <= 960 else 24)) }
+  border_color: c_ep_accent_1
+  pad_left: ${ 0 if ([screen_width|int, screen_height|int]|max) <= 240 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+
+- id: epaper_stripe_2_style
+  bg_opa: TRANSP
+  border_side: LEFT
+  border_width: ${ 0 if ([screen_width|int, screen_height|int]|max) <= 240 else (8 if ([screen_width|int, screen_height|int]|max) <= 400 else (12 if ([screen_width|int, screen_height|int]|max) <= 960 else 24)) }
+  border_color: c_ep_accent_2
+  pad_left: ${ 0 if ([screen_width|int, screen_height|int]|max) <= 240 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+
+- id: epaper_stripe_3_style
+  bg_opa: TRANSP
+  border_side: LEFT
+  border_width: ${ 0 if ([screen_width|int, screen_height|int]|max) <= 240 else (8 if ([screen_width|int, screen_height|int]|max) <= 400 else (12 if ([screen_width|int, screen_height|int]|max) <= 960 else 24)) }
+  border_color: c_ep_accent_3
+  pad_left: ${ 0 if ([screen_width|int, screen_height|int]|max) <= 240 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+
+- id: epaper_card_style
+  bg_opa: TRANSP
+  border_width: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
+  border_side: BOTTOM
+  border_color: c_ep_fg
+  radius: 0
+  pad_all: 0
+
+- id: epaper_card_1_style
+  bg_opa: TRANSP
+  border_width: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
+  border_side: BOTTOM
+  border_color: c_ep_accent_1
+  radius: 0
+  pad_all: 0
+
+- id: epaper_card_2_style
+  bg_opa: TRANSP
+  border_width: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
+  border_side: BOTTOM
+  border_color: c_ep_accent_2
+  radius: 0
+  pad_all: 0
+
+- id: epaper_card_3_style
+  bg_opa: TRANSP
+  border_width: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
+  border_side: BOTTOM
+  border_color: c_ep_accent_3
+  radius: 0
+  pad_all: 0

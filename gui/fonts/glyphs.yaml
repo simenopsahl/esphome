@@ -20,6 +20,10 @@
 - "\U000F0142" # chevron-right
 - "\U000F0140" # chevron-down
 - "\U000F0143" # chevron-up
+- "\U000F0450" # refresh
+- "\U000F0055" # arrow-right-thick
+- "\U000F004E" # arrow-left-thick
+- "\U000F0206" # exit-to-app
 # pages
 - "\U000F0954" # clock
 - "\U000F081F" # finance

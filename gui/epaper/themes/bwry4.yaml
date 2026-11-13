@@ -1,0 +1,31 @@
+# 4-color Black / White / Red / Yellow e-Paper theme (e.g. Zectrix Note4C).
+# Preserves Red/Yellow accents while optionally inverting B/W ground every 5th refresh.
+
+substitutions:
+  epaper_invert_every_5th: "true"
+  epaper_invert_accents: "false"
+
+packages:
+  epaper_theme_base: !include { file: _base.yaml }
+
+color:
+  - id: c_ep_bg
+    hex: "FFFFFF"
+  - id: c_ep_fg
+    hex: "000000"
+  - id: c_ep_muted
+    hex: "000000"
+  - id: c_ep_divider
+    hex: "FF0000"
+  - id: c_ep_accent_1
+    hex: "FF0000"
+  - id: c_ep_accent_2
+    hex: "FFFF00"
+  - id: c_ep_accent_3
+    hex: "FF0000"
+  - id: c_ep_wifi
+    hex: "000000"
+  - id: c_ep_ha
+    hex: "000000"
+  - id: c_ep_home
+    hex: "000000"

@@ -1,0 +1,155 @@
+# Shared base palette and 5th-refresh anti-ghosting inversion logic for e-Paper themes.
+# Included automatically by `bw.yaml`, `bwry4.yaml`, `spectra6.yaml`, and `gray16.yaml`.
+
+substitutions:
+  epaper_invert_every_5th: "true"
+  epaper_invert_accents: "true"
+
+color:
+  - id: c_black
+    hex: "000000"
+  - id: c_white
+    hex: "FFFFFF"
+  - id: c_red
+    hex: "FF0000"
+  - id: c_green
+    hex: "00FF00"
+  - id: c_blue
+    hex: "0000FF"
+  - id: c_yellow
+    hex: "FFFF00"
+  - id: c_gray_light
+    hex: "CCCCCC"
+  - id: c_gray_mid
+    hex: "888888"
+  - id: c_gray_dark
+    hex: "444444"
+
+script:
+  - id: apply_epaper_theme_refresh
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return (std::string("${epaper_invert_every_5th}") == "true") &&
+                     ((id(recorded_display_refresh) % 5) == 0);
+          then:
+            - lvgl.style.update:
+                id: epaper_page_style
+                bg_color: c_black
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_overlay_style
+                bg_color: c_black
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_fg_text_style
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_muted_style
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_wifi_style
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_ha_style
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_home_style
+                text_color: c_white
+            - lvgl.style.update:
+                id: epaper_card_style
+                border_color: c_white
+            - if:
+                condition:
+                  lambda: |-
+                    return std::string("${epaper_invert_accents}") == "true";
+                then:
+                  - lvgl.style.update:
+                      id: epaper_divider_style
+                      bg_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_accent1_style
+                      bg_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_accent2_style
+                      bg_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_accent3_style
+                      bg_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_stripe_1_style
+                      border_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_stripe_2_style
+                      border_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_stripe_3_style
+                      border_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_card_1_style
+                      border_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_card_2_style
+                      border_color: c_white
+                  - lvgl.style.update:
+                      id: epaper_card_3_style
+                      border_color: c_white
+          else:
+            - lvgl.style.update:
+                id: epaper_page_style
+                bg_color: c_ep_bg
+                text_color: c_ep_fg
+            - lvgl.style.update:
+                id: epaper_overlay_style
+                bg_color: c_ep_bg
+                text_color: c_ep_fg
+            - lvgl.style.update:
+                id: epaper_fg_text_style
+                text_color: c_ep_fg
+            - lvgl.style.update:
+                id: epaper_muted_style
+                text_color: c_ep_muted
+            - lvgl.style.update:
+                id: epaper_wifi_style
+                text_color: c_ep_wifi
+            - lvgl.style.update:
+                id: epaper_ha_style
+                text_color: c_ep_ha
+            - lvgl.style.update:
+                id: epaper_home_style
+                text_color: c_ep_home
+            - lvgl.style.update:
+                id: epaper_card_style
+                border_color: c_ep_fg
+            - lvgl.style.update:
+                id: epaper_divider_style
+                bg_color: c_ep_divider
+            - lvgl.style.update:
+                id: epaper_accent1_style
+                bg_color: c_ep_accent_1
+            - lvgl.style.update:
+                id: epaper_accent2_style
+                bg_color: c_ep_accent_2
+            - lvgl.style.update:
+                id: epaper_accent3_style
+                bg_color: c_ep_accent_3
+            - lvgl.style.update:
+                id: epaper_stripe_1_style
+                border_color: c_ep_accent_1
+            - lvgl.style.update:
+                id: epaper_stripe_2_style
+                border_color: c_ep_accent_2
+            - lvgl.style.update:
+                id: epaper_stripe_3_style
+                border_color: c_ep_accent_3
+            - lvgl.style.update:
+                id: epaper_card_1_style
+                border_color: c_ep_accent_1
+            - lvgl.style.update:
+                id: epaper_card_2_style
+                border_color: c_ep_accent_2
+            - lvgl.style.update:
+                id: epaper_card_3_style
+                border_color: c_ep_accent_3

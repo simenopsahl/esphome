@@ -1,0 +1,33 @@
+# Bezel navigation hints for M5Stack CoreInk (200x200) top dial & button.
+# Sets footer connection badges and places Home / Refresh / Next icons along the top-left bezel.
+
+substitutions:
+  epaper_status_in_footer: "true"
+  epaper_nav_pad_right: "0"
+
+lvgl:
+  top_layer:
+    widgets:
+      - container:
+          id: ep_nav_coreink
+          styles: epaper_fg_text_style
+          x: ${epaper_pad_x}
+          y: 0
+          width: SIZE_CONTENT
+          height: ${epaper_header_h}
+          layout:
+            type: FLEX
+            flex_flow: ROW
+            flex_align_main: START
+            flex_align_cross: CENTER
+            pad_column: 10
+          widgets:
+            - label:
+                text: "\U000F02DC" # home
+                text_font: mdi_sm
+            - label:
+                text: "\U000F0450" # refresh
+                text_font: mdi_sm
+            - label:
+                text: "\U000F0055" # arrow-right-thick
+                text_font: mdi_sm

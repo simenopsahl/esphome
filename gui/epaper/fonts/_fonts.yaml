@@ -1,0 +1,156 @@
+# Shared responsive e-Paper font definitions (`font_sm..font_fl` and `mdi_sm..mdi_xxl`).
+# Included by `gui/epaper/fonts/bw.yaml` (`bpp: 1`) or `gui/epaper/fonts/color_gray.yaml` (`bpp: 4`).
+#
+# Size tiers mapped to e-Paper hardware families:
+#   - 200x200         (CoreInk / Air Quality):  max(W,H) <= 240
+#   - 300x400/400x300 (Note4C / CrowPanel 4.2): min(W,H) <= 300 (also 792x272)
+#   - 800x480         (E1001 / E1002):          max(W,H) <= 960 and min(W,H) > 300
+#   - 1872x1404       (E1003):                  max(W,H) > 960
+
+substitutions:
+  epaper_font_bpp: "1"
+
+  text_sm: >-
+    ${ 13 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (15 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (18 if ([screen_width|int, screen_height|int]|max) <= 960 else 34)) }
+  text_md: >-
+    ${ 16 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (18 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (22 if ([screen_width|int, screen_height|int]|max) <= 960 else 42)) }
+  text_lg: >-
+    ${ 20 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (22 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (26 if ([screen_width|int, screen_height|int]|max) <= 960 else 52)) }
+  text_xl: >-
+    ${ 24 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (26 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (32 if ([screen_width|int, screen_height|int]|max) <= 960 else 64)) }
+  text_xxl: >-
+    ${ 32 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (34 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (40 if ([screen_width|int, screen_height|int]|max) <= 960 else 84)) }
+  text_hg: >-
+    ${ 48 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (56 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (80 if ([screen_width|int, screen_height|int]|max) <= 960 else 140)) }
+  text_fl: >-
+    ${ 72 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (96 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (140 if ([screen_width|int, screen_height|int]|max) <= 960 else 220)) }
+
+  icons_sm: >-
+    ${ 20 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (24 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (30 if ([screen_width|int, screen_height|int]|max) <= 960 else 48)) }
+  icons_md: >-
+    ${ 24 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (28 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (36 if ([screen_width|int, screen_height|int]|max) <= 960 else 60)) }
+  icons_lg: >-
+    ${ 28 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (34 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (44 if ([screen_width|int, screen_height|int]|max) <= 960 else 76)) }
+  icons_xl: >-
+    ${ 34 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (42 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (52 if ([screen_width|int, screen_height|int]|max) <= 960 else 92)) }
+  icons_xxl: >-
+    ${ 42 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (52 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (64 if ([screen_width|int, screen_height|int]|max) <= 960 else 112)) }
+
+font:
+  - id: font_sm
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_sm}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: &epaper-norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', "'", '!', '#', '$', '&', '(', ')',
+      '*', '+', '=', '<', '>', '[', ']', '\', '|', '_', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
+
+  - id: font_md
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_md}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: *epaper-norwegian-glyphs
+
+  - id: font_lg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_lg}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: *epaper-norwegian-glyphs
+
+  - id: font_xl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_xl}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: *epaper-norwegian-glyphs
+
+  - id: font_xxl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+    size: ${text_xxl}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: *epaper-norwegian-glyphs
+
+  - id: font_hg
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 500
+    size: ${text_hg}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: *epaper-norwegian-glyphs
+
+  - id: font_fl
+    file:
+      type: gfonts
+      family: Noto Sans Display
+      weight: 600
+    size: ${text_fl}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: *epaper-norwegian-glyphs
+
+  - id: mdi_sm
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_sm}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: !include ../../fonts/glyphs.yaml
+
+  - id: mdi_md
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_md}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: !include ../../fonts/glyphs.yaml
+
+  - id: mdi_lg
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_lg}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: !include ../../fonts/glyphs.yaml
+
+  - id: mdi_xl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_xl}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: !include ../../fonts/glyphs.yaml
+
+  - id: mdi_xxl
+    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
+    size: ${icons_xxl}
+    bpp: ${epaper_font_bpp | int}
+    glyphs: !include ../../fonts/glyphs.yaml

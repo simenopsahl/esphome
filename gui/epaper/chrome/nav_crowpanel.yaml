@@ -1,0 +1,39 @@
+# Bezel navigation hints for Elecrow CrowPanel e-Paper (4.2" 400x300 & 5.79" 792x272).
+# Reserves right-edge margin for the 5 physical bezel icons and places Wi-Fi/HA in the footer.
+
+substitutions:
+  epaper_nav_pad_right: "36"
+  epaper_status_in_footer: "true"
+
+lvgl:
+  top_layer:
+    widgets:
+      - container:
+          id: ep_nav_crowpanel
+          styles: epaper_fg_text_style
+          align: RIGHT_MID
+          width: 34
+          height: 100%
+          pad_top: 6
+          pad_bottom: 6
+          layout:
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_main: SPACE_EVENLY
+            flex_align_cross: CENTER
+          widgets:
+            - label:
+                text: "\U000F02DC" # home
+                text_font: mdi_sm
+            - label:
+                text: "\U000F004E" # arrow-left-thick
+                text_font: mdi_sm
+            - label:
+                text: "\U000F0450" # refresh
+                text_font: mdi_sm
+            - label:
+                text: "\U000F0055" # arrow-right-thick
+                text_font: mdi_sm
+            - label:
+                text: "\U000F0206" # exit-to-app
+                text_font: mdi_sm

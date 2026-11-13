@@ -1,0 +1,43 @@
+# Default LVGL widget theme for e-Paper displays.
+# Omits `text_color` on labels/objects so text inherits `epaper_page_style`
+# cleanly during normal and inverted (5th-refresh) passes.
+
+obj:
+  bg_opa: TRANSP
+  border_width: 0
+  radius: 0
+  shadow_width: 0
+  pad_all: 0
+  scrollable: false
+
+label:
+  border_width: 0
+  pad_all: 0
+  scrollable: false
+
+image:
+  border_width: 0
+  scrollable: false
+
+button:
+  bg_opa: TRANSP
+  border_width: 1
+  border_color: c_ep_fg
+  radius: 0
+  shadow_width: 0
+  pad_all: 2
+
+line:
+  line_width: 1
+  line_rounded: false
+
+bar:
+  radius: 0
+  border_width: 1
+  border_color: c_ep_fg
+  bg_color: c_ep_bg
+  bg_opa: COVER
+  indicator:
+    radius: 0
+    bg_color: c_ep_fg
+    bg_opa: COVER

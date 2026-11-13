@@ -1,0 +1,35 @@
+# Bezel navigation hints for Seeed reTerminal E1001 (800x480), E1002 (800x480), & E1003 (1872x1404).
+# Places Left / Right / Home icons in the header aligned beneath the top hardware keys.
+
+substitutions:
+  epaper_status_in_footer: "false"
+  epaper_nav_pad_right: "0"
+
+lvgl:
+  top_layer:
+    widgets:
+      - container:
+          id: ep_nav_reterminal
+          styles: epaper_fg_text_style
+          align: TOP_RIGHT
+          x: ${ -(360 if ([screen_width|int, screen_height|int]|max) > 960 else 160) }
+          y: 0
+          width: SIZE_CONTENT
+          height: ${epaper_header_h}
+          layout:
+            type: FLEX
+            flex_flow: ROW
+            flex_align_main: CENTER
+            flex_align_cross: CENTER
+            pad_column: ${ 36 if ([screen_width|int, screen_height|int]|max) > 960 else 18 }
+          widgets:
+            - label:
+                text: "\U000F0141" # chevron-left
+                text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|min) > 300 else "mdi_sm" }
+            - label:
+                text: "\U000F0142" # chevron-right
+                text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|min) > 300 else "mdi_sm" }
+            - label:
+                text: "\U000F02DC" # home
+                text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|min) > 300 else "mdi_sm" }
+                styles: epaper_home_style

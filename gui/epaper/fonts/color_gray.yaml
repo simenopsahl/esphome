@@ -1,0 +1,7 @@
+# Anti-aliased font pack for multi-color & 16-gray e-Paper panels (`bpp: 4` default).
+# Override `epaper_font_bpp: "2"` in a device/theme if lower flash footprint is preferred.
+substitutions:
+  epaper_font_bpp: "4"
+
+packages:
+  epaper_fonts: !include { file: _fonts.yaml }

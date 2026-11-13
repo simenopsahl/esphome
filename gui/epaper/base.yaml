@@ -1,0 +1,242 @@
+# Core LVGL engine, e-Paper refresh pipeline, top-layer overlays, and shared automation.
+#
+# Replaces `features/epaper.yaml` for LVGL-migrated e-Paper devices.
+# Expects a display with `id: display_eink` (`update_interval: never`), a font pack
+# (`gui/epaper/fonts/bw.yaml` or `color_gray.yaml`), and a theme pack
+# (`gui/epaper/themes/{bw,bwry4,spectra6,gray16}.yaml`).
+
+substitutions:
+  epaper_buffer_size: "50%"
+  epaper_home_page: "page_info"
+  epaper_time_id: "time_homeassistant"
+  epaper_scrubber_cycles: "2"
+
+  # Responsive chrome geometry derived from physical display dimensions
+  epaper_header_h: >-
+    ${ 28 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (34 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (44 if ([screen_width|int, screen_height|int]|max) <= 960 else 88)) }
+  epaper_footer_h: >-
+    ${ 22 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (26 if ([screen_width|int, screen_height|int]|min) <= 300 else
+       (32 if ([screen_width|int, screen_height|int]|max) <= 960 else 56)) }
+  epaper_pad_x: >-
+    ${ 4 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 400 else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 960 else 40)) }
+  epaper_pad_y: >-
+    ${ 4 if ([screen_width|int, screen_height|int]|max) <= 240 else
+       (8 if ([screen_width|int, screen_height|int]|max) <= 400 else
+       (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+
+  # Overridden by bezel nav packages (e.g. nav_crowpanel sets nav_pad_right)
+  epaper_nav_pad_right: "0"
+  epaper_nav_pad_left: "0"
+  epaper_status_in_footer: "false"
+
+globals:
+  - id: data_updated
+    type: bool
+    restore_value: no
+    initial_value: "false"
+  - id: initial_data_received
+    type: bool
+    restore_value: no
+    initial_value: "false"
+  - id: recorded_display_refresh
+    type: int
+    restore_value: yes
+    initial_value: "0"
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) && id(initial_data_received);'
+        - lvgl.widget.hide: epaper_boot_overlay
+        - lvgl.page.show: ${epaper_home_page}
+        - script.execute: update_screen
+
+binary_sensor:
+  # Occupancy gate for scheduled /5 min refreshes (override with !extend in device YAML)
+  - platform: template
+    id: presence_detected
+    lambda: 'return true;'
+
+sensor:
+  - platform: template
+    id: display_last_update
+    name: "Siste oppdatering"
+    device_class: timestamp
+    entity_category: diagnostic
+
+  - platform: template
+    id: recorded_display_refresh_sensor
+    name: "Antall oppdateringer"
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    state_class: total_increasing
+    lambda: 'return id(recorded_display_refresh);'
+
+button:
+  - platform: template
+    id: btn_refresh_screen
+    name: "Oppdater skjerm"
+    icon: "mdi:refresh"
+    on_press:
+      - script.execute: update_screen
+
+  - platform: template
+    id: btn_repair_screen
+    name: "Reparer skjerm"
+    icon: "mdi:broom"
+    entity_category: config
+    on_press:
+      - script.execute: repair_script
+
+time:
+  - id: !extend ${epaper_time_id}
+    on_time:
+      - seconds: 0
+        minutes: /5
+        then:
+          - if:
+              condition:
+                and:
+                  - binary_sensor.is_on: presence_detected
+                  - lambda: 'return id(data_updated) && id(initial_data_received);'
+              then:
+                - script.execute: update_screen
+
+script:
+  # Safe no-op defaults extended by `gui/epaper/chrome/status_bar.yaml`
+  - id: set_page_title
+    parameters:
+      title: string
+      icon: string
+    then:
+      - lambda: |-
+          (void) title;
+          (void) icon;
+
+  - id: epaper_refresh_status
+    mode: single
+    then:
+      - lambda: ""
+
+  # Single-shot LVGL render + physical e-Paper flush
+  - id: update_screen
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: 'return id(initial_data_received);'
+          then:
+            - lvgl.widget.hide: epaper_boot_overlay
+          else:
+            - lvgl.widget.show: epaper_boot_overlay
+      - globals.set:
+          id: data_updated
+          value: "false"
+      - lambda: |-
+          id(recorded_display_refresh) += 1;
+          id(recorded_display_refresh_sensor).publish_state(id(recorded_display_refresh));
+      - script.execute: apply_epaper_theme_refresh
+      - script.execute: epaper_refresh_status
+      - lvgl.resume:
+          lvgl_id: lvgl_comp
+      - wait_until:
+          condition:
+            lvgl.is_paused:
+              lvgl_id: lvgl_comp
+          timeout: 2s
+      - component.update: display_eink
+      - lambda: |-
+          auto t = id(${epaper_time_id}).now();
+          if (t.is_valid()) {
+            id(display_last_update).publish_state(t.timestamp);
+          }
+
+  # Anti-burn-in full-panel scrubber cycling Black <-> White on `top_layer`
+  - id: repair_script
+    mode: single
+    then:
+      - lvgl.widget.show: epaper_scrubber_overlay
+      - lambda: 'lv_obj_move_foreground(id(epaper_scrubber_overlay));'
+      - repeat:
+          count: ${epaper_scrubber_cycles}
+          then:
+            - lvgl.style.update:
+                id: epaper_scrubber_style
+                bg_color: c_black
+            - lvgl.resume:
+                lvgl_id: lvgl_comp
+            - wait_until:
+                condition:
+                  lvgl.is_paused:
+                    lvgl_id: lvgl_comp
+                timeout: 2s
+            - component.update: display_eink
+            - delay: 5s
+            - lvgl.style.update:
+                id: epaper_scrubber_style
+                bg_color: c_white
+            - lvgl.resume:
+                lvgl_id: lvgl_comp
+            - wait_until:
+                condition:
+                  lvgl.is_paused:
+                    lvgl_id: lvgl_comp
+                timeout: 2s
+            - component.update: display_eink
+            - delay: 5s
+      - lvgl.widget.hide: epaper_scrubber_overlay
+      - script.execute: update_screen
+
+lvgl:
+  id: lvgl_comp
+  displays:
+    - display_eink
+  buffer_size: ${epaper_buffer_size}
+  default_font: font_md
+  paused: true
+  resume_on_input: false
+  theme: !include themes/lvgl_theme.yaml
+  style_definitions: !include styles/main.yaml
+  on_draw_end:
+    - then:
+        - lvgl.pause:
+            show_snow: false
+  top_layer:
+    widgets:
+      - obj:
+          id: epaper_scrubber_overlay
+          width: 100%
+          height: 100%
+          hidden: true
+          styles: epaper_scrubber_style
+      - container:
+          id: epaper_boot_overlay
+          width: 100%
+          height: 100%
+          hidden: false
+          styles: epaper_overlay_style
+          layout:
+            type: FLEX
+            flex_flow: COLUMN
+            flex_align_main: CENTER
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+            pad_row: 8
+          widgets:
+            - label:
+                id: lbl_epaper_boot_title
+                text: "Venter på data..."
+                text_font: font_lg
+            - label:
+                id: lbl_epaper_boot_device
+                text: "${device.name}"
+                text_font: font_sm
+                styles: epaper_muted_style

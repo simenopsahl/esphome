@@ -1,0 +1,7 @@
+# Bezel layout profile for Zectrix Note4C (300x400 4-color BWRY).
+# Side hardware buttons (GPIO0 OK, GPIO39 Opp, GPIO18 Ned) are shown inside `page_info`;
+# header holds Wi-Fi & HA status badges and footer holds `@ HH:MM`.
+
+substitutions:
+  epaper_status_in_footer: "false"
+  epaper_nav_pad_right: "0"

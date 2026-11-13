@@ -1,0 +1,21 @@
+# Universal network text-sensor bindings for `gui/epaper/pages/info.yaml`.
+# Relies on `sensor_ssid`, `sensor_ip_address`, and `sensor_mac_address` from `common/`.
+
+text_sensor:
+  - id: !extend sensor_ssid
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_info_ssid
+          text: !lambda 'return x;'
+
+  - id: !extend sensor_ip_address
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_info_ip
+          text: !lambda 'return x;'
+
+  - id: !extend sensor_mac_address
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_info_mac
+          text: !lambda 'return x;'

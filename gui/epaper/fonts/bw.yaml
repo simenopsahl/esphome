@@ -1,0 +1,6 @@
+# 1-bit sharp monochrome font pack for B/W e-Paper panels (`bpp: 1`).
+substitutions:
+  epaper_font_bpp: "1"
+
+packages:
+  epaper_fonts: !include { file: _fonts.yaml }

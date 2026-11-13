@@ -1,0 +1,31 @@
+# 1-bit monochrome Black & White e-Paper theme.
+# Supports optional 5th-refresh black/white polarity inversion (`epaper_invert_every_5th`).
+
+substitutions:
+  epaper_invert_every_5th: "true"
+  epaper_invert_accents: "true"
+
+packages:
+  epaper_theme_base: !include { file: _base.yaml }
+
+color:
+  - id: c_ep_bg
+    hex: "FFFFFF"
+  - id: c_ep_fg
+    hex: "000000"
+  - id: c_ep_muted
+    hex: "000000"
+  - id: c_ep_divider
+    hex: "000000"
+  - id: c_ep_accent_1
+    hex: "000000"
+  - id: c_ep_accent_2
+    hex: "000000"
+  - id: c_ep_accent_3
+    hex: "000000"
+  - id: c_ep_wifi
+    hex: "000000"
+  - id: c_ep_ha
+    hex: "000000"
+  - id: c_ep_home
+    hex: "000000"

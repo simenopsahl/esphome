@@ -1,0 +1,244 @@
+# Responsive LVGL Device Info page (`page_info`) for e-Paper displays.
+#
+# Adapts automatically across:
+#   - 200x200         (CoreInk / Air Quality): compact single-column
+#   - 300x400 / 400x300 (Note4C / CrowPanel 4.2): stacked accented cards
+#   - 792x272 / 800x480 / 1872x1404: 2-column cards (Device+Network left, Sensors right)
+#
+# Optional vars:
+#   page_title: "Enhet"
+#   hint_1 / hint_2 / hint_3: Hardware key legend strings (hidden if empty)
+#   show_battery_pct: false
+#   show_battery_volt: false
+#   show_temp: false
+#   show_humidity: false
+#   show_sd: false
+
+id: page_info
+styles: epaper_page_style
+pad_top: ${ (epaper_header_h|int) + (epaper_pad_y|int) }
+pad_bottom: ${ (epaper_footer_h|int) + (4 if ([screen_width|int, screen_height|int]|max) <= 240 else (epaper_pad_y|int)) }
+pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
+pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
+on_load:
+  - script.execute:
+      id: set_page_title
+      title: ${ page_title | default("Enhet") }
+      icon: "\U000F02FC"
+widgets:
+  - container:
+      id: cont_ep_info_root
+      width: 100%
+      height: 100%
+      layout:
+        type: FLEX
+        flex_flow: ${ "ROW" if (screen_width|int) >= 600 else "COLUMN" }
+        flex_align_main: ${ "SPACE_BETWEEN" if (screen_width|int) >= 600 else "SPACE_EVENLY" }
+        flex_align_cross: ${ "START" if (screen_width|int) >= 600 else "CENTER" }
+        pad_row: ${ 4 if ([screen_width|int, screen_height|int]|max) <= 240 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+        pad_column: ${ 20 if (screen_width|int) <= 960 else 44 }
+      widgets:
+        # Left Column (or Top stack on Portrait / Narrow): Device + Network Cards
+        - container:
+            id: col_ep_info_left
+            width: ${ "100%" if (screen_width|int) < 600 else "48%" }
+            height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "100%" }
+            flex_grow: ${ 0 if (screen_width|int) < 600 else 1 }
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_main: SPACE_EVENLY
+              flex_align_cross: START
+              pad_row: ${ 6 if ([screen_width|int, screen_height|int]|max) <= 240 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+            widgets:
+              # Card 1: Device Name & Hardware Key Hints
+              - container:
+                  id: card_ep_info_device
+                  width: 100%
+                  height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "48%" }
+                  flex_grow: ${ 0 if (screen_width|int) < 600 else 1 }
+                  styles: ${ "epaper_card_1_style" if ([screen_width|int, screen_height|int]|max) > 240 else "epaper_page_style" }
+                  pad_bottom: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (6 if ([screen_width|int, screen_height|int]|max) <= 400 else (10 if ([screen_width|int, screen_height|int]|max) <= 960 else 18)) }
+                  widgets:
+                    - container:
+                        width: 100%
+                        height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "100%" }
+                        styles: epaper_stripe_1_style
+                        layout:
+                          type: FLEX
+                          flex_flow: COLUMN
+                          flex_align_main: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "SPACE_EVENLY" }
+                          flex_align_cross: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
+                          flex_align_track: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
+                          pad_row: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (4 if ([screen_width|int, screen_height|int]|max) <= 400 else (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14)) }
+                        widgets:
+                          - label:
+                              id: lbl_ep_info_device_name
+                              text: "${device.name}"
+                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "font_lg" }
+                          - label:
+                              id: lbl_ep_info_hint_1
+                              text: "${ hint_1 | default('') }"
+                              text_font: font_sm
+                              hidden: ${ "false" if (hint_1 | default("")) else "true" }
+                          - label:
+                              id: lbl_ep_info_hint_2
+                              text: "${ hint_2 | default('') }"
+                              text_font: font_sm
+                              hidden: ${ "false" if (hint_2 | default("")) else "true" }
+                          - label:
+                              id: lbl_ep_info_hint_3
+                              text: "${ hint_3 | default('') }"
+                              text_font: font_sm
+                              hidden: ${ "false" if (hint_3 | default("")) else "true" }
+
+              # Card 2: Network Info (SSID, IP, MAC)
+              - container:
+                  id: card_ep_info_network
+                  width: 100%
+                  height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "48%" }
+                  flex_grow: ${ 0 if (screen_width|int) < 600 else 1 }
+                  styles: ${ "epaper_card_2_style" if ([screen_width|int, screen_height|int]|max) > 240 else "epaper_page_style" }
+                  pad_bottom: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (6 if ([screen_width|int, screen_height|int]|max) <= 400 else (10 if ([screen_width|int, screen_height|int]|max) <= 960 else 18)) }
+                  widgets:
+                    - container:
+                        width: 100%
+                        height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "100%" }
+                        styles: epaper_stripe_2_style
+                        layout:
+                          type: FLEX
+                          flex_flow: COLUMN
+                          flex_align_main: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "SPACE_EVENLY" }
+                          flex_align_cross: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
+                          flex_align_track: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
+                          pad_row: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (4 if ([screen_width|int, screen_height|int]|max) <= 400 else (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14)) }
+                        widgets:
+                          - label:
+                              id: lbl_ep_info_ssid
+                              text: "--"
+                              text_font: font_md
+                          - label:
+                              id: lbl_ep_info_ip
+                              text: "--"
+                              text_font: font_md
+                          - label:
+                              id: lbl_ep_info_mac
+                              text: "--"
+                              text_font: font_md
+
+        # Card 3: Onboard Sensors & Battery (Right Column on Landscape >=600, Bottom on Portrait)
+        - container:
+            id: card_ep_info_sensors
+            width: ${ "100%" if (screen_width|int) < 600 else "48%" }
+            height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "100%" }
+            flex_grow: ${ 0 if (screen_width|int) < 600 else 1 }
+            hidden: ${ "false" if ((show_battery_pct | default(false)) or (show_battery_volt | default(false)) or (show_temp | default(false)) or (show_humidity | default(false)) or (show_sd | default(false))) else "true" }
+            styles: ${ "epaper_card_3_style" if ([screen_width|int, screen_height|int]|max) > 240 else "epaper_page_style" }
+            pad_bottom: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (6 if ([screen_width|int, screen_height|int]|max) <= 400 else (10 if ([screen_width|int, screen_height|int]|max) <= 960 else 18)) }
+            widgets:
+              - container:
+                  width: 100%
+                  height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "100%" }
+                  styles: epaper_stripe_3_style
+                  layout:
+                    type: FLEX
+                    flex_flow: COLUMN
+                    flex_align_main: SPACE_EVENLY
+                    flex_align_cross: START
+                    flex_align_track: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
+                    pad_row: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (4 if ([screen_width|int, screen_height|int]|max) <= 400 else (8 if ([screen_width|int, screen_height|int]|max) <= 960 else 18)) }
+                  widgets:
+                    # Battery %
+                    - container:
+                        width: 100%
+                        height: SIZE_CONTENT
+                        hidden: ${ "false" if (show_battery_pct | default(false)) else "true" }
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: SPACE_BETWEEN
+                          flex_align_cross: CENTER
+                        widgets:
+                          - label:
+                              text: "Batteriprosent:"
+                              text_font: font_md
+                          - label:
+                              id: lbl_ep_info_bat_pct
+                              text: "--%"
+                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) > 400 else "font_lg" }
+
+                    # Battery Voltage
+                    - container:
+                        width: 100%
+                        height: SIZE_CONTENT
+                        hidden: ${ "false" if (show_battery_volt | default(false)) else "true" }
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: SPACE_BETWEEN
+                          flex_align_cross: CENTER
+                        widgets:
+                          - label:
+                              text: "Batterispenning:"
+                              text_font: font_md
+                          - label:
+                              id: lbl_ep_info_bat_volt
+                              text: "--V"
+                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) > 400 else "font_lg" }
+
+                    # Temperature
+                    - container:
+                        width: 100%
+                        height: SIZE_CONTENT
+                        hidden: ${ "false" if (show_temp | default(false)) else "true" }
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: SPACE_BETWEEN
+                          flex_align_cross: CENTER
+                        widgets:
+                          - label:
+                              text: "Temperatur:"
+                              text_font: font_md
+                          - label:
+                              id: lbl_ep_info_temp
+                              text: "-- C"
+                              text_font: font_md
+
+                    # Humidity
+                    - container:
+                        width: 100%
+                        height: SIZE_CONTENT
+                        hidden: ${ "false" if (show_humidity | default(false)) else "true" }
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: SPACE_BETWEEN
+                          flex_align_cross: CENTER
+                        widgets:
+                          - label:
+                              text: "Luftfuktighet:"
+                              text_font: font_md
+                          - label:
+                              id: lbl_ep_info_hum
+                              text: "-- %"
+                              text_font: font_md
+
+                    # SD Card Status
+                    - container:
+                        width: 100%
+                        height: SIZE_CONTENT
+                        hidden: ${ "false" if (show_sd | default(false)) else "true" }
+                        layout:
+                          type: FLEX
+                          flex_flow: ROW
+                          flex_align_main: SPACE_BETWEEN
+                          flex_align_cross: CENTER
+                        widgets:
+                          - label:
+                              text: "SD Kort:"
+                              text_font: font_sm
+                          - label:
+                              id: lbl_ep_info_sd
+                              text: "--"
+                              text_font: font_sm
