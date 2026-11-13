@@ -14,6 +14,7 @@ substitutions:
   screen_width: "300"
   screen_height: "400"
   epaper_home_page: page_content
+  epaper_rotation: "270"
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
@@ -35,10 +36,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.70.33
-
-display:
-  - id: !extend display_eink
-    rotation: 270°
 
 lvgl:
   pages:
