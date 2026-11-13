@@ -188,14 +188,14 @@ binary_sensor:
 sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: measured_temp
     id: temperature_ute
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: temp_simen
     id: temperature_simen
     on_value:
@@ -211,14 +211,14 @@ sensor:
 # Strings from Home Assistant
 text_sensor:
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_now
     id: weather_condition_now
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
-    entity_id: sensor.waveshare_display_data
+    entity_id: sensor.epaper_data_general
     attribute: weather_condition_0
     id: weather_condition_next
     on_value:
