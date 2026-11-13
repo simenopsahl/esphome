@@ -1,0 +1,208 @@
+# Reusable Bento section: FolloRen 4-bin waste collection (`gui/epaper/sections/folloren.yaml`)
+# Option 1 layout: headline (`folloren_next` + optional `I DAG` badge) & 4 bin cards highlighted by `today_types` / `next_types`.
+# Companion sensor/script package: `gui/epaper/sections/folloren_sensors.yaml`
+
+obj:
+  id: ep_sec_folloren
+  width: 100%
+  height: SIZE_CONTENT
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: flex
+    flex_flow: COLUMN
+    pad_row: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "12" }
+  widgets:
+    # Header row: Recycle icon + "FolloRen" + conditional "I DAG" pill
+    - obj:
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+          flex_align_cross: CENTER
+        widgets:
+          - obj:
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: ROW
+                flex_align_cross: CENTER
+                pad_column: ${ "6" if ([screen_width|int, screen_height|int]|max) <= 960 else "14" }
+              widgets:
+                - label:
+                    text: "\U000F044C"
+                    text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+                    styles: epaper_wifi_style
+                - label:
+                    text: "FolloRen"
+                    text_font: font_md
+                    styles: epaper_title_style
+          - obj:
+              id: box_ep_fl_today_badge
+              hidden: true
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              styles: epaper_accent3_style
+              radius: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_left: ${ "8" if ([screen_width|int, screen_height|int]|max) <= 960 else "16" }
+              pad_right: ${ "8" if ([screen_width|int, screen_height|int]|max) <= 960 else "16" }
+              pad_top: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              pad_bottom: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              widgets:
+                - label:
+                    text: "I DAG"
+                    text_font: font_sm
+                    text_color: c_ep_bg
+
+    # Next collection headline (prefixed "Neste: " automatically when `today_types` is active)
+    - label:
+        id: lbl_ep_fl_next
+        width: 100%
+        text: "--"
+        text_font: font_lg
+        long_mode: CLIP
+        styles: epaper_fg_text_style
+
+    # 4-bin compact grid (`Rest`, `Papir`, `Glass`, `Mat`)
+    - obj:
+        id: ep_fl_bins_grid
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        layout:
+          type: grid
+          grid_columns: [FR(1), FR(1), FR(1), FR(1)]
+          grid_rows: [CONTENT]
+          pad_column: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "12" }
+        widgets:
+          - obj:
+              id: card_ep_fl_rest
+              grid_cell_column_pos: 0
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              radius: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_top: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_left: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              pad_right: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: icon_ep_fl_rest
+                    text: "\U000F0A79"
+                    text_font: mdi_md
+                    text_color: c_ep_muted
+                - label:
+                    id: lbl_ep_fl_rest
+                    text: "--"
+                    text_font: font_sm
+                    text_color: c_ep_muted
+          - obj:
+              id: card_ep_fl_papir
+              grid_cell_column_pos: 1
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              radius: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_top: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_left: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              pad_right: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: icon_ep_fl_papir
+                    text: "\U000F0395"
+                    text_font: mdi_md
+                    text_color: c_ep_muted
+                - label:
+                    id: lbl_ep_fl_papir
+                    text: "--"
+                    text_font: font_sm
+                    text_color: c_ep_muted
+          - obj:
+              id: card_ep_fl_glass
+              grid_cell_column_pos: 2
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              radius: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_top: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_left: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              pad_right: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: icon_ep_fl_glass
+                    text: "\U000F1873"
+                    text_font: mdi_md
+                    text_color: c_ep_muted
+                - label:
+                    id: lbl_ep_fl_glass
+                    text: "--"
+                    text_font: font_sm
+                    text_color: c_ep_muted
+          - obj:
+              id: card_ep_fl_mat
+              grid_cell_column_pos: 3
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              radius: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_top: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              pad_left: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              pad_right: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: icon_ep_fl_mat
+                    text: "\U000F141F"
+                    text_font: mdi_md
+                    text_color: c_ep_muted
+                - label:
+                    id: lbl_ep_fl_mat
+                    text: "--"
+                    text_font: font_sm
+                    text_color: c_ep_muted

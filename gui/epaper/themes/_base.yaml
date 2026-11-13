@@ -59,6 +59,9 @@ script:
                 id: epaper_home_style
                 text_color: c_white
             - lvgl.style.update:
+                id: epaper_title_style
+                text_color: c_white
+            - lvgl.style.update:
                 id: epaper_card_style
                 border_color: c_white
             - if:
@@ -120,6 +123,9 @@ script:
             - lvgl.style.update:
                 id: epaper_home_style
                 text_color: c_ep_home
+            - lvgl.style.update:
+                id: epaper_title_style
+                text_color: c_ep_ha
             - lvgl.style.update:
                 id: epaper_card_style
                 border_color: c_ep_fg

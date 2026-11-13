@@ -1,0 +1,138 @@
+# Reusable Bento section: NordPool hourly stepped price graph (`gui/epaper/sections/nordpool_graph.yaml`)
+# Uses runtime box measurement via `lv_obj_get_content_width/height` in `epaper_update_nordpool_chart`.
+# Companion sensor/script package: `gui/epaper/sections/nordpool_graph_sensors.yaml`
+
+obj:
+  id: ep_sec_nordpool
+  width: 100%
+  height: ${ "216" if ([screen_width|int, screen_height|int]|max) <= 960 else "640" }
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: grid
+    grid_columns: [FR(1)]
+    grid_rows: [CONTENT, FR(1), CONTENT]
+    pad_row: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "10" }
+  widgets:
+    # Time axis header (t0, t4, t8)
+    - obj:
+        grid_cell_column_pos: 0
+        grid_cell_row_pos: 0
+        grid_cell_x_align: STRETCH
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+        widgets:
+          - label:
+              id: lbl_ep_np_t0
+              text: "--:--"
+              text_font: font_sm
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_np_t4
+              text: "--:--"
+              text_font: font_sm
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_np_t8
+              text: "--:--"
+              text_font: font_sm
+              styles: epaper_fg_text_style
+
+    # Plot area with subtle reference hairlines + LVGL stepped price line
+    - obj:
+        id: ep_np_plot_box
+        grid_cell_column_pos: 0
+        grid_cell_row_pos: 1
+        grid_cell_x_align: STRETCH
+        grid_cell_y_align: STRETCH
+        bg_opa: TRANSP
+        border_width: ${ "1" if ([screen_width|int, screen_height|int]|max) <= 960 else "2" }
+        border_color: c_ep_divider
+        radius: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        widgets:
+          - obj:
+              width: 100%
+              height: 1
+              x: 0
+              y: 50%
+              bg_color: c_ep_divider
+              bg_opa: COVER
+              border_width: 0
+          - obj:
+              width: 1
+              height: 100%
+              x: 25%
+              y: 0
+              bg_color: c_ep_divider
+              bg_opa: COVER
+              border_width: 0
+          - obj:
+              width: 1
+              height: 100%
+              x: 50%
+              y: 0
+              bg_color: c_ep_divider
+              bg_opa: COVER
+              border_width: 0
+          - obj:
+              width: 1
+              height: 100%
+              x: 75%
+              y: 0
+              bg_color: c_ep_divider
+              bg_opa: COVER
+              border_width: 0
+          - line:
+              id: ep_np_line
+              width: 100%
+              height: 100%
+              align: TOP_LEFT
+              pad_all: 0
+              line_width: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "8" }
+              line_color: c_ep_fg
+              line_rounded: false
+              points:
+                - x: 0
+                  y: 40
+                - x: 300
+                  y: 40
+
+    # Price labels footer (p0, p4, p8)
+    - obj:
+        grid_cell_column_pos: 0
+        grid_cell_row_pos: 2
+        grid_cell_x_align: STRETCH
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+        widgets:
+          - label:
+              id: lbl_ep_np_p0
+              text: "-- Øre"
+              text_font: font_lg
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_np_p4
+              text: "-- Øre"
+              text_font: font_lg
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_np_p8
+              text: "-- Øre"
+              text_font: font_lg
+              styles: epaper_fg_text_style

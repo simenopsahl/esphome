@@ -126,6 +126,31 @@ script:
     then:
       - lambda: ""
 
+  - id: epaper_hide_chrome
+    mode: queued
+    max_runs: 2
+    then:
+      - lambda: ""
+
+  - id: epaper_show_chrome
+    mode: queued
+    max_runs: 2
+    then:
+      - lambda: ""
+
+  # Latches `initial_data_received` shortly after the first Home Assistant display push arrives
+  - id: epaper_mark_initial_data
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: 'return !id(initial_data_received);'
+          then:
+            - delay: 1s
+            - lambda: |-
+                id(initial_data_received) = true;
+                id(data_updated) = true;
+
   # Single-shot LVGL render + physical e-Paper flush
   - id: update_screen
     mode: single

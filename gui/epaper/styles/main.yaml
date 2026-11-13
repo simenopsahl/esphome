@@ -47,6 +47,8 @@
 
 - id: epaper_home_style
   text_color: c_ep_home
+- id: epaper_title_style
+  text_color: c_ep_ha
 
 - id: epaper_accent1_style
   bg_color: c_ep_accent_1

@@ -1,0 +1,42 @@
+# Companion sensor bindings for `gui/epaper/sections/car_status.yaml`
+# Uses `text_sensor` to gracefully handle `"?"` / unavailable strings from Home Assistant templates.
+
+substitutions:
+  epaper_data_entity: "sensor.waveshare_display_data"
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: car_battery_percent
+    id: ep_car_pct
+    internal: true
+    on_value:
+      - lambda: |-
+          char buf[24];
+          char *end = nullptr;
+          float val = std::strtof(x.c_str(), &end);
+          if (end != x.c_str() && !isnan(val) && x != "?" && x != "unknown" && x != "unavailable") {
+            snprintf(buf, sizeof(buf), "%d%%", (int) lroundf(val));
+          } else {
+            snprintf(buf, sizeof(buf), "%s", (x == "?") ? "? %" : "--%");
+          }
+          lv_label_set_text(id(lbl_ep_car_pct), buf);
+          id(data_updated) = true;
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: car_battery_range
+    id: ep_car_range
+    internal: true
+    on_value:
+      - lambda: |-
+          char buf[24];
+          char *end = nullptr;
+          float val = std::strtof(x.c_str(), &end);
+          if (end != x.c_str() && !isnan(val) && x != "?" && x != "unknown" && x != "unavailable") {
+            snprintf(buf, sizeof(buf), "%d km", (int) lroundf(val));
+          } else {
+            snprintf(buf, sizeof(buf), "%s", (x == "?") ? "? km" : "-- km");
+          }
+          lv_label_set_text(id(lbl_ep_car_range), buf);
+          id(data_updated) = true;

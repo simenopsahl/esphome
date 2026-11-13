@@ -1,21 +1,18 @@
 # Universal network text-sensor bindings for `gui/epaper/pages/info.yaml`.
-# Relies on `sensor_ssid`, `sensor_ip_address`, and `sensor_mac_address` from `common/`.
+# Relies on `sensor_ssid`, `sensor_ip_address`, and `sensor_mac_address` from `common/wifi.yaml` (or host-sdl mocks).
+# Reads sensor states inside `epaper_refresh_status` rather than `!extend` because `common/wifi.yaml`
+# declares them as nested `wifi_info` sub-sensors, which ESPHome `!extend` cannot target across packages.
 
-text_sensor:
-  - id: !extend sensor_ssid
-    on_value:
-      - lvgl.label.update:
-          id: lbl_ep_info_ssid
-          text: !lambda 'return x;'
-
-  - id: !extend sensor_ip_address
-    on_value:
-      - lvgl.label.update:
-          id: lbl_ep_info_ip
-          text: !lambda 'return x;'
-
-  - id: !extend sensor_mac_address
-    on_value:
-      - lvgl.label.update:
-          id: lbl_ep_info_mac
-          text: !lambda 'return x;'
+script:
+  - id: !extend epaper_refresh_status
+    then:
+      - lambda: |-
+          if (id(sensor_ssid).has_state()) {
+            lv_label_set_text(id(lbl_ep_info_ssid), id(sensor_ssid).state.c_str());
+          }
+          if (id(sensor_ip_address).has_state()) {
+            lv_label_set_text(id(lbl_ep_info_ip), id(sensor_ip_address).state.c_str());
+          }
+          if (id(sensor_mac_address).has_state()) {
+            lv_label_set_text(id(lbl_ep_info_mac), id(sensor_mac_address).state.c_str());
+          }

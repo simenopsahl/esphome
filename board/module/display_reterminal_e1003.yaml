@@ -33,33 +33,28 @@ labels: [SPI, display, ePaper]
 # Unsure if 16-level grayscale is needed (probably slower rendering)
 
 packages:
-  epaper: !include ../../features/epaper.yaml
+  epaper_base: !include ../../gui/epaper/base.yaml
+  epaper_theme: !include ../../gui/epaper/themes/gray16.yaml
+  epaper_fonts: !include ../../gui/epaper/fonts/color_gray.yaml
+  epaper_chrome: !include ../../gui/epaper/chrome/status_bar.yaml
+  epaper_nav: !include ../../gui/epaper/chrome/nav_reterminal.yaml
+  epaper_info: !include ../../gui/epaper/pages/info_sensors.yaml
   mic: !include audio/common_mic.yaml
 
 substitutions:
   screen_width: "1872"
   screen_height: "1404"
+  epaper_home_page: "page_info"
+  epaper_time_id: "time_rtc"
+  hint_1: "KEY0 GPIO3: Grønn"
+  hint_2: "KEY1 GPIO4: Høyre"
+  hint_3: "KEY2 GPIO5: Venstre"
   device:
     model: "Seeed reTerminal E1003"
     rtc: "true"
     screen:
       width: ${screen_width}
       height: ${screen_height}
-  display:
-    home_page: page_info
-    font:
-      text_sm: 26
-      text_md: 30
-      text_lg: 34
-      text_xl: 38
-      text_xxl: 48
-      text_hg: 56
-      text_fl: 68
-      icons_sm: 38
-      icons_md: 48
-      icons_lg: 56
-      icons_xl: 68
-      icons_xxl: 80
   pin:
     light:
       led: GPIO16
@@ -144,123 +139,10 @@ display:
     transform:
       mirror_x: true
       mirror_y: false
-    pages:
-      - id: page_black
-        lambda: |-
-          ESP_LOGI("display", "Page: Black");
-          // Fill background.
-          it.fill( id(color_black) );
-      - id: page_white
-        lambda: |-
-          ESP_LOGI("display", "Page: White");
-          // Fill background.
-          it.fill( id(color_white) );
-      - id: page_info
-        lambda: |-
-          ESP_LOGI("display", "Page: Info");
-          // Fill background.
-          it.fill( id(epaper_bg_color) );
 
-          // NAV
-            // Back
-          it.print( (it.get_width()/48)*33 , 2, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0141");
-            // Next
-          it.print( (it.get_width()/48)*35 , 2, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_CENTER, "\U000F0142");
-            // Home
-          it.print( (it.get_width()/48)*37 , 2, id(mdi_sm), id(color_green), TextAlign::TOP_LEFT, "\U000F02DC");
-          
-          // Show wifi icon.
-          if ( id(component_wifi).is_connected() ) {
-            it.print( 0 , 2, id(mdi_md), id(color_green), TextAlign::TOP_LEFT, "\U000F05A9");
-          }
-          // Show HA icon.
-          if ( id(component_api).is_connected() ) {
-            it.print( it.get_width() , 2, id(mdi_md), id(color_blue), TextAlign::TOP_RIGHT, "\U000F07D0");
-          }
-          // PAGE
-          it.print( (it.get_width()/48)*7 , 2, id(mdi_md), id(epaper_text_color), "\U000F02FC");
-          it.print( (it.get_width()/48)*10, 4, id(font_lg), id(epaper_text_color), "Enhet");
-          it.line(10, 52, 1862, 52, id(epaper_text_color));
-
-          
-          // DEVICE
-          it.filled_rectangle(20, 78, 10, 616, id(epaper_text_color));
-          it.line(20, 694, 896, 694, id(epaper_text_color));
-          // NAME
-          it.printf( 60, 110, id(font_lg), id(epaper_text_color), "%s", App.get_name().c_str() );
-          it.printf(60, 260, id(font_md), id(epaper_text_color), "KEY0 GPIO3: Grønn");
-          it.printf(60, 410, id(font_md), id(epaper_text_color), "KEY1 GPIO4: Høyre");
-          it.printf(60, 560, id(font_md), id(epaper_text_color), "KEY2 GPIO5: Venstre");
-          
-          // NETWORK
-          it.filled_rectangle(20, 714, 10, 618, id(epaper_text_color));
-          it.line(20, 1332, 896, 1332, id(epaper_text_color));
-          // SSID
-          it.printf( 60, 756, id(font_lg), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
-          // IP
-          it.printf( 60, 956, id(font_lg), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
-          // MAC
-          it.printf( 60, 1156, id(font_lg), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
-
-          // SENSORS
-          it.filled_rectangle(936, 78, 10, 1254, id(epaper_text_color));
-          it.line(936, 1332, 1842, 1332, id(epaper_text_color));
-          // PERCENT
-          it.print( 976, 110, id(font_lg), id(epaper_text_color), "Batteriprosent: " );
-          if (id(battery_level).has_state()) {
-            it.printf(1350, 110, id(font_xl), id(epaper_text_color), "%.0f%%", id(battery_level).state);
-          } else {
-            it.print(1350, 110, id(font_xl), id(epaper_text_color), "--%");
-          }
-          // VOLTAGE
-          it.print( 976, 360, id(font_lg), id(epaper_text_color), "Batterispenning: " );
-          if (id(battery_voltage).has_state()) {
-            it.printf(1350, 360, id(font_xl), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
-          } else {
-            it.print(1350, 360, id(font_xl), id(epaper_text_color), "--V");
-          }
-          // TEMPERATURE
-          it.print( 976, 610, id(font_lg), id(epaper_text_color), "Temperatur: " );
-          if (id(temperature_sht40).has_state()) {
-            it.printf(1350, 610, id(font_xl), id(epaper_text_color), "%.1f C", id(temperature_sht40).state);
-          } else {
-            it.print(1350, 610, id(font_xl), id(epaper_text_color), "-- C");
-          }
-          // HUMIDITY
-          it.print( 976, 860, id(font_lg), id(epaper_text_color), "Luftfuktighet: " );
-          if (id(humidity_sht40).has_state()) {
-            it.printf(1350, 860, id(font_xl), id(epaper_text_color), "%.1f %%", id(humidity_sht40).state);
-          } else {
-            it.print(1350, 860, id(font_xl), id(epaper_text_color), "-- %");
-          }
-          // SD card
-          if (id(sd_card_detect).state) {
-            it.printf(976, 1110, id(font_md), id(epaper_text_color), "SD Kort: oppdaget");
-          } else {
-            it.printf(976, 1110, id(font_md), id(epaper_text_color), "SD Kort: ikke oppdaget");
-          }
-          
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_rtc).now().timestamp;
-          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( 2, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "@ %s", str );
-
-#    lambda: |-
-#      const auto BLACK   = Color(0,   0,   0,   0);
-#      const auto WHITE   = Color(255, 255, 255, 0);
-#      const auto RED     = Color(255, 0,   0,   0);
-#      const auto GREEN   = Color(0,   255, 0,   0);
-#      const auto BLUE    = Color(0,   0,   255, 0);
-#      const auto YELLOW  = Color(255, 255, 0,   0);
-
-#      it.rectangle(10, 10, 100, 50, BLACK);
-#      it.rectangle(150, 10, 50, 50, RED);
-#      it.circle(250, 35, 25, GREEN);
-#      it.filled_rectangle(10, 80, 100, 50, BLUE);
-#      it.filled_rectangle(150, 80, 50, 50, YELLOW);
-#      it.filled_circle(250, 105, 25, WHITE);
+lvgl:
+  touchscreens:
+    - touchscreen_gt911
 
 touchscreen:
   - platform: gt911
@@ -280,83 +162,6 @@ touchscreen:
                     touch.x_raw,
                     touch.y_raw
                     );
-
-font:
-  - id: font_sm
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_sm}
-    bpp: 4
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', '!', '#', '$', '&', '(', ')',
-      '*', '+', '=', '<', '>', '[', ']', '\', '|', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - id: font_md
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_md}
-    bpp: 4
-    glyphs: *norwegian-glyphs
-  - id: font_lg
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_lg}
-    bpp: 4
-    glyphs: *norwegian-glyphs
-  - id: font_xl
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_xl}
-    bpp: 4
-    glyphs: *norwegian-glyphs
-  - id: font_xxl
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_xxl}
-    bpp: 4
-    glyphs: *norwegian-glyphs
-  - id: font_hg
-    file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    size: ${display.font.text_hg}
-    bpp: 4
-    glyphs: *norwegian-glyphs
-
-  - id: mdi_sm
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_sm}
-    bpp: 4
-    glyphs: !include ../../gui/fonts/glyphs.yaml
-  - id: mdi_md
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_md}
-    bpp: 4
-    glyphs: !include ../../gui/fonts/glyphs.yaml
-  - id: mdi_lg
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_lg}
-    bpp: 4
-    glyphs: !include ../../gui/fonts/glyphs.yaml
-  - id: mdi_xl
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_xl}
-    bpp: 4
-    glyphs: !include ../../gui/fonts/glyphs.yaml
-  - id: mdi_xxl
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_xxl}
-    bpp: 4
-    glyphs: !include ../../gui/fonts/glyphs.yaml
 
 # Enable serial logging
 # The reTerminal E series has a CH340K USB-to-UART bridge on UART0.
@@ -405,6 +210,14 @@ sensor:
     filters:
       # Compensate for onboard voltage divider (1:2)
       - multiply: 2.0
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_info_bat_volt
+          text: !lambda |-
+            char buf[16];
+            snprintf(buf, sizeof(buf), isnan(x) ? "--V" : "%.2fV", x);
+            return std::string(buf);
+      - lambda: 'id(data_updated) = true;'
 
   # --- Battery level (percentage) ---
   - platform: template
@@ -433,6 +246,14 @@ sensor:
       - clamp:
           min_value: 0
           max_value: 100
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_info_bat_pct
+          text: !lambda |-
+            char buf[16];
+            snprintf(buf, sizeof(buf), isnan(x) ? "--%%" : "%.0f%%", x);
+            return std::string(buf);
+      - lambda: 'id(data_updated) = true;'
 
   # --- SHT4x temperature & humidity (I2C) ---
   - platform: sht4x
@@ -451,6 +272,12 @@ sensor:
             send_every: 3
       on_value:
         then:
+          - lvgl.label.update:
+              id: lbl_ep_info_temp
+              text: !lambda |-
+                char buf[16];
+                snprintf(buf, sizeof(buf), isnan(x) ? "-- °C" : "%.1f °C", x);
+                return std::string(buf);
           - lambda: 'id(data_updated) = true;'
     humidity:
       id: humidity_sht40
@@ -465,32 +292,22 @@ sensor:
             send_every: 3
       on_value:
         then:
+          - lvgl.label.update:
+              id: lbl_ep_info_hum
+              text: !lambda |-
+                char buf[16];
+                snprintf(buf, sizeof(buf), isnan(x) ? "-- %%" : "%.1f %%", x);
+                return std::string(buf);
           - lambda: 'id(data_updated) = true;'
     heater_power: Low
     heater_time: Short
     update_interval: 10s
 
-  - id: !extend recorded_display_refresh_sensor
-    # Alternate epaper colors
-    on_value:
-      - then:
-          - lambda: |-
-              // This C++ logic updates the color globals
-              if (((int)x) % 5 == 0) {
-                // On refreshes 0, 5, 10, etc., set Black background, White text
-                id(epaper_bg_color) = Color(0, 0, 0, 0);
-                id(epaper_text_color) = Color(255, 255, 255, 0);
-              } else {
-                // On all other refreshes, set White background, Black text
-                id(epaper_bg_color) = Color(255, 255, 255, 0);
-                id(epaper_text_color) = Color(0, 0, 0, 0);
-              }
-
 binary_sensor:
   # KEY0 (GPIO3)
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1002.btn.green}
+      number: ${pin.reTerminal.e1003.btn.green}
       mode: INPUT
       inverted: true
     id: button_green
@@ -501,13 +318,15 @@ binary_sensor:
     on_press:
       - logger.log: "KEY0 (GPIO3) pressed"
       - script.execute: buzzer_beep
+      - lvgl.page.show: ${epaper_home_page}
+      - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
 
   # KEY1 (GPIO4)
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1002.btn.right}
+      number: ${pin.reTerminal.e1003.btn.right}
       mode: INPUT
       inverted: true
     id: button_right
@@ -518,13 +337,15 @@ binary_sensor:
     on_press:
       - logger.log: "KEY1 (GPIO4) pressed"
       - script.execute: buzzer_beep
+      - lvgl.page.next:
+      - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
 
   # KEY2 (GPIO5)
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1002.btn.left}
+      number: ${pin.reTerminal.e1003.btn.left}
       mode: INPUT
       inverted: true
     id: button_left
@@ -535,6 +356,8 @@ binary_sensor:
     on_press:
       - logger.log: "KEY2 (GPIO5) pressed"
       - script.execute: buzzer_beep
+      - lvgl.page.previous:
+      - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
 
@@ -550,7 +373,7 @@ binary_sensor:
   # For direct file operations (e.g. recording WAV files), use the Arduino framework.
   - platform: gpio
     pin:
-      number: ${pin.reTerminal.e1002.card.detect}
+      number: ${pin.reTerminal.e1003.card.detect}
       mode: INPUT_PULLUP
       inverted: true
     id: sd_card_detect
@@ -559,6 +382,9 @@ binary_sensor:
     disabled_by_default: true
     on_state:
       then:
+        - lvgl.label.update:
+            id: lbl_ep_info_sd
+            text: !lambda 'return x ? "oppdaget" : "ikke oppdaget";'
         - lambda: 'id(data_updated) = true;'
 
 

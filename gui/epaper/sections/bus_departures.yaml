@@ -1,0 +1,108 @@
+# Reusable Bento section: Bregnefaret bus departures (`gui/epaper/sections/bus_departures.yaml`)
+# Companion sensor package: `gui/epaper/sections/bus_departures_sensors.yaml`
+
+obj:
+  id: ep_sec_bus
+  width: 100%
+  height: SIZE_CONTENT
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: flex
+    flex_flow: COLUMN
+    pad_row: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "12" }
+  widgets:
+    - obj:
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_cross: CENTER
+          pad_column: ${ "6" if ([screen_width|int, screen_height|int]|max) <= 960 else "14" }
+        widgets:
+          - label:
+              text: "\U000F08CA"
+              text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+              styles: epaper_title_style
+          - label:
+              text: "Bregnefaret"
+              text_font: font_md
+              styles: epaper_title_style
+
+    - obj:
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+          flex_align_cross: CENTER
+        widgets:
+          - label:
+              id: lbl_ep_bus_line_0
+              text: "510 Drøbak"
+              text_font: font_md
+              long_mode: CLIP
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_bus_time_0
+              text: "--:--"
+              text_font: font_lg
+              styles: epaper_fg_text_style
+
+    - obj:
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+          flex_align_cross: CENTER
+        widgets:
+          - label:
+              id: lbl_ep_bus_line_1
+              text: "510 Drøbak"
+              text_font: font_md
+              long_mode: CLIP
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_bus_time_1
+              text: "--:--"
+              text_font: font_lg
+              styles: epaper_fg_text_style
+
+    - obj:
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+          flex_align_cross: CENTER
+        widgets:
+          - label:
+              id: lbl_ep_bus_line_2
+              text: "510 Drøbak"
+              text_font: font_md
+              long_mode: CLIP
+              styles: epaper_fg_text_style
+          - label:
+              id: lbl_ep_bus_time_2
+              text: "--:--"
+              text_font: font_lg
+              styles: epaper_fg_text_style

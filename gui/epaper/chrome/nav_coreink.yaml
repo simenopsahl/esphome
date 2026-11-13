@@ -5,6 +5,15 @@ substitutions:
   epaper_status_in_footer: "true"
   epaper_nav_pad_right: "0"
 
+script:
+  - id: !extend epaper_hide_chrome
+    then:
+      - lvgl.widget.hide: ep_nav_coreink
+
+  - id: !extend epaper_show_chrome
+    then:
+      - lvgl.widget.show: ep_nav_coreink
+
 lvgl:
   top_layer:
     widgets:

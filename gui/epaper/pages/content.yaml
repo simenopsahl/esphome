@@ -1,0 +1,89 @@
+# Two-column Daily Info Bento page (`gui/epaper/pages/content.yaml`)
+# Landscape dashboards (`e1002` 800x480 Spectra 6, `e1003` 1872x1404 Gray16):
+#   Left column:  Weather forecast -> Horizontal divider -> FolloRen -> Car status
+#   Right column: NordPool graph   -> Horizontal divider -> Bus departures
+# Companion package: `gui/epaper/pages/content_sensors.yaml`
+
+id: page_content
+styles: epaper_page_style
+pad_top: ${ (epaper_header_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) }
+pad_bottom: ${ (epaper_footer_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) }
+pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
+pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
+scrollbar_mode: "OFF"
+on_load:
+  - script.execute:
+      id: set_page_title
+      icon: "\U000F02DC"
+      title: "Info"
+  - script.execute: epaper_update_nordpool_chart
+widgets:
+  - obj:
+      id: cont_ep_content_root
+      width: 100%
+      height: 100%
+      bg_opa: TRANSP
+      border_width: 0
+      pad_all: 0
+      scrollbar_mode: "OFF"
+      layout:
+        type: grid
+        grid_columns: [FR(1), CONTENT, FR(1)]
+        grid_rows: [FR(1)]
+        pad_column: ${ "10" if ([screen_width|int, screen_height|int]|max) <= 960 else "24" }
+      widgets:
+        # Left Column: Weather, FolloRen, Car Status
+        - obj:
+            id: col_ep_content_left
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 0
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            scrollbar_mode: "OFF"
+            layout:
+              type: flex
+              flex_flow: COLUMN
+              flex_align_main: SPACE_BETWEEN
+            widgets:
+              - !include ../sections/weather_forecast.yaml
+              - obj:
+                  width: 100%
+                  height: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+                  styles: epaper_accent2_style
+              - !include ../sections/folloren.yaml
+              - !include ../sections/car_status.yaml
+
+        # Center vertical divider
+        - obj:
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 0
+            grid_cell_y_align: STRETCH
+            width: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+            height: 100%
+            styles: epaper_accent1_style
+
+        # Right Column: NordPool graph, Bus departures
+        - obj:
+            id: col_ep_content_right
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 0
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            scrollbar_mode: "OFF"
+            layout:
+              type: flex
+              flex_flow: COLUMN
+              flex_align_main: SPACE_BETWEEN
+            widgets:
+              - !include ../sections/nordpool_graph.yaml
+              - obj:
+                  width: 100%
+                  height: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
+                  styles: epaper_accent3_style
+              - !include ../sections/bus_departures.yaml

@@ -1,0 +1,240 @@
+# Reusable Bento section: Weather Now + 5-slot hourly forecast (`gui/epaper/sections/weather_forecast.yaml`)
+# Companion sensor/script package: `gui/epaper/sections/weather_forecast_sensors.yaml`
+
+obj:
+  id: ep_sec_weather
+  width: 100%
+  height: SIZE_CONTENT
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: flex
+    flex_flow: COLUMN
+    pad_row: ${ "8" if ([screen_width|int, screen_height|int]|max) <= 960 else "24" }
+  widgets:
+    # Current conditions & measured vs forecast temperatures
+    - obj:
+        id: ep_w_now_row
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_main: SPACE_BETWEEN
+          flex_align_cross: CENTER
+          pad_column: ${ "8" if ([screen_width|int, screen_height|int]|max) <= 960 else "20" }
+        widgets:
+          - label:
+              id: lbl_ep_w_icon_now
+              text: "\U000F0590"
+              text_font: mdi_xxl
+              styles: epaper_fg_text_style
+          - obj:
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: START
+                pad_row: 0
+              widgets:
+                - label:
+                    text: "Målt:"
+                    text_font: font_sm
+                    styles: epaper_muted_style
+                - label:
+                    id: lbl_ep_w_temp_measured
+                    text: "--°C"
+                    text_font: font_xxl
+                    styles: epaper_fg_text_style
+          - obj:
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: START
+                pad_row: 0
+              widgets:
+                - label:
+                    text: "Meldt:"
+                    text_font: font_sm
+                    styles: epaper_title_style
+                - label:
+                    id: lbl_ep_w_temp_forecast
+                    text: "--°C"
+                    text_font: font_xxl
+                    styles: epaper_title_style
+
+    # 5-slot hourly forecast strip (`weather_*_0` .. `weather_*_4`)
+    - obj:
+        id: ep_w_forecast_grid
+        width: 100%
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        layout:
+          type: grid
+          grid_columns: [FR(1), FR(1), FR(1), FR(1), FR(1)]
+          grid_rows: [CONTENT]
+          pad_column: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "10" }
+        widgets:
+          - obj:
+              grid_cell_column_pos: 0
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: lbl_ep_w_time_0
+                    text: "--:--"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_icon_0
+                    text: "\U000F0590"
+                    text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_temp_0
+                    text: "--°C"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+          - obj:
+              grid_cell_column_pos: 1
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: lbl_ep_w_time_1
+                    text: "--:--"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_icon_1
+                    text: "\U000F0590"
+                    text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_temp_1
+                    text: "--°C"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+          - obj:
+              grid_cell_column_pos: 2
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: lbl_ep_w_time_2
+                    text: "--:--"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_icon_2
+                    text: "\U000F0590"
+                    text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_temp_2
+                    text: "--°C"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+          - obj:
+              grid_cell_column_pos: 3
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: lbl_ep_w_time_3
+                    text: "--:--"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_icon_3
+                    text: "\U000F0590"
+                    text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_temp_3
+                    text: "--°C"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+          - obj:
+              grid_cell_column_pos: 4
+              grid_cell_row_pos: 0
+              grid_cell_x_align: STRETCH
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              layout:
+                type: flex
+                flex_flow: COLUMN
+                flex_align_cross: CENTER
+                pad_row: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "6" }
+              widgets:
+                - label:
+                    id: lbl_ep_w_time_4
+                    text: "--:--"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_icon_4
+                    text: "\U000F0590"
+                    text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_lg" }
+                    styles: epaper_fg_text_style
+                - label:
+                    id: lbl_ep_w_temp_4
+                    text: "--°C"
+                    text_font: font_sm
+                    styles: epaper_fg_text_style

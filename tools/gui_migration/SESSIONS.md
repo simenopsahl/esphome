@@ -441,16 +441,28 @@ Build the 5 composable "Daily Info" Bento sections under `gui/epaper/sections/` 
 
 ### Tasks
 
-- [ ] **E3.1** Create reusable Bento section packages in `gui/epaper/sections/`:
-  - `weather_forecast.yaml` (Current weather icon + `Målt` / `Meldt` temperatures + 4/5-slot forecast row)
-  - `folloren.yaml` (FolloRen waste pickup next/restavfall/papir)
-  - `nordpool_graph.yaml` (LVGL `line` graph with runtime container measurement + `price_0`/`price_4`/`price_8` & `time_0`/`time_4`/`time_8`)
-  - `bus_departures.yaml` (Bregnefaret 510 Drøbak departure rows)
-  - `car_status.yaml` (EV battery `%` and range `km`)
-- [ ] **E3.2** Create `gui/epaper/pages/image.yaml` for the random/cycled full-screen image page (`i_selma_1..3`).
-- [ ] **E3.3** Migrate [`seeed-trmnl-e1002-ec2478.yaml`](file:///x:/esphome/seeed-trmnl-e1002-ec2478.yaml) and [` board/module/display_reterminal_e1002.yaml`](file:///x:/esphome/board/module/display_reterminal_e1002.yaml) to `gui/epaper/` (`page_info`, `page_image`, `page_content`).
-- [ ] **E3.4** Migrate [`seeed-trmnl-e1003-190420.yaml`](file:///x:/esphome/seeed-trmnl-e1003-190420.yaml) and [`board/module/display_reterminal_e1003.yaml`](file:///x:/esphome/board/module/display_reterminal_e1003.yaml) to `gui/epaper/` (`page_info`, `page_image`, `page_content`).
-- [ ] **E3.5** Validate both with `esphome config` and compare `host-sdl` screenshots against the Session E1 baseline.
+- [x] **E3.1** Create reusable Bento section packages in `gui/epaper/sections/`:
+  - `weather_forecast.yaml` & `weather_forecast_sensors.yaml` (Current weather icon + `Målt` / `Meldt` temperatures + 5-slot forecast row)
+  - `folloren.yaml` & `folloren_sensors.yaml` (FolloRen waste pickup Option 1: `folloren_next`, `"I DAG"` pill via `folloren_today_types`, `folloren_next_types`, and 4 bin date cards `restavfall`/`papir`/`glass`/`mat`)
+  - `nordpool_graph.yaml` & `nordpool_graph_sensors.yaml` (LVGL `line` graph with runtime container measurement + `price_0`/`price_4`/`price_8` & `time_0`/`time_4`/`time_8`)
+  - `bus_departures.yaml` & `bus_departures_sensors.yaml` (Bregnefaret 510 Drøbak departure rows)
+  - `car_status.yaml` & `car_status_sensors.yaml` (EV battery `%` and range `km`, gracefully handling `"?"` via `text_sensor`)
+- [x] **E3.2** Create `gui/epaper/pages/image.yaml` (+ `image_sensors.yaml`) for the cycled full-screen image page (`i_selma_1..3` with chrome auto-hide/restore via `epaper_hide_chrome` / `epaper_show_chrome`) and `gui/epaper/pages/content.yaml` (+ `content_sensors.yaml`) for the 2-column Bento dashboard.
+- [x] **E3.3** Migrate [`seeed-trmnl-e1002-ec2478.yaml`](file:///x:/esphome/seeed-trmnl-e1002-ec2478.yaml) and [`board/module/display_reterminal_e1002.yaml`](file:///x:/esphome/board/module/display_reterminal_e1002.yaml) to `gui/epaper/` (`page_content`, `page_image`, `page_info`).
+- [x] **E3.4** Migrate [`seeed-trmnl-e1003-190420.yaml`](file:///x:/esphome/seeed-trmnl-e1003-190420.yaml) and [`board/module/display_reterminal_e1003.yaml`](file:///x:/esphome/board/module/display_reterminal_e1003.yaml) to `gui/epaper/` (`page_content`, `page_image`, `page_info`).
+- [x] **E3.5** Validate both with `esphome config` and compare `host-sdl` screenshots against the Session E1 baseline.
+
+### Session E3 Completion Report
+
+- **Date**: 2026-11-13
+- **Summary of Changes**:
+  - Updated [`gui/fonts/glyphs.yaml`](file:///x:/esphome/gui/fonts/glyphs.yaml) with `glass-fragile` (`\U000F1873`) and `food-drumstick` (`\U000F141F`) for the 4-bin FolloRen strip, and added `epaper_title_style` in [`gui/epaper/styles/main.yaml`](file:///x:/esphome/gui/epaper/styles/main.yaml) / [`gui/epaper/themes/_base.yaml`](file:///x:/esphome/gui/epaper/themes/_base.yaml).
+  - Updated [`gui/epaper/base.yaml`](file:///x:/esphome/gui/epaper/base.yaml) (`epaper_mark_initial_data` with `mode: restart` 1s debounce, plus `epaper_hide_chrome` / `epaper_show_chrome` hooks extended by `chrome/status_bar.yaml` and `chrome/nav_{coreink,crowpanel,reterminal}.yaml`) and fixed [`gui/epaper/pages/info_sensors.yaml`](file:///x:/esphome/gui/epaper/pages/info_sensors.yaml) to read `wifi_info` sub-sensors inside `epaper_refresh_status` instead of invalid `!extend` targets.
+  - Built the 5 composable Bento section + sensor packages under `gui/epaper/sections/` ([`weather_forecast`](file:///x:/esphome/gui/epaper/sections/weather_forecast.yaml), [`folloren`](file:///x:/esphome/gui/epaper/sections/folloren.yaml), [`nordpool_graph`](file:///x:/esphome/gui/epaper/sections/nordpool_graph.yaml) using `std::array` globals & runtime plot measurement, [`bus_departures`](file:///x:/esphome/gui/epaper/sections/bus_departures.yaml), [`car_status`](file:///x:/esphome/gui/epaper/sections/car_status.yaml)), plus [`gui/epaper/pages/content.yaml`](file:///x:/esphome/gui/epaper/pages/content.yaml) (+ [`content_sensors.yaml`](file:///x:/esphome/gui/epaper/pages/content_sensors.yaml)) and [`gui/epaper/pages/image.yaml`](file:///x:/esphome/gui/epaper/pages/image.yaml) (+ [`image_sensors.yaml`](file:///x:/esphome/gui/epaper/pages/image_sensors.yaml)).
+  - Migrated [`board/module/display_reterminal_e1002.yaml`](file:///x:/esphome/board/module/display_reterminal_e1002.yaml), [`seeed-trmnl-e1002-ec2478.yaml`](file:///x:/esphome/seeed-trmnl-e1002-ec2478.yaml), [`board/module/display_reterminal_e1003.yaml`](file:///x:/esphome/board/module/display_reterminal_e1003.yaml), and [`seeed-trmnl-e1003-190420.yaml`](file:///x:/esphome/seeed-trmnl-e1003-190420.yaml) (`epaper_image_type: RGB` on `1872×1404` so LVGL `scale` transform has `LV_DRAW_SW_SUPPORT_RGB888` enabled cleanly).
+- **Verification**:
+  - `esphome -q config` exited `0` on Windows 11 for both [`seeed-trmnl-e1002-ec2478.yaml`](file:///x:/esphome/seeed-trmnl-e1002-ec2478.yaml) and [`seeed-trmnl-e1003-190420.yaml`](file:///x:/esphome/seeed-trmnl-e1003-190420.yaml).
+  - Compiled and inspected headless `host-sdl` PNG captures (`page_content`, `page_content_alt`, `page_image`, `page_info`) for both `800×480` Spectra 6 (`e1002`) and `1872×1404` Gray16 (`e1003`), confirming layout fidelity, stepped NordPool chart scaling, FolloRen today/next highlighting, `"?"` car state (`? %` / `? km`), `-0.3°C` -> `0°C` rounding, edge-to-edge full-screen photo chrome hiding/restoration, and `2.34×` centered photo scaling on `1872×1404`.
 
 ---
 

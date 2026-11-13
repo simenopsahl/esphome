@@ -87,6 +87,18 @@ script:
             - lvgl.widget.hide: lbl_ep_ha_ftr
             - lvgl.widget.hide: lbl_ep_ha_hdr
 
+  - id: !extend epaper_hide_chrome
+    then:
+      - lvgl.widget.hide: ep_header_bar
+      - lvgl.widget.hide: ep_header_divider
+      - lvgl.widget.hide: ep_footer_bar
+
+  - id: !extend epaper_show_chrome
+    then:
+      - lvgl.widget.show: ep_header_bar
+      - lvgl.widget.show: ep_header_divider
+      - lvgl.widget.show: ep_footer_bar
+
 lvgl:
   top_layer:
     widgets:

@@ -1,0 +1,43 @@
+# Reusable Bento section: EV battery % and estimated range (`gui/epaper/sections/car_status.yaml`)
+# Companion sensor package: `gui/epaper/sections/car_status_sensors.yaml`
+
+obj:
+  id: ep_sec_car
+  width: 100%
+  height: SIZE_CONTENT
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: flex
+    flex_flow: ROW
+    flex_align_main: SPACE_BETWEEN
+    flex_align_cross: CENTER
+  widgets:
+    - obj:
+        width: SIZE_CONTENT
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        layout:
+          type: flex
+          flex_flow: ROW
+          flex_align_cross: CENTER
+          pad_column: ${ "8" if ([screen_width|int, screen_height|int]|max) <= 960 else "16" }
+        widgets:
+          - label:
+              text: "\U000F010B"
+              text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "mdi_xl" }
+              styles: epaper_title_style
+          - label:
+              id: lbl_ep_car_pct
+              text: "--%"
+              text_font: font_xl
+              styles: epaper_fg_text_style
+    - label:
+        id: lbl_ep_car_range
+        text: "-- km"
+        text_font: font_lg
+        styles: epaper_fg_text_style

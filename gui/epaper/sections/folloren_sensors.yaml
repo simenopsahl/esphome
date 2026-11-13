@@ -1,0 +1,185 @@
+# Companion sensor & script bindings for `gui/epaper/sections/folloren.yaml`
+# Binds `folloren_next`, `folloren_today_types`, `folloren_next_types`, and the 4 bin date attributes.
+
+substitutions:
+  epaper_data_entity: "sensor.waveshare_display_data"
+
+globals:
+  - id: ep_fl_next_text
+    type: std::string
+    restore_value: no
+    initial_value: '"--"'
+  - id: ep_fl_today_csv
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: ep_fl_next_csv
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+
+script:
+  - id: epaper_update_folloren
+    mode: queued
+    max_runs: 4
+    then:
+      - lambda: |-
+          auto clean_csv = [](const std::string &s) -> std::string {
+            if (s == "unknown" || s == "unavailable" || s == "None" || s == "none") return "";
+            return s;
+          };
+          auto has_token = [](const std::string &csv, const char *tok) -> bool {
+            if (csv.empty()) return false;
+            size_t start = 0;
+            while (start < csv.size()) {
+              size_t comma = csv.find(',', start);
+              size_t end = (comma == std::string::npos) ? csv.size() : comma;
+              while (start < end && (csv[start] == ' ' || csv[start] == '\t')) start++;
+              while (end > start && (csv[end - 1] == ' ' || csv[end - 1] == '\t')) end--;
+              if (csv.compare(start, end - start, tok) == 0) return true;
+              if (comma == std::string::npos) break;
+              start = comma + 1;
+            }
+            return false;
+          };
+          auto to_lv = [](const Color &c) -> lv_color_t {
+            return lv_color_make(c.red, c.green, c.blue);
+          };
+
+          const std::string today = clean_csv(id(ep_fl_today_csv));
+          const std::string next_types = clean_csv(id(ep_fl_next_csv));
+          const std::string next_text = id(ep_fl_next_text);
+
+          // Toggle "I DAG" pill and headline prefix
+          if (!today.empty()) {
+            lv_obj_clear_flag(id(box_ep_fl_today_badge), LV_OBJ_FLAG_HIDDEN);
+            if (!next_text.empty() && next_text != "--" && next_text != "I dag") {
+              std::string prefixed = "Neste: " + next_text;
+              lv_label_set_text(id(lbl_ep_fl_next), prefixed.c_str());
+            } else {
+              lv_label_set_text(id(lbl_ep_fl_next), next_text.empty() ? "--" : next_text.c_str());
+            }
+          } else {
+            lv_obj_add_flag(id(box_ep_fl_today_badge), LV_OBJ_FLAG_HIDDEN);
+            lv_label_set_text(id(lbl_ep_fl_next), next_text.empty() ? "--" : next_text.c_str());
+          }
+
+          const bool hi_res = (${screen_width} > 960 || ${screen_height} > 960);
+          const lv_coord_t bw_today = hi_res ? 4 : 2;
+          const lv_coord_t bw_next = hi_res ? 3 : 2;
+          const lv_color_t c_bg = to_lv(id(c_ep_bg));
+          const lv_color_t c_fg = to_lv(id(c_ep_fg));
+          const lv_color_t c_muted = to_lv(id(c_ep_muted));
+          const lv_color_t c_next = to_lv(id(c_ep_ha));
+          const lv_color_t c_today = to_lv(id(c_ep_accent_3));
+
+          struct BinSlot {
+            const char *tok;
+            lv_obj_t *card;
+            lv_obj_t *icon;
+            lv_obj_t *lbl;
+          };
+          const BinSlot bins[4] = {
+            {"rest",  id(card_ep_fl_rest),  id(icon_ep_fl_rest),  id(lbl_ep_fl_rest)},
+            {"papir", id(card_ep_fl_papir), id(icon_ep_fl_papir), id(lbl_ep_fl_papir)},
+            {"glass", id(card_ep_fl_glass), id(icon_ep_fl_glass), id(lbl_ep_fl_glass)},
+            {"mat",   id(card_ep_fl_mat),   id(icon_ep_fl_mat),   id(lbl_ep_fl_mat)},
+          };
+
+          for (const auto &b : bins) {
+            const bool is_today = has_token(today, b.tok);
+            const bool is_next = has_token(next_types, b.tok);
+            if (is_today) {
+              lv_obj_set_style_bg_color(b.card, c_today, 0);
+              lv_obj_set_style_bg_opa(b.card, LV_OPA_COVER, 0);
+              lv_obj_set_style_border_color(b.card, c_today, 0);
+              lv_obj_set_style_border_width(b.card, bw_today, 0);
+              lv_obj_set_style_text_color(b.icon, c_bg, 0);
+              lv_obj_set_style_text_color(b.lbl, c_bg, 0);
+            } else if (is_next) {
+              lv_obj_set_style_bg_opa(b.card, LV_OPA_TRANSP, 0);
+              lv_obj_set_style_border_color(b.card, c_next, 0);
+              lv_obj_set_style_border_width(b.card, bw_next, 0);
+              lv_obj_set_style_text_color(b.icon, c_next, 0);
+              lv_obj_set_style_text_color(b.lbl, c_fg, 0);
+            } else {
+              lv_obj_set_style_bg_opa(b.card, LV_OPA_TRANSP, 0);
+              lv_obj_set_style_border_width(b.card, 0, 0);
+              lv_obj_set_style_text_color(b.icon, c_muted, 0);
+              lv_obj_set_style_text_color(b.lbl, c_muted, 0);
+            }
+          }
+          id(data_updated) = true;
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_next
+    id: ep_fl_next
+    internal: true
+    on_value:
+      - lambda: 'id(ep_fl_next_text) = x;'
+      - script.execute: epaper_update_folloren
+      - script.execute: epaper_mark_initial_data
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_today_types
+    id: ep_fl_today_types
+    internal: true
+    on_value:
+      - lambda: 'id(ep_fl_today_csv) = x;'
+      - script.execute: epaper_update_folloren
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_next_types
+    id: ep_fl_next_types
+    internal: true
+    on_value:
+      - lambda: 'id(ep_fl_next_csv) = x;'
+      - script.execute: epaper_update_folloren
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_restavfall
+    id: ep_fl_restavfall
+    internal: true
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_fl_rest
+          text: !lambda 'return x;'
+      - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_papir
+    id: ep_fl_papir
+    internal: true
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_fl_papir
+          text: !lambda 'return x;'
+      - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_glass
+    id: ep_fl_glass
+    internal: true
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_fl_glass
+          text: !lambda 'return x;'
+      - lambda: 'id(data_updated) = true;'
+
+  - platform: homeassistant
+    entity_id: ${epaper_data_entity}
+    attribute: folloren_mat
+    id: ep_fl_mat
+    internal: true
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_fl_mat
+          text: !lambda 'return x;'
+      - lambda: 'id(data_updated) = true;'

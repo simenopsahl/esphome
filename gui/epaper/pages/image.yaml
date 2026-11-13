@@ -1,0 +1,24 @@
+# Full-screen e-Paper photo page (`gui/epaper/pages/image.yaml`)
+# Hides top_layer header/footer chrome while displayed so images fill edge-to-edge.
+# Companion image assets & cycling script: `gui/epaper/pages/image_sensors.yaml`
+
+id: page_image
+styles: epaper_page_style
+pad_all: 0
+scrollbar_mode: "OFF"
+on_load:
+  - script.execute: epaper_hide_chrome
+  - script.execute: epaper_next_image
+on_unload:
+  - script.execute: epaper_show_chrome
+widgets:
+  - image:
+      id: img_ep_photo
+      src: i_selma_1
+      align: CENTER
+      pivot_x: 400
+      pivot_y: 240
+      scale: ${ ([screen_width|float / 800.0, screen_height|float / 480.0]|min) | round(3) }
+      on_click:
+        - lvgl.page.next:
+        - script.execute: update_screen
