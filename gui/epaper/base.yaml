@@ -9,6 +9,7 @@ substitutions:
   epaper_buffer_size: "50%"
   epaper_home_page: "page_info"
   epaper_time_id: "time_homeassistant"
+  epaper_rotation: "0"
   epaper_scrubber_cycles: "2"
 
   # Responsive chrome geometry derived from physical display dimensions
@@ -138,6 +139,12 @@ script:
     then:
       - lambda: ""
 
+  # Dispatcher extended by each `rolling_graph_*` instance to trigger layout draw on page load
+  - id: epaper_refresh_rolling_graphs
+    mode: single
+    then:
+      - lambda: ""
+
   # Latches `initial_data_received` shortly after the first Home Assistant display push arrives
   - id: epaper_mark_initial_data
     mode: restart
@@ -224,6 +231,7 @@ lvgl:
   id: lvgl_comp
   displays:
     - display_eink
+  rotation: ${epaper_rotation}
   buffer_size: ${epaper_buffer_size}
   default_font: font_md
   paused: true

@@ -1,0 +1,129 @@
+# Responsive e-Paper Weather Station page (`gui/epaper/pages/weather_station.yaml`)
+# Replaces `waveshare-weather-station` across 300x400 (Zectrix Note4C), 400x300 (CrowPanel 4.2"),
+# 792x272 (CrowPanel 5.79"), and 800x480 (Seeed reTerminal E1001).
+#
+# Adapts into 3 responsive layouts:
+#   - Portrait (W < H):                   Header top -> H-divider -> 3 stacked rows
+#   - Ultra-Wide Ribbon (W >= 600, H < 280): Header left -> V-divider -> 3 side-by-side columns
+#   - Landscape (W >= H, H >= 280):          Header left -> V-divider -> 3 stacked rows
+#
+# Companion package: `gui/epaper/pages/weather_station_sensors.yaml`
+
+id: ${epaper_ws_page_id | default("page_content")}
+styles: epaper_page_style
+pad_top: ${ (epaper_header_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) }
+pad_bottom: ${ (epaper_footer_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) }
+pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
+pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
+scrollbar_mode: "OFF"
+on_load:
+  - script.execute:
+      id: set_page_title
+      icon: "\U000F050F"
+      title: "Vær"
+  - script.execute: epaper_update_weather_header
+  - script.execute: epaper_refresh_rolling_graphs
+widgets:
+  - obj:
+      id: cont_ep_ws_root
+      width: 100%
+      height: 100%
+      bg_opa: TRANSP
+      border_width: 0
+      pad_all: 0
+      scrollbar_mode: "OFF"
+      layout:
+        type: grid
+        grid_columns: ${ ["FR(1)"] if ((screen_width|int) < (screen_height|int)) else ["CONTENT", "CONTENT", "FR(1)"] }
+        grid_rows: ${ ["CONTENT", "CONTENT", "FR(1)"] if ((screen_width|int) < (screen_height|int)) else ["FR(1)"] }
+        pad_row: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else "10" }
+        pad_column: ${ "8" if ([screen_width|int, screen_height|int]|min) <= 300 else "14" }
+      widgets:
+        # Weather header (`now` or `now -> next`)
+        - obj:
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 0
+            grid_cell_x_align: ${ "STRETCH" if ((screen_width|int) < (screen_height|int)) else "CENTER" }
+            grid_cell_y_align: ${ "CENTER" if ((screen_width|int) < (screen_height|int)) else "STRETCH" }
+            width: ${ "100%" if ((screen_width|int) < (screen_height|int)) else "SIZE_CONTENT" }
+            height: ${ "SIZE_CONTENT" if ((screen_width|int) < (screen_height|int)) else "100%" }
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            scrollbar_mode: "OFF"
+            widgets:
+              - !include ../sections/weather_header.yaml
+
+        # Primary section divider (horizontal in portrait, vertical in landscape)
+        - obj:
+            grid_cell_column_pos: ${ "0" if ((screen_width|int) < (screen_height|int)) else "1" }
+            grid_cell_row_pos: ${ "1" if ((screen_width|int) < (screen_height|int)) else "0" }
+            grid_cell_x_align: ${ "STRETCH" if ((screen_width|int) < (screen_height|int)) else "CENTER" }
+            grid_cell_y_align: ${ "CENTER" if ((screen_width|int) < (screen_height|int)) else "STRETCH" }
+            width: ${ "100%" if ((screen_width|int) < (screen_height|int)) else "2" }
+            height: ${ "2" if ((screen_width|int) < (screen_height|int)) else "100%" }
+            styles: epaper_accent1_style
+
+        # 3 Rolling 12-hour temperature graphs (`Ute`, `Foran`, `Bak`)
+        - obj:
+            id: cont_ep_ws_graphs
+            grid_cell_column_pos: ${ "0" if ((screen_width|int) < (screen_height|int)) else "2" }
+            grid_cell_row_pos: ${ "2" if ((screen_width|int) < (screen_height|int)) else "0" }
+            grid_cell_x_align: STRETCH
+            grid_cell_y_align: STRETCH
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            scrollbar_mode: "OFF"
+            layout:
+              type: grid
+              grid_columns: ${ ["FR(1)", "FR(1)", "FR(1)"] if ((screen_height|int) < 280 and (screen_width|int) >= 600) else ["FR(1)"] }
+              grid_rows: ${ ["FR(1)"] if ((screen_height|int) < 280 and (screen_width|int) >= 600) else ["FR(1)", "FR(1)", "FR(1)"] }
+              pad_row: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else "12" }
+              pad_column: ${ "12" if ((screen_height|int) < 280 and (screen_width|int) >= 600) else "0" }
+            widgets:
+              - obj:
+                  grid_cell_column_pos: 0
+                  grid_cell_row_pos: 0
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  scrollbar_mode: "OFF"
+                  widgets:
+                    - !include
+                      file: ../sections/rolling_graph.yaml
+                      vars:
+                        uid: graph_temp_ute
+                        title: "Ute"
+              - obj:
+                  grid_cell_column_pos: ${ "1" if ((screen_height|int) < 280 and (screen_width|int) >= 600) else "0" }
+                  grid_cell_row_pos: ${ "0" if ((screen_height|int) < 280 and (screen_width|int) >= 600) else "1" }
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  scrollbar_mode: "OFF"
+                  widgets:
+                    - !include
+                      file: ../sections/rolling_graph.yaml
+                      vars:
+                        uid: graph_temp_foran
+                        title: "Foran"
+              - obj:
+                  grid_cell_column_pos: ${ "2" if ((screen_height|int) < 280 and (screen_width|int) >= 600) else "0" }
+                  grid_cell_row_pos: ${ "0" if ((screen_height|int) < 280 and (screen_width|int) >= 600) else "2" }
+                  grid_cell_x_align: STRETCH
+                  grid_cell_y_align: STRETCH
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  scrollbar_mode: "OFF"
+                  widgets:
+                    - !include
+                      file: ../sections/rolling_graph.yaml
+                      vars:
+                        uid: graph_temp_bak
+                        title: "Bak"

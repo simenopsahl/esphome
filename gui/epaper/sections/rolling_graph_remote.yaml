@@ -1,0 +1,24 @@
+# Bind a remote Home Assistant entity (`entity_id`) to a `rolling_graph.yaml` widget (`uid`).
+# Modeled after `gui/tiles/sensor/remote.yaml`.
+#
+# Required vars: `uid`, `entity_id`
+# Optional vars: `min_span`, `value_fmt`, `sample_interval`
+
+packages:
+  core: !include
+    file: _rolling_graph_core.yaml
+    vars:
+      uid: ${uid}
+      min_span: ${min_span | default("2.0")}
+      value_fmt: ${value_fmt | default("%.0f")}
+      sample_interval: ${sample_interval | default("10min")}
+
+sensor:
+  - platform: homeassistant
+    entity_id: ${entity_id}
+    id: ${uid}_sensor
+    internal: true
+    on_value:
+      - script.execute:
+          id: epaper_on_val_${uid}
+          val: !lambda 'return x;'

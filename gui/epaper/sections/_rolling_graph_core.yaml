@@ -1,0 +1,182 @@
+# Shared rolling 12-hour history ring buffer & LVGL line renderer for `rolling_graph.yaml`.
+# Included with `vars:` by `rolling_graph_local.yaml`, `rolling_graph_remote.yaml`,
+# and `rolling_graph_ha_attr.yaml`.
+#
+# Required vars: `uid`
+# Optional vars: `min_span`, `value_fmt`, `sample_interval`
+
+globals:
+  - id: ${uid}_samples
+    type: std::array<float, 72>
+    restore_value: no
+    initial_value: '{0}'
+  - id: ${uid}_count
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: ${uid}_head
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: ${uid}_last_val
+    type: float
+    restore_value: no
+    initial_value: "NAN"
+
+interval:
+  - interval: ${sample_interval | default("10min")}
+    then:
+      - if:
+          condition:
+            lambda: 'return !isnan(id(${uid}_last_val));'
+          then:
+            - script.execute:
+                id: epaper_push_${uid}
+                val: !lambda 'return id(${uid}_last_val);'
+            - lambda: 'id(data_updated) = true;'
+
+script:
+  - id: epaper_on_val_${uid}
+    mode: single
+    parameters:
+      val: float
+    then:
+      - lambda: |-
+          char buf[24];
+          if (isnan(val)) {
+            snprintf(buf, sizeof(buf), "--");
+            lv_label_set_text(id(${uid}_value), buf);
+          } else {
+            id(${uid}_last_val) = val;
+            const char *fmt = "${value_fmt | default('%.0f')}";
+            float clean_val = val;
+            if ((strcmp(fmt, "%.0f") == 0 && fabsf(val) < 0.5f) ||
+                (strcmp(fmt, "%.1f") == 0 && fabsf(val) < 0.05f)) {
+              clean_val = 0.0f;
+            }
+            snprintf(buf, sizeof(buf), fmt, clean_val);
+            lv_label_set_text(id(${uid}_value), buf);
+          }
+          id(data_updated) = true;
+      - if:
+          condition:
+            lambda: 'return !isnan(val) && id(${uid}_count) == 0;'
+          then:
+            - script.execute:
+                id: epaper_push_${uid}
+                val: !lambda 'return val;'
+      - script.execute: epaper_mark_initial_data
+
+  - id: epaper_push_${uid}
+    mode: queued
+    max_runs: 4
+    parameters:
+      val: float
+    then:
+      - lambda: |-
+          if (isnan(val)) return;
+          id(${uid}_last_val) = val;
+          int head = id(${uid}_head);
+          id(${uid}_samples)[head] = val;
+          id(${uid}_head) = (head + 1) % 72;
+          if (id(${uid}_count) < 72) {
+            id(${uid}_count) += 1;
+          }
+      - script.execute: epaper_draw_${uid}
+
+  - id: epaper_set_series_${uid}
+    mode: single
+    parameters:
+      csv: string
+    then:
+      - lambda: |-
+          const char *p = csv.c_str();
+          int new_head = 0;
+          int new_count = 0;
+          float last_ok = NAN;
+          while (*p != '\0') {
+            while (*p == ' ' || *p == ',' || *p == ';' || *p == '[' || *p == ']' || *p == '\n' || *p == '\t') p++;
+            if (*p == '\0') break;
+            char *end = nullptr;
+            float v = strtof(p, &end);
+            if (end == p) {
+              p++;
+              continue;
+            }
+            if (std::isfinite(v)) {
+              id(${uid}_samples)[new_head] = v;
+              new_head = (new_head + 1) % 72;
+              if (new_count < 72) new_count += 1;
+              last_ok = v;
+            }
+            p = end;
+          }
+          if (new_count <= 0) return;
+          id(${uid}_head) = new_head;
+          id(${uid}_count) = new_count;
+          id(${uid}_last_val) = last_ok;
+          id(data_updated) = true;
+      - script.execute: epaper_draw_${uid}
+      - script.execute: epaper_mark_initial_data
+
+  - id: epaper_draw_${uid}
+    mode: single
+    then:
+      - lambda: |-
+          lv_obj_t *box = id(${uid}_plot_box);
+          auto *line = id(${uid}_line);
+          if (box == nullptr || line == nullptr) return;
+          lv_obj_update_layout(box);
+          int box_w = lv_obj_get_content_width(box);
+          int box_h = lv_obj_get_content_height(box);
+          int n = id(${uid}_count);
+          if (box_w <= 4 || box_h <= 4 || n <= 0) return;
+
+          int start = (id(${uid}_head) - n + 72) % 72;
+          float p_min = id(${uid}_samples)[start];
+          float p_max = p_min;
+          for (int i = 1; i < n; i++) {
+            float v = id(${uid}_samples)[(start + i) % 72];
+            if (v < p_min) p_min = v;
+            if (v > p_max) p_max = v;
+          }
+          const float min_span = ${min_span | default("2.0")};
+          float span = p_max - p_min;
+          if (span < min_span) {
+            float mid = (p_max + p_min) * 0.5f;
+            p_min = mid - (min_span * 0.5f);
+            p_max = mid + (min_span * 0.5f);
+            span = min_span;
+          }
+
+          const int pad_x = 3;
+          const int pad_y = (${screen_width} > 960 || ${screen_height} > 960) ? 10 : 5;
+          const int plot_w = box_w - (pad_x * 2);
+          const int plot_h = box_h - (pad_y * 2);
+          if (plot_w <= 4 || plot_h <= 4) return;
+
+          auto map_y = [&](float v) -> lv_value_precise_t {
+            float norm = (p_max - v) / span;
+            return (lv_value_precise_t) (pad_y + lroundf(norm * plot_h));
+          };
+
+          esphome::FixedVector<lv_point_precise_t> pts;
+          pts.init((size_t) (n == 1 ? 2 : n));
+          if (n == 1) {
+            lv_value_precise_t y0 = map_y(id(${uid}_samples)[start]);
+            pts.push_back(lv_point_precise_t{(lv_value_precise_t) pad_x, y0});
+            pts.push_back(lv_point_precise_t{(lv_value_precise_t) (pad_x + plot_w), y0});
+          } else {
+            for (int i = 0; i < n; i++) {
+              float v = id(${uid}_samples)[(start + i) % 72];
+              pts.push_back(lv_point_precise_t{
+                  (lv_value_precise_t) (pad_x + (plot_w * i) / (n - 1)),
+                  map_y(v),
+              });
+            }
+          }
+          line->set_points(std::move(pts));
+
+  - id: !extend epaper_refresh_rolling_graphs
+    then:
+      - script.execute: epaper_draw_${uid}

@@ -1,0 +1,114 @@
+# Modular `${uid}`-prefixed rolling 12-hour graph widget (`gui/epaper/sections/rolling_graph.yaml`)
+# Adapts automatically between horizontal `[plot | metric]` rows and vertical `[metric / plot]` cards
+# on ultra-wide low-height displays (`height < 280` & `width >= 600`), or via `vars: card_layout`.
+#
+# Required vars: `uid`, `title`
+# Optional vars: `unit` ("°C"), `card_layout` ("auto"), `title_font`, `value_font`, `unit_font`,
+#                `stat_width`, `line_width`
+
+obj:
+  id: ${uid}_root
+  width: 100%
+  height: 100%
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: grid
+    grid_columns: >-
+      ${ ["FR(1)"] if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+         else ["FR(1)", (stat_width|default(88 if ([screen_width|int, screen_height|int]|min) <= 300 else (126 if ([screen_width|int, screen_height|int]|max) <= 960 else 240)))|string] }
+    grid_rows: >-
+      ${ ["CONTENT", "FR(1)"] if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+         else ["FR(1)"] }
+    pad_column: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else ("12" if ([screen_width|int, screen_height|int]|max) <= 960 else "24") }
+    pad_row: ${ "4" if ([screen_width|int, screen_height|int]|max) <= 960 else "10" }
+  widgets:
+    # Rolling polyline plot area
+    - obj:
+        id: ${uid}_plot_box
+        grid_cell_column_pos: 0
+        grid_cell_row_pos: >-
+          ${ "1" if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+             else "0" }
+        grid_cell_x_align: STRETCH
+        grid_cell_y_align: STRETCH
+        bg_opa: TRANSP
+        border_width: ${ "1" if ([screen_width|int, screen_height|int]|max) <= 960 else "2" }
+        border_color: c_ep_fg
+        radius: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        widgets:
+          - line:
+              id: ${uid}_line
+              styles: epaper_line_style
+              width: 100%
+              height: 100%
+              align: TOP_LEFT
+              pad_all: 0
+              line_width: ${ line_width | default("4" if ([screen_width|int, screen_height|int]|min) <= 300 else ("5" if ([screen_width|int, screen_height|int]|max) <= 960 else "8")) }
+              points:
+                - x: 0
+                  y: 20
+                - x: 100
+                  y: 20
+
+    # Title + large value + unit readout
+    - obj:
+        id: ${uid}_metric
+        grid_cell_column_pos: >-
+          ${ "0" if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+             else "1" }
+        grid_cell_row_pos: 0
+        grid_cell_x_align: STRETCH
+        grid_cell_y_align: CENTER
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 0
+        pad_all: 0
+        scrollbar_mode: "OFF"
+        layout:
+          type: flex
+          flex_flow: >-
+            ${ "ROW" if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+               else "COLUMN" }
+          flex_align_main: >-
+            ${ "SPACE_BETWEEN" if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+               else "CENTER" }
+          flex_align_cross: >-
+            ${ "CENTER" if (card_layout|default("auto") == "column" or (card_layout|default("auto") == "auto" and (screen_height|int) < 280 and (screen_width|int) >= 600))
+               else "START" }
+          pad_row: 0
+          pad_column: 4
+        widgets:
+          - label:
+              id: ${uid}_title
+              text: "${title}"
+              text_font: ${ title_font | default("font_md" if ([screen_width|int, screen_height|int]|max) <= 400 else "font_lg") }
+              styles: epaper_fg_text_style
+          - obj:
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              bg_opa: TRANSP
+              border_width: 0
+              pad_all: 0
+              scrollbar_mode: "OFF"
+              layout:
+                type: flex
+                flex_flow: ROW
+                flex_align_cross: END
+                pad_column: 2
+              widgets:
+                - label:
+                    id: ${uid}_value
+                    text: "--"
+                    text_font: ${ value_font | default("font_xxl" if ([screen_width|int, screen_height|int]|min) <= 300 else "font_hg") }
+                    styles: epaper_fg_text_style
+                - label:
+                    id: ${uid}_unit
+                    text: ${ unit | default("°C") }
+                    text_font: ${ unit_font | default("font_sm" if ([screen_width|int, screen_height|int]|min) <= 300 else "font_md") }
+                    pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|min) <= 300 else "8" }
+                    styles: epaper_muted_style

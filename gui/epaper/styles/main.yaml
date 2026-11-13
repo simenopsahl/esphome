@@ -123,3 +123,7 @@
   border_color: c_ep_accent_3
   radius: 0
   pad_all: 0
+
+- id: epaper_line_style
+  line_color: c_ep_fg
+  line_rounded: true

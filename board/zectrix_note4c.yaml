@@ -11,20 +11,31 @@ labels: [esp32s3, ePaper, display]
 # Zectrix Note4C
 #
 
-# Pins for this model
+# Pins and modular GUI packages for this model
 packages:
   pins: !include pins/zectrix_note4.yaml
   i2c: !include extension/internal_i2c.yaml
-  epaper: !include ../features/epaper.yaml
+  epaper_base: !include ../gui/epaper/base.yaml
+  epaper_theme: !include ../gui/epaper/themes/bwry4.yaml
+  epaper_fonts: !include ../gui/epaper/fonts/color_gray.yaml
+  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
+  epaper_nav: !include ../gui/epaper/chrome/nav_zectrix.yaml
+  epaper_info: !include ../gui/epaper/pages/info_sensors.yaml
   audio: !include
     file: module/audio/${feature.audio.hardware_module | default("zectrix_note4_audio.yaml")}
     condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
-  screen_width: "400"
-  screen_height: "300"
+  screen_width: "300"
+  screen_height: "400"
+  epaper_home_page: "page_info"
+  epaper_time_id: "time_rtc"
+  hint_1: "GPIO0: OK (Hjem)"
+  hint_2: "GPIO39: Opp (Neste)"
+  hint_3: "GPIO18: Ned (Forrige / 3s Av)"
+  show_battery_pct: "true"
+  show_battery_volt: "true"
   time_timezone: "Europe/Oslo"
-  home_page: page_content
   module:
     internal:
       i2c_bus: i2c_internal
@@ -39,21 +50,6 @@ substitutions:
     screen:
       width: ${screen_width}
       height: ${screen_height}
-  display:
-    home_page: page_info
-    font:
-      text_sm: 16
-      text_md: 18
-      text_lg: 20
-      text_xl: 24
-      text_xxl: 26
-      text_hg: 28
-      text_fl: 50
-      icons_sm: 28
-      icons_md: 32
-      icons_lg: 36
-      icons_xl: 42
-      icons_xxl: 48
   feature:
     audio:
       hardware_module: zectrix_note4_audio.yaml
@@ -98,16 +94,6 @@ wifi:
   enable_btm: true
   enable_rrm: true
 
-globals:
-  - id: !extend epaper_bg_color
-    initial_value: 'Color(255, 255, 255, 0)' # Default to white background
-  - id: !extend epaper_text_color
-    initial_value: 'Color(0, 0, 0, 0)' # Default to black text
-  - id: !extend epaper_accent1_color
-    initial_value: 'Color(255, 255, 0, 0)' # Default to yellow accent
-  - id: !extend epaper_accent2_color
-    initial_value: 'Color(255, 0, 0, 0)' # Default to red accent
-
 time:
   - platform: pcf8563
     i2c_id: ${module.internal.i2c_bus}
@@ -124,7 +110,7 @@ spi:
   mosi_pin: ${pin.int.spi.mosi}
 
 display:
-  # 400 x 300 resolution B/W + Red/Yellow
+  # Physical 400x300 panel (4-color B/W/Red/Yellow); LVGL portrait rotation is handled in device YAML.
   - platform: epaper_spi
     id: display_eink
     model: jd79660
@@ -142,82 +128,10 @@ display:
       - [0xE9, 0x01]
       - [0x04]
     dimensions:
-      width: ${screen_width}
-      height: ${screen_height}
+      width: 400
+      height: 300
     full_update_every: 1
     update_interval: never
-    pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill( id(color_black) );
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill( id(color_white) );
-      - id: page_info # Copied from display_reterminal_e1001.yaml coordinates after // Page is not yet correct
-        lambda: |-
-          ESP_LOGI("display", "Page: Info");
-          // Fill background.
-          it.fill( id(epaper_bg_color) );
-          
-          // Show wifi icon.
-          if ( id(component_wifi).is_connected() ) {
-            it.print( it.get_width() , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_RIGHT, "\U000F05A9");
-          }
-          // Show HA icon.
-          if ( id(component_api).is_connected() ) {
-            it.print( it.get_width()-36 , 0, id(mdi_sm), id(epaper_text_color), TextAlign::TOP_RIGHT, "\U000F07D0");
-          }
-          // PAGE
-          it.print( 0 , 0, id(mdi_md), id(epaper_text_color), "\U000F02FC");
-          it.print( 36, 3, id(font_md), id(epaper_text_color), "Enhet");
-          it.line( 10, 36, it.get_width()-10, 36, id(epaper_accent_color));
-
-          
-          // DEVICE
-          it.filled_rectangle(20, (it.get_height()/50)*6, 15, (it.get_height()/50)*15, id(epaper_accent_color));
-          it.line(20, (it.get_height()/50)*21, it.get_width()-20, (it.get_height()/50)*21, id(epaper_accent_color));
-          // NAME
-          it.printf(40, (it.get_height()/50)*7, id(font_md), id(epaper_text_color), "%s", App.get_name().c_str() );
-          it.printf(40, (it.get_height()/50)*11, id(font_sm), id(epaper_text_color), "GPIO0: OK");
-          it.printf(40, (it.get_height()/50)*14, id(font_sm), id(epaper_text_color), "GPIO39: Opp");
-          it.printf(40, (it.get_height()/50)*17, id(font_sm), id(epaper_text_color), "GPIO18: Ned (3s -> Power off)");
-          
-          // NETWORK
-          it.filled_rectangle(20, (it.get_height()/50)*22, 15, (it.get_height()/50)*14, id(epaper_accent1_color));
-          it.line(20, (it.get_height()/50)*36, it.get_width()-20, (it.get_height()/50)*36, id(epaper_accent1_color));
-          // SSID
-          it.printf( 40, (it.get_height()/50)*23, id(font_md), id(epaper_text_color), "%s", id(sensor_ssid).state.c_str() );
-          // IP
-          it.printf( 40, (it.get_height()/50)*27, id(font_md), id(epaper_text_color), "%s", id(sensor_ip_address).state.c_str() );
-          // MAC
-          it.printf( 40, (it.get_height()/50)*31, id(font_md), id(epaper_text_color), "%s", id(sensor_mac_address).state.c_str() );
-
-          // SENSORS
-          it.filled_rectangle(20, (it.get_height()/50)*37, 15, (it.get_height()/50)*10, id(epaper_accent2_color));
-          it.line(20, (it.get_height()/50)*47, it.get_width()-20, (it.get_height()/50)*47, id(epaper_accent2_color));
-          // PERCENT
-          it.print( 40, (it.get_height()/50)*38, id(font_md), id(epaper_text_color), "Batteriprosent: " );
-          if (id(battery_level).has_state()) {
-            it.printf( it.get_width()-70, (it.get_height()/50)*38, id(font_lg), id(epaper_text_color), "%.0f%%", id(battery_level).state);
-          } else {
-            it.print( it.get_width()-70, (it.get_height()/50)*38, id(font_lg), id(epaper_text_color), "--%");
-          }
-          // VOLTAGE
-          it.print( 40, (it.get_height()/50)*42, id(font_md), id(epaper_text_color), "Batterispenning: " );
-          if (id(battery_voltage).has_state()) {
-            it.printf( it.get_width()-70, (it.get_height()/50)*42, id(font_lg), id(epaper_text_color), "%.2fV", id(battery_voltage).state);
-          } else {
-            it.print( it.get_width()-70, (it.get_height()/50)*42, id(font_lg), id(epaper_text_color), "--V");
-          }
-          
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(font_sm), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
 
 binary_sensor:
   # Stick Up
@@ -230,6 +144,8 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button Up
+      - lvgl.page.next:
+      - script.execute: update_screen
     name: Button Up
     entity_category: diagnostic
     disabled_by_default: true
@@ -244,6 +160,8 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button OK
+      - lvgl.page.show: ${epaper_home_page}
+      - script.execute: update_screen
     name: Button OK
     entity_category: diagnostic
     disabled_by_default: true
@@ -257,6 +175,8 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button Down
+      - lvgl.page.previous:
+      - script.execute: update_screen
     on_multi_click:
       - timing:
           - ON for at least 3s
@@ -348,6 +268,14 @@ sensor:
     disabled_by_default: true
     device_class: voltage
     unit_of_measurement: V
+    on_value:
+      - lvgl.label.update:
+          id: lbl_ep_info_bat_volt
+          text: !lambda |-
+            char buf[16];
+            snprintf(buf, sizeof(buf), isnan(x) ? "--V" : "%.2fV", x);
+            return std::string(buf);
+      - lambda: 'id(data_updated) = true;'
   # Battery Percent
   - platform: template
     name: "Battery"
@@ -375,107 +303,16 @@ sensor:
       - clamp:
           min_value: 0
           max_value: 100
-
-  - id: !extend recorded_display_refresh_sensor
-    # Alternate epaper colors
     on_value:
-      - then:
-          - lambda: |-
-              // This C++ logic updates the color globals
-              if (((int)x) % 5 == 0) {
-                // On refreshes 0, 5, 10, etc., set Black background, White text
-                id(epaper_bg_color) = Color(0,0,0,0);
-                id(epaper_text_color) = Color(255,255,255,255);
-                id(epaper_accent_color) = Color(255, 255, 0, 0);
-                id(epaper_accent1_color) = Color(255, 0, 0, 0);
-                id(epaper_accent2_color) = Color(255, 255, 0, 0);
-              } else {
-                // On all other refreshes, set White background, Black text
-                id(epaper_bg_color) = Color(255,255,255,255);
-                id(epaper_text_color) = Color(0,0,0,0);
-                id(epaper_accent_color) = Color(255, 0, 0, 0);
-                id(epaper_accent1_color) = Color(255, 255, 0, 0);
-                id(epaper_accent2_color) = Color(255, 0, 0, 0);
-              }
+      - lvgl.label.update:
+          id: lbl_ep_info_bat_pct
+          text: !lambda |-
+            char buf[16];
+            snprintf(buf, sizeof(buf), isnan(x) ? "--%%" : "%.0f%%", x);
+            return std::string(buf);
+      - lambda: 'id(data_updated) = true;'
 
 status_led:
   pin:
     number: ${pin.light.led}
     ignore_strapping_warning: true
-
-font:
-  - id: font_sm
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_sm}
-    bpp: 2
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', '!', '#', '$', '&', '(', ')',
-      '*', '+', '=', '<', '>', '[', ']', '\', '|', 'µ', '³', '¨', '®', '±', '×', '÷', '½', '¼', '¾', '-', '/',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - id: font_md
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_md}
-    bpp: 2
-    glyphs: *norwegian-glyphs
-  - id: font_lg
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_lg}
-    bpp: 2
-    glyphs: *norwegian-glyphs
-  - id: font_xl
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_xl}
-    bpp: 2
-    glyphs: *norwegian-glyphs
-  - id: font_xxl
-    file:
-      type: gfonts
-      family: Noto Sans Display
-    size: ${display.font.text_xxl}
-    bpp: 2
-    glyphs: *norwegian-glyphs
-  - id: font_hg
-    file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    size: ${display.font.text_hg}
-    bpp: 2
-    glyphs: *norwegian-glyphs
-
-  - id: mdi_sm
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_sm}
-    bpp: 2
-    glyphs: !include ../gui/fonts/glyphs.yaml
-  - id: mdi_md
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_md}
-    bpp: 2
-    glyphs: !include ../gui/fonts/glyphs.yaml
-  - id: mdi_lg
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_lg}
-    bpp: 2
-    glyphs: !include ../gui/fonts/glyphs.yaml
-  - id: mdi_xl
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_xl}
-    bpp: 2
-    glyphs: !include ../gui/fonts/glyphs.yaml
-  - id: mdi_xxl
-    file: https://github.com/Pictogrammers/pictogrammers.github.io/raw/refs/heads/main/@mdi/font/7.4.47/fonts/materialdesignicons-webfont.ttf
-    size: ${display.font.icons_xxl}
-    bpp: 2
-    glyphs: !include ../gui/fonts/glyphs.yaml

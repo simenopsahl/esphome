@@ -49,7 +49,7 @@ widgets:
               flex_flow: COLUMN
               flex_align_main: SPACE_EVENLY
               flex_align_cross: START
-              pad_row: ${ 6 if ([screen_width|int, screen_height|int]|max) <= 240 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
+              pad_row: ${ 6 if ([screen_width|int, screen_height|int]|max) <= 240 or (screen_height|int) <= 280 else (10 if ([screen_width|int, screen_height|int]|max) <= 400 else (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
             widgets:
               # Card 1: Device Name & Hardware Key Hints
               - container:
@@ -58,7 +58,7 @@ widgets:
                   height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "48%" }
                   flex_grow: ${ 0 if (screen_width|int) < 600 else 1 }
                   styles: ${ "epaper_card_1_style" if ([screen_width|int, screen_height|int]|max) > 240 else "epaper_page_style" }
-                  pad_bottom: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (6 if ([screen_width|int, screen_height|int]|max) <= 400 else (10 if ([screen_width|int, screen_height|int]|max) <= 960 else 18)) }
+                  pad_bottom: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (4 if (screen_height|int) <= 280 else (6 if ([screen_width|int, screen_height|int]|max) <= 400 else (10 if ([screen_width|int, screen_height|int]|max) <= 960 else 18))) }
                   widgets:
                     - container:
                         width: 100%
@@ -70,7 +70,7 @@ widgets:
                           flex_align_main: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "SPACE_EVENLY" }
                           flex_align_cross: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
                           flex_align_track: ${ "CENTER" if ([screen_width|int, screen_height|int]|max) <= 240 else "START" }
-                          pad_row: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (4 if ([screen_width|int, screen_height|int]|max) <= 400 else (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14)) }
+                          pad_row: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 or (screen_height|int) <= 280 else (4 if ([screen_width|int, screen_height|int]|max) <= 400 else (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14)) }
                         widgets:
                           - label:
                               id: lbl_ep_info_device_name

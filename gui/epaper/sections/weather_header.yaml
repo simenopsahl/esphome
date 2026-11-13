@@ -1,0 +1,38 @@
+# Reusable Weather Station header (`gui/epaper/sections/weather_header.yaml`)
+# Shows single centered condition icon when `now == next`, or `now -> next` transition.
+# Companion sensor/script package: `gui/epaper/sections/weather_header_sensors.yaml`
+
+obj:
+  id: ep_sec_weather_header
+  width: ${ "100%" if ((screen_width|int) < (screen_height|int)) else "SIZE_CONTENT" }
+  height: ${ "SIZE_CONTENT" if ((screen_width|int) < (screen_height|int)) else "100%" }
+  min_width: ${ "0" if ((screen_width|int) < (screen_height|int)) else ("84" if ((screen_width|int) < 600) else ("108" if ((screen_height|int) < 280) else "132")) }
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: flex
+    flex_flow: ${ "ROW" if ((screen_width|int) < (screen_height|int)) else "COLUMN" }
+    flex_align_main: CENTER
+    flex_align_cross: CENTER
+    pad_column: ${ "10" if ((screen_width|int) < 600) else "16" }
+    pad_row: ${ "2" if ((screen_height|int) < 280) else "6" }
+  widgets:
+    - label:
+        id: lbl_ep_wh_now
+        text: "\U000F0590"
+        text_font: ${ "mdi_xl" if ((screen_height|int) < 280) else "mdi_xxl" }
+        styles: epaper_fg_text_style
+    - label:
+        id: lbl_ep_wh_arrow
+        text: ${ "\U000F0142" if ((screen_width|int) < (screen_height|int)) else "\U000F0140" }
+        text_font: ${ "mdi_sm" if ((screen_height|int) < 320) else "mdi_md" }
+        styles: epaper_fg_text_style
+        hidden: true
+    - label:
+        id: lbl_ep_wh_next
+        text: "\U000F0590"
+        text_font: ${ "mdi_xl" if ((screen_height|int) < 280) else "mdi_xxl" }
+        styles: epaper_title_style
+        hidden: true

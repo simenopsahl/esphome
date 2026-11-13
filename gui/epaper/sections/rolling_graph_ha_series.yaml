@@ -1,0 +1,37 @@
+# Bind a Home Assistant sensor attribute (`entity_id` + `attribute`) AND optional pre-made CSV/JSON
+# history string attribute (`history_attribute`) to a `rolling_graph.yaml` widget (`uid`).
+# Combines instant full history on boot from Home Assistant with live value + interval sampling.
+#
+# Required vars: `uid`, `entity_id`, `attribute`, `history_attribute`
+# Optional vars: `min_span`, `value_fmt`, `sample_interval`
+
+packages:
+  core: !include
+    file: _rolling_graph_core.yaml
+    vars:
+      uid: ${uid}
+      min_span: ${min_span | default("2.0")}
+      value_fmt: ${value_fmt | default("%.0f")}
+      sample_interval: ${sample_interval | default("10min")}
+
+sensor:
+  - platform: homeassistant
+    entity_id: ${entity_id}
+    attribute: ${attribute}
+    id: ${uid}_sensor
+    internal: true
+    on_value:
+      - script.execute:
+          id: epaper_on_val_${uid}
+          val: !lambda 'return x;'
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: ${entity_id}
+    attribute: ${history_attribute}
+    id: ${uid}_history
+    internal: true
+    on_value:
+      - script.execute:
+          id: epaper_set_series_${uid}
+          csv: !lambda 'return x;'

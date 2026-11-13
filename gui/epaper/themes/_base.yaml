@@ -64,6 +64,9 @@ script:
             - lvgl.style.update:
                 id: epaper_card_style
                 border_color: c_white
+            - lvgl.style.update:
+                id: epaper_line_style
+                line_color: c_white
             - if:
                 condition:
                   lambda: |-
@@ -129,6 +132,9 @@ script:
             - lvgl.style.update:
                 id: epaper_card_style
                 border_color: c_ep_fg
+            - lvgl.style.update:
+                id: epaper_line_style
+                line_color: c_ep_fg
             - lvgl.style.update:
                 id: epaper_divider_style
                 bg_color: c_ep_divider
