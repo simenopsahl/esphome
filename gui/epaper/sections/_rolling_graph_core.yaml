@@ -7,7 +7,7 @@
 
 globals:
   - id: ${uid}_samples
-    type: std::array<float, 72>
+    type: std::array<float, 36>
     restore_value: no
     initial_value: '{0}'
   - id: ${uid}_count
@@ -24,7 +24,7 @@ globals:
     initial_value: "NAN"
 
 interval:
-  - interval: ${sample_interval | default("10min")}
+  - interval: ${sample_interval | default("20min")}
     then:
       - if:
           condition:
@@ -78,8 +78,8 @@ script:
           id(${uid}_last_val) = val;
           int head = id(${uid}_head);
           id(${uid}_samples)[head] = val;
-          id(${uid}_head) = (head + 1) % 72;
-          if (id(${uid}_count) < 72) {
+          id(${uid}_head) = (head + 1) % 36;
+          if (id(${uid}_count) < 36) {
             id(${uid}_count) += 1;
           }
       - script.execute: epaper_draw_${uid}
@@ -105,8 +105,8 @@ script:
             }
             if (std::isfinite(v)) {
               id(${uid}_samples)[new_head] = v;
-              new_head = (new_head + 1) % 72;
-              if (new_count < 72) new_count += 1;
+              new_head = (new_head + 1) % 36;
+              if (new_count < 36) new_count += 1;
               last_ok = v;
             }
             p = end;
@@ -132,11 +132,11 @@ script:
           int n = id(${uid}_count);
           if (box_w <= 4 || box_h <= 4 || n <= 0) return;
 
-          int start = (id(${uid}_head) - n + 72) % 72;
+          int start = (id(${uid}_head) - n + 36) % 36;
           float p_min = id(${uid}_samples)[start];
           float p_max = p_min;
           for (int i = 1; i < n; i++) {
-            float v = id(${uid}_samples)[(start + i) % 72];
+            float v = id(${uid}_samples)[(start + i) % 36];
             if (v < p_min) p_min = v;
             if (v > p_max) p_max = v;
           }
@@ -168,7 +168,7 @@ script:
             pts.push_back(lv_point_precise_t{(lv_value_precise_t) (pad_x + plot_w), y0});
           } else {
             for (int i = 0; i < n; i++) {
-              float v = id(${uid}_samples)[(start + i) % 72];
+              float v = id(${uid}_samples)[(start + i) % 36];
               pts.push_back(lv_point_precise_t{
                   (lv_value_precise_t) (pad_x + (plot_w * i) / (n - 1)),
                   map_y(v),

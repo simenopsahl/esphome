@@ -25,6 +25,12 @@ color:
   - id: c_gray_dark
     hex: "444444"
 
+globals:
+  - id: epaper_page_inverted
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
 script:
   - id: apply_epaper_theme_refresh
     mode: single
@@ -32,8 +38,10 @@ script:
       - if:
           condition:
             lambda: |-
-              return (std::string("${epaper_invert_every_5th}") == "true") &&
-                     ((id(recorded_display_refresh) % 5) == 0);
+              bool fifth = (std::string("${epaper_invert_every_5th}") == "true") &&
+                           (id(recorded_display_refresh) > 0) &&
+                           ((id(recorded_display_refresh) % 5) == 0);
+              return fifth ^ id(epaper_page_inverted);
           then:
             - lvgl.style.update:
                 id: epaper_page_style

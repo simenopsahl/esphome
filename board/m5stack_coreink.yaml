@@ -2,20 +2,32 @@ labels: [esp32, ePaper, display]
 ---
 # https://docs.m5stack.com/en/core/coreink
 # Schematic reference: "esphome/pinmap/schematics/esp32 M5Stack CoreInk.png"
-# Base functions for:
-# M5Stack CoreInk
+# Base LVGL e-Paper hardware package for:
+# M5Stack CoreInk (ESP32-PICO-D4, no PSRAM)
 #
 
-# Pins for this model
+# Pins for this model & shared gui/epaper engine
 packages:
   pins: !include pins/m5stack_coreink.yaml
-  epaper: !include ../features/epaper.yaml
+  epaper: !include ../gui/epaper/base.yaml
+  epaper_theme: !include ../gui/epaper/themes/bw.yaml
+  epaper_fonts: !include ../gui/epaper/fonts/bw.yaml
+  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
+  epaper_nav: !include ../gui/epaper/chrome/nav_coreink.yaml
+  epaper_info: !include ../gui/epaper/pages/info_sensors.yaml
 
 substitutions:
-  screen_width: "200"
-  screen_height: "200"
+  panel_width: "200"
+  panel_height: "200"
+  epaper_rotation: "0"
+  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
+  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
+  epaper_buffer_size: "5%"
+  epaper_home_page: "page_room"
+  epaper_show_header: "true"
+  epaper_status_in_footer: "true"
+  epaper_time_id: "time_homeassistant"
   time_timezone: "Europe/Oslo"
-  home_page: page_content
   module:
     internal:
       i2c_bus: i2c_internal
@@ -34,17 +46,8 @@ esphome:
     name: "M5Stack.CoreInk"
     version: "1.0.0"
   on_boot:
-# i2c RTC only with one additional i2c bus
-#    - priority: 800
-#      then:
-#        - pcf8563.read_time:
     - priority: 800
       then:
-        # Bypass sleep circuit arduino
-#        - lambda: |-
-#            pinMode(GPIO_NUM_12, OUTPUT);
-#            digitalWrite(GPIO_NUM_12, HIGH);
-#            gpio_hold_en(GPIO_NUM_12);
         # Bypass sleep circuit esp-idf
         - lambda: |-
             gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
@@ -59,8 +62,10 @@ esp32:
   cpu_frequency: 240MHz
   framework:
     advanced:
-      compiler_optimization: PERF
-      sram1_as_iram: true
+      compiler_optimization: SIZE
+      flash_chip: gd
+    sdkconfig_options:
+      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
     type: ${device.framework.type}
 
 wifi:
@@ -72,23 +77,12 @@ bluetooth_proxy:
   connection_slots: 1
 
 esp32_ble:
-  max_connections: 2
+  max_connections: 1
 
 esp32_ble_tracker:
   scan_parameters:
     interval: 500ms
     window: 10ms
-
-# i2c RTC only with one additional i2c bus
-#time:
-#  - platform: bm8563
-#    i2c_id: ${module.internal.i2c_bus}
-#    id: time_rtc
-#    update_interval: 15min
-#  - id: !extend time_homeassistant
-#    on_time_sync:
-#      then:
-#        bm8563.write_time:
 
 spi:
   clk_pin: ${pin.int.spi.clk}
@@ -101,17 +95,13 @@ output:
     pin:
       number: ${pin.audio.buzzer}
       ignore_strapping_warning: true
-#  - platform: gpio
-#    id: power_hold
-#    pin:
-#      number: ${pin.int.pwr_mos}
-#      allow_other_uses: true
 
 display:
   # 200 x 200 resolution
-  - platform: waveshare_epaper
+  - platform: epaper_spi
     id: display_eink
-    model: 1.54inv2
+    model: Waveshare-1.54in-v2
+    data_rate: 10MHz
     cs_pin: ${pin.int.spi.disp.cs}
     dc_pin:
       number: ${pin.int.spi.disp.dc}
@@ -123,73 +113,10 @@ display:
       number: ${pin.int.spi.disp.busy}
       inverted: false
     full_update_every: 2
-#    reset_duration: 2ms
+    auto_clear_enabled: false
     update_interval: never
-    pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_text_color));
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_bg_color));
-
-# text_sensor:
-#   - platform: template
-#     id: wakeup_cause
-#     lambda: return to_string( esp_sleep_get_wakeup_cause() );
-#     filters:
-#       - lambda: |-
-#           if (x == "0") {
-#             return x + "_ESP_SLEEP_WAKEUP_UNDEFINED";
-#           } else if (x == "1") {
-#             return x + "_ESP_SLEEP_WAKEUP_ALL";
-#           } else if (x == "2") {
-#             return x + "_ESP_SLEEP_WAKEUP_EXT0";
-#           } else if (x == "3") {
-#             return x + "_ESP_SLEEP_WAKEUP_EXT1";
-#           } else if (x == "4") {
-#             return x + "_ESP_SLEEP_WAKEUP_TIMER";
-#           } else if (x == "5") {
-#             return x + "_ESP_SLEEP_WAKEUP_TOUCHPAD";
-#           } else if (x == "6") {
-#             return x + "_ESP_SLEEP_WAKEUP_ULP";
-#           } else if (x == "7") {
-#             return x + "_ESP_SLEEP_WAKEUP_GPIO";
-#           } else if (x == "8") {
-#             return x + "_ESP_SLEEP_WAKEUP_UART";
-#           } else if (x == "9") {
-#             return x + "_ESP_SLEEP_WAKEUP_WIFI";
-#           } else if (x == "10") {
-#             return x + "_ESP_SLEEP_WAKEUP_COCPU";
-#           } else if (x == "11") {
-#             return x + "_ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG";
-#           } else if (x == "12") {
-#             return x + "_ESP_SLEEP_WAKEUP_BT";
-#           } else {
-#             return x + "_UNKNOWN";
-#           }
-#     name: "Wakeup Cause"
-#     entity_category: diagnostic
-#     disabled_by_default: true
 
 binary_sensor:
-  # Power Button
-#  - platform: gpio
-#    id: button_side
-#    name: Side Button
-#    pin:
-#      number: ${pin.btn.side}
-#      inverted: true
-#      mode:
-#        input: true
-#        pullup: true
-#    filters:
-#      - delayed_off: 10ms
-#    on_press:
-#      then:
-#        - logger.log: Side Button Pressed
   # Top Button
   - platform: gpio
     id: button_top
@@ -210,83 +137,81 @@ binary_sensor:
     on_release:
       - output.turn_off: buzzer
 
-  # Stick Up
+  # Stick Up (Home)
   - platform: gpio
     id: stick_up
     pin:
       number: ${pin.btn.stick.up}
-#      allow_other_uses: true
       inverted: true
       mode:
         input: true
-#        pullup: true
     filters:
       - delayed_off: 10ms
     on_press:
       - logger.log: Stick Up
       - script.execute: buzzer_beep
+      - lvgl.page.show:
+          id: ${epaper_home_page}
+          animation: NONE
+          time: 0ms
+      - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
     name: Stick Up
     entity_category: diagnostic
-  # Stick Press
+
+  # Stick Press (Refresh)
   - platform: gpio
     id: stick_press
     pin:
       number: ${pin.btn.stick.press}
-#      allow_other_uses: true
       inverted: true
       mode:
         input: true
-#        pullup: true
     filters:
       - delayed_off: 10ms
     on_press:
       - logger.log: Stick Press
       - script.execute: buzzer_beep
+      - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
     name: Stick Press
     entity_category: diagnostic
-  # Stick Down
+
+  # Stick Down (Next Page)
   - platform: gpio
     id: stick_down
     pin:
       number: ${pin.btn.stick.down}
-#      allow_other_uses: true
       inverted: true
       mode:
         input: true
-#        pullup: true
     filters:
       - delayed_off: 10ms
     on_press:
       - logger.log: Stick Down
       - script.execute: buzzer_beep
+      - lvgl.page.next:
+          animation: NONE
+          time: 0ms
+      - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
     name: Stick Down
     entity_category: diagnostic
 
-# Power Hold
+  # Power Hold
   - platform: gpio
     id: pwr_hold
     pin:
       number: ${pin.int.pwr_mos}
-#      allow_other_uses: true
       ignore_strapping_warning: true
       inverted: true
     name: Power Hold
     entity_category: diagnostic
 
 sensor:
-  # Deep Sleep wakeup cause
-#  - platform: template
-#    name: "Wakeup Cause"
-#    entity_category: diagnostic
-#    accuracy_decimals: 0
-#    lambda: return esp_sleep_get_wakeup_cause();
-  
   # Battery voltage
   - platform: adc
     pin: ${pin.int.bat_feedback}
@@ -308,6 +233,7 @@ sensor:
     on_value:
       - then:
           - component.update: bat_percent
+
   # Battery Percent
   - platform: template
     name: "Battery"
@@ -329,39 +255,6 @@ sensor:
     entity_category: diagnostic
     device_class: battery
     unit_of_measurement: "%"
-
-#switch:
-  # Power Hold
-#  - platform: template
-#    id: sw_pwr_hold
-#    lambda: |-
-#      if (id(pwr_hold).state) {
-#        return true;
-#      } else {
-#        return false;
-#      }
-#    restore_mode: RESTORE_DEFAULT_ON
-#    turn_on_action:
-#      then:
-#        - logger.log: Power Hold On
-#        - lambda: |-
-#            gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
-#            gpio_set_level(GPIO_NUM_12, 1);
-#            gpio_hold_en(GPIO_NUM_12);
-#            gpio_deep_sleep_hold_en();
-#        - deep_sleep.prevent: deep_sleep_battery
-#    turn_off_action:
-#      then:
-#        - logger.log: Power Hold Off
-#        - lambda: |-
-#            gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
-#            gpio_set_level(GPIO_NUM_12, 0);
-#            gpio_hold_en(GPIO_NUM_12);
-#            gpio_deep_sleep_hold_dis();
-#        - deep_sleep.allow: deep_sleep_battery
-#    name: Power Hold
-#    entity_category: config
-#    optimistic: true
 
 # Script for buzzer beep
 script:
@@ -385,25 +278,6 @@ script:
           level: "1%"
       - delay: 30ms
       - output.turn_off: buzzer
-
-#deep_sleep:
-#  id: deep_sleep_battery
-#  run_duration: 120s
-#  sleep_duration: 180s
-#  wakeup_pin_mode: KEEP_AWAKE
-#  esp32_ext1_wakeup:
-#    mode: ANY_HIGH
-#    pins:
-#      - number: ${pin.int.rtc_wakeup}
-#      - number: ${pin.int.pwr_mos}
-#        allow_other_uses: true
-#        inverted: true
-#      - number: ${pin.btn.stick.up}
-#        allow_other_uses: true
-#      - number: ${pin.btn.stick.press}
-#        allow_other_uses: true
-#      - number: ${pin.btn.stick.down}
-#        allow_other_uses: true
 
 status_led:
   pin: ${pin.light.led}

@@ -11,15 +11,23 @@ labels: [esp32s3, BM8563, RTC, SCD40, CO2, temperature, humidity, SEN55, particu
 packages:
   pins: !include pins/m5stack_air_quality.yaml
   i2c_int: !include extension/internal_i2c.yaml
-  epaper: !include ../features/epaper.yaml
+  epaper: !include ../gui/epaper/base.yaml
+  epaper_theme: !include ../gui/epaper/themes/bw.yaml
+  epaper_fonts: !include ../gui/epaper/fonts/bw.yaml
+  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
   status_led: !include ../features/system_status_led.yaml
 
 substitutions:
-  screen_width: "200"
-  screen_height: "200"
+  panel_width: "200"
+  panel_height: "200"
+  epaper_rotation: "0"
+  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
+  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
+  epaper_home_page: "page_local"
+  epaper_show_header: "false"
+  epaper_status_in_footer: "true"
+  epaper_time_id: "time_homeassistant"
   time_timezone: "Europe/Oslo"
-  display:
-    home_page: page_content
   module:
     internal:
       i2c_bus: i2c_internal
@@ -137,9 +145,10 @@ light:
 
 display:
   # 200 x 200 resolution
-  - platform: waveshare_epaper
+  - platform: epaper_spi
     id: display_eink
-    model: 1.54inv2
+    model: Waveshare-1.54in-v2
+    data_rate: 10MHz
     cs_pin: ${pin.int.spi.disp.cs}
     dc_pin:
       number: ${pin.int.spi.disp.dc}
@@ -149,17 +158,8 @@ display:
       number: ${pin.int.spi.disp.busy}
       inverted: false
     full_update_every: 2
-#    reset_duration: 2ms
+    auto_clear_enabled: false
     update_interval: never
-    pages:
-      - id: page_black
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_text_color));
-      - id: page_white
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_bg_color));
 
 binary_sensor:
   - platform: gpio
@@ -197,7 +197,9 @@ binary_sensor:
     on_press:
       - logger.log: Button B Pressed
       - script.execute: buzzer_beep
-      - display.page.show_next: display_eink
+      - lvgl.page.next:
+          animation: NONE
+          time: 0ms
       - script.execute: update_screen
     on_release:
       - then:

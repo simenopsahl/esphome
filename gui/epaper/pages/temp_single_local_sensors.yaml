@@ -1,0 +1,25 @@
+# Bind a local ESPHome temperature sensor (`sensor_id`) to a `temp_single.yaml` widget (`uid`).
+# Useful for graph-less local pages (e.g. `m5s-air-quality` / `m5s-coreink` `page_local`).
+#
+# Required vars: `uid`, `sensor_id`
+# Optional vars: `value_fmt` (defaults to "%.0f")
+
+sensor:
+  - id: !extend ${sensor_id}
+    on_value:
+      - lambda: |-
+          char buf[16];
+          if (isnan(x)) {
+            snprintf(buf, sizeof(buf), "--");
+          } else {
+            const char *fmt = "${value_fmt | default('%.0f')}";
+            float clean_val = x;
+            if ((strcmp(fmt, "%.0f") == 0 && fabsf(x) < 0.5f) ||
+                (strcmp(fmt, "%.1f") == 0 && fabsf(x) < 0.05f)) {
+              clean_val = 0.0f;
+            }
+            snprintf(buf, sizeof(buf), fmt, clean_val);
+          }
+          lv_label_set_text(id(${uid}_value), buf);
+          id(data_updated) = true;
+      - script.execute: epaper_mark_initial_data

@@ -74,20 +74,24 @@ widgets:
                         widgets:
                           - label:
                               id: lbl_ep_info_device_name
+                              styles: epaper_fg_text_style
                               text: "${device.name}"
                               text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) <= 960 else "font_lg" }
                           - label:
                               id: lbl_ep_info_hint_1
+                              styles: epaper_fg_text_style
                               text: "${ hint_1 | default('') }"
                               text_font: font_sm
                               hidden: ${ "false" if (hint_1 | default("")) else "true" }
                           - label:
                               id: lbl_ep_info_hint_2
+                              styles: epaper_fg_text_style
                               text: "${ hint_2 | default('') }"
                               text_font: font_sm
                               hidden: ${ "false" if (hint_2 | default("")) else "true" }
                           - label:
                               id: lbl_ep_info_hint_3
+                              styles: epaper_fg_text_style
                               text: "${ hint_3 | default('') }"
                               text_font: font_sm
                               hidden: ${ "false" if (hint_3 | default("")) else "true" }
@@ -115,14 +119,17 @@ widgets:
                         widgets:
                           - label:
                               id: lbl_ep_info_ssid
+                              styles: epaper_fg_text_style
                               text: "--"
                               text_font: font_md
                           - label:
                               id: lbl_ep_info_ip
+                              styles: epaper_fg_text_style
                               text: "--"
                               text_font: font_md
                           - label:
                               id: lbl_ep_info_mac
+                              styles: epaper_fg_text_style
                               text: "--"
                               text_font: font_md
 
@@ -160,12 +167,14 @@ widgets:
                           flex_align_cross: CENTER
                         widgets:
                           - label:
+                              styles: epaper_fg_text_style
                               text: "Batteriprosent:"
                               text_font: font_md
                           - label:
                               id: lbl_ep_info_bat_pct
+                              styles: epaper_fg_text_style
                               text: "--%"
-                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) > 400 else "font_lg" }
+                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) <= 240 or ([screen_width|int, screen_height|int]|max) > 400 else "font_lg" }
 
                     # Battery Voltage
                     - container:
@@ -179,12 +188,14 @@ widgets:
                           flex_align_cross: CENTER
                         widgets:
                           - label:
+                              styles: epaper_fg_text_style
                               text: "Batterispenning:"
                               text_font: font_md
                           - label:
                               id: lbl_ep_info_bat_volt
+                              styles: epaper_fg_text_style
                               text: "--V"
-                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) > 400 else "font_lg" }
+                              text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) <= 240 or ([screen_width|int, screen_height|int]|max) > 400 else "font_lg" }
 
                     # Temperature
                     - container:
@@ -198,10 +209,12 @@ widgets:
                           flex_align_cross: CENTER
                         widgets:
                           - label:
+                              styles: epaper_fg_text_style
                               text: "Temperatur:"
                               text_font: font_md
                           - label:
                               id: lbl_ep_info_temp
+                              styles: epaper_fg_text_style
                               text: "-- C"
                               text_font: font_md
 
@@ -217,10 +230,12 @@ widgets:
                           flex_align_cross: CENTER
                         widgets:
                           - label:
+                              styles: epaper_fg_text_style
                               text: "Luftfuktighet:"
                               text_font: font_md
                           - label:
                               id: lbl_ep_info_hum
+                              styles: epaper_fg_text_style
                               text: "-- %"
                               text_font: font_md
 
@@ -236,9 +251,11 @@ widgets:
                           flex_align_cross: CENTER
                         widgets:
                           - label:
+                              styles: epaper_fg_text_style
                               text: "SD Kort:"
                               text_font: font_sm
                           - label:
                               id: lbl_ep_info_sd
+                              styles: epaper_fg_text_style
                               text: "--"
                               text_font: font_sm

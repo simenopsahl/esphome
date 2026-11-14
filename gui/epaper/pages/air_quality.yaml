@@ -1,0 +1,224 @@
+# Compact 7-row Air Quality metrics page (`gui/epaper/pages/air_quality.yaml`).
+# Designed for M5Stack Air Quality (200x200, SEN55 + SCD40) and reusable on any SEN5x+SCD4x display.
+# Companion bindings: `gui/epaper/pages/air_quality_sensors.yaml`
+#
+# Optional vars:
+#   aq_page_id: "page_info"
+#   page_title: "Luftkvalitet"
+
+id: ${aq_page_id | default("page_info")}
+styles: epaper_page_style
+pad_top: ${ (epaper_header_h|int) + (epaper_nav_pad_top|int) if (epaper_show_header | default("true")) == "true" else (2 + (epaper_nav_pad_top|int)) }
+pad_bottom: ${ (epaper_footer_h|int) + 2 + (epaper_nav_pad_bottom|int) }
+pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
+pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
+scrollbar_mode: "OFF"
+on_load:
+  - script.execute:
+      id: set_page_title
+      title: "${page_title | default('Luftkvalitet')}"
+      icon: "\U000F0D43"
+widgets:
+  - obj:
+      id: cont_ep_aq_root
+      width: 100%
+      height: 100%
+      bg_opa: TRANSP
+      border_width: 0
+      pad_all: 0
+      scrollbar_mode: "OFF"
+      layout:
+        type: grid
+        grid_columns: [FR(1), CONTENT, CONTENT]
+        grid_rows: [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
+        pad_row: 0
+        pad_column: 4
+      widgets:
+        # Row 0: PM 1
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 0
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "PM 1:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_pm1
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 0
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "--.-"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 0
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "µg/m³"
+            text_font: font_sm
+
+        # Row 1: PM 2.5
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 1
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "PM 2.5:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_pm25
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 1
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "--.-"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 1
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "µg/m³"
+            text_font: font_sm
+
+        # Row 2: PM 4
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 2
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "PM 4:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_pm4
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 2
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "--.-"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 2
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "µg/m³"
+            text_font: font_sm
+
+        # Row 3: PM 10
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 3
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "PM 10:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_pm10
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 3
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "--.-"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 3
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "µg/m³"
+            text_font: font_sm
+
+        # Row 4: CO2
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 4
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "CO2:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_co2
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 4
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "---"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 4
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "ppm"
+            text_font: font_sm
+
+        # Row 5: VOC
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 5
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "VOC:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_voc
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 5
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "---"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 5
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "ppb"
+            text_font: font_sm
+
+        # Row 6: NOx
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 0
+            grid_cell_row_pos: 6
+            grid_cell_x_align: START
+            grid_cell_y_align: CENTER
+            text: "NOx:"
+            text_font: font_md
+        - label:
+            id: lbl_ep_aq_nox
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 1
+            grid_cell_row_pos: 6
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "---"
+            text_font: font_lg
+        - label:
+            styles: epaper_fg_text_style
+            grid_cell_column_pos: 2
+            grid_cell_row_pos: 6
+            grid_cell_x_align: END
+            grid_cell_y_align: CENTER
+            text: "ppb"
+            text_font: font_sm

@@ -1,0 +1,37 @@
+# Bind a direct remote Home Assistant sensor (`entity_id`) AND a pre-made CSV/JSON
+# history string attribute (`history_entity_id` + `history_attribute`) to a
+# `rolling_graph.yaml` / `temp_single.yaml` widget (`uid`).
+#
+# Required vars: `uid`, `entity_id`, `history_attribute`
+# Optional vars: `history_entity_id` (defaults to `sensor.epaper_data_temperatures`),
+#                `min_span`, `value_fmt`, `sample_interval`
+
+packages:
+  core: !include
+    file: _rolling_graph_core.yaml
+    vars:
+      uid: ${uid}
+      min_span: ${min_span | default("2.0")}
+      value_fmt: ${value_fmt | default("%.0f")}
+      sample_interval: ${sample_interval | default("20min")}
+
+sensor:
+  - platform: homeassistant
+    entity_id: ${entity_id}
+    id: ${uid}_sensor
+    internal: true
+    on_value:
+      - script.execute:
+          id: epaper_on_val_${uid}
+          val: !lambda 'return x;'
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: ${history_entity_id | default("sensor.epaper_data_temperatures")}
+    attribute: ${history_attribute}
+    id: ${uid}_history
+    internal: true
+    on_value:
+      - script.execute:
+          id: epaper_set_series_${uid}
+          csv: !lambda 'return x;'

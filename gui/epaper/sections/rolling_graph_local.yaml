@@ -11,7 +11,7 @@ packages:
       uid: ${uid}
       min_span: ${min_span | default("2.0")}
       value_fmt: ${value_fmt | default("%.0f")}
-      sample_interval: ${sample_interval | default("10min")}
+      sample_interval: ${sample_interval | default("20min")}
 
 sensor:
   - id: !extend ${sensor_id}

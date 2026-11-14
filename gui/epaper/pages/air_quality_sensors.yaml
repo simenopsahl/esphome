@@ -1,0 +1,93 @@
+# Sensor bindings for `gui/epaper/pages/air_quality.yaml` (`SEN55` + `SCD40`).
+# Extends onboard Air Quality sensor IDs provided by `board/m5stack_air_quality.yaml`.
+
+script:
+  - id: epaper_aq_set_value
+    mode: queued
+    max_runs: 10
+    parameters:
+      idx: int
+      val: float
+      one_dec: bool
+    then:
+      - lambda: |-
+          lv_obj_t *lbl = nullptr;
+          switch (idx) {
+            case 0: lbl = id(lbl_ep_aq_pm1); break;
+            case 1: lbl = id(lbl_ep_aq_pm25); break;
+            case 2: lbl = id(lbl_ep_aq_pm4); break;
+            case 3: lbl = id(lbl_ep_aq_pm10); break;
+            case 4: lbl = id(lbl_ep_aq_co2); break;
+            case 5: lbl = id(lbl_ep_aq_voc); break;
+            case 6: lbl = id(lbl_ep_aq_nox); break;
+          }
+          if (lbl == nullptr) return;
+          char buf[16];
+          if (isnan(val)) {
+            snprintf(buf, sizeof(buf), one_dec ? "--.-" : "---");
+          } else {
+            snprintf(buf, sizeof(buf), one_dec ? "%.1f" : "%.0f", val);
+          }
+          lv_label_set_text(lbl, buf);
+          id(data_updated) = true;
+
+sensor:
+  - id: !extend aq_scd40_sensor
+    co2:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 4
+            val: !lambda 'return x;'
+            one_dec: false
+        - script.execute: epaper_mark_initial_data
+
+  - id: !extend sen55_sensor
+    pm_1_0:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 0
+            val: !lambda 'return x;'
+            one_dec: true
+        - script.execute: epaper_mark_initial_data
+    pm_2_5:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 1
+            val: !lambda 'return x;'
+            one_dec: true
+        - script.execute: epaper_mark_initial_data
+    pm_4_0:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 2
+            val: !lambda 'return x;'
+            one_dec: true
+        - script.execute: epaper_mark_initial_data
+    pm_10_0:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 3
+            val: !lambda 'return x;'
+            one_dec: true
+        - script.execute: epaper_mark_initial_data
+    voc_index:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 5
+            val: !lambda 'return x;'
+            one_dec: false
+        - script.execute: epaper_mark_initial_data
+    nox_index:
+      on_value:
+        - script.execute:
+            id: epaper_aq_set_value
+            idx: 6
+            val: !lambda 'return x;'
+            one_dec: false
+        - script.execute: epaper_mark_initial_data

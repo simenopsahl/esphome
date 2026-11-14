@@ -351,7 +351,7 @@ ESPHome 2025.11 introduced the native `container` widget. Unlike `obj`, `contain
 | **Session E2** | `gui/epaper/` Foundation, 4 Color Themes, `top_layer` Overlays & Standard `page_info` | ✅ **Done** | 2026-11-13 | Built `gui/epaper/{base,styles,fonts,themes,chrome,pages/info}.yaml` with on-demand `paused: true` + `on_draw_end: lvgl.pause`, `top_layer` repair scrubber & boot overlay, and verified in `host-sdl` across 6 configurations (`200×200`, `400×300`, `300×400` BWRY, `800×480` B/W & Spectra 6, `1872×1404` Gray16). |
 | **Session E3** | Replacing `waveshare-display-board` $\rightarrow$ `seeed-trmnl-e1002` (Spectra 6) & `e1003` (1872×1404) | ⏳ **Next Up** | — | Build 5 reusable Bento sections (`weather_forecast`, `folloren`, `nordpool_graph`, `bus_departures`, `car_status`) + `pages/image.yaml`. |
 | **Session E4** | Replacing `waveshare-weather-station` $\rightarrow$ `e1001`, `zectrix-note4c` & `crowpanel-42/579` | ⬜ Pending | — | Build `weather_header.yaml` & `rolling_graph.yaml` (`Ute`, `Foran`, `Bak` 12h LVGL line graphs); migrate all 4 S3 replacement candidates. |
-| **Session E5** | 200×200 Active Fleet (`m5s-air-quality-b62db0` & `m5s-coreink` Spike) | ⬜ Pending | — | Migrate S3 `m5s-air-quality` to LVGL; test non-PSRAM `m5s-coreink-2df58c` (`bpp: 1`, small buffer) and either migrate `9fc390`/`9fc2c8` or apply 2-line C++ repair page skip fix. |
+| **Session E5** | 200×200 Active Fleet (`m5s-air-quality-b62db0` & `m5s-coreink-*`) | ✅ **Done** | 2026-11-14 | Migrated `m5s-air-quality-b62db0` (`180°`) and all 3 `m5s-coreink` nodes (`2df58c`, `9fc2c8`, `9fc390` at `90°`) to `gui/epaper/` + `epaper_spi` (`Waveshare-1.54in-v2`) with hardware rotation; merged `board/m5stack_coreink_lvgl.yaml` into `board/m5stack_coreink.yaml`. |
 | **Session E6** | Physical Hardware Verification, Legacy Retirement & Docs Handover | ⬜ Pending | — | Flash and verify chosen replacements, retire legacy `waveshare-*` configs, and update `gui/ARCHITECTURE.md` & `AGENTS.md`. |
 
 ---
@@ -503,11 +503,18 @@ Migrate `m5s-air-quality-b62db0.yaml` (ESP32-S3, `200×200`) to LVGL, and run a 
 
 ### Tasks
 
-- [ ] **E5.1** Create `gui/epaper/pages/temp_single.yaml` (reusable `200×200` large temperature readout page with optional top `rolling_graph` strip).
-- [ ] **E5.2** Migrate [`m5s-air-quality-b62db0.yaml`](file:///x:/esphome/m5s-air-quality-b62db0.yaml) (`page_local`, SEN55/SCD40 AQ table `page_info`, `page_room` with `rolling_graph`) to `gui/epaper/` and verify in `host-sdl`.
-- [ ] **E5.3** Test [`m5s-coreink-2df58c.yaml`](file:///x:/esphome/m5s-coreink-2df58c.yaml) with `gui/epaper/` (`buffer_size: 10%`, `bpp: 1` fonts).
-  - If compilation and free heap on ESP32-PICO-D4 are healthy, migrate `m5s-coreink-9fc390.yaml` and `m5s-coreink-9fc2c8.yaml`.
-  - If heap is too tight, keep the 3 CoreInks on `features/epaper.yaml` and fix their button-navigation bug in C++ by removing `page_black`/`page_white` in favor of a boolean `is_repairing` check.
+- [x] **E5.1** Create [`gui/epaper/pages/temp_single.yaml`](file:///x:/esphome/gui/epaper/pages/temp_single.yaml) (+ [`temp_single_local_sensors.yaml`](file:///x:/esphome/gui/epaper/pages/temp_single_local_sensors.yaml), [`rolling_graph_remote_series.yaml`](file:///x:/esphome/gui/epaper/sections/rolling_graph_remote_series.yaml)) — reusable `200×200` large temperature readout page with optional top `rolling_graph` strip.
+- [x] **E5.2** Migrate [`m5s-air-quality-b62db0.yaml`](file:///x:/esphome/m5s-air-quality-b62db0.yaml) (`page_local`, SEN55/SCD40 AQ table `page_info`, `page_room` with `rolling_graph`) to `gui/epaper/`, verified in `host-sdl` and remote compile (`pve-esphome`: RAM `36.1%`, Flash `35.3%`).
+- [x] **E5.3** Migrate [`m5s-coreink-2df58c.yaml`](file:///x:/esphome/m5s-coreink-2df58c.yaml), [`m5s-coreink-9fc2c8.yaml`](file:///x:/esphome/m5s-coreink-9fc2c8.yaml), and [`m5s-coreink-9fc390.yaml`](file:///x:/esphome/m5s-coreink-9fc390.yaml) (`ESP32-PICO-D4`, no PSRAM) to `gui/epaper/` (`buffer_size: 5%`, `bpp: 1` fonts, `epaper_spi` `Waveshare-1.54in-v2` with LVGL `ROTATION_HARDWARE`) and merge [`board/m5stack_coreink.yaml`](file:///x:/esphome/board/m5stack_coreink.yaml).
+  - **`m5s-coreink-2df58c`**: RAM `54.2%` (`67,485 / 124,580 B`), Flash `86.7%` (`1,590,140 / 1,835,008 B`); OTA (`192.168.71.74`) verified, `epaper_spi` display update `521 ms`, physical `90°` rotation and navigation confirmed.
+  - **`m5s-coreink-9fc2c8`**: RAM `55.9%` (`69,581 / 124,580 B`), Flash `88.4%` (`1,622,728 / 1,835,008 B`); OTA (`192.168.71.41`) verified online (`antall_oppdateringer: 154311`), physical `90°` rotation confirmed.
+  - **`m5s-coreink-9fc390`**: RAM `56.6%` (`70,565 / 124,580 B`), Flash `88.7%` (`1,628,408 / 1,835,008 B`); USB-flashed on `COM19` (`1,694,064 B`), verified online (`antall_oppdateringer` incremented `79126 -> 79127`).
+  - **`m5s-air-quality-b62db0`**: Migrated [`board/m5stack_air_quality.yaml`](file:///x:/esphome/board/m5stack_air_quality.yaml) display to `epaper_spi` (`Waveshare-1.54in-v2`, `180°` hardware rotation); RAM `36.1%` (`123,239 / 341,760 B`), Flash `35.3%` (`1,389,287 / 3,932,160 B`); OTA (`192.168.71.50`) verified online (`antall_oppdateringer: 50230 -> 50233`), physical rotation confirmed.
+  - **`host-sdl` & HA Template Tuning**: Adjusted CoreInk rotated chrome (`nav_coreink.yaml`), reduced `epaper_helpers.jinja` `statistics_series_10m` window granularity to `20m` (36 points), and merged `board/m5stack_coreink_lvgl.yaml` into [`board/m5stack_coreink.yaml`](file:///x:/esphome/board/m5stack_coreink.yaml).
+
+### Session E5 Completion Report
+- **Outcome**: All 4 production `200×200` e-Paper nodes (`m5s-air-quality-b62db0`, `m5s-coreink-2df58c`, `m5s-coreink-9fc2c8`, `m5s-coreink-9fc390`) are live on `gui/epaper/` + `epaper_spi` (`Waveshare-1.54in-v2`) with LVGL `ROTATION_HARDWARE` (`has_hardware_rotation=True`, avoiding software `rotate_buf_` allocation and `2.5s` blocking `waveshare_epaper` idle waits).
+- **Board Consolidation**: Replaced legacy `board/m5stack_coreink.yaml` with the verified LVGL + `epaper_spi` configuration and removed `board/m5stack_coreink_lvgl.yaml`.
 
 ---
 
