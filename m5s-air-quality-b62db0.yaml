@@ -85,7 +85,9 @@ lvgl:
 binary_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.etg2_occupancy
-    id: presence_detected
+    id: ha_presence_detected
+  - id: !extend presence_detected
+    lambda: 'return id(ha_presence_detected).state;'
 
 sensor:
   # Update top corner sub-sensor readouts on page_local (SCD40 left, SEN55 right)
