@@ -3,7 +3,7 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-  board: !include board/m5stack_coreink_lvgl.yaml
+  board: !include board/m5stack_coreink.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
