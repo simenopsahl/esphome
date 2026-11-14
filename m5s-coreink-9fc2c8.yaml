@@ -3,8 +3,7 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-  board: !include board/m5stack_coreink.yaml
-#  internal_i2c: !include board/extension/internal_i2c.yaml
+  board: !include board/m5stack_coreink_lvgl.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
   env_iii: !include board/module/hat_env_iii.yaml
@@ -13,6 +12,22 @@ packages:
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
+
+  # --- E-PAPER PAGE BINDINGS ---
+  epaper_room_series: !include
+    file: gui/epaper/sections/rolling_graph_remote_series.yaml
+    vars:
+      uid: simen_room
+      entity_id: sensor.etg2_simen_temperature
+      history_attribute: temp_simen_history
+      value_fmt: "%.0f"
+      min_span: "2.0"
+  epaper_local_sensors: !include
+    file: gui/epaper/pages/temp_single_local_sensors.yaml
+    vars:
+      uid: simen_local
+      sensor_id: temperature_local
+      value_fmt: "%.0f"
 
 substitutions:
   common:
@@ -27,8 +42,8 @@ substitutions:
     i2c:
       grove:
         frequency: 40kHz
-  display:
-    home_page: page_room
+  epaper_rotation: "90"
+  epaper_home_page: "page_room"
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -39,308 +54,68 @@ esphome:
 wifi:
 #  use_address: 192.168.69.67
   use_address: ${device.name}.local
-  manual_ip: 
+  manual_ip:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.41
 
-display:
-  - id: !extend display_eink
-    rotation: 90
-    pages:
-      - id: page_local
-        lambda: |-
-          // Fill background.
-          it.fill( id(epaper_bg_color) );
-
-          //it.graph( 0, 0, id(graph_temperature_local), id(epaper_text_color) );
-          
-          // NAV
-          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          // PAGE
-          it.print( it.get_width(), 0, id(f25b), id(epaper_text_color), TextAlign::TOP_RIGHT, "Enhet" );
-
-          // THERMOMETER
-          it.image( 0, it.get_height()/2, id(i_temp), ImageAlign::LEFT, id(epaper_text_color), id(epaper_bg_color) );
-          // TEMPERATURE
-          it.printf( it.get_width()/2, it.get_height()/2, id(f120b), id(epaper_text_color), TextAlign::CENTER, "%2.0f", id(temperature_local).state );
-          // UNIT
-          it.print( it.get_width(), it.get_height()/2, id(f25b), id(epaper_text_color), TextAlign::RIGHT, "°C" );
-
-          // Show wifi icon.
-          if ( id(component_wifi).is_connected() ) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_text_color), id(epaper_bg_color) );
-          }
-          // Show HA icon.
-          if ( id(component_api).is_connected() ) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          }
-
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f18), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
-      - id: page_info
-        lambda: |-
-          // Fill background.
-          it.fill( id(epaper_bg_color) );
-
-          // NAV
-          it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-          // PAGE
-          it.image( it.get_width(), 0, id(i_info), ImageAlign::TOP_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          
-          // BATTERY
-          it.print( 0, 57, id(f18), id(epaper_text_color), TextAlign::BOTTOM_LEFT, "Batteri: " );
-          it.printf( it.get_width() - 15, 55, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "%.2f", id(bat_adc).state );
-          it.print( it.get_width(), 57, id(f16), id(epaper_text_color), TextAlign::BOTTOM_RIGHT, "V" );
-
-          // DEVICE
-          //it.print( it.get_width()/2, 70, id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "ESPHome" );
-          // NAME
-          it.printf( it.get_width()/2, 87, id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", App.get_name().c_str() );
-
-          // NETWORK
-          //it.print( it.get_width()/2, 110, id(f20), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "Nettverk" );
-          // SSID
-          it.printf( it.get_width()/2, 117, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ssid).state.c_str() );
-          // IP
-          it.printf( it.get_width()/2, 143, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_ip_address).state.c_str() );
-          // MAC
-          it.printf( it.get_width()/2, 169, id(f20b), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "%s", id(sensor_mac_address).state.c_str() );
-
-          // Show wifi icon.
-          if ( id(component_wifi).is_connected() ) {
-            it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_text_color), id(epaper_bg_color) );
-          }
-          // Show HA icon.
-          if ( id(component_api).is_connected() ) {
-            it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-          }
-
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-          it.printf( it.get_width()/2, it.get_height(), id(f18), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
-      - id: page_room
-        lambda: |-
-          // Fill background.
-          it.fill( id(epaper_bg_color) );
-
-          // Show loading screen before data is received.
-          if ( id(initial_data_received) == false ) {
-            it.printf( it.get_width()/2, it.get_height()/2, id(f20b), id(epaper_text_color), TextAlign::CENTER, "Venter på data..." );
-          } else {
-
-            // NAV
-            it.image( (it.get_width()/14)*2 , 0, id(i_home), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-            it.image( (it.get_width()/14)*4 , 0, id(i_refresh), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-            it.image( (it.get_width()/14)*6 , 0, id(i_next), ImageAlign::TOP_CENTER, id(epaper_text_color), id(epaper_bg_color) );
-            // PAGE
-            it.print( it.get_width(), 0, id(f25b), id(epaper_text_color), TextAlign::TOP_RIGHT, "Rom" );
-
-            // GRAPH
-            // it.graph( 0, 0, id(graph_temperature_room), id(epaper_text_color) );
-            
-            // THERMOMETER
-            it.image( 0, it.get_height()/2, id(i_temp), ImageAlign::LEFT, id(epaper_text_color), id(epaper_bg_color) );
-            // TEMPERATURE
-            it.printf( it.get_width()/2, it.get_height()/2, id(f120b), id(epaper_text_color), TextAlign::CENTER, "%2.0f", id(temperature_feels_like).state );
-            // UNIT
-            it.print( it.get_width(), it.get_height()/2, id(f25b), id(epaper_text_color), TextAlign::RIGHT, "°C" );
-
-            // Show wifi icon.
-            if ( id(component_wifi).is_connected() ) {
-              it.image( 0, it.get_height(), id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_text_color), id(epaper_bg_color) );
-            }
-            // Show HA icon.
-            if ( id(component_api).is_connected() ) {
-              it.image( it.get_width(), it.get_height(), id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color) );
-            }
-
-            // Refresh Timestamp
-            // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-            char str[17];
-            time_t currTime = id(time_homeassistant).now().timestamp;
-            strftime( str, sizeof(str), "%H:%M", localtime(&currTime) );
-            it.printf( it.get_width()/2, it.get_height(), id(f18), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
-          }
-
-font:
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f16
-    size: 16
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f20
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 800
-    id: f20b
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f25b
-    size: 25
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 600
-    id: f120b
-    size: 120
-    glyphs: *norwegian-glyphs
-
-image:
-  - platform: file
-    defaults:
-      type: binary
-      resize: 28x28
-    files:
-      - id: i_wifi
-        file: mdi:wifi
-      - id: i_api
-        file: mdi:home-assistant
-    
-      - id: i_refresh
-        file: mdi:refresh
-      - id: i_next
-        file: mdi:arrow-right-thick
-      - id: i_home
-        file: mdi:home
-    
-      - id: i_info
-        file: mdi:information
-    
-      - id: i_temp
-        file: mdi:thermometer
-
-#graph:
-#  - id: graph_temperature_room
-#    duration: 8h
-#    x_grid: 15min
-#    y_grid: 1.0
-#    width: 200
-#    height: 50
-#    border: false
-#    traces:
-#      - sensor: temperature_feels_like
-#        line_thickness: 6
-#        continuous: true
-#  - id: graph_temperature_local
-#    duration: 6h
-#    x_grid: 15min
-#    y_grid: 1.0
-#    width: 200
-#    height: 70
-#    border: false
-#    traces:
-#      - sensor: temperature_local
-#        line_thickness: 6
-#        continuous: true
+lvgl:
+  pages:
+    - !include
+      file: gui/epaper/pages/temp_single.yaml
+      vars:
+        uid: simen_room
+        page_id: page_room
+        title: "Rom"
+        show_graph: "true"
+    - !include
+      file: gui/epaper/pages/temp_single.yaml
+      vars:
+        uid: simen_local
+        page_id: page_local
+        title: "Enhet"
+        icon: "\U000F0510"
+    - !include
+      file: gui/epaper/pages/info.yaml
+      vars:
+        show_battery_volt: true
 
 # Check if person is home
 binary_sensor:
   - platform: homeassistant
     entity_id: binary_sensor.etg2_occupancy
-    id: presence_detected
-
-  # Stick Up
-  - id: !extend stick_up
-    on_press:
-      - display.page.show: ${display.home_page}
-      - script.execute: update_screen
-  # Stick Press
-  - id: !extend stick_press
-    on_press:
-      - script.execute: update_screen
-  # Stick Down
-  - id: !extend stick_down
-    on_press:
-      - display.page.show_next: display_eink
-      - script.execute: update_screen
+    id: ha_presence_detected
+  - id: !extend presence_detected
+    lambda: 'return id(ha_presence_detected).state;'
 
 sensor:
-  # Call sensors from HA.
-#  - platform: homeassistant
-#    entity_id: sensor.etg2_simen_temperature
-#    id: temperature_homeassistant
-#    on_value:
-#      then:
-#        - lambda: 'id(data_updated) = true;'
-  - platform: homeassistant
-    entity_id: sensor.etg2_simen_tc_heatindex
-    id: temperature_feels_like
+  - id: !extend bat_adc
     on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
+      - then:
+          - lambda: |-
+              char buf[12];
+              if (isnan(x)) snprintf(buf, sizeof(buf), "--V");
+              else snprintf(buf, sizeof(buf), "%.2f V", x);
+              lv_label_set_text(id(lbl_ep_info_bat_volt), buf);
 
   # Combine sensors
   - id: !extend temperature_local
     sources:
-      # Base BTC
-#      - source: temperature_sht30_base_btc
       # HAT ENV III
       - source: temperature_sht30_hat_env
       - source: temperature_qmp6988_hat_env
-      # Unit ENV III
-#      - source: temperature_sht30_unit_env
-#      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
       - source: temperature_bmp280_unit_env
       - source: temperature_sht40_unit_env
-      # Unit ENV Pro
-#      - source: temperature_bme688
       # Unit CO2
       - source: temperature_scd40_unit_co2
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
 
   - id: !extend humidity_local
     sources:
-      # Base BTC
-#      - source: humidity_sht30_base_btc
       # HAT ENV III
       - source: humidity_sht30_hat_env
-      # Unit ENV III
-#      - source: humidity_sht30_unit_env
       # Unit ENV IV
       - source: humidity_sht40_unit_env
-      # Unit ENV Pro
-#      - source: humidity_bme688
       # Unit CO2
       - source: humidity_scd40_unit_co2
 
@@ -348,9 +123,5 @@ sensor:
     sources:
       # HAT ENV III
       - source: pressure_qmp6988_hat_env
-      # Unit ENV III
-#      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
       - source: pressure_bmp280_unit_env
-      # Unit ENV Pro
-#      - source: pressure_bme688
