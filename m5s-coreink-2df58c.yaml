@@ -3,7 +3,7 @@ packages:
   <<: !include_dir_named common
 
   # --- BOARD AND MODULES ---
-  board: !include board/m5stack_coreink_lvgl.yaml
+  board: !include board/m5stack_coreink.yaml
 
   # --- E-PAPER PAGE BINDINGS ---
   epaper_room_series: !include
