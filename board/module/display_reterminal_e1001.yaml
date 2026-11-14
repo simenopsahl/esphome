@@ -358,7 +358,7 @@ binary_sensor:
       then:
         - lvgl.label.update:
             id: lbl_ep_info_sd
-            text: !lambda 'return x ? "oppdaget" : "ikke oppdaget";'
+            text: !lambda 'return std::string(x ? "oppdaget" : "ikke oppdaget");'
         - lambda: 'id(data_updated) = true;'
 
 
