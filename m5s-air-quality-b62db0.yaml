@@ -11,6 +11,23 @@ packages:
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
+  # --- E-PAPER PAGE BINDINGS ---
+  epaper_aq_sensors: !include gui/epaper/pages/air_quality_sensors.yaml
+  epaper_local_sensors: !include
+    file: gui/epaper/pages/temp_single_local_sensors.yaml
+    vars:
+      uid: aq_local
+      sensor_id: temperature_local
+      value_fmt: "%.0f"
+  epaper_room_series: !include
+    file: gui/epaper/sections/rolling_graph_remote_series.yaml
+    vars:
+      uid: aq_room
+      entity_id: sensor.etg2_gang_temperature
+      history_attribute: temp_gang_history
+      value_fmt: "%.0f"
+      min_span: "2.0"
+
 substitutions:
   common:
     log_level: WARN
@@ -20,8 +37,8 @@ substitutions:
     location: "Gang"
     framework:
       type: esp-idf
-  display:
-    home_page: page_local
+  epaper_rotation: "180"
+  epaper_home_page: "page_local"
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -37,187 +54,32 @@ wifi:
     subnet: 255.255.252.0
     static_ip: 192.168.71.50
 
-display:
-  # 200 x 200 resolution
-  - id: !extend display_eink
-    rotation: 180
-    pages:
-      - id: page_local
-        lambda: |-
-          // Set graph color
-          id(trace_temperature_room)->set_line_color( id(epaper_text_color) );
-
-          // Fill background.
-          it.fill(id(epaper_text_color));
-
-          //it.graph( 0, 0, id(graph_temperature_local), id(epaper_bg_color) );
-            
-          it.print( it.get_width()/2, 0, id(f26b), id(epaper_bg_color), TextAlign::TOP_CENTER, "Enhet" );
-          it.printf( it.get_width()/2, it.get_height()/2, id(f130b), id(epaper_bg_color), TextAlign::CENTER, "%2.0f", id(temperature_local).state );
-
-          it.printf( 0, 0, id(f20), id(epaper_bg_color), TextAlign::TOP_LEFT, "%.1f", id(temperature_scd40_aq).state );
-
-          it.printf( it.get_width(), 0, id(f20), id(epaper_bg_color), TextAlign::TOP_RIGHT, "%.1f", id(temperature_sen55).state );
-
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image( 0, it.get_height()+5, id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_bg_color), id(epaper_text_color) );
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image( it.get_width(), it.get_height()+5, id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_bg_color), id(epaper_text_color) );
-          }
-
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf( it.get_width()/2, it.get_height()+3, id(f14), id(epaper_bg_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
-      - id: page_info
-        lambda: |-
-          // Fill background.
-          it.fill(id(epaper_bg_color));
-
-          it.print( 0, -1, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "PM 1: " );
-          it.print( 0, 25, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "PM 2.5: " );
-          it.print( 0, 51, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "PM 4: " );
-          it.print( 0, 77, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "PM 10: " );
-          it.print( 0, 103, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "CO2: " );
-          it.print( 0, 129, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "VOC: " );
-          it.print( 0, 155, id(f20b), id(epaper_text_color), TextAlign::TOP_LEFT, "NOx: " );
-
-          it.printf( it.get_width()-55, -2, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.1f", id(pm1_0_sen55).state );
-          it.print( it.get_width(), 0, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "µg/m³" );
-
-          it.printf( it.get_width()-55, 24, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.1f", id(pm2_5_sen55).state );
-          it.print( it.get_width(), 26, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "µg/m³" );
-
-          it.printf( it.get_width()-55, 50, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.1f", id(pm4_0_sen55).state );
-          it.print( it.get_width(), 52, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "µg/m³" );
-
-          it.printf( it.get_width()-55, 76, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.1f", id(pm10_0_sen55).state );
-          it.print( it.get_width(), 78, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "µg/m³" );
-
-          it.printf( it.get_width()-55, 102, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.0f", id(co2_scd40_aq).state );
-          it.print( it.get_width(), 104, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "ppm" );
-
-          it.printf( it.get_width()-55, 128, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.0f", id(voc_sen55).state );
-          it.print( it.get_width(), 130, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "ppb" );
-
-          it.printf( it.get_width()-55, 154, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "%.0f", id(nox_sen55).state );
-          it.print( it.get_width(), 156, id(f18), id(epaper_text_color), TextAlign::TOP_RIGHT, "ppb" );
-
-          // Show wifi icon.
-          if (id(component_wifi).is_connected()) {
-            it.image(0, it.get_height()+6, id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_text_color), id(epaper_bg_color));
-          }
-          // Show HA icon.
-          if (id(component_api).is_connected()) {
-            it.image(it.get_width(), it.get_height()+6, id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color));
-          }
-
-          // Refresh Timestamp
-          // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-          char str[17];
-          time_t currTime = id(time_homeassistant).now().timestamp;
-          strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-          it.printf( it.get_width()/2, it.get_height()+3, id(f14), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str );
-      - id: page_room
-        lambda: |-
-          // Set graph color
-          id(trace_temperature_room)->set_line_color( id(epaper_text_color) );
-          
-          // Fill background.
-          it.fill(id(epaper_bg_color));
-
-          // Show loading screen before data is received.
-          if (id(initial_data_received) == false) {
-            it.printf(it.get_width()/2, it.get_height()/2, id(f20b), id(epaper_text_color), TextAlign::CENTER, "Venter på data...");
-          } else {
-
-            it.graph(0, 0, id(graph_temperature_room), id(epaper_text_color));
-            
-            it.print(0, 45, id(f20), id(epaper_text_color), TextAlign::TOP_LEFT, "Rom");
-            it.print(it.get_width(), 45, id(f26b), id(epaper_text_color), TextAlign::TOP_RIGHT, "°C");
-            it.printf(it.get_width()/2, 166, id(f130b), id(epaper_text_color), TextAlign::BASELINE_CENTER, "%2.0f", id(temperature_feels_like).state);
-
-            // Show wifi icon.
-            if (id(component_wifi).is_connected()) {
-              it.image(0, it.get_height()+5, id(i_wifi), ImageAlign::BOTTOM_LEFT, id(epaper_text_color), id(epaper_bg_color));
-            }
-            // Show HA icon.
-            if (id(component_api).is_connected()) {
-              it.image(it.get_width(), it.get_height()+5, id(i_api), ImageAlign::BOTTOM_RIGHT, id(epaper_text_color), id(epaper_bg_color));
-            }
-
-            // Refresh Timestamp
-            // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
-            char str[17];
-            time_t currTime = id(time_homeassistant).now().timestamp;
-            strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
-            it.printf(it.get_width()/2, it.get_height()+3, id(f14), id(epaper_text_color), TextAlign::BOTTOM_CENTER, "@ %s", str);
-          }
-
-font:
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f14
-    size: 14
-    glyphs: &norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?','~',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/', 'µ', '³',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Æ', 'Ø', 'Å',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-      'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'æ', 'ø', 'å']
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f18
-    size: 18
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 500
-    id: f20
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 800
-    id: f20b
-    size: 20
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 700
-    id: f26b
-    size: 26
-    glyphs: *norwegian-glyphs
-  - file:
-      type: gfonts
-      family: Noto Sans Display
-      weight: 600
-    id: f130b
-    size: 130
-    glyphs: *norwegian-glyphs
-
-image:
-  - platform: file
-    defaults:
-      type: binary
-      resize: 28x28
-    files:
-      - id: i_wifi
-        file: mdi:wifi
-      - id: i_api
-        file: mdi:home-assistant
+lvgl:
+  pages:
+    - !include
+      file: gui/epaper/pages/temp_single.yaml
+      vars:
+        uid: aq_local
+        page_id: page_local
+        title: "Enhet"
+        invert_colors: "true"
+        show_top_row: "true"
+        top_left_text: "--.-"
+        top_center_text: "Enhet"
+        top_right_text: "--.-"
+        unit: ""
+    - !include gui/epaper/pages/air_quality.yaml
+    - !include
+      file: gui/epaper/pages/temp_single.yaml
+      vars:
+        uid: aq_room
+        page_id: page_room
+        title: "Rom"
+        show_graph: "true"
+        show_top_row: "true"
+        top_left_text: "Rom"
+        top_right_text: "°C"
+        unit: ""
 
 # Check if person is home
 binary_sensor:
@@ -225,45 +87,26 @@ binary_sensor:
     entity_id: binary_sensor.etg2_occupancy
     id: presence_detected
 
-graph:
-  - id: graph_temperature_room
-    duration: 8h
-#    x_grid: 15min
-#    y_grid: 1.0
-    width: 200
-    height: 50
-    border: false
-    traces:
-      - id: trace_temperature_room
-        sensor: temperature_feels_like
-        line_thickness: 6
-        continuous: true
-#  - id: graph_temperature_local
-#    duration: 6h
-#    x_grid: 15min
-#    y_grid: 1.0
-#    width: 200
-#    height: 50
-#    border: false
-#    traces:
-#      - sensor: temperature_local
-#        line_thickness: 6
-#        continuous: true
-
 sensor:
-  # Call sensors from HA.
-  - platform: homeassistant
-    entity_id: sensor.etg2_gang_temperature
-    id: temperature_homeassistant
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
-  - platform: homeassistant
-    entity_id: sensor.etg2_ellen_svein_tc_heatindex
-    id: temperature_feels_like
-    on_value:
-      then:
-        - lambda: 'id(data_updated) = true;'
+  # Update top corner sub-sensor readouts on page_local (SCD40 left, SEN55 right)
+  - id: !extend aq_scd40_sensor
+    temperature:
+      on_value:
+        - lambda: |-
+            char buf[16];
+            if (isnan(x)) snprintf(buf, sizeof(buf), "--.-");
+            else snprintf(buf, sizeof(buf), "%.1f", x);
+            lv_label_set_text(id(aq_local_top_left), buf);
+            id(data_updated) = true;
+  - id: !extend sen55_sensor
+    temperature:
+      on_value:
+        - lambda: |-
+            char buf[16];
+            if (isnan(x)) snprintf(buf, sizeof(buf), "--.-");
+            else snprintf(buf, sizeof(buf), "%.1f", x);
+            lv_label_set_text(id(aq_local_top_right), buf);
+            id(data_updated) = true;
 
   # Combine sensors
   - id: !extend temperature_local
