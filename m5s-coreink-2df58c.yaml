@@ -4,8 +4,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_coreink.yaml
-  grove: !include board/extension/grove_i2c.yaml
-  tof: !include board/module/unit_tof.yaml
 
 substitutions:
   common:
