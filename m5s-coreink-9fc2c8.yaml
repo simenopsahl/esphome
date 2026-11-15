@@ -15,15 +15,14 @@ packages:
 
   # --- E-PAPER PAGE BINDINGS ---
   epaper_room_series: !include
-    file: gui/epaper/sections/rolling_graph_remote_series.yaml
+    file: gui/epaper/sections/rolling_graph/remote_series.yaml
     vars:
       uid: simen_room
       entity_id: sensor.etg2_simen_temperature
-      history_attribute: temp_simen_history
       value_fmt: "%.0f"
       min_span: "2.0"
   epaper_local_sensors: !include
-    file: gui/epaper/pages/temp_single_local_sensors.yaml
+    file: gui/epaper/pages/temperature/local.yaml
     vars:
       uid: simen_local
       sensor_id: temperature_local
@@ -42,8 +41,9 @@ substitutions:
     i2c:
       grove:
         frequency: 40kHz
-  epaper_rotation: "90"
-  epaper_home_page: "page_room"
+  display:
+    rotation: "90"
+    home_page: "page_room"
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -62,23 +62,19 @@ wifi:
 lvgl:
   pages:
     - !include
-      file: gui/epaper/pages/temp_single.yaml
+      file: gui/epaper/pages/temperature/page.yaml
       vars:
         uid: simen_room
         page_id: page_room
-        title: "Rom"
+        area_label: "Rom"
         show_graph: "true"
     - !include
-      file: gui/epaper/pages/temp_single.yaml
+      file: gui/epaper/pages/temperature/page.yaml
       vars:
         uid: simen_local
         page_id: page_local
-        title: "Enhet"
+        area_label: "Enhet"
         icon: "\U000F0510"
-    - !include
-      file: gui/epaper/pages/info.yaml
-      vars:
-        show_battery_volt: true
 
 # Check if person is home
 binary_sensor:
@@ -89,15 +85,6 @@ binary_sensor:
     lambda: 'return id(ha_presence_detected).state;'
 
 sensor:
-  - id: !extend bat_adc
-    on_value:
-      - then:
-          - lambda: |-
-              char buf[12];
-              if (isnan(x)) snprintf(buf, sizeof(buf), "--V");
-              else snprintf(buf, sizeof(buf), "%.2f V", x);
-              lv_label_set_text(id(lbl_ep_info_bat_volt), buf);
-
   # Combine sensors
   - id: !extend temperature_local
     sources:
