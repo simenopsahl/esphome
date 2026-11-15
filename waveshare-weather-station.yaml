@@ -33,9 +33,6 @@ substitutions:
       icons_xl: 64
       icons_xxl: 90
 
-#external_components:
-#  - source: github://pr#6209
-#    components: [ waveshare_epaper ]
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -44,7 +41,6 @@ esphome:
   area: ${device.location}
 
 wifi:
-#  use_address: 192.168.69.52
   use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
