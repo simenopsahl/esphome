@@ -33,24 +33,28 @@ labels: [SPI, display, ePaper]
 # Unsure if 16-level grayscale is needed (probably slower rendering)
 
 packages:
-  epaper_base: !include ../../gui/epaper/base.yaml
-  epaper_theme: !include ../../gui/epaper/themes/gray16.yaml
-  epaper_fonts: !include ../../gui/epaper/fonts/color_gray.yaml
-  epaper_chrome: !include ../../gui/epaper/chrome/status_bar.yaml
-  epaper_nav: !include ../../gui/epaper/chrome/nav_reterminal.yaml
-  epaper_info: !include ../../gui/epaper/pages/info_sensors.yaml
+  epaper: !include ../../gui/epaper/base.yaml
   mic: !include audio/common_mic.yaml
 
 substitutions:
   panel_width: "1872"
   panel_height: "1404"
-  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
-  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
-  epaper_home_page: "page_info"
-  epaper_time_id: "time_rtc"
-  hint_1: "KEY0 GPIO3: Grønn"
-  hint_2: "KEY1 GPIO4: Høyre"
-  hint_3: "KEY2 GPIO5: Venstre"
+  epaper:
+    theme: gray16
+    fonts: color_gray
+    nav: reterminal
+  display:
+    home_page: "page_info"
+    page:
+      info:
+        hint_1: "KEY0 GPIO3: Grønn"
+        hint_2: "KEY1 GPIO4: Høyre"
+        hint_3: "KEY2 GPIO5: Venstre"
+        show_battery_pct: "true"
+        show_battery_volt: "true"
+        show_temp: "true"
+        show_humidity: "true"
+        show_sd: "true"
   device:
     model: "Seeed reTerminal E1003"
     rtc: "true"
@@ -320,7 +324,7 @@ binary_sensor:
     on_press:
       - logger.log: "KEY0 (GPIO3) pressed"
       - script.execute: buzzer_beep
-      - lvgl.page.show: ${epaper_home_page}
+      - lvgl.page.show: ${display.home_page}
       - script.execute: update_screen
     on_release:
       - output.turn_off: buzzer
@@ -386,7 +390,7 @@ binary_sensor:
       then:
         - lvgl.label.update:
             id: lbl_ep_info_sd
-            text: !lambda 'return x ? "oppdaget" : "ikke oppdaget";'
+            text: !lambda 'return std::string(x ? "oppdaget" : "ikke oppdaget");'
         - lambda: 'id(data_updated) = true;'
 
 

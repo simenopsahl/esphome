@@ -1,8 +1,9 @@
 # 6-color Spectra 6 e-Paper theme (Black, White, Red, Yellow, Blue, Green — e.g. reTerminal E1002).
 
 substitutions:
-  epaper_invert_every_5th: "false"
-  epaper_invert_accents: "false"
+  display:
+    invert_every_5th: "false"
+    invert_accents: "false"
 
 packages:
   epaper_theme_base: !include { file: _base.yaml }

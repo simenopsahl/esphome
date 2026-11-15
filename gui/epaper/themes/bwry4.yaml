@@ -2,8 +2,9 @@
 # Preserves Red/Yellow accents while optionally inverting B/W ground every 5th refresh.
 
 substitutions:
-  epaper_invert_every_5th: "true"
-  epaper_invert_accents: "false"
+  display:
+    invert_every_5th: "true"
+    invert_accents: "false"
 
 packages:
   epaper_theme_base: !include { file: _base.yaml }

@@ -1,12 +1,9 @@
 # Companion sensor bindings for `gui/epaper/sections/car_status.yaml`
 # Uses `text_sensor` to gracefully handle `"?"` / unavailable strings from Home Assistant templates.
 
-substitutions:
-  epaper_data_entity: "sensor.epaper_data_general"
-
 text_sensor:
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: car_battery_percent
     id: ep_car_pct
     internal: true
@@ -24,7 +21,7 @@ text_sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: car_battery_range
     id: ep_car_range
     internal: true

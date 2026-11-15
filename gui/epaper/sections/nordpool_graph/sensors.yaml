@@ -1,9 +1,6 @@
 # Companion sensor & script bindings for `gui/epaper/sections/nordpool_graph.yaml`
 # Measures `ep_np_plot_box` at runtime (`lv_obj_get_content_width/height`) to plot 9 hourly stepped bars (18 points).
 
-substitutions:
-  epaper_nordpool_entity: "sensor.epaper_data_nordpool_future_offset"
-
 globals:
   - id: ep_np_prices
     type: std::array<float, 9>
@@ -109,7 +106,7 @@ script:
 
 text_sensor:
   - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
+    entity_id: ${display.nordpool_entity}
     attribute: prices
     id: ep_np_prices_text
     internal: true
@@ -144,7 +141,7 @@ text_sensor:
       - script.execute: epaper_mark_initial_data
 
   - platform: homeassistant
-    entity_id: ${epaper_nordpool_entity}
+    entity_id: ${display.nordpool_entity}
     attribute: times
     id: ep_np_times_text
     internal: true

@@ -12,22 +12,24 @@ packages:
   pins: !include pins/m5stack_air_quality.yaml
   i2c_int: !include extension/internal_i2c.yaml
   epaper: !include ../gui/epaper/base.yaml
-  epaper_theme: !include ../gui/epaper/themes/bw.yaml
-  epaper_fonts: !include ../gui/epaper/fonts/bw.yaml
-  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
   status_led: !include ../features/system_status_led.yaml
 
 substitutions:
   panel_width: "200"
   panel_height: "200"
-  epaper_rotation: "0"
-  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
-  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
-  epaper_home_page: "page_local"
-  epaper_show_header: "false"
-  epaper_status_in_footer: "true"
-  epaper_time_id: "time_homeassistant"
   time_timezone: "Europe/Oslo"
+  epaper:
+    theme: bw
+    fonts: bw
+    nav: none
+  display:
+    home_page: "page_local"
+    chrome:
+      header: "false"
+      status_in_footer: "true"
+    page:
+      info:
+        skip: "true"
   module:
     internal:
       i2c_bus: i2c_internal

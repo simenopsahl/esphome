@@ -5,10 +5,9 @@
 # bezel layout (`epaper_status_in_footer`, `epaper_nav_pad_right`).
 
 substitutions:
-  epaper_show_header: "true"
   epaper_header_show_title: ${ "false" if ([screen_width|int, screen_height|int]|max) <= 240 else "true" }
   epaper_header_page_right: ${ "true" if ([screen_width|int, screen_height|int]|max) <= 240 else "false" }
-  epaper_footer_ts_align: ${ "LEFT_MID" if ((screen_width|int) >= 600 and epaper_status_in_footer == "false") else "CENTER" }
+  epaper_footer_ts_align: ${ "LEFT_MID" if ((screen_width|int) >= 600 and _ep_status_in_footer == "false") else "CENTER" }
   epaper_icon_font: ${ "mdi_sm" if ([screen_width|int, screen_height|int]|min) <= 300 else "mdi_md" }
 
 script:
@@ -27,7 +26,7 @@ script:
   - id: !extend epaper_refresh_status
     then:
       - lambda: |-
-          auto t = id(${epaper_time_id}).now();
+          auto t = id(${_ep_time_id}).now();
           char buf[16];
           if (t.is_valid()) {
             t.strftime(buf, sizeof(buf), "@ %H:%M");
@@ -46,7 +45,7 @@ script:
           then:
             - if:
                 condition:
-                  lambda: 'return (std::string("${epaper_status_in_footer}") == "true");'
+                  lambda: 'return (std::string("${_ep_status_in_footer}") == "true");'
                 then:
                   - lvgl.widget.show: lbl_ep_wifi_ftr
                   - lvgl.widget.hide: lbl_ep_wifi_left
@@ -77,7 +76,7 @@ script:
           then:
             - if:
                 condition:
-                  lambda: 'return (std::string("${epaper_status_in_footer}") == "true");'
+                  lambda: 'return (std::string("${_ep_status_in_footer}") == "true");'
                 then:
                   - lvgl.widget.show: lbl_ep_ha_ftr
                   - lvgl.widget.hide: lbl_ep_ha_hdr
@@ -98,7 +97,7 @@ script:
     then:
       - if:
           condition:
-            lambda: 'return std::string("${epaper_show_header}") == "true";'
+            lambda: 'return std::string("${_ep_show_header}") == "true";'
           then:
             - lvgl.widget.show: ep_header_bar
             - if:
@@ -119,7 +118,7 @@ lvgl:
           y: ${epaper_nav_pad_top}
           width: 100%
           height: ${epaper_header_h}
-          hidden: ${ "true" if epaper_show_header == "false" else "false" }
+          hidden: ${ "true" if _ep_show_header == "false" else "false" }
           pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
           pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
           layout:
@@ -144,7 +143,7 @@ lvgl:
                       text: "\U000F05A9"
                       text_font: ${epaper_icon_font}
                       styles: epaper_wifi_style
-                      hidden: ${ "false" if (epaper_status_in_footer == "false" and (screen_width|int) >= 600) else "true" }
+                      hidden: ${ "false" if (_ep_status_in_footer == "false" and (screen_width|int) >= 600) else "true" }
                   - label:
                       id: lbl_ep_page_icon_left
                       text: "\U000F02FC"
@@ -177,13 +176,13 @@ lvgl:
                       text: "\U000F07D0"
                       text_font: ${epaper_icon_font}
                       styles: epaper_ha_style
-                      hidden: ${ "false" if epaper_status_in_footer == "false" else "true" }
+                      hidden: ${ "false" if _ep_status_in_footer == "false" else "true" }
                   - label:
                       id: lbl_ep_wifi_hdr
                       text: "\U000F05A9"
                       text_font: ${epaper_icon_font}
                       styles: epaper_wifi_style
-                      hidden: ${ "false" if (epaper_status_in_footer == "false" and (screen_width|int) < 600) else "true" }
+                      hidden: ${ "false" if (_ep_status_in_footer == "false" and (screen_width|int) < 600) else "true" }
 
       # Header bottom divider line
       - obj:
@@ -193,7 +192,7 @@ lvgl:
           width: ${ (screen_width|int) - (2 * (epaper_pad_x|int)) - (epaper_nav_pad_left|int) - (epaper_nav_pad_right|int) }
           height: ${ 2 if ([screen_width|int, screen_height|int]|max) > 960 else 1 }
           styles: epaper_divider_style
-          hidden: ${ "true" if (epaper_show_header == "false" or ([screen_width|int, screen_height|int]|max) <= 240) else "false" }
+          hidden: ${ "true" if (_ep_show_header == "false" or ([screen_width|int, screen_height|int]|max) <= 240) else "false" }
 
       # Bottom footer bar
       - container:
@@ -212,7 +211,7 @@ lvgl:
                 text: "\U000F05A9"
                 text_font: ${epaper_icon_font}
                 styles: epaper_wifi_style
-                hidden: ${ "false" if epaper_status_in_footer == "true" else "true" }
+                hidden: ${ "false" if _ep_status_in_footer == "true" else "true" }
             - label:
                 id: lbl_ep_ha_ftr
                 align: ${ "LEFT_MID" if (screen_width|int) >= 360 else "RIGHT_MID" }
@@ -220,7 +219,7 @@ lvgl:
                 text: "\U000F07D0"
                 text_font: ${epaper_icon_font}
                 styles: epaper_ha_style
-                hidden: ${ "false" if epaper_status_in_footer == "true" else "true" }
+                hidden: ${ "false" if _ep_status_in_footer == "true" else "true" }
             - label:
                 id: lbl_ep_refresh_time
                 align: ${epaper_footer_ts_align}

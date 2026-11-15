@@ -15,12 +15,7 @@ labels: [esp32s3, ePaper, display]
 packages:
   pins: !include pins/zectrix_note4.yaml
   i2c: !include extension/internal_i2c.yaml
-  epaper_base: !include ../gui/epaper/base.yaml
-  epaper_theme: !include ../gui/epaper/themes/bwry4.yaml
-  epaper_fonts: !include ../gui/epaper/fonts/color_gray.yaml
-  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
-  epaper_nav: !include ../gui/epaper/chrome/nav_zectrix.yaml
-  epaper_info: !include ../gui/epaper/pages/info_sensors.yaml
+  epaper: !include ../gui/epaper/base.yaml
   audio: !include
     file: module/audio/${feature.audio.hardware_module | default("zectrix_note4_audio.yaml")}
     condition: ${feature_audio_enabled | default("false")}
@@ -28,17 +23,21 @@ packages:
 substitutions:
   panel_width: "400"
   panel_height: "300"
-  epaper_rotation: "270"
-  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
-  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
-  epaper_home_page: "page_info"
-  epaper_time_id: "time_rtc"
-  hint_1: "GPIO0: OK (Hjem)"
-  hint_2: "GPIO39: Opp (Neste)"
-  hint_3: "GPIO18: Ned (Forrige / 3s Av)"
-  show_battery_pct: "true"
-  show_battery_volt: "true"
   time_timezone: "Europe/Oslo"
+  epaper:
+    theme: bwry4
+    fonts: color_gray
+    nav: zectrix
+  display:
+    rotation: "270"
+    home_page: "page_info"
+    page:
+      info:
+        hint_1: "GPIO0: OK (Hjem)"
+        hint_2: "GPIO39: Opp (Neste)"
+        hint_3: "GPIO18: Ned (Forrige / 3s Av)"
+        show_battery_pct: "true"
+        show_battery_volt: "true"
   module:
     internal:
       i2c_bus: i2c_internal
@@ -163,7 +162,7 @@ binary_sensor:
       - delayed_off: 10ms
     on_press:
       - logger.log: Button OK
-      - lvgl.page.show: ${epaper_home_page}
+      - lvgl.page.show: ${display.home_page}
       - script.execute: update_screen
     name: Button OK
     entity_category: diagnostic

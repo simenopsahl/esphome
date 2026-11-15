@@ -10,24 +10,24 @@ labels: [esp32, ePaper, display]
 packages:
   pins: !include pins/m5stack_coreink.yaml
   epaper: !include ../gui/epaper/base.yaml
-  epaper_theme: !include ../gui/epaper/themes/bw.yaml
-  epaper_fonts: !include ../gui/epaper/fonts/bw.yaml
-  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
-  epaper_nav: !include ../gui/epaper/chrome/nav_coreink.yaml
-  epaper_info: !include ../gui/epaper/pages/info_sensors.yaml
 
 substitutions:
   panel_width: "200"
   panel_height: "200"
-  epaper_rotation: "0"
-  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
-  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
-  epaper_buffer_size: "5%"
-  epaper_home_page: "page_room"
-  epaper_show_header: "true"
-  epaper_status_in_footer: "true"
-  epaper_time_id: "time_homeassistant"
   time_timezone: "Europe/Oslo"
+  epaper:
+    theme: bw
+    fonts: bw
+    nav: coreink
+  display:
+    buffer_size: "5%"
+    home_page: "page_room"
+    chrome:
+      header: "true"
+      status_in_footer: "true"
+    page:
+      info:
+        show_battery_volt: "true"
   module:
     internal:
       i2c_bus: i2c_internal
@@ -151,7 +151,7 @@ binary_sensor:
       - logger.log: Stick Up
       - script.execute: buzzer_beep
       - lvgl.page.show:
-          id: ${epaper_home_page}
+          id: ${display.home_page}
           animation: NONE
           time: 0ms
       - script.execute: update_screen
@@ -220,11 +220,11 @@ sensor:
     samples: 10
     accuracy_decimals: 3
     filters:
-      - multiply: 4.25
+      - multiply: 2.0
       - median:
-          window_size: 7
-          send_every: 7
-          send_first_at: 7
+          window_size: 6
+          send_every: 3
+          send_first_at: 1
     name: "Battery Voltage"
     entity_category: diagnostic
     disabled_by_default: true
@@ -233,6 +233,12 @@ sensor:
     on_value:
       - then:
           - component.update: bat_percent
+          - lambda: |-
+              char buf[12];
+              if (isnan(x)) snprintf(buf, sizeof(buf), "--V");
+              else snprintf(buf, sizeof(buf), "%.2f V", x);
+              lv_label_set_text(id(lbl_ep_info_bat_volt), buf);
+              id(data_updated) = true;
 
   # Battery Percent
   - platform: template
@@ -243,12 +249,17 @@ sensor:
     filters:
       - calibrate_linear:
           datapoints:
-            - 0.00 -> 0.0
-            - 3.00 -> 1.0
-            - 3.10 -> 10.0
-            - 3.20 -> 50.0
-            - 3.55 -> 85.0
-            - 3.685 -> 100.0
+            - 3.27 -> 0.0
+            - 3.61 -> 10.0
+            - 3.69 -> 20.0
+            - 3.74 -> 30.0
+            - 3.79 -> 40.0
+            - 3.83 -> 50.0
+            - 3.87 -> 60.0
+            - 3.92 -> 70.0
+            - 3.98 -> 80.0
+            - 4.08 -> 90.0
+            - 4.20 -> 100.0
       - clamp:
           min_value: 0
           max_value: 100

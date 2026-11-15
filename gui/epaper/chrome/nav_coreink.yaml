@@ -3,11 +3,13 @@
 # display rotations (`epaper_rotation`: 0, 90, 180, 270) while keeping glyphs upright.
 
 substitutions:
-  epaper_status_in_footer: "true"
+  display:
+    chrome:
+      status_in_footer: "true"
   epaper_nav_pad_top: "0"
-  epaper_nav_pad_left: ${ "24" if (epaper_rotation|string) == "180" else "0" }
-  epaper_nav_pad_bottom: ${ "22" if (epaper_rotation|string) == "270" else "0" }
-  epaper_nav_pad_right: ${ "24" if (epaper_rotation|string) == "0" else "0" }
+  epaper_nav_pad_left: ${ "24" if (_ep_rotation|string) == "180" else "0" }
+  epaper_nav_pad_bottom: ${ "22" if (_ep_rotation|string) == "270" else "0" }
+  epaper_nav_pad_right: ${ "24" if (_ep_rotation|string) == "0" else "0" }
 
 script:
   - id: !extend epaper_hide_chrome
@@ -25,32 +27,32 @@ lvgl:
           id: ep_nav_coreink
           styles: epaper_fg_text_style
           align: >-
-            ${ "TOP_LEFT" if (epaper_rotation|string) == "90"
-               else ("BOTTOM_LEFT" if (epaper_rotation|string) == "180"
-               else ("BOTTOM_RIGHT" if (epaper_rotation|string) == "270"
+            ${ "TOP_LEFT" if (_ep_rotation|string) == "90"
+               else ("BOTTOM_LEFT" if (_ep_rotation|string) == "180"
+               else ("BOTTOM_RIGHT" if (_ep_rotation|string) == "270"
                else "TOP_RIGHT")) }
           x: >-
-            ${ -(epaper_pad_x|int) if (epaper_rotation|string) == "270"
-               else (epaper_pad_x if (epaper_rotation|string) == "90" else 0) }
+            ${ -(epaper_pad_x|int) if (_ep_rotation|string) == "270"
+               else (epaper_pad_x if (_ep_rotation|string) == "90" else 0) }
           y: >-
-            ${ -(epaper_pad_x|int) if (epaper_rotation|string) == "180"
-               else (epaper_pad_x if (epaper_rotation|string) == "0" else 0) }
-          width: ${ 24 if (epaper_rotation|string) in ["0", "180"] else "SIZE_CONTENT" }
+            ${ -(epaper_pad_x|int) if (_ep_rotation|string) == "180"
+               else (epaper_pad_x if (_ep_rotation|string) == "0" else 0) }
+          width: ${ 24 if (_ep_rotation|string) in ["0", "180"] else "SIZE_CONTENT" }
           height: >-
-            ${ epaper_header_h if (epaper_rotation|string) == "90"
-               else (22 if (epaper_rotation|string) == "270" else "SIZE_CONTENT") }
+            ${ epaper_header_h if (_ep_rotation|string) == "90"
+               else (22 if (_ep_rotation|string) == "270" else "SIZE_CONTENT") }
           pad_all: 0
           layout:
             type: FLEX
             flex_flow: >-
-              ${ "ROW" if (epaper_rotation|string) == "90"
-                 else ("COLUMN_REVERSE" if (epaper_rotation|string) == "180"
-                 else ("ROW_REVERSE" if (epaper_rotation|string) == "270"
+              ${ "ROW" if (_ep_rotation|string) == "90"
+                 else ("COLUMN_REVERSE" if (_ep_rotation|string) == "180"
+                 else ("ROW_REVERSE" if (_ep_rotation|string) == "270"
                  else "COLUMN")) }
             flex_align_main: START
             flex_align_cross: CENTER
-            pad_column: ${ 10 if (epaper_rotation|string) in ["90", "270"] else 0 }
-            pad_row: ${ 10 if (epaper_rotation|string) in ["0", "180"] else 0 }
+            pad_column: ${ 10 if (_ep_rotation|string) in ["90", "270"] else 0 }
+            pad_row: ${ 10 if (_ep_rotation|string) in ["0", "180"] else 0 }
           widgets:
             - label:
                 text: "\U000F02DC" # home

@@ -48,13 +48,13 @@ widgets:
               flex_flow: COLUMN
               flex_align_main: SPACE_BETWEEN
             widgets:
-              - !include ../sections/weather_forecast.yaml
+              - !include ../../sections/weather_forecast/section.yaml
               - obj:
                   width: 100%
                   height: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
                   styles: epaper_accent2_style
-              - !include ../sections/folloren.yaml
-              - !include ../sections/car_status.yaml
+              - !include ../../sections/folloren/section.yaml
+              - !include ../../sections/car_status/section.yaml
 
         # Center vertical divider
         - obj:
@@ -81,9 +81,9 @@ widgets:
               flex_flow: COLUMN
               flex_align_main: SPACE_BETWEEN
             widgets:
-              - !include ../sections/nordpool_graph.yaml
+              - !include ../../sections/nordpool_graph/section.yaml
               - obj:
                   width: 100%
                   height: ${ "2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4" }
                   styles: epaper_accent3_style
-              - !include ../sections/bus_departures.yaml
+              - !include ../../sections/bus_departures/section.yaml

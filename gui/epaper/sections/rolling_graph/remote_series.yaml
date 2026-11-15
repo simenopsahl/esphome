@@ -1,0 +1,77 @@
+# Required vars: `uid`, `entity_id`
+# Optional vars: `hours` (12), `minutes` (20), `period` (5minute),
+#                `stat_type` (mean), `group_by` (4), `precision` (1),
+#                `min_span`, `value_fmt`, `sample_interval`
+
+packages:
+  core: !include
+    file: _core.yaml
+    vars:
+      uid: ${uid}
+      min_span: ${min_span | default("2.0")}
+      value_fmt: ${value_fmt | default("%.0f")}
+      sample_interval: ${sample_interval | default("20min")}
+      remote_series: "true"
+
+interval:
+  - interval: ${sample_interval | default("20min")}
+    then:
+      - if:
+          condition:
+            api.connected:
+          then:
+            - script.execute: epaper_fetch_series_${uid}
+
+sensor:
+  - platform: homeassistant
+    entity_id: ${entity_id}
+    id: ${uid}_sensor
+    internal: true
+    on_value:
+      - script.execute:
+          id: epaper_on_val_${uid}
+          val: !lambda 'return x;'
+
+script:
+  - id: !extend epaper_on_api_connected
+    then:
+      - script.execute: epaper_fetch_series_${uid}
+
+  - id: epaper_fetch_series_${uid}
+    mode: single
+    then:
+      - homeassistant.action:
+          action: script.esphome_get_rolling_graph_data
+          data:
+            get_entity: "${entity_id}"
+            get_hours: !lambda 'return "${hours | default("12")}";'
+            get_minutes: !lambda 'return "${minutes | default("20")}";'
+            get_period: "${period | default('5minute')}"
+            get_types: "${stat_type | default('mean')}"
+            get_group_by: !lambda 'return "${group_by | default("4")}";'
+            get_precision: !lambda 'return "${precision | default("1")}";'
+          capture_response: true
+          on_success:
+            - script.execute:
+                id: epaper_set_series_${uid}
+                csv: !lambda |-
+                  if (response["response"]["csv"].is<const char *>()) {
+                    return std::string(response["response"]["csv"].as<const char *>());
+                  }
+                  if (response["csv"].is<const char *>()) {
+                    return std::string(response["csv"].as<const char *>());
+                  }
+                  return std::string("");
+          on_error:
+            - logger.log:
+                level: WARN
+                format: "Failed to fetch graph data for ${uid}: %s"
+                args: ['error.c_str()']
+            - if:
+                condition:
+                  lambda: 'return !isnan(id(${uid}_last_val)) && id(${uid}_count) == 0;'
+                then:
+                  - script.execute:
+                      id: epaper_push_${uid}
+                      val: !lambda 'return id(${uid}_last_val);'
+            - script.execute: epaper_mark_initial_data

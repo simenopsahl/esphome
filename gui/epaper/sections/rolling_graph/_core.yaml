@@ -3,7 +3,7 @@
 # and `rolling_graph_ha_attr.yaml`.
 #
 # Required vars: `uid`
-# Optional vars: `min_span`, `value_fmt`, `sample_interval`
+# Optional vars: `min_span`, `value_fmt`, `sample_interval`, `remote_series`
 
 globals:
   - id: ${uid}_samples
@@ -28,7 +28,7 @@ interval:
     then:
       - if:
           condition:
-            lambda: 'return !isnan(id(${uid}_last_val));'
+            lambda: 'return !(${remote_series | default("false")}) && !isnan(id(${uid}_last_val));'
           then:
             - script.execute:
                 id: epaper_push_${uid}
@@ -60,12 +60,16 @@ script:
           id(data_updated) = true;
       - if:
           condition:
-            lambda: 'return !isnan(val) && id(${uid}_count) == 0;'
+            lambda: 'return !(${remote_series | default("false")});'
           then:
-            - script.execute:
-                id: epaper_push_${uid}
-                val: !lambda 'return val;'
-      - script.execute: epaper_mark_initial_data
+            - if:
+                condition:
+                  lambda: 'return !isnan(val) && id(${uid}_count) == 0;'
+                then:
+                  - script.execute:
+                      id: epaper_push_${uid}
+                      val: !lambda 'return val;'
+            - script.execute: epaper_mark_initial_data
 
   - id: epaper_push_${uid}
     mode: queued
@@ -116,6 +120,7 @@ script:
           id(${uid}_count) = new_count;
           id(${uid}_last_val) = last_ok;
           id(data_updated) = true;
+          ESP_LOGD("rolling_graph", "Loaded %d samples for ${uid} (latest=%.2f)", new_count, last_ok);
       - script.execute: epaper_draw_${uid}
       - script.execute: epaper_mark_initial_data
 

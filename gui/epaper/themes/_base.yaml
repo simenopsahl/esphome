@@ -2,8 +2,9 @@
 # Included automatically by `bw.yaml`, `bwry4.yaml`, `spectra6.yaml`, and `gray16.yaml`.
 
 substitutions:
-  epaper_invert_every_5th: "true"
-  epaper_invert_accents: "true"
+  display:
+    invert_every_5th: "true"
+    invert_accents: "true"
 
 color:
   - id: c_black
@@ -38,7 +39,7 @@ script:
       - if:
           condition:
             lambda: |-
-              bool fifth = (std::string("${epaper_invert_every_5th}") == "true") &&
+              bool fifth = (std::string("${display.invert_every_5th}") == "true") &&
                            (id(recorded_display_refresh) > 0) &&
                            ((id(recorded_display_refresh) % 5) == 0);
               return fifth ^ id(epaper_page_inverted);
@@ -78,7 +79,7 @@ script:
             - if:
                 condition:
                   lambda: |-
-                    return std::string("${epaper_invert_accents}") == "true";
+                    return std::string("${display.invert_accents}") == "true";
                 then:
                   - lvgl.style.update:
                       id: epaper_divider_style

@@ -3,5 +3,7 @@
 # header holds Wi-Fi & HA status badges and footer holds `@ HH:MM`.
 
 substitutions:
-  epaper_status_in_footer: "false"
+  display:
+    chrome:
+      status_in_footer: "false"
   epaper_nav_pad_right: "0"

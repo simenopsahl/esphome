@@ -6,7 +6,7 @@
 
 packages:
   core: !include
-    file: _rolling_graph_core.yaml
+    file: _core.yaml
     vars:
       uid: ${uid}
       min_span: ${min_span | default("2.0")}

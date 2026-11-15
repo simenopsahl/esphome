@@ -1,22 +1,21 @@
 # Responsive LVGL Device Info page (`page_info`) for e-Paper displays.
 #
-# Adapts automatically across:
-#   - 200x200         (CoreInk / Air Quality): compact single-column
-#   - 300x400 / 400x300 (Note4C / CrowPanel 4.2): stacked accented cards
-#   - 792x272 / 800x480 / 1872x1404: 2-column cards (Device+Network left, Sensors right)
-#
-# Optional vars:
-#   page_title: "Enhet"
-#   hint_1 / hint_2 / hint_3: Hardware key legend strings (hidden if empty)
-#   show_battery_pct: false
-#   show_battery_volt: false
-#   show_temp: false
-#   show_humidity: false
-#   show_sd: false
+# Included automatically by `gui/epaper/base.yaml` when `display.page.info.include: "true"`.
+# Reads board-level defaults from `display.page.info.*` substitutions (or optional `vars:` overrides):
+#   display.page.info.show_battery_pct
+#   display.page.info.show_battery_volt
+#   display.page.info.show_temp
+#   display.page.info.show_humidity
+#   display.page.info.show_sd
+#   display.page.info.hint_1 / hint_2 / hint_3
 
 id: page_info
+skip: ${ "true" if (_ep_info_skip | default("false")) | string | lower == "true" else "false" }
 styles: epaper_page_style
-pad_top: ${ (epaper_header_h|int) + (epaper_pad_y|int) + (epaper_nav_pad_top|int) }
+pad_top: >-
+  ${ ((epaper_header_h|int) + (epaper_pad_y|int) + (epaper_nav_pad_top|int))
+     if (_ep_show_header | default("true")) == "true"
+     else ((epaper_pad_y|int) + (epaper_nav_pad_top|int)) }
 pad_bottom: ${ (epaper_footer_h|int) + (4 if ([screen_width|int, screen_height|int]|max) <= 240 else (epaper_pad_y|int)) + (epaper_nav_pad_bottom|int) }
 pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
 pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
@@ -80,21 +79,21 @@ widgets:
                           - label:
                               id: lbl_ep_info_hint_1
                               styles: epaper_fg_text_style
-                              text: "${ hint_1 | default('') }"
+                              text: "${ hint_1 | default(_ep_info_hint_1 | default('')) }"
                               text_font: font_sm
-                              hidden: ${ "false" if (hint_1 | default("")) else "true" }
+                              hidden: ${ "false" if ((hint_1 | default(_ep_info_hint_1 | default(""))) and ([screen_width|int, screen_height|int]|max) > 240) else "true" }
                           - label:
                               id: lbl_ep_info_hint_2
                               styles: epaper_fg_text_style
-                              text: "${ hint_2 | default('') }"
+                              text: "${ hint_2 | default(_ep_info_hint_2 | default('')) }"
                               text_font: font_sm
-                              hidden: ${ "false" if (hint_2 | default("")) else "true" }
+                              hidden: ${ "false" if ((hint_2 | default(_ep_info_hint_2 | default(""))) and ([screen_width|int, screen_height|int]|max) > 240) else "true" }
                           - label:
                               id: lbl_ep_info_hint_3
                               styles: epaper_fg_text_style
-                              text: "${ hint_3 | default('') }"
+                              text: "${ hint_3 | default(_ep_info_hint_3 | default('')) }"
                               text_font: font_sm
-                              hidden: ${ "false" if (hint_3 | default("")) else "true" }
+                              hidden: ${ "false" if ((hint_3 | default(_ep_info_hint_3 | default(""))) and ([screen_width|int, screen_height|int]|max) > 240) else "true" }
 
               # Card 2: Network Info (SSID, IP, MAC)
               - container:
@@ -139,7 +138,14 @@ widgets:
             width: ${ "100%" if (screen_width|int) < 600 else "48%" }
             height: ${ "SIZE_CONTENT" if (screen_width|int) < 600 else "100%" }
             flex_grow: ${ 0 if (screen_width|int) < 600 else 1 }
-            hidden: ${ "false" if ((show_battery_pct | default(false)) or (show_battery_volt | default(false)) or (show_temp | default(false)) or (show_humidity | default(false)) or (show_sd | default(false))) else "true" }
+            hidden: >-
+              ${ "false"
+                 if ((show_battery_pct | default(_ep_info_bat_pct | default("false"))) | string | lower == "true"
+                     or (show_battery_volt | default(_ep_info_bat_volt | default("false"))) | string | lower == "true"
+                     or (show_temp | default(_ep_info_temp | default("false"))) | string | lower == "true"
+                     or (show_humidity | default(_ep_info_hum | default("false"))) | string | lower == "true"
+                     or (show_sd | default(_ep_info_sd | default("false"))) | string | lower == "true")
+                 else "true" }
             styles: ${ "epaper_card_3_style" if ([screen_width|int, screen_height|int]|max) > 240 else "epaper_page_style" }
             pad_bottom: ${ 2 if ([screen_width|int, screen_height|int]|max) <= 240 else (6 if ([screen_width|int, screen_height|int]|max) <= 400 else (10 if ([screen_width|int, screen_height|int]|max) <= 960 else 18)) }
             widgets:
@@ -159,7 +165,7 @@ widgets:
                     - container:
                         width: 100%
                         height: SIZE_CONTENT
-                        hidden: ${ "false" if (show_battery_pct | default(false)) else "true" }
+                        hidden: ${ "false" if (show_battery_pct | default(_ep_info_bat_pct | default("false"))) | string | lower == "true" else "true" }
                         layout:
                           type: FLEX
                           flex_flow: ROW
@@ -180,7 +186,7 @@ widgets:
                     - container:
                         width: 100%
                         height: SIZE_CONTENT
-                        hidden: ${ "false" if (show_battery_volt | default(false)) else "true" }
+                        hidden: ${ "false" if (show_battery_volt | default(_ep_info_bat_volt | default("false"))) | string | lower == "true" else "true" }
                         layout:
                           type: FLEX
                           flex_flow: ROW
@@ -201,7 +207,7 @@ widgets:
                     - container:
                         width: 100%
                         height: SIZE_CONTENT
-                        hidden: ${ "false" if (show_temp | default(false)) else "true" }
+                        hidden: ${ "false" if (show_temp | default(_ep_info_temp | default("false"))) | string | lower == "true" else "true" }
                         layout:
                           type: FLEX
                           flex_flow: ROW
@@ -222,7 +228,7 @@ widgets:
                     - container:
                         width: 100%
                         height: SIZE_CONTENT
-                        hidden: ${ "false" if (show_humidity | default(false)) else "true" }
+                        hidden: ${ "false" if (show_humidity | default(_ep_info_hum | default("false"))) | string | lower == "true" else "true" }
                         layout:
                           type: FLEX
                           flex_flow: ROW
@@ -243,7 +249,7 @@ widgets:
                     - container:
                         width: 100%
                         height: SIZE_CONTENT
-                        hidden: ${ "false" if (show_sd | default(false)) else "true" }
+                        hidden: ${ "false" if (show_sd | default(_ep_info_sd | default("false"))) | string | lower == "true" else "true" }
                         layout:
                           type: FLEX
                           flex_flow: ROW

@@ -13,6 +13,7 @@
   pwsh tools/host_sdl/host-sdl.ps1 run 480x320                # build + run gui/480x320.yaml
   pwsh tools/host_sdl/host-sdl.ps1 run -Size 320x240          # explicit WxH resolution override
   pwsh tools/host_sdl/host-sdl.ps1 run 240x320 -Modules       # include simulated module pages (air_quality, dual_kmeter, cc1101)
+  pwsh tools/host_sdl/host-sdl.ps1 run -Epaper -Size 800x480  # preview .host-sdl-epaper.yaml at custom panel size
   pwsh tools/host_sdl/host-sdl.ps1 config 128x128             # validate only
   pwsh tools/host_sdl/host-sdl.ps1 screenshot                 # save PNG of the running UI
   pwsh tools/host_sdl/host-sdl.ps1 page next                  # navigate (next|prev|<index>)
@@ -37,6 +38,9 @@ param(
   # CC1101 page variant when -Modules is active ('packet' or 'async')
   [ValidateSet('', 'packet', 'async')]
   [string]$Cc1101Mode = '',
+
+  # Use .host-sdl-epaper.yaml instead of .host-sdl.yaml
+  [switch]$Epaper,
 
   [string]$Distro = 'Ubuntu',
   [int]$ScreenshotPort = 8080,
@@ -111,6 +115,7 @@ switch ($Command) {
     $repo = Get-WslRepoPath
     $runArgs = @($Command)
     if ($Arg) { $runArgs += "'$Arg'" }
+    if ($Epaper) { $runArgs += "--epaper" }
     if ($Size) { $runArgs += "--size '$Size'" }
     if ($Modules) { $runArgs += "--modules" }
     if ($Cc1101Mode) { $runArgs += "--cc1101-mode '$Cc1101Mode'" }

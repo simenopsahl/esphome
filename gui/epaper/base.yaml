@@ -1,24 +1,51 @@
 # Core LVGL engine, e-Paper refresh pipeline, top-layer overlays, and shared automation.
 #
 # Replaces `features/epaper.yaml` for LVGL-migrated e-Paper devices.
-# Expects a display with `id: display_eink` (`update_interval: never`), a font pack
-# (`gui/epaper/fonts/bw.yaml` or `color_gray.yaml`), and a theme pack
-# (`gui/epaper/themes/{bw,bwry4,spectra6,gray16}.yaml`).
+# Automatically includes the board-configured theme (`display.theme`), font pack (`display.fonts`),
+# status bar chrome, bezel navigation (`display.nav`), and optional `page_info` (`display.page.info.include`).
+
+packages:
+  epaper_defaults: !include _defaults.yaml
+  epaper_theme: !include themes/${epaper.theme}.yaml
+  epaper_fonts: !include fonts/${epaper.fonts}.yaml
+  epaper_nav: !include chrome/nav_${epaper.nav}.yaml
+  epaper_chrome: !include chrome/status_bar.yaml
+  epaper_info: !include pages/info/sensors.yaml
 
 substitutions:
-  epaper_buffer_size: "50%"
-  epaper_home_page: "page_info"
-  epaper_time_id: "time_homeassistant"
-  epaper_rotation: "0"
-  epaper_scrubber_cycles: "2"
+  epaper:
+    theme: "bw"
+    fonts: "bw"
+    nav: "none"
 
-  # Responsive chrome geometry derived from physical display dimensions
+  # Flat internal bridges for cross-package ESPHome Jinja expressions
+  _ep_rtc: "${device.rtc}"
+  _ep_time_id: ${ "time_rtc" if _ep_rtc == "true" else "time_homeassistant" }
+  _ep_rotation: "${display.rotation}"
+  _ep_show_header: "${display.chrome.header}"
+  _ep_status_in_footer: "${display.chrome.status_in_footer}"
+  _ep_temp_area_label: "${display.page.temperature.area_label}"
+  _ep_info_skip: "${display.page.info.skip}"
+  _ep_info_bat_pct: "${display.page.info.show_battery_pct}"
+  _ep_info_bat_volt: "${display.page.info.show_battery_volt}"
+  _ep_info_temp: "${display.page.info.show_temp}"
+  _ep_info_hum: "${display.page.info.show_humidity}"
+  _ep_info_sd: "${display.page.info.show_sd}"
+  _ep_info_hint_1: "${display.page.info.hint_1}"
+  _ep_info_hint_2: "${display.page.info.hint_2}"
+  _ep_info_hint_3: "${display.page.info.hint_3}"
+
+  # Effective logical screen dimensions after display.rotation
+  screen_width: ${ panel_height if (_ep_rotation|string) in ["90", "270"] else panel_width }
+  screen_height: ${ panel_width if (_ep_rotation|string) in ["90", "270"] else panel_height }
+
+  # Responsive chrome geometry derived from logical display dimensions
   epaper_header_h: >-
-    ${ 28 if ([screen_width|int, screen_height|int]|max) <= 240 else
+    ${ 24 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (34 if ([screen_width|int, screen_height|int]|min) <= 300 else
        (44 if ([screen_width|int, screen_height|int]|max) <= 960 else 88)) }
   epaper_footer_h: >-
-    ${ 22 if ([screen_width|int, screen_height|int]|max) <= 240 else
+    ${ 20 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (26 if ([screen_width|int, screen_height|int]|min) <= 300 else
        (32 if ([screen_width|int, screen_height|int]|max) <= 960 else 56)) }
   epaper_pad_x: >-
@@ -29,13 +56,6 @@ substitutions:
     ${ 4 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (8 if ([screen_width|int, screen_height|int]|max) <= 400 else
        (14 if ([screen_width|int, screen_height|int]|max) <= 960 else 28)) }
-
-  # Overridden by bezel nav packages (e.g. nav_crowpanel / rotated nav_reterminal)
-  epaper_nav_pad_top: "0"
-  epaper_nav_pad_bottom: "0"
-  epaper_nav_pad_right: "0"
-  epaper_nav_pad_left: "0"
-  epaper_status_in_footer: "false"
 
 globals:
   - id: data_updated
@@ -51,6 +71,11 @@ globals:
     restore_value: yes
     initial_value: "0"
 
+api:
+  on_client_connected:
+    - delay: 1500ms
+    - script.execute: epaper_on_api_connected
+
 esphome:
   on_boot:
     - priority: -100
@@ -59,7 +84,7 @@ esphome:
             condition:
               lambda: 'return id(data_updated) && id(initial_data_received);'
         - lvgl.widget.hide: epaper_boot_overlay
-        - lvgl.page.show: ${epaper_home_page}
+        - lvgl.page.show: ${display.home_page}
         - script.execute: update_screen
 
 binary_sensor:
@@ -100,7 +125,7 @@ button:
       - script.execute: repair_script
 
 time:
-  - id: !extend ${epaper_time_id}
+  - id: !extend ${_ep_time_id}
     on_time:
       - seconds: 0
         minutes: /5
@@ -141,8 +166,14 @@ script:
     then:
       - lambda: ""
 
-  # Dispatcher extended by each `rolling_graph_*` instance to trigger layout draw on page load
+  # Dispatcher extended by each `rolling_graph` instance to trigger layout draw on page load
   - id: epaper_refresh_rolling_graphs
+    mode: single
+    then:
+      - lambda: ""
+
+  # Dispatcher extended by `rolling_graph/remote_series.yaml` after HA API connects and subscribes to actions
+  - id: epaper_on_api_connected
     mode: single
     then:
       - lambda: ""
@@ -188,7 +219,7 @@ script:
           timeout: 2s
       - component.update: display_eink
       - lambda: |-
-          auto t = id(${epaper_time_id}).now();
+          auto t = id(${_ep_time_id}).now();
           if (t.is_valid()) {
             id(display_last_update).publish_state(t.timestamp);
           }
@@ -200,7 +231,7 @@ script:
       - lvgl.widget.show: epaper_scrubber_overlay
       - lambda: 'lv_obj_move_foreground(id(epaper_scrubber_overlay));'
       - repeat:
-          count: ${epaper_scrubber_cycles}
+          count: ${display.scrubber_cycles}
           then:
             - lvgl.style.update:
                 id: epaper_scrubber_style
@@ -233,8 +264,8 @@ lvgl:
   id: lvgl_comp
   displays:
     - display_eink
-  rotation: ${epaper_rotation}
-  buffer_size: ${epaper_buffer_size}
+  rotation: ${display.rotation}
+  buffer_size: ${display.buffer_size}
   default_font: font_md
   paused: true
   resume_on_input: false
@@ -275,3 +306,5 @@ lvgl:
                 text: "${device.name}"
                 text_font: font_sm
                 styles: epaper_muted_style
+  pages:
+    - !include pages/info/page.yaml

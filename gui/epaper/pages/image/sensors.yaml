@@ -1,10 +1,6 @@
 # Companion image assets & cycling script for `gui/epaper/pages/image.yaml`
 # Override `epaper_image_dir` (e.g. `gui/img/eink/spectra6` on Spectra 6 boards).
 
-substitutions:
-  epaper_image_dir: "gui/img/eink"
-  epaper_image_type: "RGB565"
-
 globals:
   - id: epaper_image_index
     type: int
@@ -14,16 +10,16 @@ globals:
 image:
   - platform: file
     id: i_selma_1
-    file: ${epaper_image_dir}/selma_1_480x800.png
-    type: ${epaper_image_type}
+    file: ${display.page.image.dir}/selma_1_480x800.png
+    type: ${display.page.image.type}
   - platform: file
     id: i_selma_2
-    file: ${epaper_image_dir}/selma_2_480x800.png
-    type: ${epaper_image_type}
+    file: ${display.page.image.dir}/selma_2_480x800.png
+    type: ${display.page.image.type}
   - platform: file
     id: i_selma_3
-    file: ${epaper_image_dir}/selma_3_480x800.png
-    type: ${epaper_image_type}
+    file: ${display.page.image.dir}/selma_3_480x800.png
+    type: ${display.page.image.type}
 
 script:
   - id: epaper_next_image

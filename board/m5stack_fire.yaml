@@ -43,6 +43,8 @@ esp32:
       minimum_chip_revision: 3.1
       sram1_as_iram: true
       loop_task_stack_size: 16384
+    sdkconfig_options:
+      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
 
 # PSRAM is shared with UART bus tx17/rx16
 #psram:
@@ -58,12 +60,12 @@ bluetooth_proxy:
   connection_slots: 1
 
 esp32_ble:
-  max_connections: 2
+  max_connections: 1
 
 esp32_ble_tracker:
   scan_parameters:
     interval: 500ms
-    window: 20ms
+    window: 10ms
 
 spi:
   clk_pin: ${pin.int.spi.clk}

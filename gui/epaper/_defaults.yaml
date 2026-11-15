@@ -1,0 +1,42 @@
+# Fallback default substitutions for gui/epaper/ packages.
+# Included FIRST in `gui/epaper/base.yaml` so that `themes/*.yaml`, `fonts/*.yaml`,
+# `chrome/nav_*.yaml`, board configs, and device YAMLs can all override these defaults.
+
+substitutions:
+  device:
+    rtc: "false"
+  display:
+    rotation: "0"
+    buffer_size: "50%"
+    home_page: "page_info"
+    scrubber_cycles: "2"
+    invert_every_5th: "true"
+    invert_accents: "true"
+    data_entity: "sensor.epaper_data_general"
+    temperatures_entity: "sensor.epaper_data_temperatures"
+    nordpool_entity: "sensor.epaper_data_nordpool_future_offset"
+    chrome:
+      header: "true"
+      status_in_footer: "false"
+    page:
+      temperature:
+        area_label: "Rom"
+      info:
+        skip: "false"
+        show_battery_pct: "false"
+        show_battery_volt: "false"
+        show_temp: "false"
+        show_humidity: "false"
+        show_sd: "false"
+        hint_1: ""
+        hint_2: ""
+        hint_3: ""
+      image:
+        dir: "gui/img/eink"
+        type: "RGB565"
+
+  # Overridden by bezel nav packages (e.g. nav_coreink, nav_crowpanel, nav_reterminal)
+  epaper_nav_pad_top: "0"
+  epaper_nav_pad_bottom: "0"
+  epaper_nav_pad_right: "0"
+  epaper_nav_pad_left: "0"

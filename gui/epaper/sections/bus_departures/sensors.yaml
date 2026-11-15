@@ -1,11 +1,8 @@
 # Companion sensor bindings for `gui/epaper/sections/bus_departures.yaml`
 
-substitutions:
-  epaper_data_entity: "sensor.epaper_data_general"
-
 text_sensor:
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: bus_bregnefaret_line_0
     id: ep_bus_line_0
     internal: true
@@ -19,7 +16,7 @@ text_sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: bus_bregnefaret_line_1
     id: ep_bus_line_1
     internal: true
@@ -33,7 +30,7 @@ text_sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: bus_bregnefaret_line_2
     id: ep_bus_line_2
     internal: true
@@ -47,7 +44,7 @@ text_sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: bus_bregnefaret_time_0
     id: ep_bus_time_0
     internal: true
@@ -59,7 +56,7 @@ text_sensor:
       - script.execute: epaper_mark_initial_data
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: bus_bregnefaret_time_1
     id: ep_bus_time_1
     internal: true
@@ -70,7 +67,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: bus_bregnefaret_time_2
     id: ep_bus_time_2
     internal: true

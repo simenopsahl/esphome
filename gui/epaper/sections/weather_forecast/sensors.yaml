@@ -1,8 +1,5 @@
 # Companion sensor & script bindings for `gui/epaper/sections/weather_forecast.yaml`
 
-substitutions:
-  epaper_data_entity: "sensor.epaper_data_general"
-
 script:
   - id: epaper_set_weather_icon
     mode: parallel
@@ -70,7 +67,7 @@ script:
 
 sensor:
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: temp_measured
     id: ep_temp_measured
     internal: true
@@ -87,7 +84,7 @@ sensor:
       - script.execute: epaper_mark_initial_data
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: temp_forecast
     id: ep_temp_forecast
     internal: true
@@ -103,7 +100,7 @@ sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_temperature_0
     id: ep_weather_temp_0
     internal: true
@@ -115,7 +112,7 @@ sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_temperature_1
     id: ep_weather_temp_1
     internal: true
@@ -127,7 +124,7 @@ sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_temperature_2
     id: ep_weather_temp_2
     internal: true
@@ -139,7 +136,7 @@ sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_temperature_3
     id: ep_weather_temp_3
     internal: true
@@ -151,7 +148,7 @@ sensor:
           id(data_updated) = true;
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_temperature_4
     id: ep_weather_temp_4
     internal: true
@@ -164,7 +161,7 @@ sensor:
 
 text_sensor:
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_now
     id: ep_weather_cond_now
     internal: true
@@ -176,7 +173,7 @@ text_sensor:
       - script.execute: epaper_mark_initial_data
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_0
     id: ep_weather_cond_0
     internal: true
@@ -187,7 +184,7 @@ text_sensor:
           cond: !lambda 'return x;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_1
     id: ep_weather_cond_1
     internal: true
@@ -198,7 +195,7 @@ text_sensor:
           cond: !lambda 'return x;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_2
     id: ep_weather_cond_2
     internal: true
@@ -209,7 +206,7 @@ text_sensor:
           cond: !lambda 'return x;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_3
     id: ep_weather_cond_3
     internal: true
@@ -220,7 +217,7 @@ text_sensor:
           cond: !lambda 'return x;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_4
     id: ep_weather_cond_4
     internal: true
@@ -231,7 +228,7 @@ text_sensor:
           cond: !lambda 'return x;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_timestamp_0
     id: ep_weather_time_0
     internal: true
@@ -242,7 +239,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_timestamp_1
     id: ep_weather_time_1
     internal: true
@@ -253,7 +250,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_timestamp_2
     id: ep_weather_time_2
     internal: true
@@ -264,7 +261,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_timestamp_3
     id: ep_weather_time_3
     internal: true
@@ -275,7 +272,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_timestamp_4
     id: ep_weather_time_4
     internal: true

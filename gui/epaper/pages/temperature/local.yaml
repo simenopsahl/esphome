@@ -1,14 +1,14 @@
-# Bind a local ESPHome temperature sensor (`sensor_id`) to a `temp_single.yaml` widget (`uid`).
-# Useful for graph-less local pages (e.g. `m5s-air-quality` / `m5s-coreink` `page_local`).
+# Bind a local ESPHome temperature sensor (`sensor_id`) to a `gui/epaper/pages/temperature/page.yaml`
+# hero label (`${uid}_value`) without allocating a 36-point rolling graph ring buffer.
 #
 # Required vars: `uid`, `sensor_id`
-# Optional vars: `value_fmt` (defaults to "%.0f")
+# Optional vars: `value_fmt` (default `"%.0f"`)
 
 sensor:
   - id: !extend ${sensor_id}
     on_value:
       - lambda: |-
-          char buf[16];
+          char buf[24];
           if (isnan(x)) {
             snprintf(buf, sizeof(buf), "--");
           } else {

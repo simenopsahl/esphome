@@ -52,7 +52,7 @@ widgets:
             pad_all: 0
             scrollbar_mode: "OFF"
             widgets:
-              - !include ../sections/weather_header.yaml
+              - !include ../../sections/weather_header/section.yaml
 
         # Primary section divider (horizontal in portrait, vertical in landscape)
         - obj:
@@ -93,7 +93,7 @@ widgets:
                   scrollbar_mode: "OFF"
                   widgets:
                     - !include
-                      file: ../sections/rolling_graph.yaml
+                      file: ../../sections/rolling_graph/section.yaml
                       vars:
                         uid: graph_temp_ute
                         title: "Ute"
@@ -108,7 +108,7 @@ widgets:
                   scrollbar_mode: "OFF"
                   widgets:
                     - !include
-                      file: ../sections/rolling_graph.yaml
+                      file: ../../sections/rolling_graph/section.yaml
                       vars:
                         uid: graph_temp_foran
                         title: "Foran"
@@ -123,7 +123,7 @@ widgets:
                   scrollbar_mode: "OFF"
                   widgets:
                     - !include
-                      file: ../sections/rolling_graph.yaml
+                      file: ../../sections/rolling_graph/section.yaml
                       vars:
                         uid: graph_temp_bak
                         title: "Bak"

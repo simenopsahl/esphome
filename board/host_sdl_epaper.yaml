@@ -1,0 +1,137 @@
+labels: [host, sdl, display, ePaper, virtual]
+---
+# Virtual e-Paper display board: ESPHome `host` platform rendering to an SDL2 window.
+#
+# Companion to board/host_sdl.yaml for gui/epaper/ devices (`lvgl_comp` + `display_eink`).
+# Builds and runs on Linux/WSL2 — never flashed to hardware.
+#
+# Exposes the shared IDs that gui/epaper/ and physical e-Paper boards provide:
+#   display_eink, lvgl_screenshot, btn_a / btn_b / btn_c,
+#   and template stand-ins for sensor_ip_address / sensor_ssid / sensor_mac_address.
+
+packages:
+  epaper: !include ../gui/epaper/base.yaml
+
+substitutions:
+  panel_width: "200"
+  panel_height: "200"
+  epaper:
+    theme: "bw"
+    fonts: "bw"
+    nav: "coreink"
+  display:
+    rotation: "0"
+    home_page: "page_content"
+  device:
+    model: "Host SDL e-Paper"
+    board: host_sdl
+    # Shared virtual MAC with board/host_sdl.yaml (only one virtual instance runs at a time)
+    mac_address: "02:5D:1A:00:00:03"
+    # Shown on page_info only (host has no wifi_info sensor)
+    ip_address: "127.0.0.1"
+    ssid: "WSL (virtual)"
+    rtc: "false"
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
+    framework:
+      type: host
+  module:
+    screenshot_port: "8080"
+
+esphome:
+  project:
+    name: "ESPHome.HostSDLePaper"
+    version: "1.0"
+
+host:
+  mac_address: ${device.mac_address}
+
+# Screenshot / page navigation HTTP endpoint for inspecting gui/epaper pages:
+#   GET /screenshot   GET /page/next | /page/prev | /page/<index>
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [lvgl_screenshot]
+
+lvgl_screenshot:
+  id: epaper_screenshot
+  lvgl_id: lvgl_comp
+  port: ${module.screenshot_port}
+
+display:
+  - platform: sdl
+    id: display_eink
+    snapshot_key: SDLK_F12
+    update_interval: never
+    auto_clear_enabled: false
+    dimensions:
+      width: ${panel_width}
+      height: ${panel_height}
+
+api:
+  services:
+    - service: take_snapshot
+      then:
+        - snapshot.take: display_eink
+
+# Keyboard stands in for the three physical navigation keys (window must have focus)
+binary_sensor:
+  # Button A / Prev: Left arrow
+  - platform: sdl
+    id: btn_a
+    name: "Button A"
+    entity_category: diagnostic
+    key: SDLK_LEFT
+    on_press:
+      - logger.log: Button A Pressed
+  # Button B / Home: Down arrow
+  - platform: sdl
+    id: btn_b
+    name: "Button B"
+    entity_category: diagnostic
+    key: SDLK_DOWN
+    on_press:
+      - logger.log: Button B Pressed
+  # Button C / Next: Right arrow
+  - platform: sdl
+    id: btn_c
+    name: "Button C"
+    entity_category: diagnostic
+    key: SDLK_RIGHT
+    on_press:
+      - logger.log: Button C Pressed
+
+button:
+  - platform: template
+    name: "Take Snapshot"
+    id: btn_take_snapshot
+    icon: "mdi:camera"
+    entity_category: diagnostic
+    on_press:
+      - snapshot.take: display_eink
+
+# Stand-ins for common/wifi.yaml diagnostics used by gui/epaper/pages/info_sensors.yaml
+text_sensor:
+  - platform: template
+    id: sensor_ip_address
+    name: "IP Address"
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 60s
+    lambda: return {"${device.ip_address}"};
+  - platform: template
+    id: sensor_ssid
+    name: "Connected SSID"
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 60s
+    lambda: return {"${device.ssid}"};
+  - platform: template
+    id: sensor_mac_address
+    name: "Mac Address"
+    entity_category: diagnostic
+    disabled_by_default: true
+    update_interval: 60s
+    lambda: return {"${device.mac_address}"};

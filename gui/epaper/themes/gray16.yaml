@@ -1,8 +1,9 @@
 # 16-level Grayscale e-Paper theme (e.g. Seeed reTerminal E1003 IT8951).
 
 substitutions:
-  epaper_invert_every_5th: "false"
-  epaper_invert_accents: "true"
+  display:
+    invert_every_5th: "false"
+    invert_accents: "true"
 
 packages:
   epaper_theme_base: !include { file: _base.yaml }

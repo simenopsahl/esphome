@@ -1,0 +1,30 @@
+# Companion sensor & script bindings for `gui/epaper/pages/weather_station.yaml`.
+# Instantiates Weather Header + 3 Rolling 12-hour Temperature Graphs (`Ute`, `Foran`, `Bak`)
+# from `${display.data_entity}` attributes.
+
+packages:
+  weather_header: !include ../../sections/weather_header/sensors.yaml
+  graph_ute: !include
+    file: ../../sections/rolling_graph/ha_series.yaml
+    vars:
+      uid: graph_temp_ute
+      entity_id: ${display.data_entity}
+      attribute: temp_measured
+      history_entity_id: ${display.temperatures_entity}
+      history_attribute: temp_measured_history
+  graph_foran: !include
+    file: ../../sections/rolling_graph/ha_series.yaml
+    vars:
+      uid: graph_temp_foran
+      entity_id: ${display.data_entity}
+      attribute: temp_foran
+      history_entity_id: ${display.temperatures_entity}
+      history_attribute: temp_foran_history
+  graph_bak: !include
+    file: ../../sections/rolling_graph/ha_series.yaml
+    vars:
+      uid: graph_temp_bak
+      entity_id: ${display.data_entity}
+      attribute: temp_bak
+      history_entity_id: ${display.temperatures_entity}
+      history_attribute: temp_bak_history

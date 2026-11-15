@@ -1,0 +1,49 @@
+# Companion diagnostic Wi-Fi text sensor bindings for `gui/epaper/pages/info/page.yaml`.
+# Included automatically by `gui/epaper/base.yaml`.
+# Uses `platform: copy` (matching `gui/pages/status/sensors.yaml`) so it works with both
+# `common/wifi.yaml` (`wifi_info` sub-sensors) and `board/host_sdl_epaper.yaml` (`template` sensors).
+
+text_sensor:
+  - platform: copy
+    source_id: sensor_ip_address
+    id: ep_sensor_ip_address_copy
+    internal: true
+    on_value:
+      - then:
+          - lambda: |-
+              lv_label_set_text(id(lbl_ep_info_ip), x.c_str());
+              id(data_updated) = true;
+
+  - platform: copy
+    source_id: sensor_ssid
+    id: ep_sensor_ssid_copy
+    internal: true
+    on_value:
+      - then:
+          - lambda: |-
+              lv_label_set_text(id(lbl_ep_info_ssid), x.c_str());
+              id(data_updated) = true;
+
+  - platform: copy
+    source_id: sensor_mac_address
+    id: ep_sensor_mac_address_copy
+    internal: true
+    on_value:
+      - then:
+          - lambda: |-
+              lv_label_set_text(id(lbl_ep_info_mac), x.c_str());
+              id(data_updated) = true;
+
+script:
+  - id: !extend epaper_refresh_status
+    then:
+      - lambda: |-
+          if (id(sensor_ssid).has_state()) {
+            lv_label_set_text(id(lbl_ep_info_ssid), id(sensor_ssid).state.c_str());
+          }
+          if (id(sensor_ip_address).has_state()) {
+            lv_label_set_text(id(lbl_ep_info_ip), id(sensor_ip_address).state.c_str());
+          }
+          if (id(sensor_mac_address).has_state()) {
+            lv_label_set_text(id(lbl_ep_info_mac), id(sensor_mac_address).state.c_str());
+          }

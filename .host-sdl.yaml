@@ -13,7 +13,6 @@
 
 packages:
   # --- COMMON PACKAGES (host subset: no wifi / debug on host platform) ---
-  api: !include common/api.yaml
   logger: !include common/logger.yaml
   ota: !include common/ota.yaml
   restart: !include common/restart.yaml
@@ -74,12 +73,16 @@ esphome:
         - lvgl.widget.hide: boot_screen
         - script.execute: lvgl_time_update
 
-# The GUI header package hooks wifi events; there is no wifi on host
-wifi: !remove
-
 api:
+  id: component_api
   # Keep running when no Home Assistant client is connected
   reboot_timeout: 0s
+  # Does not need encryption for local API access
+#  encryption:
+#    key: !secret homeassistant_api
+
+# The GUI header package hooks wifi events; there is no wifi on host
+wifi: !remove
 
 # --- LVGL CLOCKS ---
 # Replace the HA time source with the host system clock (same ID, so the GUI

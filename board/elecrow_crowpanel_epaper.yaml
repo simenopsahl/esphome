@@ -24,23 +24,23 @@ labels: [esp32s3, ePaper, display]
 
 packages:
   pins: !include pins/elecrow_crowpanel_epaper.yaml
-  epaper_base: !include ../gui/epaper/base.yaml
-  epaper_theme: !include ../gui/epaper/themes/bw.yaml
-  epaper_fonts: !include ../gui/epaper/fonts/bw.yaml
-  epaper_chrome: !include ../gui/epaper/chrome/status_bar.yaml
-  epaper_nav: !include ../gui/epaper/chrome/nav_crowpanel.yaml
-  epaper_info: !include ../gui/epaper/pages/info_sensors.yaml
+  epaper: !include ../gui/epaper/base.yaml
 
 substitutions:
   panel_width: "400"
   panel_height: "300"
-  screen_width: ${ panel_height if (epaper_rotation|string) in ["90", "270"] else panel_width }
-  screen_height: ${ panel_width if (epaper_rotation|string) in ["90", "270"] else panel_height }
-  epaper_home_page: "page_info"
-  hint_1: "Meny: Hjem | Exit: Info"
-  hint_2: "Pinne: Side / Oppdater"
-  hint_3: ""
   time_timezone: "Europe/Oslo"
+  epaper:
+    theme: bw
+    fonts: bw
+    nav: crowpanel
+  display:
+    home_page: "page_info"
+    page:
+      info:
+        hint_1: "Meny: Hjem | Exit: Info"
+        hint_2: "Pinne: Side / Oppdater"
+        hint_3: ""
   device:
     model: "Elecrow CrowPanel epaper"
     board: elecrow_crowpanel_epaper
@@ -116,7 +116,7 @@ binary_sensor:
     on_press:
       then:
         - logger.log: Menu Button Pressed
-        - lvgl.page.show: ${epaper_home_page}
+        - lvgl.page.show: ${display.home_page}
         - script.execute: update_screen
     name: Menu Button
     entity_category: diagnostic

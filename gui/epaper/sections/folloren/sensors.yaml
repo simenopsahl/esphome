@@ -1,9 +1,6 @@
 # Companion sensor & script bindings for `gui/epaper/sections/folloren.yaml`
 # Binds `folloren_next`, `folloren_today_types`, `folloren_next_types`, and the 4 bin date attributes.
 
-substitutions:
-  epaper_data_entity: "sensor.epaper_data_general"
-
 globals:
   - id: ep_fl_next_text
     type: std::string
@@ -113,7 +110,7 @@ script:
 
 text_sensor:
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_next
     id: ep_fl_next
     internal: true
@@ -123,7 +120,7 @@ text_sensor:
       - script.execute: epaper_mark_initial_data
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_today_types
     id: ep_fl_today_types
     internal: true
@@ -132,7 +129,7 @@ text_sensor:
       - script.execute: epaper_update_folloren
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_next_types
     id: ep_fl_next_types
     internal: true
@@ -141,7 +138,7 @@ text_sensor:
       - script.execute: epaper_update_folloren
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_restavfall
     id: ep_fl_restavfall
     internal: true
@@ -152,7 +149,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_papir
     id: ep_fl_papir
     internal: true
@@ -163,7 +160,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_glass
     id: ep_fl_glass
     internal: true
@@ -174,7 +171,7 @@ text_sensor:
       - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: folloren_mat
     id: ep_fl_mat
     internal: true

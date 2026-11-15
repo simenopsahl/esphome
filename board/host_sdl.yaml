@@ -22,7 +22,7 @@ substitutions:
     model: "Host SDL"
     board: host_sdl
     # Locally administered MAC; must be unique per virtual device
-    mac_address: "02:5D:1A:00:00:01"
+    mac_address: "02:5D:1A:00:00:03"
     # Shown on the status page only (host has no wifi_info sensor)
     ip_address: "127.0.0.1"
     ssid: "WSL (virtual)"

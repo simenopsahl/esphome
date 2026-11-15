@@ -1,0 +1,139 @@
+# Unified e-Paper LVGL temperature page (`gui/epaper/pages/temperature/page.yaml`).
+# Modeled directly after LCD LVGL (`gui/pages/temperature/page.yaml`):
+#   - Optional top rolling 12-hour polyline graph strip (`${uid}_plot_box` + `${uid}_line`)
+#   - Hero row with [icon + area_label] column on the left, large temperature value in the center,
+#     and unit (`°C`) on the right.
+#
+# Optional vars:
+#   uid:              "temp_single"   # Unique widget ID prefix per page instance
+#   page_id:          "page_room"     # LVGL page ID
+#   area_label:       "Rom"           # Area/source label (falls back to `title` or `display.page.temperature.area_label`)
+#   title:            ""              # Alias for `area_label`
+#   icon:             "\U000F050F"    # Icon glyph (default MDI thermometer)
+#   unit:             "°C"            # Temperature unit label
+#   show_graph:       "false"         # Top rolling 12h graph strip (`${uid}_plot_box` + `${uid}_line`)
+#   graph_height:     auto            # Graph strip height in px (default 42 on <=240px, 90 on larger)
+#   invert_colors:    "false"         # Polarity invert (e.g. black background on Air Quality `page_local`)
+#   value_font:       "font_fl"       # Hero temperature font (`84px` on <=240px)
+
+id: ${page_id | default("page_room")}
+styles: epaper_page_style
+pad_top: >-
+  ${ ((epaper_header_h|int) + (epaper_nav_pad_top|int))
+     if (_ep_show_header | default("true")) == "true"
+     else ((epaper_nav_pad_top|int) if (show_graph | default("false")) == "true"
+     else ((epaper_pad_y|int) + (epaper_nav_pad_top|int))) }
+pad_bottom: ${ (epaper_footer_h|int) + (epaper_nav_pad_bottom|int) }
+pad_left: >-
+  ${ (epaper_nav_pad_left|int)
+     if (show_graph | default("false")) == "true"
+     else ((epaper_pad_x|int) + (epaper_nav_pad_left|int)) }
+pad_right: >-
+  ${ (epaper_nav_pad_right|int)
+     if (show_graph | default("false")) == "true"
+     else ((epaper_pad_x|int) + (epaper_nav_pad_right|int)) }
+scrollbar_mode: "OFF"
+on_load:
+  - script.execute:
+      id: set_page_title
+      title: "${area_label | default(title | default(_ep_temp_area_label | default('Rom')))}"
+      icon: "${icon | default('\U000F050F')}"
+  - lambda: |-
+      bool want_inv = (std::string("${invert_colors | default('false')}") == "true");
+      if (id(epaper_page_inverted) != want_inv) {
+        id(epaper_page_inverted) = want_inv;
+      }
+  - script.execute: apply_epaper_theme_refresh
+  - script.execute: epaper_refresh_rolling_graphs
+on_unload:
+  - lambda: |-
+      if (id(epaper_page_inverted)) {
+        id(epaper_page_inverted) = false;
+      }
+  - script.execute: apply_epaper_theme_refresh
+layout:
+  type: flex
+  flex_flow: COLUMN
+  flex_align_main: SPACE_BETWEEN
+  flex_align_cross: CENTER
+  pad_row: 0
+widgets:
+  # Optional top rolling 12h polyline graph strip (compatible with `sections/rolling_graph/_core.yaml`)
+  - obj:
+      id: ${uid | default("temp_single")}_plot_box
+      width: 100%
+      height: ${ graph_height | default("42" if ([screen_width|int, screen_height|int]|max) <= 240 else "90") }
+      bg_opa: TRANSP
+      border_width: 0
+      pad_all: 0
+      scrollbar_mode: "OFF"
+      hidden: ${ "false" if (show_graph | default("false")) == "true" else "true" }
+      widgets:
+        - line:
+            id: ${uid | default("temp_single")}_line
+            styles: epaper_line_style
+            width: 100%
+            height: 100%
+            align: TOP_LEFT
+            pad_all: 0
+            line_width: ${ line_width | default("4" if ([screen_width|int, screen_height|int]|min) <= 300 else "6") }
+            points:
+              - x: 0
+                y: 20
+              - x: 100
+                y: 20
+
+  # Hero temperature row: [icon / area_label] on left, [value] in center, [unit] on right
+  - obj:
+      id: ${uid | default("temp_single")}_hero
+      width: 100%
+      flex_grow: 1
+      bg_opa: TRANSP
+      border_width: 0
+      pad_top: 0
+      pad_bottom: 0
+      pad_left: ${ (epaper_pad_x|int) if (show_graph | default("false")) == "true" else 0 }
+      pad_right: ${ (epaper_pad_x|int) if (show_graph | default("false")) == "true" else 0 }
+      scrollbar_mode: "OFF"
+      layout:
+        type: flex
+        flex_flow: ROW
+        flex_align_main: SPACE_BETWEEN
+        flex_align_cross: CENTER
+        pad_column: 2
+      widgets:
+        - obj:
+            width: SIZE_CONTENT
+            height: SIZE_CONTENT
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            scrollbar_mode: "OFF"
+            layout:
+              type: flex
+              flex_flow: COLUMN
+              flex_align_main: CENTER
+              flex_align_cross: START
+              pad_row: 2
+            widgets:
+              - label:
+                  id: ${uid | default("temp_single")}_thermometer
+                  styles: epaper_fg_text_style
+                  text: "${icon | default('\U000F050F')}"
+                  text_font: ${ "mdi_md" if ([screen_width|int, screen_height|int]|max) <= 240 else "mdi_lg" }
+              - label:
+                  id: ${uid | default("temp_single")}_area
+                  styles: epaper_fg_text_style
+                  text: "${area_label | default(title | default(_ep_temp_area_label | default('Rom')))}"
+                  text_font: ${ "font_md" if ([screen_width|int, screen_height|int]|max) <= 240 else "font_lg" }
+        - label:
+            id: ${uid | default("temp_single")}_value
+            styles: epaper_fg_text_style
+            text: "--"
+            text_font: ${value_font | default("font_fl")}
+        - label:
+            id: ${uid | default("temp_single")}_unit
+            styles: epaper_fg_text_style
+            text: "${unit | default('°C')}"
+            text_font: ${unit_font | default("font_xl")}
+            hidden: ${ "false" if (unit | default("°C")) != "" else "true" }

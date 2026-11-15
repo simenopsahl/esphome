@@ -35,7 +35,7 @@ substitutions:
        (56 if ([screen_width|int, screen_height|int]|min) <= 300 else
        (80 if ([screen_width|int, screen_height|int]|max) <= 960 else 140)) }
   text_fl: >-
-    ${ 104 if ([screen_width|int, screen_height|int]|max) <= 240 else
+    ${ 84 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (96 if ([screen_width|int, screen_height|int]|min) <= 300 else
        (140 if ([screen_width|int, screen_height|int]|max) <= 960 else 220)) }
 

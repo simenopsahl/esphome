@@ -1,8 +1,5 @@
 # Companion sensor & script bindings for `gui/epaper/sections/weather_header.yaml`
-# Tracks `weather_condition_now` and `weather_condition_0` from `${epaper_data_entity}`.
-
-substitutions:
-  epaper_data_entity: "sensor.epaper_data_general"
+# Tracks `weather_condition_now` and `weather_condition_0` from `${display.data_entity}`.
 
 globals:
   - id: ep_wh_cond_now
@@ -73,7 +70,7 @@ script:
 
 text_sensor:
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_now
     id: ep_wh_condition_now
     internal: true
@@ -83,7 +80,7 @@ text_sensor:
       - script.execute: epaper_mark_initial_data
 
   - platform: homeassistant
-    entity_id: ${epaper_data_entity}
+    entity_id: ${display.data_entity}
     attribute: weather_condition_0
     id: ep_wh_condition_next
     internal: true
