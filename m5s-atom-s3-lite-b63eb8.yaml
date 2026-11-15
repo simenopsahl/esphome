@@ -45,7 +45,6 @@ esphome:
       area_id: area_ute_foran
 
 wifi:
-#  use_address: 192.168.69.61
   use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
