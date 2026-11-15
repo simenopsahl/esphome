@@ -35,7 +35,6 @@ esphome:
     version: "1.0.0"
 
 wifi:
-#  use_address: 192.168.69.79
   use_address: rf-link.local
   manual_ip: 
     gateway: 192.168.68.1
