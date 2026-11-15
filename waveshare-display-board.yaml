@@ -42,7 +42,6 @@ esphome:
   area: ${device.location}
 
 wifi:
-#  use_address: 192.168.69.51
   use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
