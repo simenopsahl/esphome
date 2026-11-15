@@ -12,19 +12,18 @@ packages:
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
   # --- E-PAPER PAGE BINDINGS ---
-  epaper_aq_sensors: !include gui/epaper/pages/air_quality_sensors.yaml
+  epaper_aq_sensors: !include gui/epaper/pages/air_quality/sensors.yaml
   epaper_local_sensors: !include
-    file: gui/epaper/pages/temp_single_local_sensors.yaml
+    file: gui/epaper/pages/temperature/local.yaml
     vars:
       uid: aq_local
       sensor_id: temperature_local
       value_fmt: "%.0f"
   epaper_room_series: !include
-    file: gui/epaper/sections/rolling_graph_remote_series.yaml
+    file: gui/epaper/sections/rolling_graph/remote_series.yaml
     vars:
       uid: aq_room
       entity_id: sensor.etg2_gang_temperature
-      history_attribute: temp_gang_history
       value_fmt: "%.0f"
       min_span: "2.0"
 
@@ -37,8 +36,9 @@ substitutions:
     location: "Gang"
     framework:
       type: esp-idf
-  epaper_rotation: "180"
-  epaper_home_page: "page_local"
+  display:
+    rotation: "180"
+    home_page: "page_local"
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -57,29 +57,21 @@ wifi:
 lvgl:
   pages:
     - !include
-      file: gui/epaper/pages/temp_single.yaml
+      file: gui/epaper/pages/temperature/page.yaml
       vars:
         uid: aq_local
         page_id: page_local
-        title: "Enhet"
+        area_label: "Enhet"
+        icon: "\U000F0510"
         invert_colors: "true"
-        show_top_row: "true"
-        top_left_text: "--.-"
-        top_center_text: "Enhet"
-        top_right_text: "--.-"
-        unit: ""
-    - !include gui/epaper/pages/air_quality.yaml
+    - !include gui/epaper/pages/air_quality/page.yaml
     - !include
-      file: gui/epaper/pages/temp_single.yaml
+      file: gui/epaper/pages/temperature/page.yaml
       vars:
         uid: aq_room
         page_id: page_room
-        title: "Rom"
+        area_label: "Rom"
         show_graph: "true"
-        show_top_row: "true"
-        top_left_text: "Rom"
-        top_right_text: "°C"
-        unit: ""
 
 # Check if person is home
 binary_sensor:
@@ -90,26 +82,6 @@ binary_sensor:
     lambda: 'return id(ha_presence_detected).state;'
 
 sensor:
-  # Update top corner sub-sensor readouts on page_local (SCD40 left, SEN55 right)
-  - id: !extend aq_scd40_sensor
-    temperature:
-      on_value:
-        - lambda: |-
-            char buf[16];
-            if (isnan(x)) snprintf(buf, sizeof(buf), "--.-");
-            else snprintf(buf, sizeof(buf), "%.1f", x);
-            lv_label_set_text(id(aq_local_top_left), buf);
-            id(data_updated) = true;
-  - id: !extend sen55_sensor
-    temperature:
-      on_value:
-        - lambda: |-
-            char buf[16];
-            if (isnan(x)) snprintf(buf, sizeof(buf), "--.-");
-            else snprintf(buf, sizeof(buf), "%.1f", x);
-            lv_label_set_text(id(aq_local_top_right), buf);
-            id(data_updated) = true;
-
   # Combine sensors
   - id: !extend temperature_local
     sources:
