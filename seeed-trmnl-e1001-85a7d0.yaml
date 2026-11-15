@@ -8,8 +8,8 @@ packages:
   e1001: !include board/module/display_reterminal_e1001.yaml
 
   # --- EPAPER DASHBOARD PACKAGES ---
-  epaper_content: !include gui/epaper/pages/weather_station_sensors.yaml
-  epaper_image: !include gui/epaper/pages/image_sensors.yaml
+  epaper_content: !include gui/epaper/pages/weather_station/sensors.yaml
+  epaper_image: !include gui/epaper/pages/image/sensors.yaml
 
 substitutions:
   common:
@@ -20,8 +20,11 @@ substitutions:
     location: "Storage"
     framework:
       type: esp-idf
-  epaper_home_page: page_content
-  epaper_image_dir: gui/img/eink
+  display:
+    home_page: page_content
+    page:
+      image:
+        dir: gui/img/eink
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -38,9 +41,8 @@ wifi:
 
 lvgl:
   pages:
-    - !include gui/epaper/pages/weather_station.yaml
-    - !include gui/epaper/pages/image.yaml
-    - !include gui/epaper/pages/info.yaml
+    - !include gui/epaper/pages/weather_station/page.yaml
+    - !include gui/epaper/pages/image/page.yaml
 
 # Check if person is home
 binary_sensor:
