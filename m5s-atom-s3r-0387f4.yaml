@@ -42,14 +42,12 @@ substitutions:
       hardware_module: atomic_voice_pyramid.yaml
 
 esphome:
-#  build_path: C:/Users/simen/.esphome_build/m5s-atom-s3r-0387f4
   comment: ${device.model} @ ${device.location}
   name: ${device.name}
   friendly_name: ${device.name}
   area: ${device.location}
 
 wifi:
-#  use_address: 192.168.69.64
   use_address: ${device.name}.local
   manual_ip: 
     gateway: 192.168.68.1
