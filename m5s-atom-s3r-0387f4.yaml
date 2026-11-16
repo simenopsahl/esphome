@@ -39,7 +39,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3r-0387f4
-    location: "Storage"
+    location: "Bod"
     framework:
       type: esp-idf
   module:
