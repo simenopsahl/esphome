@@ -37,6 +37,8 @@ esp32:
   cpu_frequency: 160MHz
   framework:
     type: ${device.framework.type}
+    advanced:
+      flash_chip: generic
 #    version: 5.4.0
 #    platform_version: espressif32 @ 6.10.0
 

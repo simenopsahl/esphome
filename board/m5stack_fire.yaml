@@ -43,6 +43,7 @@ esp32:
       minimum_chip_revision: 3.1
       sram1_as_iram: true
       loop_task_stack_size: 16384
+      flash_chip: generic
     sdkconfig_options:
       CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
 

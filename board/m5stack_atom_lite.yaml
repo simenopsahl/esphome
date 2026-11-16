@@ -42,6 +42,7 @@ esp32:
     advanced:
       compiler_optimization: PERF
       sram1_as_iram: true
+      flash_chip: gd
 
 wifi:
   enable_btm: true

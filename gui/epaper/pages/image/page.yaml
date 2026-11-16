@@ -7,6 +7,10 @@ styles: epaper_page_style
 pad_all: 0
 scrollbar_mode: "OFF"
 on_load:
+  - script.execute:
+      id: set_page_title
+      title: "${page_title | default('Bilde')}"
+      icon: ""
   - script.execute: epaper_hide_chrome
   - script.execute: epaper_next_image
 on_unload:

@@ -34,6 +34,7 @@ esp32:
       loop_task_stack_size: 16384
       assertion_level: DISABLE
       enable_lwip_assert : false
+      flash_chip: boya
     sdkconfig_options:
       # Caching Optimizations
       CONFIG_ESP32S3_DATA_CACHE_64KB: "y"

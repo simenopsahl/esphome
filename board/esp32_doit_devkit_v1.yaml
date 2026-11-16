@@ -26,6 +26,7 @@ esp32:
       compiler_optimization: PERF
       sram1_as_iram: true
       minimum_chip_revision: 3.1
+      flash_chip: generic
 
 esphome:
   project:

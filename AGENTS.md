@@ -192,6 +192,21 @@ riscv32-esp-elf-addr2line -pfiaC -e C:\Users\simen\.esphome_build\<device>\build
 4. **Sensor Aggregation Pattern**:
    - Environmental sensors feed into `temperature_local`, `humidity_local`, and `pressure_local` templates via `sources:`.
    - In device YAMLs, extend `temperature_local` and add active sensor sources under `sources: - source: <sensor_id>`.
+5. **ESP-IDF Flash Chip Driver (`flash_chip`)**:
+   - When working on an ESP32-family device whose board file (`board/<board>.yaml`) does not specify `flash_chip:` under `esp32 > framework > advanced`, check the device logs to identify and set it (`generic`, `gd`, `issi`, `mxic`, `winbond`, `boya`, `th`, or `mxic_opi` for ESP32-S3 with `flash_mode: opi`).
+   - Naming the vendor drops unused SPI flash drivers, saving ~1 KB of IRAM on original ESP32 and 2–3 KB of IRAM on ESP32-S3 (plus ~124 B DRAM per driver).
+   - **How to identify**: Leave `flash_chip` unset on a new board first. When `dump_config` runs (both at boot over USB serial `COM<N>` and when connecting via Wi-Fi/OTA `esphome logs --device <IP>`), ESPHome logs a warning with the exact value to use:
+     ```text
+     [W][app:...]: Set flash_chip: gd under esp32 > framework > advanced to save IRAM
+     ```
+   - Once identified from the log, add it to `board/<board>.yaml`:
+     ```yaml
+     esp32:
+       framework:
+         advanced:
+           flash_chip: <vendor>
+     ```
+   - Never guess `flash_chip` before checking the logs, especially on boards using `qio`/`qout` flash modes where an incorrect vendor driver can prevent flash initialization at startup.
 
 ---
 

@@ -6,6 +6,12 @@ esphome:
       then:
         - script.execute: go_home
 
+script:
+  # Optional post-navigation hook (extended by `gui/epaper/base.yaml` to trigger `update_screen`)
+  - id: on_page_navigate
+    then:
+      - lambda: ""
+
 button:
   # Previous page button
   - platform: template
@@ -16,6 +22,7 @@ button:
     on_press:
       - then:
           - lvgl.page.previous:
+          - script.execute: on_page_navigate
   # Home page button
   - platform: template
     id: btn_home_page
@@ -25,6 +32,7 @@ button:
     on_press:
       - then:
           - script.execute: go_home
+          - script.execute: on_page_navigate
   # Next page button
   - platform: template
     id: btn_next_page
@@ -34,12 +42,12 @@ button:
     on_press:
       - then:
           - lvgl.page.next:
+          - script.execute: on_page_navigate
 
 text_sensor:
-  # Current page text sensor
-  - platform: lvgl
+  # Current page text sensor (updated by `set_page_title` in chrome/base & epaper/base)
+  - platform: template
     id: sensor_current_page
-    widget: lbl_page_title
     name: "Current page"
     icon: mdi:page-layout-header
     entity_category: diagnostic

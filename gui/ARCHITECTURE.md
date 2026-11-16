@@ -1,6 +1,9 @@
 # Modular LVGL GUI Architecture
 
-This directory (`gui/`) implements a resolution-independent, package-based LVGL user interface system for ESPHome displays ranging from tiny `128×128` LCDs to `480×800` / `800×480` touch panels.
+This directory (`gui/`) implements two complementary, resolution-independent, package-based LVGL user interface systems for ESPHome displays:
+
+1. **LCD / Touch LVGL Engine (`gui/main.yaml`)**: For backlit LCDs and touchscreens ranging from `128×128` to `480×800` / `800×480`.
+2. **e-Paper LVGL Engine (`gui/epaper/base.yaml`)**: For monochrome, 4-color BWRY, 6-color Spectra 6, and 16-grayscale e-Paper displays ranging from `200×200` (CoreInk / Air Quality) up to `1872×1404` (reTerminal E1003).
 
 For general ESPHome LVGL widget and layout syntax rules, see [`gui/LVGL_REFERENCE.md`](file:///x:/esphome/gui/LVGL_REFERENCE.md).
 
@@ -10,28 +13,67 @@ For general ESPHome LVGL widget and layout syntax rules, see [`gui/LVGL_REFERENC
 
 ```text
 gui/
-  ├── main.yaml               # Unified responsive LVGL entry point (pages, theme, styles, chrome)
-  ├── <W>x<H>.yaml            # Thin resolution stubs (set screen_width/screen_height and include main.yaml)
+  ├── main.yaml               # Unified responsive LCD LVGL entry point (pages, theme, styles, chrome)
+  ├── <W>x<H>.yaml            # Thin LCD resolution stubs (set screen_width/screen_height and include main.yaml)
   ├── 5x5.yaml                # Standalone config for 5×5 RGB LED matrix displays
-  ├── common/                 # Global top_layer chrome & system overlays
+  ├── common/                 # Global LCD top_layer chrome & system overlays
   │     ├── chrome/
   │     │     ├── base.yaml   # Chrome height/padding math & safe no-op `set_page_title` script
   │     │     ├── header.yaml # Top status bar (`titlebar`: Wi-Fi, page title/icon, clock, HA status)
   │     │     └── footer.yaml # Bottom touch navigation bar (`navbar`: Prev, Home, Next)
   │     ├── boot_screen/      # Boot splash overlay (`widget.yaml` + `sensors.yaml`)
   │     └── ota_screen/       # OTA progress bar overlay (`widget.yaml` + `sensors.yaml`)
+  ├── epaper/                 # Modular LVGL engine for e-Paper panels (`lvgl_comp` + `display_eink`)
+  │     ├── base.yaml         # Core e-Paper LVGL engine, on-demand refresh pipeline & overlays
+  │     ├── _defaults.yaml    # Lowest-priority fallback substitutions (`display.*`, `epaper_nav_pad_*`)
+  │     ├── chrome/           # Top-layer status bar & hardware bezel key hints
+  │     │     ├── status_bar.yaml      # Header/footer bar (`@ HH:MM`, Wi-Fi/HA badges, page icon/title)
+  │     │     ├── nav_coreink.yaml     # M5Stack CoreInk dial hints (rotation-aware: 0/90/180/270)
+  │     │     ├── nav_crowpanel.yaml   # Elecrow CrowPanel 5-key bezel hints (rotation-aware)
+  │     │     ├── nav_reterminal.yaml  # Seeed reTerminal 3-key top bezel hints (rotation-aware)
+  │     │     ├── nav_zectrix.yaml     # Zectrix Note4C touch navigation bar
+  │     │     └── nav_none.yaml        # No-op navigation stub (`epaper.nav: none`)
+  │     ├── fonts/            # Responsive 5-tier e-Paper font sizing (`bw.yaml` 1-bit & `color_gray.yaml` 4-bit)
+  │     │     ├── _fonts.yaml          # Shared font size math (`font_xs`..`font_fl`, `mdi_sm`..`mdi_xl`)
+  │     │     ├── bw.yaml              # 1-bit sharp monochrome wrapper (`epaper_font_bpp: "1"`)
+  │     │     ├── color_gray.yaml      # 4-bit anti-aliased wrapper (`epaper_font_bpp: "4"`)
+  │     │     └── glyphs.yaml          # e-Paper MDI glyph subset
+  │     ├── pages/            # Full-screen e-Paper pages (`page.yaml` + optional `sensors.yaml`)
+  │     │     ├── info/                # Default diagnostic info page (`page_info`, included by `base.yaml`)
+  │     │     ├── temperature/         # Unified room/device temperature page (`page.yaml` + `local.yaml`)
+  │     │     ├── air_quality/         # M5Stack Air Quality multi-sensor grid (`page_air_quality`)
+  │     │     ├── weather_station/     # 3-graph + forecast weather station (`page_content` for CrowPanel)
+  │     │     ├── content/             # Multi-column dashboard (`page_content` for reTerminal E1001/E1002/E1003)
+  │     │     └── image/               # Full-screen photo/art frame (`page_image_1`, `page_image_2`)
+  │     ├── sections/         # Reusable e-Paper layout sections & data bindings
+  │     │     ├── rolling_graph/       # 12-hour 36-slot polyline graph (`section`, `_core`, `remote_series`, `local`, `remote`, `ha_attr`, `ha_series`)
+  │     │     ├── weather_header/      # Current weather icon + condition + high/low summary
+  │     │     ├── weather_forecast/    # Multi-slot weather forecast strip
+  │     │     ├── nordpool_graph/      # 48-slot NordPool electricity price bar graph + stats
+  │     │     ├── bus_departures/      # Real-time public transit departure rows
+  │     │     ├── car_status/          # EV battery SoC, range, charging & lock status
+  │     │     └── folloren/            # Recycle bin collection schedule & status
+  │     ├── styles/
+  │     │     └── main.yaml            # Shared e-Paper LVGL `style_definitions`
+  │     └── themes/           # e-Paper color palettes & 5th-refresh anti-ghosting polarity inversion
+  │           ├── _base.yaml           # Shared palette colors & `apply_epaper_theme_refresh` script
+  │           ├── lvgl_theme.yaml      # Base LVGL widget theme for e-Paper
+  │           ├── bw.yaml              # 1-bit Black & White theme (`invert_every_5th: "true"`)
+  │           ├── bwry4.yaml           # 4-color Black/White/Red/Yellow theme (`invert_accents: "false"`)
+  │           ├── spectra6.yaml        # 6-color Spectra 6 theme (`invert_every_5th: "false"`)
+  │           └── gray16.yaml          # 16-level Grayscale theme (`invert_every_5th: "false"`)
   ├── fonts/
-  │     ├── main.yaml         # 5-tier responsive font sizing (`font_sm`..`font_fl`, `mdi_sm`..`mdi_xxl`)
+  │     ├── main.yaml         # 5-tier responsive LCD font sizing (`font_sm`..`font_fl`, `mdi_sm`..`mdi_xxl`)
   │     └── glyphs.yaml       # Material Design Icons (MDI) codepoints included across all `mdi_*` sizes
-  ├── functions/              # Reusable behavioral packages & fragments
+  ├── functions/              # Reusable LVGL behavioral packages & fragments (LCD & e-Paper)
   │     ├── control_auto_display.yaml  # Presence-based backlight dimming & auto-off
-  │     ├── control_navigation.yaml    # HA page navigation buttons & `sensor_current_page`
+  │     ├── control_navigation.yaml    # HA page navigation buttons, `on_page_navigate` & `sensor_current_page`
   │     ├── swipe_navigation.yaml      # Left/right touch swipe page navigation fragment
   │     ├── anti_burn_in.yaml          # Pixel-shift antiburn helper
   │     ├── number_sensor.yaml         # Bind an arbitrary LVGL label to a Home Assistant numeric sensor
   │     └── text_sensor.yaml           # Bind an arbitrary LVGL label to a Home Assistant text sensor
-  ├── img/                    # Image & SVG assets (boot logo, weather condition icons)
-  ├── pages/                  # Full-screen LVGL pages (`page.yaml` + optional `sensors.yaml`)
+  ├── img/                    # Image & SVG assets (boot logo, weather condition icons, `eink/` assets)
+  ├── pages/                  # Full-screen LCD LVGL pages (`page.yaml` + optional `sensors.yaml`)
   │     ├── clock/            # Analog/digital clock page (standard)
   │     ├── temperature/      # Room temperature page (standard; includes `local.yaml` & `remote.yaml`)
   │     ├── nordpool/         # NordPool electricity price graph page (standard)
@@ -42,13 +84,13 @@ gui/
   │     ├── air_quality/      # CO2 / PM1 / PM2.5 / PM10 hardware module page (opt-in via `board/module/`)
   │     ├── cc1101/           # Sub-GHz radio / wMBus water meter pages (`async`, `packet`, `wmbus`)
   │     └── dual_kmeter/      # Dual thermocouple hot-water tank graphic page (`page_kmeter`)
-  ├── styles/                 # Shared LVGL `style_definitions:` (loaded via `!include_dir_merge_list styles`)
+  ├── styles/                 # Shared LCD LVGL `style_definitions:` (loaded via `!include_dir_merge_list styles`)
   │     ├── page_styles.yaml      # `- id: page_style` (reserves `page_pad_top` & `page_pad_bottom` for chrome)
   │     └── container_styles.yaml # `- id: container_style` (100%x100% transparent content area with padding)
-  ├── themes/                 # LVGL widget theme & color palettes
+  ├── themes/                 # LCD LVGL widget theme & color palettes
   │     ├── main.yaml             # Default styling for `button`, `obj` (card surface), `label`, `arc`, etc.
   │     └── colors_*.yaml         # Color palette definitions (`colors_night_owl.yaml`, `colors.yaml`, etc.)
-  └── tiles/                  # Modular dashboard tiles that `!extend` `page_dashboard`
+  └── tiles/                  # Modular LCD dashboard tiles that `!extend` `page_dashboard`
         ├── binary_sensor/    # `local.yaml` & `remote.yaml` (read-only on/off indicator tile)
         ├── button/           # `local.yaml` & `remote.yaml` (stateless action/service trigger tile)
         ├── climate/          # `local.yaml` & `remote.yaml` (live setpoint/action tile -> opens `page_climate`)
@@ -172,14 +214,111 @@ packages:
 
 ---
 
-## 5. Authoring Checklist for New Pages & Tiles
+## 5. E-Paper LVGL Architecture (`gui/epaper/`)
+
+While `gui/main.yaml` drives continuous-refresh color LCD/MIPI panels, [`gui/epaper/base.yaml`](file:///x:/esphome/gui/epaper/base.yaml) provides a dedicated, power-aware LVGL subsystem tailored for bistable e-Paper displays (`200x200` M5Stack CoreInk / AirQuality, `400x300` CrowPanel 4.2", `800x480` Waveshare 7.5").
+
+### A. On-Demand Refresh Pipeline (`gui/epaper/base.yaml`)
+
+Unlike LCD panels that redraw at 30–60 FPS, e-Paper panels have slow physical waveform transitions (1–4 seconds) and degrade if refreshed continuously:
+
+1. **Paused by Default**:
+   - `lvgl_comp` initializes with `paused: true`, `update_interval: never`, and `on_draw_end: - lvgl.pause: { id: lvgl_comp }`.
+   - Sensor updates modify LVGL widget states in memory (`lvgl.label.update`, `lvgl.line.update`, etc.) without triggering a physical SPI e-Paper transfer.
+2. **Single-Frame `update_screen` Script**:
+   - Triggered on scheduled intervals (e.g., `on_time` every 5 minutes), physical navigation buttons, Home Assistant navigation actions (`btn_previous_page`, `btn_home_page`, `btn_next_page` via `control_navigation.yaml`'s `on_page_navigate` hook), or initial boot data arrival (`epaper_boot_overlay`).
+   - Increments `recorded_display_refresh`, runs `apply_epaper_theme_refresh` (which optionally inverts foreground/background colors every 5th refresh when `display.invert_every_5th: "true"` to prevent ghosting) and `epaper_refresh_status` (updating the header/footer clock and connectivity icons), resumes `lvgl_comp` for one render cycle, and calls `component.update: display_eink`.
+3. **Home Assistant Page State & Remote Navigation (`control_navigation.yaml`)**:
+   - [`gui/epaper/base.yaml`](file:///x:/esphome/gui/epaper/base.yaml) includes [`gui/functions/control_navigation.yaml`](file:///x:/esphome/gui/functions/control_navigation.yaml), exposing `btn_previous_page`, `btn_home_page`, `btn_next_page`, and `sensor_current_page` cleanly to Home Assistant just like LCD devices.
+   - Because `set_page_title` publishes the plain text `title` to `sensor_current_page` (template text sensor) rather than scraping display label glyphs, Home Assistant always receives readable page titles even on compact 200×200 header layouts that display only an icon.
+   - `epaper/base.yaml` defines `go_home` (`animation: NONE, time: 0ms`) and extends `on_page_navigate` to run `update_screen` when HA navigation buttons are pressed, while boot `go_home` skips refreshing so `epaper_boot_overlay` waits cleanly for initial data.
+4. **Ghosting Scrubbing (`repair_script`)**:
+   - Activated via `button_screen_repair` or a scheduled maintenance cron.
+   - Cycles full-screen black and white fills on `epaper_scrubber_overlay` (`top_layer`) across three physical display updates before restoring the active page.
+
+---
+
+### B. Substitution Hierarchy & Package Inclusion
+
+Board configurations (e.g., [`board/m5stack_coreink.yaml`](file:///x:/esphome/board/m5stack_coreink.yaml), [`board/elecrow_crowpanel_epaper.yaml`](file:///x:/esphome/board/elecrow_crowpanel_epaper.yaml)) only need to include **`epaper: !include ../gui/epaper/base.yaml`**. All theme, font, navigation chrome, default info page, and HA `control_navigation` packages are pulled in automatically by `base.yaml` using two substitution namespaces:
+
+1. **Package Selectors (`epaper.*`)** — Must be literal strings in board/device configs because ESPHome's `do_packages_pass` expands `!include` paths in a single non-recursive pass:
+   - `epaper.theme`: `"bw"`, `"bwry4"`, `"spectra6"`, or `"gray16"`. Includes `gui/epaper/themes/${epaper.theme}.yaml`.
+   - `epaper.fonts`: `"bw"` (1-bpp crisp fonts) or `"color_gray"` (4-bpp anti-aliased fonts). Includes `gui/epaper/fonts/${epaper.fonts}.yaml`.
+   - `epaper.nav`: `"coreink"`, `"crowpanel"`, `"reterminal"`, `"zectrix"`, or `"none"`. Includes `gui/epaper/chrome/nav_${epaper.nav}.yaml` (which sets `epaper_nav_pad_*` margins and renders side/top button hint ticks).
+
+2. **Display & Page Options (`display.*`)** — Mirrors the LCD LVGL substitution convention:
+   - `display.rotation`: `"0"`, `"90"`, `"180"`, or `"270"`. Automatically swaps `_ep_w` / `_ep_h` logical canvas dimensions on `90°`/`270°` rotations.
+   - `display.home_page`: ID of the page shown on boot (default `"page_info"`, or `"page_local"` / `"page_room"` / `"page_content"`).
+   - `display.buffer_size`: LVGL draw buffer fraction (default `"100%"`).
+   - `display.invert_every_5th`: `"true"` or `"false"` (periodic full-screen polarity inversion).
+   - `display.invert_accents`: `"true"` or `"false"` (high-contrast black fill on cards/headers).
+   - `display.chrome.header`: `"true"` or `"false"` (top status bar visibility).
+   - `display.chrome.status_in_footer`: `"true"` or `"false"` (compact bottom status bar for 200×200 displays without a top header).
+   - `display.page.temperature.area_label`: Room title displayed on `page_temperature` (default `"Local"`).
+   - `display.page.info.*`: Controls optional diagnostic rows and physical button hints on the built-in `page_info` (`skip`, `show_battery_pct`, `show_battery_volt`, `show_temp`, `show_humidity`, `show_sd`, `hint_1`, `hint_2`, `hint_3`).
+   - `display.page.image.{dir,type}`: Source directory and image encoding for SD/flash image slideshow pages.
+
+3. **Why [`gui/epaper/_defaults.yaml`](file:///x:/esphome/gui/epaper/_defaults.yaml) Exists**:
+   - In ESPHome, a parent file's `substitutions:` block overrides all `substitutions:` blocks of files it includes under `packages:`.
+   - By placing fallback defaults inside `_defaults.yaml` and including it **first** in `base.yaml`'s `packages:` map (`epaper_defaults: !include _defaults.yaml`), `themes/${epaper.theme}.yaml` and `chrome/nav_${epaper.nav}.yaml` can override default colors and nav padding, while board and root device YAMLs override everything.
+   - Time source selection (`_ep_time_id`) is derived automatically from `${device.rtc}` (`time_rtc` when `device.rtc == "true"`, otherwise `time_homeassistant`).
+
+---
+
+### C. E-Paper Pages, Sections & Rolling Graphs
+
+1. **Built-in `page_info` (`gui/epaper/pages/info/`)**:
+   - Included automatically by `base.yaml` (`epaper_info_page` + `epaper_info_sensors`).
+   - Displays device name, IP, MAC, RSSI, uptime, refresh counter, and board-configured battery/sensor/SD rows and physical button hints. Set `display.page.info.skip: "true"` on single-page devices to omit it from navigation.
+
+2. **Full-Screen Pages (`gui/epaper/pages/<name>/`)**:
+   - **`temperature/`**: Unified 200×200 temperature + humidity + 12h rolling graph layout (`page.yaml` + `local.yaml`) shared across CoreInk and AirQuality devices. Optionally displays a secondary top row (e.g., CO₂ ppm on AirQuality or secondary room sensor) and min/max/avg footer stats.
+   - **`air_quality/`**: Multi-metric indoor air quality page (`SEN55` / `SCD40` CO₂, PM, VOC, NOx, temp, humidity).
+   - **`weather_station/`**: Full 800×480 dashboard combining header, weather forecast, room temperature cards, NordPool electricity prices, and calendar/transit sections.
+   - **`content/`**: Composable container page (`gui/epaper/pages/content/page.yaml`) for medium/large panels (such as the 400×300 CrowPanel 4.2") where individual `gui/epaper/sections/*` widgets are placed via `lvgl: !extend` or package includes.
+   - **`image/`**: Full-screen image/poster viewer (`page.yaml` + `sd_card.yaml`).
+
+3. **Modular Sections (`gui/epaper/sections/<name>/`)**:
+   - Reusable widget blocks (`clock`, `weather`, `temperatures`, `power_price`, `transport`, `calendar`, `sun`, `air_quality_bar`, `rolling_graph`) split into `section.yaml` (LVGL layout) and `sensors.yaml` (HA sensors & update scripts).
+
+4. **12-Hour Rolling Polyline Graphs (`gui/epaper/sections/rolling_graph/`)**:
+   - Renders a 36-point historical polyline (`line` widget) with dynamic min/max Y-axis scaling, dashed average reference line, and min/max/avg summary labels (`_core.yaml`).
+   - **Data Sources**:
+     - `remote_series.yaml` (**Preferred for HA entities**): Calls Home Assistant's `script.esphome_get_rolling_graph_data` via `homeassistant.action` (`capture_response: true`), parsing `response["response"]["csv"]` (36 comma-separated statistics samples over 12 hours at 20-minute intervals) into `id(${uid}_buf)`. Triggered once on `epaper_on_api_connected` and every `20min` (`sample_interval`) to avoid continuous script polling.
+     - `local.yaml` / `remote.yaml`: Samples a live local or remote sensor into a ring buffer on the ESP32 every `sample_interval` (default `20min`).
+     - `ha_attr.yaml` / `ha_series.yaml`: Legacy attribute/state CSV importers from `sensor.epaper_data_temperatures`.
+
+---
+
+### D. Virtual `host-sdl` Preview for E-Paper
+
+You can build and preview any e-Paper resolution natively via WSL + Windows X11/WSLg without physical hardware:
+
+```powershell
+# 200x200 (defaults to CoreInk nav, rotation 90, page_room)
+pwsh tools/host_sdl/host-sdl.ps1 run -Epaper -Size 200x200
+
+# 400x300 (CrowPanel 4.2" layout)
+pwsh tools/host_sdl/host-sdl.ps1 run -Epaper -Size 400x300
+
+# Capture screenshot of the active host-sdl window
+pwsh tools/host_sdl/host-sdl.ps1 screenshot
+```
+
+---
+
+## 6. Authoring Checklist for New Pages & Tiles
 
 1. **Page Boilerplate**:
-   - Every page in `gui/pages/<name>/page.yaml` should set `styles: page_style`, call `script.execute: { id: set_page_title, title: ..., icon: ... }` in `on_load:`, and include `<<: !include ../../functions/swipe_navigation.yaml`.
+   - Every LCD page in `gui/pages/<name>/page.yaml` should set `styles: page_style`, call `script.execute: { id: set_page_title, title: ..., icon: ... }` in `on_load:`, and include `<<: !include ../../functions/swipe_navigation.yaml`.
    - Wrap the page's main body in a `- container:` with `styles: container_style`.
+   - Every e-Paper page in `gui/epaper/pages/<name>/page.yaml` should compute its layout using `epaper_header_h`, `epaper_footer_h`, `epaper_pad_x`, `epaper_pad_y`, and `epaper_nav_pad_*` (from `gui/epaper/base.yaml`) so it automatically respects top header (`display.chrome.header`), bottom footer (`display.chrome.status_in_footer`), and side button hint margins (`epaper_nav_pad_*`).
 2. **Jinja Substitution Rules in ESPHome**:
    - Do not reference one computed Jinja substitution inside another computed Jinja substitution in the same `substitutions:` block (ESPHome evaluates them in a single pass before chained expressions resolve). Write each formula directly in terms of `screen_width`, `screen_height`, `page_pad_top/bottom`, and `container_pad_*`.
+   - In `packages:` `!include` paths, only reference literal string substitutions (e.g. `${epaper.theme}`), never chained substitutions, because `do_packages_pass` runs a single non-recursive `substitute()` pass.
    - In inline YAML lambdas, never write an unquoted ternary `a ? b : c` on a single line (YAML parses `:` as a mapping key); always use a block scalar (`!lambda |-`).
+   - In `homeassistant.action` `data:` maps, wrap substituted numeric parameters in `!lambda 'return "${hours | default("12")}";'` so ESPHome's Jinja evaluator does not coerce them into `EInt` and fail `cv.string_strict`.
    - In raw `lvgl.label.update` `format:` strings (when not using C++ lambdas), always escape literal percent signs as `%%`. In sensor tiles, inline lambdas handle unit concatenation automatically so `unit: "%"` is safe as-is.
 3. **Font Glyphs**:
-   - Whenever a new MDI icon `\U000Fxxxx` is used in a page or tile, add its codepoint to [`gui/fonts/glyphs.yaml`](file:///x:/esphome/gui/fonts/glyphs.yaml) so it is compiled into `mdi_sm`..`mdi_xxl`.
+   - Whenever a new MDI icon `\U000Fxxxx` is used in an LCD or e-Paper page or tile, add its codepoint to [`gui/fonts/glyphs.yaml`](file:///x:/esphome/gui/fonts/glyphs.yaml) so it is compiled into `mdi_sm`..`mdi_xxl` and into the e-Paper font definitions in [`gui/epaper/fonts/_fonts.yaml`](file:///x:/esphome/gui/epaper/fonts/_fonts.yaml), [`gui/epaper/fonts/bw.yaml`](file:///x:/esphome/gui/epaper/fonts/bw.yaml), and [`gui/epaper/fonts/color_gray.yaml`](file:///x:/esphome/gui/epaper/fonts/color_gray.yaml).

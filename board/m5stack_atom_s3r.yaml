@@ -52,6 +52,7 @@ esp32:
   cpu_frequency: 240MHz
   framework:
     advanced:
+      flash_chip: gd
       compiler_optimization: PERF
       execute_from_psram: true
     sdkconfig_options:

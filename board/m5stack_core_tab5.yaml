@@ -72,6 +72,7 @@ esp32:
       compiler_optimization: PERF
       execute_from_psram: true
       enable_idf_experimental_features: true
+      flash_chip: generic
     sdkconfig_options:
       # Cache optimizations for display graphics
       CONFIG_ESP32S3_DATA_CACHE_64KB: y

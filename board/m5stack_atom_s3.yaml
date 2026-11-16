@@ -44,6 +44,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
+      flash_chip: gd
     sdkconfig_options:
       # Cache optimizations for reading graphics/fonts directly from Flash
       CONFIG_ESP32S3_DATA_CACHE_64KB: y

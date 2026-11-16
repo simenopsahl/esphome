@@ -48,6 +48,7 @@ esp32:
       compiler_optimization: PERF
       ignore_efuse_custom_mac: true
       sram1_as_iram: true
+      flash_chip: generic
 
 api:
   # Enable custom Home Assistant services for EHMTXv2

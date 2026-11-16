@@ -9,6 +9,11 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
 
+logger:
+  logs:
+    motion: WARN
+    bmi270: WARN
+
 # Six-axis BMI270 IMU
 motion:
   - platform: bmi270

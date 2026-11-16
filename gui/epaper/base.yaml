@@ -11,6 +11,7 @@ packages:
   epaper_nav: !include chrome/nav_${epaper.nav}.yaml
   epaper_chrome: !include chrome/status_bar.yaml
   epaper_info: !include pages/info/sensors.yaml
+  control_navigation: !include ../functions/control_navigation.yaml
 
 substitutions:
   epaper:
@@ -84,7 +85,7 @@ esphome:
             condition:
               lambda: 'return id(data_updated) && id(initial_data_received);'
         - lvgl.widget.hide: epaper_boot_overlay
-        - lvgl.page.show: ${display.home_page}
+        - script.execute: go_home
         - script.execute: update_screen
 
 binary_sensor:
@@ -139,15 +140,32 @@ time:
                 - script.execute: update_screen
 
 script:
-  # Safe no-op defaults extended by `gui/epaper/chrome/status_bar.yaml`
+  - id: go_home
+    then:
+      - lvgl.page.show:
+          id: ${display.home_page}
+          animation: NONE
+          time: 0ms
+
+  - id: !extend on_page_navigate
+    then:
+      - script.execute: update_screen
+
+  # Safe base defaults extended by `gui/epaper/chrome/status_bar.yaml`
   - id: set_page_title
     parameters:
       title: string
       icon: string
     then:
       - lambda: |-
-          (void) title;
           (void) icon;
+      - if:
+          condition:
+            lambda: 'return !title.empty();'
+          then:
+            - text_sensor.template.publish:
+                id: sensor_current_page
+                state: !lambda 'return title;'
 
   - id: epaper_refresh_status
     mode: single

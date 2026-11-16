@@ -7,6 +7,10 @@ substitutions:
     internal:
       i2c_bus: i2c_internal
 
+logger:
+  logs:
+    mpu6886: WARN
+
   # Built-in 6-axis (IMU) that also includes a temperature sensor
 sensor:
   - platform: mpu6886

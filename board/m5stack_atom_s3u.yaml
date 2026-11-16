@@ -31,6 +31,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
+      flash_chip: gd
     type: ${device.framework.type}
 
 #i2s_audio:

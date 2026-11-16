@@ -38,6 +38,7 @@ esp32:
     type: ${device.framework.type}
     advanced:
       sram1_as_iram: true
+      flash_chip: generic
 
 # Pins for Waveshare ePaper ESP Board
 spi:

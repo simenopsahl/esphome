@@ -324,9 +324,10 @@ lvgl:
       pad_top: 32
       pad_bottom: 32
       on_load:
-        - lvgl.label.update:
-            id: lbl_page_title
-            text: IMU
+        - script.execute:
+            id: set_page_title
+            title: "IMU"
+            icon: "\U000F0D49" # axis-arrow
       <<: !include
         file: ../gui/functions/swipe_navigation.yaml
       widgets:

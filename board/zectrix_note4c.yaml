@@ -66,6 +66,7 @@ esp32:
     advanced:
       compiler_optimization: PERF
       execute_from_psram: true
+      flash_chip: generic
     type: ${device.framework.type}
 
 esphome:

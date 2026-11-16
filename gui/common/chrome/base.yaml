@@ -54,14 +54,21 @@ substitutions:
   container_pad_right: ${ 2 if (screen_width|int) <= 240 else (4 if (screen_width|int) <= 320 else 6) }
 
 script:
-  # Safe no-op by default so pages can always call `set_page_title` even when
-  # `gui/chrome/header.yaml` is omitted.
+  # Updates Home Assistant's `sensor_current_page` with the plain text `title` and acts
+  # as a safe base script so pages can always call `set_page_title` even when
+  # `gui/common/chrome/header.yaml` is omitted.
   - id: set_page_title
     parameters:
       title: string
       icon: string
     then:
       - lambda: |-
-          (void) title;
           (void) icon;
+      - if:
+          condition:
+            lambda: 'return !title.empty();'
+          then:
+            - text_sensor.template.publish:
+                id: sensor_current_page
+                state: !lambda 'return title;'
 
