@@ -5,41 +5,48 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_atom_s3r.yaml
-#  i2c_int: !include extension/internal_i2c.yaml
-#  grove: !include board/extension/grove_i2c.yaml
-#  env: !include board/module/hat_env_iii.yaml
-  media_player: !include features/media_player.yaml
+  extension: !include board/extension/port_abc_i2c.yaml
+  env: !include board/module/unit_env_iv.yaml
+  pir: !include board/module/unit_pir.yaml
 
   # --- FEATURE PACKAGES ---
-#  combined_env_sensors: !include features/combined_env_sensors.yaml
+  combined_env_sensors: !include features/combined_env_sensors.yaml
 
   # --- GUI PACKAGES ---
   colors: !include gui/themes/colors_night_owl.yaml
   lvgl: !include gui/128x128.yaml
 
   # --- LVGL WIDGET PACKAGES ---
-  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
-    uid: room_temp_value,
-    entity_id: sensor.t22_temperature
-  }}
+  room_temperature_widget_sensors:
+    !include {
+      file: gui/functions/number_sensor.yaml,
+      vars: { uid: room_temp_value, entity_id: sensor.etg2_bod_tc_heatindex },
+    }
+  fridge_temperature_widget_sensors:
+    !include {
+      file: gui/functions/number_sensor.yaml,
+      vars: { uid: fridge_temp_value, entity_id: sensor.etg2_bod_kjoleskap_temp_temperature },
+    }
+  freezer_temperature_widget_sensors:
+    !include {
+      file: gui/functions/number_sensor.yaml,
+      vars: { uid: freezer_temp_value, entity_id: sensor.etg2_bod_fryser_temp_temperature },
+    }
 
 substitutions:
   common:
-#    log_level: DEBUG
+#    log_level: WARN
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3r-0387f4
     location: "Storage"
     framework:
       type: esp-idf
+  module:
+    pir_in_pin: ${pin.ext.gpio.port_abc.in}
+    env_i2c_bus: i2c_port_abc
   display:
-    home_page: page_imu
-    page:
-      temperature:
-        area_label: T22
-  feature:
-    audio:
-      hardware_module: atomic_voice_pyramid.yaml
+    home_page: page_temperature
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -63,7 +70,7 @@ binary_sensor:
 
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: binary_sensor.etg2_simen_occupancy
+    entity_id: binary_sensor.etg2_bod_occupancy
     id: presence1
   - platform: homeassistant
     entity_id: binary_sensor.etg2_gang_occupancy
@@ -93,6 +100,130 @@ lvgl:
       line_dash_gap: 4
       line_color: c_yellow
   pages:
+    - id: !remove page_temperature
+    - id: page_temperature
+      styles: page_style
+      on_load:
+        - script.execute:
+            id: set_page_title
+            title: "Temperatur"
+            icon: "\U000F0510" # thermometer-lines
+      <<: !include
+        file: gui/functions/swipe_navigation.yaml
+      widgets:
+        - container:
+            styles: container_style
+            align: CENTER
+            layout:
+              type: FLEX
+              flex_flow: COLUMN
+              flex_align_cross: CENTER
+              flex_align_main: SPACE_EVENLY
+              flex_align_track: CENTER
+              pad_column: 0
+              pad_row: 0
+            widgets:
+              - container:
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_cross: CENTER
+                    flex_align_main: SPACE_AROUND
+                    pad_column: 0
+                    pad_row: 0
+                  widgets:
+                    # Fridge temperature
+                    - container:
+                        width: SIZE_CONTENT
+                        height: SIZE_CONTENT
+                        layout:
+                          type: FLEX
+                          flex_flow: COLUMN
+                          flex_align_main: CENTER
+                          flex_align_cross: START
+                          flex_align_track: START
+                          pad_column: 0
+                          pad_row: 0
+                        widgets:
+                          # Fridge icon
+                          - label:
+                              id: fridge_temp_icon
+                              text: "\U000F0292" # fridge-bottom
+                              pad_all: 0
+                              text_font: mdi_sm
+                              text_color: c_pink
+                          # Fridge temperature value
+                          - label:
+                              id: fridge_temp_value_widget_text
+                              text: "-°C"
+                              pad_all: 0
+                              text_font: font_sm
+                              text_color: c_text_p
+                    # Room temperature value
+                    - label:
+                        id: room_temp_value_widget_text
+                        text: "--°C"
+                        pad_all: 0
+                        text_font: font_fl
+                        text_color: c_text_p
+                        text_align: CENTER
+                    # Freezer temperature
+                    - container:
+                        width: SIZE_CONTENT
+                        height: SIZE_CONTENT
+                        layout:
+                          type: FLEX
+                          flex_flow: COLUMN
+                          flex_align_main: CENTER
+                          flex_align_cross: END
+                          flex_align_track: END
+                          pad_column: 0
+                          pad_row: 0
+                        widgets:
+                          # Freezer icon
+                          - label:
+                              id: freezer_temp_icon
+                              text: "\U000F0291" # fridge-top
+                              pad_all: 0
+                              text_font: mdi_sm
+                              text_color: c_blue
+                          # Freezer temperature value
+                          - label:
+                              id: freezer_temp_value_widget_text
+                              text: "-°C"
+                              pad_all: 0
+                              text_font: font_sm
+                              text_color: c_text_p
+
+              - container:
+                  height: SIZE_CONTENT
+                  layout:
+                    type: FLEX
+                    flex_flow: ROW
+                    flex_align_cross: CENTER
+                    flex_align_main: SPACE_AROUND
+                    pad_column: 0
+                    pad_row: 0
+                  widgets:
+                    - label: # thermometer icon
+                        id: room_temp_icon
+                        text: "\U000F050F"
+                        pad_all: 0
+                        text_font: mdi_lg
+                        text_color: c_text_s
+                    - label: # area
+                        id: room_temp_area
+                        text: "Rom"
+                        pad_all: 0
+                        text_font: font_lg
+                        text_color: c_text_s
+                    - label: # temperature unit
+                        id: room_temp_unit
+                        text: "°C"
+                        pad_all: 0
+                        text_font: font_lg
+                        text_color: c_text_s
     - id: page_imu
       styles: page_style
       on_load:
@@ -200,8 +331,8 @@ sensor:
       script.execute: update_motion
 
   # Combine sensors
-#  - id: !extend temperature_local
-#    sources:
+  - id: !extend temperature_local
+    sources:
       # Base BTC
 #      - source: temperature_sht30_base_btc
       # HAT ENV III
@@ -211,15 +342,15 @@ sensor:
 #      - source: temperature_sht30_unit_env
 #      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
-#      - source: temperature_bmp280_unit_env
-#      - source: temperature_sht40_unit_env
+      - source: temperature_bmp280_unit_env
+      - source: temperature_sht40_unit_env
       # Unit ENV Pro
 #      - source: temperature_bme688
       # Unit CO2
 #      - source: temperature_scd40_unit_co2
 
-#  - id: !extend humidity_local
-#    sources:
+  - id: !extend humidity_local
+    sources:
       # Base BTC
 #      - source: humidity_sht30_base_btc
       # HAT ENV III
@@ -227,19 +358,19 @@ sensor:
       # Unit ENV III
 #      - source: humidity_sht30_unit_env
       # Unit ENV IV
-#      - source: humidity_sht40_unit_env
+      - source: humidity_sht40_unit_env
       # Unit ENV Pro
 #      - source: humidity_bme688
       # Unit CO2
 #      - source: humidity_scd40_unit_co2
 
-#  - id: !extend pressure_local
-#    sources:
+  - id: !extend pressure_local
+    sources:
       # HAT ENV III
 #      - source: pressure_qmp6988_hat_env
       # Unit ENV III
 #      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
-#      - source: pressure_bmp280_unit_env
+      - source: pressure_bmp280_unit_env
       # Unit ENV Pro
 #      - source: pressure_bme688
