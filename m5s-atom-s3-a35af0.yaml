@@ -71,11 +71,3 @@ lvgl:
   buffer_size: 15%
   rotation: 180
 
-display:
-  - id: !extend display_lcd
-    dimensions:
-      offset_height: 1
-      offset_width: 2
-#    transform:
-#      mirror_x: true
-#      mirror_y: true
