@@ -12,7 +12,9 @@ packages:
 substitutions:
   display:
     home_page: page_content
-    rotation: "0" # "0" = 400x300 landscape; set "270" for 300x400 portrait (matching waveshare-weather-station)
+    rotation: "90" # 90 = 300x400 portrait with bezel nav buttons along top edge
+    chrome:
+      header: "false"
   common:
     log_level: DEBUG
 #    log_baud_rate: "115200"
