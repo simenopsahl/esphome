@@ -96,7 +96,7 @@ lvgl:
         file: gui/pages/grid_dashboard/page.yaml
         vars:
           page_title: "Kontrollpanel"
-          layout: 4x6
+          layout: 4x5
     - <<: !include
         file: gui/pages/climate/page.yaml
         vars:
