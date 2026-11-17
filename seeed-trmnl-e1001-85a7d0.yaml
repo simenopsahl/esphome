@@ -21,7 +21,7 @@ substitutions:
       type: esp-idf
   display:
     home_page: page_content
-    rotation: "90"
+    rotation: "270"
     chrome:
       header: "false"
 
