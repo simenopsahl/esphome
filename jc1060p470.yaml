@@ -1,32 +1,122 @@
-# Board: Guition ESP32-P4-M3-Dev
-# Definition: definitions/boards/guition_esp32_p4_m3_dev/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+
+  # --- BOARD AND MODULES ---
+  board: !include board/jc1060p470ciwy.yaml
+  media_player: !include features/media_player.yaml
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/main.yaml
+  
+  # --- LVGL PAGE & WIDGET PACKAGES ---
+  tile_climate: !include
+    file: gui/tiles/climate/remote.yaml
+    vars:
+      uid: heatpump
+      row: 0
+      col: 0
+      row_span: 1
+      col_span: 2          # e.g. span across both columns in row 0, or 1 for a single cell
+      entity_id: climate.faircon_norgespumpa12_proxy
+      title: "Varmepumpe"
+      icon: "\U000F1A43"
+  tile_outdoor_temp_sensor: !include
+    file: gui/tiles/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_outdoor_temp
+      row: 1
+      col: 0
+      icon: "\U000F0595"
+      title: "Ute"
+      entity_id: sensor.ute_temperature
+      unit: "°C"
+      format: "%.1f"
+      click_page: page_temperature
+  tile_t22_temp_sensor: !include
+    file: gui/tiles/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_t22_temp
+      row: 1
+      col: 1
+      icon: "\U000F050F"
+      title: "T22"
+      entity_id: sensor.t22_temperature
+      unit: "°C"
+      format: "%.1f"
+      click_page: page_weather
+  tile_flip_clock: !include
+    file: gui/tiles/clock/flip_clock.yaml
+    vars:
+      uid: flip_clock
+      row: 2
+      col: 0
+      row_span: 1
+      col_span: 2
+      show_date: true
+      
+  room_temp_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+
+substitutions:
+  common:
+    log_level: DEBUG
+#    log_baud_rate: "115200"
+  device:
+    name: jc1060p470
+    location: "Storage"
+    framework:
+      type: esp-idf
+  display:
+    home_page: page_dashboard
+    page:
+      temperature:
+        area_label: T22
 
 esphome:
-  name: jc1060p470
-  friendly_name: jc1060p470
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
+  area: ${device.location}
 
-esp32:
-  variant: esp32p4
-  engineering_sample: true
-  framework:
-    type: esp-idf
+wifi:
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.70.34
 
-logger:
-  hardware_uart: USB_SERIAL_JTAG
+lvgl:
+  pages:
+    - <<: !include
+        file: gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_title: "Kontrollpanel"
+          layout: 4x2
+    - <<: !include
+        file: gui/pages/climate/page.yaml
+        vars:
+          page_title: "Varmepumpe"
 
-api:
-  encryption:
-    key: "tSgg0sDOqDyQG5EAuKa/zBy11KB3Mce67h4dr80VqX4="
-
-ota:
-  - platform: esphome
-
-ethernet:
-  clk:
-    mode: CLK_EXT_IN
-    pin: GPIO50
-  mdc_pin: GPIO31
-  mdio_pin: GPIO52
-  phy_addr: 1
-  power_pin: GPIO51
-  type: IP101
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_simen_occupancy
+    id: presence1
+  - platform: homeassistant
+    entity_id: binary_sensor.etg2_gang_occupancy
+    id: presence2
+  # Turn on display while room is occupied
+  - id: !extend presence_detected
+    lambda: !lambda |-
+      if ( (id(presence1).state) or (id(presence2).state) ) {
+        return true;
+      } else {
+        return false;
+      }
