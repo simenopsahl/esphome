@@ -1,0 +1,32 @@
+# Board: Guition ESP32-P4-M3-Dev
+# Definition: definitions/boards/guition_esp32_p4_m3_dev/manifest.yaml
+
+esphome:
+  name: jc1060p470
+  friendly_name: jc1060p470
+
+esp32:
+  variant: esp32p4
+  engineering_sample: true
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+api:
+  encryption:
+    key: "tSgg0sDOqDyQG5EAuKa/zBy11KB3Mce67h4dr80VqX4="
+
+ota:
+  - platform: esphome
+
+ethernet:
+  clk:
+    mode: CLK_EXT_IN
+    pin: GPIO50
+  mdc_pin: GPIO31
+  mdio_pin: GPIO52
+  phy_addr: 1
+  power_pin: GPIO51
+  type: IP101
