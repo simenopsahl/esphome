@@ -21,9 +21,9 @@ substitutions:
       type: esp-idf
   display:
     home_page: page_content
-    rotation: "0"
+    rotation: "270"
     chrome:
-      footer: "false"
+      header: "false"
 
 esphome:
   comment: ${device.model} @ ${device.location}
