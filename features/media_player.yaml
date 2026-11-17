@@ -220,6 +220,26 @@ media_player:
       - id: speaker_enable_sound
         file: ${feature.audio.sound_file_speaker_enable | default(sound_file_speaker_enable_default)}
 
+button:
+  - platform: template
+    id: play_test_sound
+    name: Play Test Sound
+    icon: "mdi:bug-play"
+    entity_category: config
+    disabled_by_default: true
+    on_press:
+      - if:
+          condition:
+            - lambda: 'return !id(init_in_progress);'
+            - lambda: 'return id(boot_chime_done);'
+            - lambda: 'return !id(mic_disabled);'
+            - switch.is_on: amp_enable
+          then:
+            - script.execute:
+                id: play_sound
+                priority: false
+                sound_file: !lambda return id(speaker_enable_sound);
+
 switch:
   - id: !extend amp_enable
     on_turn_on:

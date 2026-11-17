@@ -1,0 +1,326 @@
+labels: [esp32p4, psram, JC1060P470, display, i2c]
+---
+# https://github.com/jtenniswood/espcontrol/blob/main/devices/guition-esp32-p4-jc1060p470-v3/device/device.yaml
+# https://github.com/agillis/esphome-modular-lvgl-buttons/blob/main/hardware/guition-esp32-p4-jc1060p470-v2.yaml
+# Schematic reference: "esphome/pinmap/schematics/esp32p4 jc1060p470.pdf"
+# Base functions for:
+# Guition module ESP32-P4 & ESP32-C6 jc1060p470c_i_w_y V3 (1024x600 7.0" display and camera)
+#
+
+# Pins for this model
+packages:
+  pins: !include pins/jc1060p470ciwy.yaml
+  i2c_int: !include extension/internal_i2c.yaml
+  status_led: !include ../features/system_status_led.yaml
+  audio: !include
+    file: module/audio/${feature.audio.hardware_module | default("jc1060p470ciwy_audio.yaml")}
+    condition: ${feature_audio_enabled | default("false")}
+
+substitutions:
+  screen_width: "1024"
+  screen_height: "600"
+  extension:
+    i2c:
+      internal:
+        frequency: 400kHz
+  device:
+    model: 'Guition 7.0"'
+    board: jc1060p470ciwy
+    rmt_symbols_block: 48
+    framework:
+      type: esp-idf
+    psram: 'true'
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
+  feature:
+    audio:
+      hardware_module: jc1060p470ciwy_audio.yaml
+
+esphome:
+  project:
+    name: 'Guition.7,0" 1024x600'
+    version: "1.0.0"
+
+esp32:
+# ESP32-P4R32 (Dual-core, 360MHz)
+# PSRAM: 32MB
+  variant: esp32p4
+  engineering_sample: false
+  flash_size: 16MB
+  cpu_frequency: 360MHz
+  framework:
+    advanced:
+      flash_chip: generic
+      compiler_optimization: PERF
+      execute_from_psram: true
+      enable_idf_experimental_features: true
+    sdkconfig_options:
+      # Memory allocation for large RGB graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+      CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG: y
+    type: ${device.framework.type}
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+esp_ldo:
+  # DSI Panel Power
+  - channel: 3
+    voltage: 2.5V
+  # SD Card Power
+  - channel: 4
+    voltage: 2.7V
+
+psram:
+  mode: hex
+  speed: 200MHz
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+preferences:
+  flash_write_interval: 5min
+
+http_request:  # Needed by esp32_hosted-update and any JSON stuff
+  buffer_size_rx: 2048
+
+# Network hardware
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  reset_pin: ${pin.int.c6_hosted.rst}
+  clk_pin: ${pin.int.c6_hosted.clk}
+  cmd_pin: ${pin.int.c6_hosted.cmd}
+  d0_pin: ${pin.int.c6_hosted.d0}
+  d1_pin: ${pin.int.c6_hosted.d1}
+  d2_pin: ${pin.int.c6_hosted.d2}
+  d3_pin: ${pin.int.c6_hosted.d3}
+  use_psram: true
+  # The V2 panel shows a fixed band of vertical streaks whenever the ESP32-C6
+  # SDIO link runs fast enough to interfere with the MIPI-DSI stream. 10MHz
+  # removes it (verified upstream on a JC1060P470C_I_W_Y / P4 rev 1.3 unit);
+  # the default is 40MHz. Note this halves the link budget the original panel
+  # keeps for camera transfers, so camera throughput here is untested.
+  sdio_frequency: 10MHz
+
+# network:
+#   priority:
+#     - wifi
+#     - ethernet
+
+# ethernet:
+#   type: IP101
+#   mdc_pin: ${pin.ext.ethernet.mdc}
+#   mdio_pin: ${pin.ext.ethernet.mdio}
+#   power_pin: ${pin.ext.ethernet.pwr}
+#   clk:
+#     pin: ${pin.ext.ethernet.clk}
+#     mode: CLK_EXT_IN
+#   phy_addr: 1
+
+# Firmware update for esp32_hosted ESP32-C6
+update:
+  - platform: esp32_hosted
+    name: "C6 CoProcessor Update"
+    icon: mdi:chip
+    type: http
+    source: https://esphome.github.io/esp-hosted-firmware/manifest/esp32c6.json
+    update_interval: 6h
+
+# Internal outputs
+output:
+  # Backlight LED
+  - platform: ledc
+    id: backlight_output
+    pin: ${pin.disp.bl}
+    frequency: 100Hz
+    inverted: false
+    max_power: 0.8 # To prevent overheating due to excessive lighting
+
+light:
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 100ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    channel_colors: GRB
+    pin: ${pin.light.rgb}
+    num_leds: 1
+    rmt_symbols: ${device.rmt_symbols_block}
+    chipset: ws2812
+    effects:
+      - pulse:
+      - strobe:
+      - strobe:
+          name: "Slow Blink" # 200ms on, 1500ms off
+          colors:
+            - state: true
+              brightness: 25%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 500ms
+              transition_length: 500ms
+            - state: false
+              duration: 2000ms
+              transition_length: 1000ms
+    default_transition_length: 100ms
+    initial_state:
+      state: true
+      brightness: 50%
+      color_brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
+    name: "LED"
+    entity_category: config
+
+# Touchscreen
+touchscreen:
+  - platform: gt911
+    i2c_id: i2c_internal
+    id: touchscreen_gt911
+    display: display_lcd
+    reset_pin: ${pin.touch.rst}
+    interrupt_pin: ${pin.touch.int}
+    transform:
+      swap_xy: false
+      mirror_x: false
+      mirror_y: false
+    on_touch:
+      - logger.log:
+          tag: "Touch"
+          level: INFO
+          format: Touch %d at (%d, %d)
+          args: [ 'touch.id', 'touch.x', 'touch.y' ]
+
+# Special LVGL settings required for this display
+lvgl:
+  byte_order: little_endian
+# Some screens need little_endian byte order and some need big_endian
+# this sets the byte order for all the images loaded in this file and the packages as well
+image:
+  defaults:
+    byte_order: little_endian
+
+display:
+  - platform: mipi_dsi
+    id: display_lcd
+    auto_clear_enabled: false
+    update_interval: 10s
+    model: CUSTOM
+    dimensions:
+      height: ${device.screen.height}
+      width: ${device.screen.width}
+    color_order: RGB
+    # Panel LCD_RST is GPIO0 on the JC1060P470C_I_W_Y schematic (FPC1 pin 4).
+    # This differs from the original profile: a wrong reset pin also suppresses
+    # ESPHome's software reset, so a warm reboot (flash, OTA, restart) keeps the
+    # previous firmware's panel registers until the next power cycle.
+    reset_pin: ${pin.disp.rst}
+    # Initialise the panel before the backlight restores its state (light setup
+    # runs at priority ~799); an un-initialised JD9165 shows a bright lavender
+    # field, so the backlight must not come on before init.
+    setup_priority: 850
+    pixel_mode: 16bit
+    color_depth: 16
+    lanes: 2
+    lane_bit_rate: 750Mbps
+    pclk_frequency: 52MHz
+    hsync_pulse_width: 24
+    hsync_back_porch: 136
+    hsync_front_porch: 160
+    vsync_pulse_width: 2
+    vsync_back_porch: 21
+    vsync_front_porch: 12
+    # JD9165 vendor init for the 2026 "New Panel" (Guition rear label "V2").
+    # Source: Guition JC1060P470C_I_W_Y.zip (2026-07-13), 1-Demo/.../JC1060P470C_I_W_Y_New_Panel/lvgl_demo_v8/src/lcd/esp_lcd_jd9165.{c,h}
+    # ESPHome appends PIXFMT/MADCTL/INVOFF/SLPOUT/DISPON, so do not add 0x3A,
+    # 0x36 or 0x29 here. The 0x11 at the end of the table IS deliberate; see the
+    # comment there before removing it.
+    init_sequence:
+      # Load-bearing: the JD9165 needs 120 ms after reset before it accepts the
+      # vendor table. ESPHome holds only SLPOUT until 120 ms after reset
+      # (mipi_dsi.cpp), not the vendor table, so the wait has to be declared
+      # here. Without it the panel comes up white on a warm reboot (A/B tested
+      # on hardware); a cold boot survives, having had power-on settling time.
+      - delay 120ms
+      - [0x30, 0x00]
+      - [0xF7, 0x49, 0x61, 0x02, 0x00]
+      - [0x30, 0x01]
+      - [0x04, 0x0C]
+      - [0x05, 0x08]
+      - [0x0B, 0x11]
+      - [0x20, 0x04]
+      - [0x1F, 0x05]
+      - [0x23, 0x38]
+      - [0x28, 0x18]
+      - [0x29, 0x29]
+      - [0x2A, 0x01]
+      - [0x2B, 0x29]
+      - [0x2C, 0x01]
+      - [0x30, 0x02]
+      - [0x00, 0x05]
+      - [0x01, 0x22]
+      - [0x02, 0x08]
+      - [0x03, 0x12]
+      - [0x04, 0x16]
+      - [0x05, 0x64]
+      - [0x06, 0x00]
+      - [0x07, 0x00]
+      - [0x08, 0x78]
+      - [0x09, 0x00]
+      - [0x0A, 0x04]
+      - [0x0B, 0x16, 0x17, 0x0B, 0x0D, 0x0D, 0x0D, 0x11, 0x10, 0x07, 0x07, 0x09]
+      - [0x0C, 0x09, 0x1E, 0x1E, 0x1C, 0x1C, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D]
+      - [0x0D, 0x0A, 0x05, 0x0B, 0x0D, 0x0D, 0x0D, 0x11, 0x10, 0x06, 0x06, 0x08]
+      - [0x0E, 0x08, 0x1F, 0x1F, 0x1D, 0x1D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D]
+      - [0x0F, 0x0A, 0x05, 0x0D, 0x0B, 0x0D, 0x0D, 0x11, 0x10, 0x1D, 0x1D, 0x1F]
+      - [0x10, 0x1F, 0x08, 0x08, 0x06, 0x06, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D]
+      - [0x11, 0x16, 0x17, 0x0D, 0x0B, 0x0D, 0x0D, 0x11, 0x10, 0x1C, 0x1C, 0x1E]
+      - [0x12, 0x1E, 0x09, 0x09, 0x07, 0x07, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D]
+      - [0x13, 0x00, 0x00, 0x00, 0x00]
+      - [0x14, 0x00, 0x00, 0x41, 0x41]
+      - [0x15, 0x00, 0x00, 0x00, 0x00]
+      - [0x17, 0x00]
+      - [0x18, 0x85]
+      - [0x19, 0x06, 0x09]
+      - [0x1A, 0x05, 0x08]
+      - [0x1B, 0x0A, 0x04]
+      - [0x26, 0x00]
+      - [0x27, 0x00]
+      - [0x30, 0x06]
+      - [0x12, 0x3F, 0x25, 0x27, 0x35, 0x1D, 0x1B, 0x1B, 0x1A, 0x18, 0x0A, 0x2A, 0x21, 0x19, 0x30]
+      - [0x13, 0x3F, 0x26, 0x27, 0x35, 0x1E, 0x1C, 0x1C, 0x1A, 0x18, 0x0B, 0x2A, 0x21, 0x19, 0x30]
+      - [0x30, 0x0A]
+      - [0x02, 0x4F]
+      - [0x0B, 0x40]
+      - [0x30, 0x0D]
+      - [0x0D, 0x04]
+      - [0x10, 0x05]
+      - [0x11, 0x0C]
+      - [0x12, 0x05]
+      - [0x13, 0x0C]
+      - [0x30, 0x00]
+      # Deliberate SLPOUT, kept for vendor-timing fidelity rather than because
+      # it is required: Guition's driver waits 120 ms between sleep-out and
+      # display-on, while ESPHome appends its own SLPOUT and then DISPON only
+      # ~10 ms later. Issuing it here plus the delay gives DISPON that margin.
+      # Isolation testing showed the leading delay above is what actually
+      # rescues the warm boot; this pair alone does not, and dropping it alone
+      # still booted cleanly on the test unit. Retained because the full
+      # firmware's boot timing differs from that minimal test.
+      - [0x11]
+      - delay 120ms

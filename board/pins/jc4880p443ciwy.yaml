@@ -1,5 +1,5 @@
 ---
-# PINs for Guition module ESP32-P4 & ESP32-C6 with 4.3" display and camera (JC4880P443C_I_W_Y)
+# PINs for Guition module ESP32-P4 & ESP32-C6 jc4880p443c_i_w_y (800x480 4.3" display and camera)
 # Model:  esp32-p4 n16r32 + esp32c6
 # FLASH:  16MB
 # PSRAM:  32MB

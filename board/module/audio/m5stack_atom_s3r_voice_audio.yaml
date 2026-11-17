@@ -62,3 +62,17 @@ switch:
     icon: "mdi:volume-high"
     entity_category: config
 
+binary_sensor:
+  - id: !extend btn_front
+    on_press:
+      - if:
+          condition:
+            - lambda: 'return !id(init_in_progress);'
+            - lambda: 'return id(boot_chime_done);'
+            - lambda: 'return !id(mic_disabled);'
+            - switch.is_on: amp_enable
+          then:
+            - script.execute:
+                id: play_sound
+                priority: false
+                sound_file: !lambda return id(speaker_enable_sound);

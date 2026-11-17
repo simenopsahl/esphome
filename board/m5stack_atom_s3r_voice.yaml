@@ -33,7 +33,7 @@ substitutions:
   feature:
     audio:
       hardware_module: m5stack_atom_s3r_voice_audio.yaml
-      volume_initial: "0.8"
+      volume_initial: "0.9"
 
 esphome:
   project:
@@ -48,6 +48,7 @@ esp32:
   cpu_frequency: 240MHz
   framework:
     advanced:
+      flash_chip: gd
       compiler_optimization: PERF
       execute_from_psram: true
     type: ${device.framework.type}
