@@ -1,6 +1,7 @@
 packages:
   # --- COMMON PACKAGES ---
   <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
 
   # --- BOARD AND MODULES ---
   board: !include board/jc1060p470ciwy.yaml
@@ -17,7 +18,7 @@ packages:
       uid: heatpump
       row: 0
       col: 0
-      row_span: 1
+      row_span: 2
       col_span: 2          # e.g. span across both columns in row 0, or 1 for a single cell
       entity_id: climate.faircon_norgespumpa12_proxy
       title: "Varmepumpe"
@@ -27,7 +28,7 @@ packages:
     vars:
       page_id: page_dashboard
       uid: tile_outdoor_temp
-      row: 1
+      row: 2
       col: 0
       icon: "\U000F0595"
       title: "Ute"
@@ -40,7 +41,7 @@ packages:
     vars:
       page_id: page_dashboard
       uid: tile_t22_temp
-      row: 1
+      row: 2
       col: 1
       icon: "\U000F050F"
       title: "T22"
@@ -52,13 +53,13 @@ packages:
     file: gui/tiles/clock/flip_clock.yaml
     vars:
       uid: flip_clock
-      row: 2
-      col: 0
-      row_span: 1
-      col_span: 2
+      row: 1
+      col: 4
+      row_span: 2
+      col_span: 3
       show_date: true
-      
-  room_temp_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
+
+  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
@@ -75,9 +76,6 @@ substitutions:
       type: esp-idf
   display:
     home_page: page_dashboard
-    page:
-      temperature:
-        area_label: T22
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -93,12 +91,13 @@ wifi:
     static_ip: 192.168.70.34
 
 lvgl:
+  buffer_size: 75%
   pages:
     - <<: !include
         file: gui/pages/grid_dashboard/page.yaml
         vars:
           page_title: "Kontrollpanel"
-          layout: 4x2
+          layout: 3x7
     - <<: !include
         file: gui/pages/climate/page.yaml
         vars:
