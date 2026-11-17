@@ -18,8 +18,8 @@ packages:
       uid: heatpump
       row: 0
       col: 0
-      row_span: 2
-      col_span: 2          # e.g. span across both columns in row 0, or 1 for a single cell
+      row_span: 3
+      col_span: 2   # e.g. span across both columns in row 0, or 1 for a single cell
       entity_id: climate.faircon_norgespumpa12_proxy
       title: "Varmepumpe"
       icon: "\U000F1A43"
@@ -28,7 +28,7 @@ packages:
     vars:
       page_id: page_dashboard
       uid: tile_outdoor_temp
-      row: 2
+      row: 3
       col: 0
       icon: "\U000F0595"
       title: "Ute"
@@ -41,7 +41,7 @@ packages:
     vars:
       page_id: page_dashboard
       uid: tile_t22_temp
-      row: 2
+      row: 3
       col: 1
       icon: "\U000F050F"
       title: "T22"
@@ -54,7 +54,7 @@ packages:
     vars:
       uid: flip_clock
       row: 1
-      col: 4
+      col: 2
       row_span: 2
       col_span: 3
       show_date: true
@@ -63,7 +63,6 @@ packages:
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
-
 
 substitutions:
   common:
@@ -97,7 +96,7 @@ lvgl:
         file: gui/pages/grid_dashboard/page.yaml
         vars:
           page_title: "Kontrollpanel"
-          layout: 3x7
+          layout: 4x6
     - <<: !include
         file: gui/pages/climate/page.yaml
         vars:
