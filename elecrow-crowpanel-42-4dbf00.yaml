@@ -10,12 +10,11 @@ packages:
   epaper_content: !include gui/epaper/pages/weather_station/sensors.yaml
 
 substitutions:
-  panel_width: "400"
-  panel_height: "300"
   display:
     home_page: page_content
+    rotation: "0" # "0" = 400x300 landscape; set "270" for 300x400 portrait (matching waveshare-weather-station)
   common:
-    log_level: debug
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     model: "Elecrow CrowPanel 4,2in"
