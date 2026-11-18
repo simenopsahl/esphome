@@ -1,7 +1,7 @@
 substitutions:
   name: everything-presence-pro-e65644
   friendly_name: EPP-e65644
-  log_level: "ERROR"
+  log_level: ERROR
   device_config:
     bluetooth_enabled: true
   device:
@@ -38,7 +38,7 @@ esp32_ble:
 esp32_ble_tracker:
   scan_parameters:
     interval: 500ms
-    window: 10ms
+    window: 15ms
 bluetooth_proxy:
   active: false
   connection_slots: 1
