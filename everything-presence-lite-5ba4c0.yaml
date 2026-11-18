@@ -1,7 +1,7 @@
 substitutions:
   name: everything-presence-lite-5ba4c0
   friendly_name: EPL-5ba4c0
-  log_level: ERROR
+  log_level: WARN
   device_config:
     bluetooth_enabled: true
   device:
