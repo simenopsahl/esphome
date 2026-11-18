@@ -23,9 +23,6 @@ substitutions:
   display:
     rotation: "0"
     home_page: page_content
-    page:
-      image:
-        type: GRAYSCALE
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -75,7 +72,12 @@ select:
           else if (x == "DU4") mode = it8951::UPDATE_MODE_DU4;
           else if (x == "A2") mode = it8951::UPDATE_MODE_A2;
           id(display_eink).set_update_mode(static_cast<uint16_t>(mode));
-          ESP_LOGI("e1003_test", "Selected update_mode=%s (enum=%u)", x.c_str(), static_cast<unsigned>(mode));
+          ESP_LOGI("e1003_test", "Selected update_mode=%s (enum=%u) - pre-clearing IT8951 buffer to white first", x.c_str(), static_cast<unsigned>(mode));
+          if (mode != it8951::UPDATE_MODE_INIT) {
+            id(display_eink).clear();
+            id(display_eink).update_mode(it8951::UPDATE_MODE_GC16);
+          }
+      - delay: 2500ms
       - script.execute: update_screen
 
 number:
@@ -86,7 +88,7 @@ number:
     entity_category: config
     optimistic: true
     restore_value: false
-    initial_value: 360
+    initial_value: 390
     min_value: 0
     max_value: 1600
     step: 10
