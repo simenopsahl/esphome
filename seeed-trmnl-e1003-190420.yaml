@@ -23,6 +23,9 @@ substitutions:
   display:
     rotation: "0"
     home_page: page_content
+    page:
+      image:
+        type: GRAYSCALE
 
 esphome:
   comment: ${device.model} @ ${device.location}
