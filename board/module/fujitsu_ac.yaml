@@ -33,6 +33,7 @@ esphome:
     - id: sub_device_ac
       name: norgespumpa 12
       area_id: area_hallway
+      relation: via
 
 external_components:
   - source: github://plains203/fujitsuac_esphome

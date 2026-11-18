@@ -21,9 +21,10 @@ substitutions:
 
   # Flat internal bridges for cross-package ESPHome Jinja expressions
   _ep_rtc: "${device.rtc}"
-  _ep_time_id: ${ "time_rtc" if _ep_rtc == "true" else "time_homeassistant" }
+  _ep_time_id: ${ _ep_defer if "$" in (device.rtc|string) else ("time_rtc" if (device.rtc|string) == "true" else "time_homeassistant") }
   _ep_rotation: "${display.rotation}"
   _ep_show_header: "${display.chrome.header}"
+  _ep_show_footer: "${display.chrome.footer}"
   _ep_status_in_footer: "${display.chrome.status_in_footer}"
   _ep_temp_area_label: "${display.page.temperature.area_label}"
   _ep_info_skip: "${display.page.info.skip}"
@@ -37,18 +38,22 @@ substitutions:
   _ep_info_hint_3: "${display.page.info.hint_3}"
 
   # Effective logical screen dimensions after display.rotation
-  screen_width: ${ panel_height if (_ep_rotation|string) in ["90", "270"] else panel_width }
-  screen_height: ${ panel_width if (_ep_rotation|string) in ["90", "270"] else panel_height }
+  screen_width: ${ _ep_defer if "$" in (display.rotation|string) else (panel_height if (display.rotation|string) in ["90", "270"] else panel_width) }
+  screen_height: ${ _ep_defer if "$" in (display.rotation|string) else (panel_width if (display.rotation|string) in ["90", "270"] else panel_height) }
 
   # Responsive chrome geometry derived from logical display dimensions
   epaper_header_h: >-
-    ${ 24 if ([screen_width|int, screen_height|int]|max) <= 240 else
+    ${ _ep_defer if "$" in (display.chrome.header|string) else
+       (0 if (display.chrome.header|string) == "false" else
+       (24 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (34 if ([screen_width|int, screen_height|int]|min) <= 300 else
-       (44 if ([screen_width|int, screen_height|int]|max) <= 960 else 88)) }
+       (44 if ([screen_width|int, screen_height|int]|max) <= 960 else 88)))) }
   epaper_footer_h: >-
-    ${ 20 if ([screen_width|int, screen_height|int]|max) <= 240 else
+    ${ _ep_defer if "$" in (display.chrome.footer|string) else
+       (0 if (display.chrome.footer|string) == "false" else
+       (20 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (26 if ([screen_width|int, screen_height|int]|min) <= 300 else
-       (32 if ([screen_width|int, screen_height|int]|max) <= 960 else 56)) }
+       (32 if ([screen_width|int, screen_height|int]|max) <= 960 else 56)))) }
   epaper_pad_x: >-
     ${ 4 if ([screen_width|int, screen_height|int]|max) <= 240 else
        (14 if ([screen_width|int, screen_height|int]|max) <= 400 else

@@ -17,6 +17,7 @@ substitutions:
     nordpool_entity: "sensor.epaper_data_nordpool_future_offset"
     chrome:
       header: "true"
+      footer: "true"
       status_in_footer: "false"
     page:
       temperature:
@@ -33,7 +34,9 @@ substitutions:
         hint_3: ""
       image:
         dir: "gui/img/eink"
+        ext: "png"
         type: "RGB565"
+        invert_alpha: "false"
 
   # Overridden by bezel nav packages (e.g. nav_coreink, nav_crowpanel, nav_reterminal)
   epaper_nav_pad_top: "0"

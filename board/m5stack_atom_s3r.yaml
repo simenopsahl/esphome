@@ -21,6 +21,7 @@ substitutions:
   screen_height: "128"
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
+  imu_bmm150_enabled: "true"
   feature_audio_module: atomic_voice_base.yaml
   module:
     internal:
@@ -78,38 +79,32 @@ spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
 
-external_components:
-  - source: github://m5stack/esphome-yaml/components
-    components: [ lp5562 ]
-
 lp5562:
   i2c_id: ${module.internal.i2c_bus}
   id: led_lp5562
-  use_internal_clk: true
-  high_pwm_freq: true
   logarithmic_dimming: true
-#  red_current: 15.5
-#  green_current: 16.5
-#  blue_current: 22.5
-  white_current: 17.5
 
 output:
   - platform: lp5562
     lp5562_id: led_lp5562
     id: lp5562_red_channel
     channel: red
+#    current: 15.5mA
   - platform: lp5562
     lp5562_id: led_lp5562
     id: lp5562_green_channel
     channel: green
+#    current: 16.5mA
   - platform: lp5562
     lp5562_id: led_lp5562
     id: lp5562_blue_channel
     channel: blue
+#    current: 22.5mA
   - platform: lp5562
     lp5562_id: led_lp5562
     id: lp5562_white_channel
     channel: white
+    current: 17.5mA
 
 light:
   # White

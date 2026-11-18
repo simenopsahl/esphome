@@ -65,6 +65,7 @@ esp32:
   framework:
     advanced:
       compiler_optimization: PERF
+      flash_chip: generic
     type: ${device.framework.type}
 
 psram:

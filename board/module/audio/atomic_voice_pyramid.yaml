@@ -70,7 +70,7 @@ api:
     - script.execute: control_leds
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: [ aw87559, si5351, pyramidrgb, pyramidtouch]
 
 # Si5351 programmable clock generator

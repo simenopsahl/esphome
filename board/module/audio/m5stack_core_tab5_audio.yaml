@@ -23,10 +23,6 @@ esphome:
   on_boot:
     - priority: -100
       then:
-        # Route ES8388 DAC output to LINE1 for the onboard speaker
-        - select.set:
-            id: dac_output
-            option: "LINE1"
         # Push the mic gain restored from flash into the ES7210. The codec boots
         # with `mic_gain` from audio_adc, so without this a saved value would show
         # in HA while the hardware sat at the default.
@@ -68,13 +64,14 @@ audio_dac:
     address: 0x10
     id: dac_es8388
 
-# DAC Output is routed to `LINE1` at boot (priority -100) for the onboard speaker
+# DAC Output is routed to `LINE1` by default for the onboard speaker
 select:
   - platform: es8388
     id: select_es8388
     dac_output:
       id: dac_output
       name: "DAC Output"
+      initial_option: "LINE1"
       entity_category: config
       disabled_by_default: true
     adc_input_mic:

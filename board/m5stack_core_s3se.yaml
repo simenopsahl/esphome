@@ -119,7 +119,7 @@ spi:
 #    scan: true
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: [ axp2101, aw9523b ]
 
 # IO Expander

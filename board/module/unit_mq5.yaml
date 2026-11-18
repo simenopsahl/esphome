@@ -16,7 +16,7 @@ globals:
     initial_value: '250.0'
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: m5stack_unit_mq
 
 # UNIT MQ-5

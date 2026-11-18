@@ -44,7 +44,10 @@ substitutions:
     fonts: color_gray
     nav: reterminal
   display:
+    buffer_size: "25%"
     home_page: "page_info"
+    chrome:
+      footer: "false"
     page:
       info:
         hint_1: "KEY0 GPIO3: Grønn"
@@ -55,6 +58,11 @@ substitutions:
         show_temp: "true"
         show_humidity: "true"
         show_sd: "true"
+      image:
+        dir: "gui/img"
+        ext: "jpg"
+        type: "GRAYSCALE"
+        invert_alpha: "true"
   device:
     model: "Seeed reTerminal E1003"
     rtc: "true"
@@ -112,6 +120,12 @@ esphome:
               lambda: return id(init_in_progress);
             then:
               - lambda: id(init_in_progress) = false;
+
+esp32:
+  framework:
+    advanced:
+      flash_chip: winbond
+      execute_from_psram: false
 
 api:
   on_client_connected:

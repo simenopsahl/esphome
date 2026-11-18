@@ -78,6 +78,11 @@ substitutions:
         p7: gpio20 # SCL
         p8: gpio19 # SDA
 
+esp32:
+  framework:
+    advanced:
+      flash_chip: winbond
+
 esphome:
   project:
     name: "Seeed.reTerminal E1001"

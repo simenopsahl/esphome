@@ -107,7 +107,6 @@ http_request: # Needed by esp32_hosted-update and any JSON stuff
 # Network hardware
 esp32_hosted:
   variant: ESP32C6
-  active_high: true
   reset_pin: ${pin.int.c6_hosted.rst}
   clk_pin: ${pin.int.c6_hosted.clk}
   cmd_pin: ${pin.int.c6_hosted.cmd}

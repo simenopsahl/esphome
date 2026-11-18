@@ -65,6 +65,7 @@ font:
     file:
       type: gfonts
       family: Noto Sans Display
+      weight: 500
     size: ${text_sm}
     bpp: ${epaper_font_bpp | int}
     glyphs: &epaper-norwegian-glyphs [ ' ', ',', '.', ':', '%', '°', '@', '?', '~', '"', "'", '!', '#', '$', '&', '(', ')',
@@ -79,6 +80,7 @@ font:
     file:
       type: gfonts
       family: Noto Sans Display
+      weight: 500
     size: ${text_md}
     bpp: ${epaper_font_bpp | int}
     glyphs: *epaper-norwegian-glyphs
@@ -87,6 +89,7 @@ font:
     file:
       type: gfonts
       family: Noto Sans Display
+      weight: 500
     size: ${text_lg}
     bpp: ${epaper_font_bpp | int}
     glyphs: *epaper-norwegian-glyphs
@@ -95,6 +98,7 @@ font:
     file:
       type: gfonts
       family: Noto Sans Display
+      weight: 500
     size: ${text_xl}
     bpp: ${epaper_font_bpp | int}
     glyphs: *epaper-norwegian-glyphs
@@ -103,6 +107,7 @@ font:
     file:
       type: gfonts
       family: Noto Sans Display
+      weight: 500
     size: ${text_xxl}
     bpp: ${epaper_font_bpp | int}
     glyphs: *epaper-norwegian-glyphs
@@ -111,7 +116,7 @@ font:
     file:
       type: gfonts
       family: Noto Sans Display
-      weight: 500
+      weight: 600
     size: ${text_hg}
     bpp: ${epaper_font_bpp | int}
     glyphs: *epaper-norwegian-glyphs

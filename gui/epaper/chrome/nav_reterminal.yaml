@@ -6,14 +6,22 @@ substitutions:
   display:
     chrome:
       status_in_footer: "false"
-  epaper_nav_pad_top: "0"
-  epaper_nav_pad_bottom: "0"
+  epaper_nav_pad_top: >-
+    ${ _ep_defer if ("$" in (display.rotation|string) or "$" in (display.chrome.header|string)) else
+       ((64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+       if ((display.rotation|string) == "0" and (display.chrome.header|string) == "false") else "0") }
+  epaper_nav_pad_bottom: >-
+    ${ _ep_defer if ("$" in (display.rotation|string) or "$" in (display.chrome.footer|string)) else
+       ((64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+       if ((display.rotation|string) == "180" and (display.chrome.footer|string) == "false") else "0") }
   epaper_nav_pad_left: >-
-    ${ (64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
-       if (_ep_rotation|string) == "90" else "0" }
+    ${ _ep_defer if "$" in (display.rotation|string) else
+       ((64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+       if (display.rotation|string) == "90" else "0") }
   epaper_nav_pad_right: >-
-    ${ (64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
-       if (_ep_rotation|string) == "270" else "0" }
+    ${ _ep_defer if "$" in (display.rotation|string) else
+       ((64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
+       if (display.rotation|string) == "270" else "0") }
 
 script:
   - id: !extend epaper_hide_chrome
@@ -36,21 +44,21 @@ lvgl:
                else ("BOTTOM_RIGHT" if (_ep_rotation|string) == "270"
                else "TOP_RIGHT")) }
           x: >-
-            ${ (360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+            ${ (390 if ([screen_width|int, screen_height|int]|max) > 960 else 230)
                if (_ep_rotation|string) == "180"
-               else (-(360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+               else (-(390 if ([screen_width|int, screen_height|int]|max) > 960 else 230)
                if (_ep_rotation|string) == "0" else 0) }
           y: >-
-            ${ (360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+            ${ (390 if ([screen_width|int, screen_height|int]|max) > 960 else 230)
                if (_ep_rotation|string) == "90"
-               else (-(360 if ([screen_width|int, screen_height|int]|max) > 960 else 160)
+               else (-(390 if ([screen_width|int, screen_height|int]|max) > 960 else 230)
                if (_ep_rotation|string) == "270" else 0) }
           width: >-
             ${ (64 if ([screen_width|int, screen_height|int]|max) > 960 else 36)
                if (_ep_rotation|string) in ["90", "270"] else "SIZE_CONTENT" }
           height: >-
-            ${ epaper_header_h if (_ep_rotation|string) == "0"
-               else (epaper_footer_h if (_ep_rotation|string) == "180"
+            ${ epaper_header_h if ((_ep_rotation|string) == "0" and (epaper_header_h|int) > 0)
+               else (epaper_footer_h if ((_ep_rotation|string) == "180" and (epaper_footer_h|int) > 0)
                else "SIZE_CONTENT") }
           pad_all: 0
           layout:

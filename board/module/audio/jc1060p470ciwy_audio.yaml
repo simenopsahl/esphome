@@ -40,7 +40,6 @@ audio_dac:
 audio_adc:
   - platform: es7210
     i2c_id: i2c_internal
-    address: 0x32
     id: adc_es7210
     bits_per_sample: 16bit
     sample_rate: 16000

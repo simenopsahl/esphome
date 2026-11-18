@@ -8,7 +8,7 @@ substitutions:
     tmos_i2c_bus: i2c_grove
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: sths34pf80
 
 # UNIT TMOS PIR

@@ -1,0 +1,42 @@
+labels: [BMM150, magnetometer, IMU, motion, i2c]
+---
+# https://esphome.io/components/motion/bmi270/
+# Optional BMM150 3-axis geomagnetic sensor connected via the BMI270 auxiliary I2C interface (0x10).
+# Used on M5Stack AtomS3R and AtomS3R-M12 (9-axis IMU: BMI270 + BMM150).
+
+motion:
+  - id: !extend motion_bmi270
+    aux_device: BMM150
+    aux_address: 0x10
+
+sensor:
+  - platform: bmi270
+    bmi270_id: motion_bmi270
+    type: magnetic_field_x
+    id: motion_mag_x
+    name: "Motion Mag X"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: bmi270
+    bmi270_id: motion_bmi270
+    type: magnetic_field_y
+    id: motion_mag_y
+    name: "Motion Mag Y"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true
+  - platform: bmi270
+    bmi270_id: motion_bmi270
+    type: magnetic_field_z
+    id: motion_mag_z
+    name: "Motion Mag Z"
+    filters:
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 2
+    disabled_by_default: true

@@ -24,6 +24,7 @@ esphome:
     - id: sub_device_water_meter
       name: kamstrup_flowiq2200
       area_id: area_kitchen
+      relation: via
 
 # Enable logging for this component
 logger:

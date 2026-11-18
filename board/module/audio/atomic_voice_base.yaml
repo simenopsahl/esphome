@@ -48,7 +48,7 @@ i2s_audio:
       allow_other_uses: true
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: [ es8311 ]
 
 audio_dac:

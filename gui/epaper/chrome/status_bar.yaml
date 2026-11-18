@@ -7,7 +7,9 @@
 substitutions:
   epaper_header_show_title: ${ "false" if ([screen_width|int, screen_height|int]|max) <= 240 else "true" }
   epaper_header_page_right: ${ "true" if ([screen_width|int, screen_height|int]|max) <= 240 else "false" }
-  epaper_footer_ts_align: ${ "LEFT_MID" if ((screen_width|int) >= 600 and _ep_status_in_footer == "false") else "CENTER" }
+  epaper_footer_show_title: ${ _ep_defer if "$" in (display.chrome.header|string) else ("true" if ((screen_width|int) >= 280 and (display.chrome.header|string) == "false") else "false") }
+  epaper_footer_has_status: ${ _ep_defer if "$" in (display.chrome.header|string) else ("true" if ((display.chrome.status_in_footer|string) == "true" or (display.chrome.header|string) == "false") else "false") }
+  epaper_footer_ts_align: ${ _ep_defer if "$" in (display.chrome.header|string) else ("LEFT_MID" if ((screen_width|int) >= 600 and (display.chrome.status_in_footer|string) == "false" and (display.chrome.header|string) != "false") else "CENTER") }
   epaper_icon_font: ${ "mdi_sm" if ([screen_width|int, screen_height|int]|min) <= 300 else "mdi_md" }
 
 script:
@@ -22,6 +24,19 @@ script:
       - lvgl.label.update:
           id: lbl_ep_page_icon_right
           text: !lambda 'return icon;'
+      - lvgl.label.update:
+          id: lbl_ep_ftr_page_icon
+          text: !lambda 'return icon;'
+      - lvgl.label.update:
+          id: lbl_ep_ftr_page_title
+          text: !lambda 'return title;'
+      - if:
+          condition:
+            lambda: 'return (std::string("${_ep_show_header}") == "false" && ${screen_width|int} >= 280 && (${screen_width|int} >= 360 || title.size() <= 8));'
+          then:
+            - lvgl.widget.show: lbl_ep_ftr_page_title
+          else:
+            - lvgl.widget.hide: lbl_ep_ftr_page_title
 
   - id: !extend epaper_refresh_status
     then:
@@ -34,6 +49,7 @@ script:
             snprintf(buf, sizeof(buf), "@ --:--");
           }
           lv_label_set_text(id(lbl_ep_refresh_time), buf);
+          lv_label_set_text(id(lbl_ep_hdr_refresh_time), buf);
       - if:
           condition:
             lambda: |-
@@ -45,7 +61,7 @@ script:
           then:
             - if:
                 condition:
-                  lambda: 'return (std::string("${_ep_status_in_footer}") == "true");'
+                  lambda: 'return (std::string("${epaper_footer_has_status}") == "true");'
                 then:
                   - lvgl.widget.show: lbl_ep_wifi_ftr
                   - lvgl.widget.hide: lbl_ep_wifi_left
@@ -76,7 +92,7 @@ script:
           then:
             - if:
                 condition:
-                  lambda: 'return (std::string("${_ep_status_in_footer}") == "true");'
+                  lambda: 'return (std::string("${epaper_footer_has_status}") == "true");'
                 then:
                   - lvgl.widget.show: lbl_ep_ha_ftr
                   - lvgl.widget.hide: lbl_ep_ha_hdr
@@ -105,7 +121,11 @@ script:
                   lambda: 'return (${screen_width} > 240 || ${screen_height} > 240);'
                 then:
                   - lvgl.widget.show: ep_header_divider
-      - lvgl.widget.show: ep_footer_bar
+      - if:
+          condition:
+            lambda: 'return std::string("${_ep_show_footer}") == "true";'
+          then:
+            - lvgl.widget.show: ep_footer_bar
 
 lvgl:
   top_layer:
@@ -121,14 +141,10 @@ lvgl:
           hidden: ${ "true" if _ep_show_header == "false" else "false" }
           pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
           pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
-          layout:
-            type: FLEX
-            flex_flow: ROW
-            flex_align_main: SPACE_BETWEEN
-            flex_align_cross: CENTER
           widgets:
             # Left cluster: optional Wi-Fi badge + Page icon + Page title
             - container:
+                align: LEFT_MID
                 width: SIZE_CONTENT
                 height: 100%
                 layout:
@@ -155,8 +171,17 @@ lvgl:
                       text_font: font_md
                       hidden: ${ "false" if epaper_header_show_title == "true" else "true" }
 
+            # Optional centered timestamp when footer is omitted (`display.chrome.footer: "false"`)
+            - label:
+                id: lbl_ep_hdr_refresh_time
+                align: CENTER
+                text: "@ --:--"
+                text_font: font_sm
+                hidden: ${ "false" if _ep_show_footer == "false" else "true" }
+
             # Right cluster: optional right page icon + HA / Wi-Fi header badges
             - container:
+                align: RIGHT_MID
                 width: SIZE_CONTENT
                 height: 100%
                 layout:
@@ -202,24 +227,48 @@ lvgl:
           y: ${ -(epaper_nav_pad_bottom|int) }
           width: 100%
           height: ${epaper_footer_h}
+          hidden: ${ "true" if _ep_show_footer == "false" else "false" }
           pad_left: ${ (epaper_pad_x|int) + (epaper_nav_pad_left|int) }
           pad_right: ${ (epaper_pad_x|int) + (epaper_nav_pad_right|int) }
           widgets:
+            - container:
+                id: cont_ep_ftr_page
+                align: LEFT_MID
+                width: SIZE_CONTENT
+                height: 100%
+                hidden: ${ "false" if _ep_show_header == "false" else "true" }
+                layout:
+                  type: FLEX
+                  flex_flow: ROW
+                  flex_align_main: START
+                  flex_align_cross: CENTER
+                  pad_column: 4
+                widgets:
+                  - label:
+                      id: lbl_ep_ftr_page_icon
+                      text: "\U000F02FC"
+                      text_font: mdi_sm
+                  - label:
+                      id: lbl_ep_ftr_page_title
+                      text: "Enhet"
+                      text_font: font_sm
+                      hidden: ${ "false" if epaper_footer_show_title == "true" else "true" }
             - label:
                 id: lbl_ep_wifi_ftr
-                align: LEFT_MID
+                align: ${ "RIGHT_MID" if _ep_show_header == "false" else "LEFT_MID" }
+                x: 0
                 text: "\U000F05A9"
-                text_font: ${epaper_icon_font}
+                text_font: mdi_sm
                 styles: epaper_wifi_style
-                hidden: ${ "false" if _ep_status_in_footer == "true" else "true" }
+                hidden: ${ "false" if epaper_footer_has_status == "true" else "true" }
             - label:
                 id: lbl_ep_ha_ftr
-                align: ${ "LEFT_MID" if (screen_width|int) >= 360 else "RIGHT_MID" }
-                x: ${ 28 if (screen_width|int) >= 360 else 0 }
+                align: ${ "RIGHT_MID" if (_ep_show_header == "false" or (screen_width|int) < 360) else "LEFT_MID" }
+                x: ${ (-(56 if ([screen_width|int, screen_height|int]|max) > 960 else (36 if ([screen_width|int, screen_height|int]|max) > 400 else (28 if ([screen_width|int, screen_height|int]|max) > 240 else 24)))) if _ep_show_header == "false" else ((56 if ([screen_width|int, screen_height|int]|max) > 960 else (36 if ([screen_width|int, screen_height|int]|max) > 400 else 28)) if (screen_width|int) >= 360 else 0) }
                 text: "\U000F07D0"
-                text_font: ${epaper_icon_font}
+                text_font: mdi_sm
                 styles: epaper_ha_style
-                hidden: ${ "false" if _ep_status_in_footer == "true" else "true" }
+                hidden: ${ "false" if epaper_footer_has_status == "true" else "true" }
             - label:
                 id: lbl_ep_refresh_time
                 align: ${epaper_footer_ts_align}

@@ -2,7 +2,14 @@ labels: [BMI270, IMU, motion, i2c]
 ---
 # https://esphome.io/components/motion/bmi270/
 # The BMI270 is an ultra-low-power IMU optimized for wearable applications.
-# It includes a 16-bit 3-axis accelerometer and a 16-bit 3-axis gyroscope
+# It includes a 16-bit 3-axis accelerometer and a 16-bit 3-axis gyroscope.
+# Boards with an auxiliary BMM150 magnetometer (e.g. AtomS3R / AtomS3R-M12)
+# set `imu_bmm150_enabled: "true"` to enable 9-axis BMM150 collection.
+
+packages:
+  bmm150: !include
+    file: chip_imu_bmm150.yaml
+    condition: ${imu_bmm150_enabled | default("false")}
 
 substitutions:
   module:
@@ -97,3 +104,14 @@ sensor:
           window_size: 3
           send_every: 1
     disabled_by_default: True
+  - platform: bmi270
+    bmi270_id: motion_bmi270
+    type: temperature
+    id: motion_temperature
+    name: "Motion Temperature"
+    entity_category: diagnostic
+    disabled_by_default: true
+    filters:
+      - sliding_window_moving_average:
+          window_size: 10
+          send_every: 10

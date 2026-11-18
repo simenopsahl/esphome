@@ -8,7 +8,7 @@ substitutions:
     sonic_i2c_bus: i2c_grove
 
 external_components:
-  - source: github://chill-Division/M5Stack-ESPHome/
+  - source: github://chill-Division/M5Stack-ESPHome
     components: sonic_i2c
 
 # UNIT Ultrasonic I2C

@@ -37,7 +37,7 @@ globals:
     initial_value: "58.0"
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: [dual_kmeter]
 
 # Module13.2 Dual Kmeter

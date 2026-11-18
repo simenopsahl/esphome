@@ -21,6 +21,7 @@ packages:
 substitutions:
   time_timezone: "Europe/Oslo"
   mbus_i2c_shared: "false"
+  imu_bmm150_enabled: "true"
   module:
     internal:
       i2c_bus: i2c_internal
@@ -106,7 +107,7 @@ logger:
     esp32_camera: DEBUG
 
 external_components:
-  - source: github://m5stack/esphome-yaml/components
+  - source: github://m5stack/esphome-yaml
     components: [ early_init ]
 
 early_init:
