@@ -43,6 +43,7 @@ esphome:
     - id: device_ute_foran
       name: ${device.name}_sub
       area_id: area_ute_foran
+      relation: via
 
 wifi:
   use_address: ${device.name}.local
