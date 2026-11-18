@@ -21,10 +21,8 @@ substitutions:
     framework:
       type: esp-idf
   display:
+    rotation: "0"
     home_page: page_content
-    page:
-      image:
-        type: RGB
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -38,6 +36,108 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.70.32
+
+display:
+  - id: !extend display_eink
+    # Prevent periodic coercion back to GC16 while testing waveform modes
+    full_update_every: 255
+
+select:
+  - platform: template
+    id: select_epaper_update_mode
+    name: "Update Mode"
+    icon: mdi:waveform
+    entity_category: config
+    optimistic: true
+    restore_value: false
+    initial_option: "GC16"
+    options:
+      - "GC16"
+      - "DU4"
+      - "GL16"
+      - "GLR16"
+      - "GLD16"
+      - "DU"
+      - "A2"
+      - "INIT"
+    set_action:
+      - lambda: |-
+          it8951::UpdateMode mode = it8951::UPDATE_MODE_GC16;
+          if (x == "INIT") mode = it8951::UPDATE_MODE_INIT;
+          else if (x == "DU") mode = it8951::UPDATE_MODE_DU;
+          else if (x == "GC16") mode = it8951::UPDATE_MODE_GC16;
+          else if (x == "GL16") mode = it8951::UPDATE_MODE_GL16;
+          else if (x == "GLR16") mode = it8951::UPDATE_MODE_GLR16;
+          else if (x == "GLD16") mode = it8951::UPDATE_MODE_GLD16;
+          else if (x == "DU4") mode = it8951::UPDATE_MODE_DU4;
+          else if (x == "A2") mode = it8951::UPDATE_MODE_A2;
+          id(display_eink).set_update_mode(static_cast<uint16_t>(mode));
+          ESP_LOGI("e1003_test", "Selected update_mode=%s (enum=%u)", x.c_str(), static_cast<unsigned>(mode));
+      - script.execute: update_screen
+
+number:
+  - platform: template
+    id: num_ep_nav_offset
+    name: "Nav Offset"
+    icon: mdi:arrow-left-right
+    entity_category: config
+    optimistic: true
+    restore_value: false
+    initial_value: 360
+    min_value: 0
+    max_value: 1600
+    step: 10
+    set_action:
+      - lambda: |-
+          int off = static_cast<int>(x);
+          std::string rot = "${display.rotation}";
+          if (rot == "0") lv_obj_set_x(id(ep_nav_reterminal), -off);
+          else if (rot == "180") lv_obj_set_x(id(ep_nav_reterminal), off);
+          else if (rot == "90") lv_obj_set_y(id(ep_nav_reterminal), off);
+          else if (rot == "270") lv_obj_set_y(id(ep_nav_reterminal), -off);
+          ESP_LOGI("e1003_test", "Set ep_nav_reterminal offset=%d (rot=%s)", off, rot.c_str());
+      - script.execute: update_screen
+
+  - platform: template
+    id: num_ep_nav_spacing
+    name: "Nav Spacing"
+    icon: mdi:format-horizontal-align-center
+    entity_category: config
+    optimistic: true
+    restore_value: false
+    initial_value: 36
+    min_value: 0
+    max_value: 200
+    step: 2
+    set_action:
+      - lambda: |-
+          int pad = static_cast<int>(x);
+          std::string rot = "${display.rotation}";
+          if (rot == "0" || rot == "180") {
+            lv_obj_set_style_pad_column(id(ep_nav_reterminal), pad, LV_PART_MAIN);
+          } else {
+            lv_obj_set_style_pad_row(id(ep_nav_reterminal), pad, LV_PART_MAIN);
+          }
+          ESP_LOGI("e1003_test", "Set ep_nav_reterminal spacing=%d (rot=%s)", pad, rot.c_str());
+      - script.execute: update_screen
+
+script:
+  - id: !extend apply_epaper_theme_refresh
+    then:
+      - lambda: |-
+          std::string opt = id(select_epaper_update_mode).current_option();
+          it8951::UpdateMode mode = it8951::UPDATE_MODE_GC16;
+          if (opt == "INIT") mode = it8951::UPDATE_MODE_INIT;
+          else if (opt == "DU") mode = it8951::UPDATE_MODE_DU;
+          else if (opt == "GC16") mode = it8951::UPDATE_MODE_GC16;
+          else if (opt == "GL16") mode = it8951::UPDATE_MODE_GL16;
+          else if (opt == "GLR16") mode = it8951::UPDATE_MODE_GLR16;
+          else if (opt == "GLD16") mode = it8951::UPDATE_MODE_GLD16;
+          else if (opt == "DU4") mode = it8951::UPDATE_MODE_DU4;
+          else if (opt == "A2") mode = it8951::UPDATE_MODE_A2;
+          id(display_eink).set_update_mode(static_cast<uint16_t>(mode));
+          lv_obj_invalidate(lv_scr_act());
+          ESP_LOGI("e1003_test", "Refreshing full screen with update_mode=%s (enum=%u)", opt.c_str(), static_cast<unsigned>(mode));
 
 lvgl:
   pages:
