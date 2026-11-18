@@ -21,7 +21,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    rotation: "90"
+    rotation: "0"
     home_page: page_content
 
 esphome:
@@ -36,52 +36,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.70.32
-
-number:
-  - platform: template
-    id: num_ep_nav_offset
-    name: "Nav Offset"
-    icon: mdi:arrow-left-right
-    entity_category: config
-    optimistic: true
-    restore_value: false
-    initial_value: 390
-    min_value: 0
-    max_value: 1600
-    step: 10
-    set_action:
-      - lambda: |-
-          int off = static_cast<int>(x);
-          std::string rot = "${display.rotation}";
-          if (rot == "0") lv_obj_set_x(id(ep_nav_reterminal), -off);
-          else if (rot == "180") lv_obj_set_x(id(ep_nav_reterminal), off);
-          else if (rot == "90") lv_obj_set_y(id(ep_nav_reterminal), off);
-          else if (rot == "270") lv_obj_set_y(id(ep_nav_reterminal), -off);
-          ESP_LOGI("e1003_test", "Set ep_nav_reterminal offset=%d (rot=%s)", off, rot.c_str());
-      - script.execute: update_screen
-
-  - platform: template
-    id: num_ep_nav_spacing
-    name: "Nav Spacing"
-    icon: mdi:format-horizontal-align-center
-    entity_category: config
-    optimistic: true
-    restore_value: false
-    initial_value: 36
-    min_value: 0
-    max_value: 200
-    step: 2
-    set_action:
-      - lambda: |-
-          int pad = static_cast<int>(x);
-          std::string rot = "${display.rotation}";
-          if (rot == "0" || rot == "180") {
-            lv_obj_set_style_pad_column(id(ep_nav_reterminal), pad, LV_PART_MAIN);
-          } else {
-            lv_obj_set_style_pad_row(id(ep_nav_reterminal), pad, LV_PART_MAIN);
-          }
-          ESP_LOGI("e1003_test", "Set ep_nav_reterminal spacing=%d (rot=%s)", pad, rot.c_str());
-      - script.execute: update_screen
 
 lvgl:
   pages:
