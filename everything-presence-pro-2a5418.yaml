@@ -1,7 +1,7 @@
 substitutions:
   name: everything-presence-pro-2a5418
   friendly_name: EPP-2a5418
-  log_level: "ERROR"
+  log_level: ERROR
   device_config:
     co2_enabled: true
     bluetooth_enabled: true
@@ -39,7 +39,7 @@ esp32_ble:
 esp32_ble_tracker:
   scan_parameters:
     interval: 500ms
-    window: 10ms
+    window: 15ms
 bluetooth_proxy:
   active: false
   connection_slots: 1
