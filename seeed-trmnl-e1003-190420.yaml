@@ -13,11 +13,11 @@ packages:
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: seeed-trmnl-e1003-190420
-    location: "Storage"
+    location: "Kjøkken"
     framework:
       type: esp-idf
   display:
