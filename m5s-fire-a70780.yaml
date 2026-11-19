@@ -54,7 +54,7 @@ wifi:
     static_ip: 192.168.71.43
 
 lvgl:
-  buffer_size: 4%
+  buffer_size: 25%
 
 binary_sensor:
   # Call sensors from HA.
