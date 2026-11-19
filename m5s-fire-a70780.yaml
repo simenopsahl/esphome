@@ -6,7 +6,6 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_fire.yaml
   mbus_i2c: !include board/extension/mbus_i2c.yaml
-  grove_i2c: !include board/extension/grove_i2c.yaml
   cc1101: !include board/module/module_cc1101_async.yaml
   env_pro: !include board/module/unit_env_pro.yaml
   base_btc: !include board/module/base_btc.yaml
@@ -36,7 +35,6 @@ substitutions:
       type: esp-idf
   module:
     env_i2c_bus: i2c_mbus
-    co2_i2c_bus: i2c_mbus
     internal:
       i2c_bus: i2c_mbus
   display:
