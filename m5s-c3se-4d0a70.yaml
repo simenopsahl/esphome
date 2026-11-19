@@ -21,6 +21,40 @@ packages:
   lvgl: !include gui/main.yaml
 
   # --- LVGL WIDGET PACKAGES ---
+  tile_flip_clock: !include
+    file: gui/tiles/clock/flip_clock.yaml
+    vars:
+      uid: flip_clock
+      row: 0
+      col: 0
+      row_span: 1
+      col_span: 2
+      show_date: true
+  tile_climate: !include
+    file: gui/tiles/climate/remote.yaml
+    vars:
+      uid: heatpump
+      row: 1
+      col: 0
+      row_span: 1
+      col_span: 1          # e.g. span across both columns in row 0, or 1 for a single cell
+      entity_id: climate.etg1_stue_panelovn_bt
+      title: "Panelovn"
+      icon: "\U000F1A43"
+  tile_t22_temp_sensor: !include
+    file: gui/tiles/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_t22_temp
+      row: 1
+      col: 1
+      icon: "\U000F050F"
+      title: "Rom"
+      entity_id: sensor.etg1_stue_temperature
+      unit: "°C"
+      format: "%.1f"
+      click_page: page_temperature
+
   room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
     entity_id: sensor.etg1_stue_tc_heatindex
@@ -39,7 +73,7 @@ substitutions:
     internal:
       i2c_bus: i2c_mbus
   display:
-    home_page: page_temperature
+    home_page: page_dashboard
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -55,6 +89,16 @@ wifi:
 
 lvgl:
   buffer_size: 40%
+  pages:
+    - <<: !include
+        file: gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_title: "Kontrollpanel"
+          layout: 2x2
+    - <<: !include
+        file: gui/pages/climate/page.yaml
+        vars:
+          page_title: "Varmepumpe"
 
 binary_sensor:
   # Call sensors from HA.
