@@ -49,7 +49,6 @@ wifi:
 
 lvgl:
   buffer_size: 40%
-  rotation: 180
 
 binary_sensor:
   # Call sensors from HA.
