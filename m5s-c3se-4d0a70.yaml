@@ -23,7 +23,7 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
-    entity_id: sensor.t22_temperature
+    entity_id: sensor.etg1_stue_tc_heatindex
   }}
 
 substitutions:
@@ -32,7 +32,7 @@ substitutions:
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-4d0a70
-    location: "Storage"
+    location: "TV Stue"
     framework:
       type: esp-idf
   module:
