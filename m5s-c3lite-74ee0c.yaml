@@ -18,6 +18,33 @@ packages:
     uid: room_temp_value,
     entity_id: sensor.t22_temperature
   }}
+  tile_flip_clock: !include
+    file: gui/tiles/clock/flip_clock.yaml
+    vars:
+      uid: flip_clock
+      row: 0
+      col: 0
+      row_span: 1
+      col_span: 2
+      show_date: true
+  tile_imu: !include
+    file: gui/tiles/imu/local.yaml
+    vars:
+      row: 1
+      col: 0
+  tile_t22_temp_sensor: !include
+    file: gui/tiles/sensor/remote.yaml
+    vars:
+      page_id: page_dashboard
+      uid: tile_t22_temp
+      row: 1
+      col: 1
+      icon: "\U000F050F"
+      title: "T22"
+      entity_id: sensor.t22_temperature
+      unit: "°C"
+      format: "%.1f"
+      click_page: page_weather
 
 substitutions:
   common:
@@ -29,7 +56,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_temperature
+    home_page: page_dashboard
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -45,14 +72,20 @@ wifi:
 
 lvgl:
   buffer_size: 40%
+  pages:
+    - <<: !include
+        file: gui/pages/grid_dashboard/page.yaml
+        vars:
+          page_title: "Kontrollpanel"
+          layout: 2x2
 
 binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: binary_sensor.etg1_bad_occupancy
+    entity_id: binary_sensor.etg2_simen_occupancy
     id: presence1
   - platform: homeassistant
-    entity_id: binary_sensor.etg1_kjokken_occupancy
+    entity_id: binary_sensor.etg2_gang_occupancy
     id: presence2
   # Turn on display while room is occupied
   - id: !extend presence_detected
