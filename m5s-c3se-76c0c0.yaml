@@ -1,30 +1,69 @@
-# Board: M5Stack CoreS3 (M5Stack)
-# Definition: definitions/boards/m5stack-cores3/manifest.yaml
+packages:
+  # --- COMMON PACKAGES ---
+  <<: !include_dir_named common
+  <<: !include_dir_named bluetooth
+
+  # --- BOARD AND MODULES ---
+  board: !include board/m5stack_core_s3se.yaml
+  mbus_i2c: !include board/extension/mbus_i2c.yaml
+
+  # --- FEATURE PACKAGES ---
+  media_player: !include features/media_player.yaml
+
+  # --- GUI PACKAGES ---
+  colors: !include gui/themes/colors_night_owl.yaml
+  lvgl: !include gui/main.yaml
+
+  # --- LVGL WIDGET PACKAGES ---
+  room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
+    uid: room_temp_value,
+    entity_id: sensor.t22_temperature
+  }}
+
+substitutions:
+  common:
+    log_level: INFO
+#    log_baud_rate: "115200"
+  device:
+    name: m5s-c3se-76c0c0
+    location: "Storage"
+    framework:
+      type: esp-idf
+  module:
+    internal:
+      i2c_bus: i2c_mbus
+  display:
+    home_page: page_temperature
 
 esphome:
-  name: m5s-c3se-76c0c0
-  friendly_name: m5s-c3se-76c0c0
-
-esp32:
-  variant: esp32s3
-  flash_size: 16MB
-  framework:
-    type: esp-idf
-
-logger:
-
-api:
-  encryption:
-    key: "a7Xaujuw2MHR3igYeORKnrfH2NU2W7diB8xzXbI0jeQ="
-
-ota:
-  - platform: esphome
+  comment: ${device.model} @ ${device.location}
+  name: ${device.name}
+  friendly_name: ${device.name}
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: m5s-c3se-76c0c0 Fallback Hotspot
-    password: "4Uk22A54tMJt"
+  use_address: ${device.name}.local
+  manual_ip: 
+    gateway: 192.168.68.1
+    subnet: 255.255.252.0
+    static_ip: 192.168.70.79
 
-captive_portal:
+lvgl:
+  buffer_size: 40%
+  rotation: 180
+
+binary_sensor:
+  # Call sensors from HA.
+  - platform: homeassistant
+    entity_id: binary_sensor.etg1_bad_occupancy
+    id: presence1
+  - platform: homeassistant
+    entity_id: binary_sensor.etg1_kjokken_occupancy
+    id: presence2
+  # Turn on display while room is occupied
+  - id: !extend presence_detected
+    lambda: !lambda |-
+      if ( (id(presence1).state) or (id(presence2).state) ) {
+        return true;
+      } else {
+        return false;
+      }
