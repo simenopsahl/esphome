@@ -12,8 +12,9 @@ labels: [esp32s3, psram, ILI9342, display, BM8563, microphone, speaker]
 
 packages:
   pins: !include pins/m5stack_core_s3se.yaml
+  mbus_i2c: !include extension/mbus_i2c.yaml
   audio: !include
-    file: module/audio/${feature.audio.hardware_module | default("m5stack_core_s3se_audio.yaml")}
+    file: module/audio/${feature.audio.hardware_module | default("m5stack_core_s3_audio.yaml")}
     condition: ${feature_audio_enabled | default("false")}
 
 substitutions:
@@ -23,7 +24,7 @@ substitutions:
   mbus_i2c_shared: "false"
   module:
     internal:
-      i2c_bus: i2c_internal
+      i2c_bus: i2c_mbus
   device:
     model: "M5Stack Core S3 SE"
     board: m5stack_core_s3se
@@ -37,8 +38,9 @@ substitutions:
       height: ${screen_height}
   feature:
     audio:
-      hardware_module: m5stack_core_s3se_audio.yaml
+      hardware_module: m5stack_core_s3_audio.yaml
       volume_initial: "0.8"
+      volume_max: "0.9"
 
 esphome:
   project:
@@ -279,6 +281,7 @@ switch:
     # BUS_OUT_EN = 1
     restore_mode: RESTORE_DEFAULT_ON
     entity_category: config
+    disabled_by_default: true
 
   - platform: gpio
     id: sw_usb_otg_en
@@ -300,3 +303,4 @@ switch:
     # BOOST_EN = 1
     restore_mode: RESTORE_DEFAULT_ON
     entity_category: config
+    disabled_by_default: true

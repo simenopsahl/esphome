@@ -40,48 +40,32 @@ esp32:
     type: ${device.framework.type}
     advanced:
       compiler_optimization: PERF
+      enable_lwip_assert: false
       minimum_chip_revision: 3.1
       sram1_as_iram: true
-      loop_task_stack_size: 16384
       flash_chip: generic
     sdkconfig_options:
-      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+      # Cache optimizations for display graphics
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation rules for graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
 
 # PSRAM is shared with UART bus tx17/rx16
-#psram:
-#  mode: quad
-#  speed: 80MHz
+psram:
+  mode: quad
+  speed: 80MHz
 
 wifi:
   enable_btm: true
   enable_rrm: true
 
-bluetooth_proxy:
-  active: false
-  connection_slots: 1
-
-esp32_ble:
-  max_connections: 1
-
-esp32_ble_tracker:
-  scan_parameters:
-    interval: 500ms
-    window: 10ms
-
 spi:
   clk_pin: ${pin.int.spi.clk}
   mosi_pin: ${pin.int.spi.mosi}
   miso_pin: ${pin.int.spi.miso}
-
-# Speaker (only got buzzer to work)
-#i2s_audio:
-#  i2s_lrclk_pin: ${pin.int.audio.i2s_lrclk}
-
-#external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/ssieb/custom_components
-#    components: [ip5306]
 
 output:
   # backlight output
@@ -236,13 +220,6 @@ script:
 #  pin: ${ir_pin}
 #  carrier_duty_percent: 50%
 #  rmt_symbols: ${device.rmt_symbols_block}
-
-#media_player:
-#  - platform: i2s_audio
-#    id: media_player_out
-#    dac_type: internal
-#    mode: stereo
-#    name: "Internal Media Player"
 
 #ip5306:
 #  battery_level:

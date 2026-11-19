@@ -47,17 +47,15 @@ api:
   encryption:
     key: !secret homeassistant_api
 
-bluetooth_proxy:
-  active: false
-  connection_slots: 1
-
 esp32_ble:
   max_connections: 2
-
 esp32_ble_tracker:
   scan_parameters:
     interval: 500ms
-    window: 20ms
+    window: 15ms
+bluetooth_proxy:
+  active: false
+  connection_slots: 1
 
 binary_sensor:
   - id: !extend zone2_occupancy

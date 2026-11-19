@@ -16,8 +16,13 @@ substitutions:
         disp:
           cs: GPIO3
           dc: GPIO35
+          rst: -1 # AW9523B P1_1
         card:
           cs: GPIO4
+        
+    touch:
+      int: -1 # AW9523B P1_2
+      rst: -1 # AW9523B P0_0
 
     cam:
       y0: nc
@@ -33,9 +38,10 @@ substitutions:
       vs: GPIO46
       hs: GPIO38
       p_clk: GPIO45
-      m_clk: GPIO36
+      # Dummy pin to satisfy esp32_camera schema (real 20MHz clock is onboard oscillator X2; GPIO6 = MBUS P21)
+      m_clk: GPIO6
       pwr: -1
-      rst: -1
+      rst: -1 # AW9523B P1_0 (pin 8, driven via sw_cam_rst)
 
     audio:
       i2s_lrclk: GPIO33

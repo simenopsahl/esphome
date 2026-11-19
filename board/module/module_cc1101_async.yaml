@@ -28,21 +28,29 @@ substitutions:
 
 esphome:
   on_boot:
-    # Sync CC1101 settings on boot (in case we changed them from Home Assistant)
+    # Sync CC1101 settings on boot (after cc1101 and lvgl have initialized)
     - priority: -10
       then:
-        # 1. Safely park the radio (in case the restored switch already turned it on)
+        # 1. Safely park the radio
         - cc1101.set_idle:
 
-        # 2. Sync all UI values to the hardware registers
+        # 2. Sync all restored UI values to the hardware registers & LVGL labels
         - cc1101.set_frequency:
             value: !lambda "return id(cc1101_frequency).state * 1e6;"
-        # Sync the symbol rate (safely grabs the float state from the number component)
+        - lvgl.label.update:
+            id: lbl_frequency_value
+            text:
+              format: "%.2f"
+              args: [ 'id(cc1101_frequency).state' ]
         - cc1101.set_symbol_rate:
             value: !lambda "return id(cc1101_symbol_rate).state;"
         - cc1101.set_output_power:
-            # Safely converts the restored select string into a float
             value: !lambda "return std::stof(id(cc1101_output_power).current_option());"
+        - lvgl.label.update:
+            id: lbl_tx_power_value
+            text:
+              format: "%s"
+              args: [ 'id(cc1101_output_power).current_option().c_str()' ]
         - if:
             condition:
               select.is:
@@ -83,13 +91,74 @@ esphome:
             then:
               - cc1101.set_modulation_type:
                   value: MSK
+        - lvgl.label.update:
+            id: lbl_modulation_value
+            text:
+              format: "%s"
+              args: [ 'id(cc1101_modulation_type).current_option().c_str()' ]
+        - if:
+            condition:
+              select.is:
+                id: cc1101_rx_attenuation
+                options: "0dB"
+            then:
+              - cc1101.set_rx_attenuation:
+                  value: 0dB
+        - if:
+            condition:
+              select.is:
+                id: cc1101_rx_attenuation
+                options: "6dB"
+            then:
+              - cc1101.set_rx_attenuation:
+                  value: 6dB
+        - if:
+            condition:
+              select.is:
+                id: cc1101_rx_attenuation
+                options: "12dB"
+            then:
+              - cc1101.set_rx_attenuation:
+                  value: 12dB
+        - if:
+            condition:
+              select.is:
+                id: cc1101_rx_attenuation
+                options: "18dB"
+            then:
+              - cc1101.set_rx_attenuation:
+                  value: 18dB
 
-        # 3. Safely bring the radio back online if the switch is ON
+        # 3. Mark boot sync complete so runtime on_value/on_turn_on handlers become active
+        - globals.set:
+            id: cc1101_boot_ready
+            value: 'true'
+
+        # 4. Safely bring the radio online if the receive switch is ON
         - if:
             condition:
               switch.is_on: cc1101_rx
             then:
               - cc1101.begin_rx:
+              - lvgl.label.update:
+                  id: lbl_cc1101_state
+                  text: "Mottar..."
+              - lvgl.led.update:
+                  id: led_cc1101_state
+                  color: c_green
+            else:
+              - lvgl.label.update:
+                  id: lbl_cc1101_state
+                  text: "Av"
+              - lvgl.led.update:
+                  id: led_cc1101_state
+                  color: c_red
+
+globals:
+  - id: cc1101_boot_ready
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
 logger:
   logs:
@@ -215,26 +284,28 @@ number:
     mode: box
     disabled_by_default: true
     on_value:
-      - then:
-          # 1. Safely park the radio state machine
-          - cc1101.set_idle:
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            # 1. Safely park the radio state machine
+            - cc1101.set_idle:
 
-          # 2. Update the hardware registers
-          - cc1101.set_frequency:
-              value: !lambda "return x * 1e6;"
+            # 2. Update the hardware registers
+            - cc1101.set_frequency:
+                value: !lambda "return x * 1e6;"
 
-          # 3. Safely bring the radio back online if the switch is ON
-          - if:
-              condition:
-                switch.is_on: cc1101_rx
-              then:
-                - cc1101.begin_rx:
-      - then:
-          - lvgl.label.update:
-              id: lbl_frequency_value
-              text:
-                format: "%.2f"
-                args: [ 'x' ]
+            # 3. Safely bring the radio back online if the switch is ON
+            - if:
+                condition:
+                  switch.is_on: cc1101_rx
+                then:
+                  - cc1101.begin_rx:
+            - lvgl.label.update:
+                id: lbl_frequency_value
+                text:
+                  format: "%.2f"
+                  args: [ 'x' ]
   # Change symbol rate from Home Assistant
   - platform: template
     id: cc1101_symbol_rate
@@ -249,20 +320,23 @@ number:
     initial_value: 5000
     disabled_by_default: true
     on_value:
-      - then:
-          # 1. Safely park the radio state machine
-          - cc1101.set_idle:
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            # 1. Safely park the radio state machine
+            - cc1101.set_idle:
 
-          # 2. Update the hardware registers
-          - cc1101.set_symbol_rate:
-              value: !lambda "return x;"
+            # 2. Update the hardware registers
+            - cc1101.set_symbol_rate:
+                value: !lambda "return x;"
 
-          # 3. Safely bring the radio back online if the switch is ON
-          - if:
-              condition:
-                switch.is_on: cc1101_rx
-              then:
-                - cc1101.begin_rx:
+            # 3. Safely bring the radio back online if the switch is ON
+            - if:
+                condition:
+                  switch.is_on: cc1101_rx
+                then:
+                  - cc1101.begin_rx:
 
 select:
   # Change output power from Home Assistant
@@ -285,27 +359,29 @@ select:
     initial_option: "5"
     disabled_by_default: true
     on_value:
-      - then:
-          # 1. Safely park the radio state machine
-          - cc1101.set_idle:
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            # 1. Safely park the radio state machine
+            - cc1101.set_idle:
 
-          # 2. Update the hardware registers
-          # std::stof converts the string 'x' (e.g., "-15") into a float
-          - cc1101.set_output_power:
-              value: !lambda "return std::stof(x);"
+            # 2. Update the hardware registers
+            # std::stof converts the string 'x' (e.g., "-15") into a float
+            - cc1101.set_output_power:
+                value: !lambda "return std::stof(x);"
 
-          # 3. Safely bring the radio back online if the switch is ON
-          - if:
-              condition:
-                switch.is_on: cc1101_rx
-              then:
-                - cc1101.begin_rx:
-      - then:
-          - lvgl.label.update:
-              id: lbl_tx_power_value
-              text:
-                format: "%s"
-                args: [ 'x.c_str()' ]
+            # 3. Safely bring the radio back online if the switch is ON
+            - if:
+                condition:
+                  switch.is_on: cc1101_rx
+                then:
+                  - cc1101.begin_rx:
+            - lvgl.label.update:
+                id: lbl_tx_power_value
+                text:
+                  format: "%s"
+                  args: [ 'x.c_str()' ]
 
   # Change modulation type from Home Assistant
   - platform: template
@@ -324,54 +400,56 @@ select:
     initial_option: "ASK/OOK"
     disabled_by_default: true
     on_value:
-      - then:
-          # 1. Safely park the radio state machine
-          - cc1101.set_idle:
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            # 1. Safely park the radio state machine
+            - cc1101.set_idle:
 
-          # 2. Update the hardware registers
-          - if:
-              condition:
-                lambda: 'return x == "ASK/OOK";'
-              then:
-                - cc1101.set_modulation_type:
-                    value: ASK/OOK
-          - if:
-              condition:
-                lambda: 'return x == "2-FSK";'
-              then:
-                - cc1101.set_modulation_type:
-                    value: 2-FSK
-          - if:
-              condition:
-                lambda: 'return x == "4-FSK";'
-              then:
-                - cc1101.set_modulation_type:
-                    value: 4-FSK
-          - if:
-              condition:
-                lambda: 'return x == "GFSK";'
-              then:
-                - cc1101.set_modulation_type:
-                    value: GFSK
-          - if:
-              condition:
-                lambda: 'return x == "MSK";'
-              then:
-                - cc1101.set_modulation_type:
-                    value: MSK
+            # 2. Update the hardware registers
+            - if:
+                condition:
+                  lambda: 'return x == "ASK/OOK";'
+                then:
+                  - cc1101.set_modulation_type:
+                      value: ASK/OOK
+            - if:
+                condition:
+                  lambda: 'return x == "2-FSK";'
+                then:
+                  - cc1101.set_modulation_type:
+                      value: 2-FSK
+            - if:
+                condition:
+                  lambda: 'return x == "4-FSK";'
+                then:
+                  - cc1101.set_modulation_type:
+                      value: 4-FSK
+            - if:
+                condition:
+                  lambda: 'return x == "GFSK";'
+                then:
+                  - cc1101.set_modulation_type:
+                      value: GFSK
+            - if:
+                condition:
+                  lambda: 'return x == "MSK";'
+                then:
+                  - cc1101.set_modulation_type:
+                      value: MSK
 
-          # 3. Safely bring the radio back online if the switch is ON
-          - if:
-              condition:
-                switch.is_on: cc1101_rx
-              then:
-                - cc1101.begin_rx:
-      - then:
-          - lvgl.label.update:
-              id: lbl_modulation_value
-              text:
-                format: "%s"
-                args: [ 'x.c_str()' ]
+            # 3. Safely bring the radio back online if the switch is ON
+            - if:
+                condition:
+                  switch.is_on: cc1101_rx
+                then:
+                  - cc1101.begin_rx:
+            - lvgl.label.update:
+                id: lbl_modulation_value
+                text:
+                  format: "%s"
+                  args: [ 'x.c_str()' ]
 
   # Change RX attenuation from Home Assistant
   - platform: template
@@ -389,42 +467,45 @@ select:
     initial_option: "6dB"
     disabled_by_default: true
     on_value:
-      - then:
-          # 1. Safely park the radio state machine
-          - cc1101.set_idle:
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            # 1. Safely park the radio state machine
+            - cc1101.set_idle:
 
-          # 2. Update the hardware registers
-          - if:
-              condition:
-                lambda: 'return x == "0dB";'
-              then:
-                - cc1101.set_rx_attenuation:
-                    value: 0dB
-          - if:
-              condition:
-                lambda: 'return x == "6dB";'
-              then:
-                - cc1101.set_rx_attenuation:
-                    value: 6dB
-          - if:
-              condition:
-                lambda: 'return x == "12dB";'
-              then:
-                - cc1101.set_rx_attenuation:
-                    value: 12dB
-          - if:
-              condition:
-                lambda: 'return x == "18dB";'
-              then:
-                - cc1101.set_rx_attenuation:
-                    value: 18dB
+            # 2. Update the hardware registers
+            - if:
+                condition:
+                  lambda: 'return x == "0dB";'
+                then:
+                  - cc1101.set_rx_attenuation:
+                      value: 0dB
+            - if:
+                condition:
+                  lambda: 'return x == "6dB";'
+                then:
+                  - cc1101.set_rx_attenuation:
+                      value: 6dB
+            - if:
+                condition:
+                  lambda: 'return x == "12dB";'
+                then:
+                  - cc1101.set_rx_attenuation:
+                      value: 12dB
+            - if:
+                condition:
+                  lambda: 'return x == "18dB";'
+                then:
+                  - cc1101.set_rx_attenuation:
+                      value: 18dB
 
             # 3. Safely bring the radio back online if the switch is ON
-          - if:
-              condition:
-                switch.is_on: cc1101_rx
-              then:
-                - cc1101.begin_rx:
+            - if:
+                condition:
+                  switch.is_on: cc1101_rx
+                then:
+                  - cc1101.begin_rx:
 
 switch:
   # Enable/disable RX mode from Home Assistant
@@ -437,25 +518,29 @@ switch:
     optimistic: true
     disabled_by_default: true
     on_turn_on:
-      - then:
-          - cc1101.begin_rx:
-      - then:
-          - lvgl.label.update:
-              id: lbl_cc1101_state
-              text: "Mottar..."
-          - lvgl.led.update:
-              id: led_cc1101_state
-              color: c_green
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            - cc1101.begin_rx:
+            - lvgl.label.update:
+                id: lbl_cc1101_state
+                text: "Mottar..."
+            - lvgl.led.update:
+                id: led_cc1101_state
+                color: c_green
     on_turn_off:
-      - then:
-          - cc1101.set_idle:
-      - then:
-          - lvgl.label.update:
-              id: lbl_cc1101_state
-              text: "Av"
-          - lvgl.led.update:
-              id: led_cc1101_state
-              color: c_red
+      - if:
+          condition:
+            lambda: "return id(cc1101_boot_ready);"
+          then:
+            - cc1101.set_idle:
+            - lvgl.label.update:
+                id: lbl_cc1101_state
+                text: "Av"
+            - lvgl.led.update:
+                id: led_cc1101_state
+                color: c_red
 
 lvgl:
   pages:

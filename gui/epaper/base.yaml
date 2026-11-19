@@ -119,6 +119,7 @@ button:
     id: btn_refresh_screen
     name: "Oppdater skjerm"
     icon: "mdi:refresh"
+    entity_category: config
     on_press:
       - script.execute: update_screen
 

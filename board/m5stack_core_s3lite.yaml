@@ -1,0 +1,424 @@
+labels: [esp32s3, psram, ILI9342, display, BM8563, microphone, speaker, BMI270, BMM150, LTR553, GC0308, camera]
+---
+# https://docs.m5stack.com/en/core/CoreS3-Lite
+# Schematic reference: "esphome/pinmap/schematics/esp32s3 M5Stack Core S3-Lite.pdf"
+# Base functions for:
+# M5Stack Core S3-Lite
+#
+# YAML example configurations
+# https://github.com/m5stack/esphome-yaml/blob/main/common/cores3-satellite-base.yaml
+# https://github.com/m5stack/esphome-yaml/blob/main/examples/kit/cores3-base-bsp.factory.yaml
+
+packages:
+  pins: !include pins/m5stack_core_s3lite.yaml
+  mbus_i2c: !include extension/mbus_i2c.yaml
+  imu: !include module/chip_imu_bmi270.yaml
+  camera: !include module/esp32_camera.yaml
+  audio: !include
+    file: module/audio/${feature.audio.hardware_module | default("m5stack_core_s3_audio.yaml")}
+    condition: ${feature_audio_enabled | default("false")}
+
+substitutions:
+  screen_width: "320"
+  screen_height: "240"
+  time_timezone: "Europe/Oslo"
+  imu_bmm150_enabled: "true"
+  mbus_i2c_shared: "false"
+  module:
+    internal:
+      i2c_bus: i2c_mbus
+    camera:
+      model: GC0308
+      # GC0308 has no hardware JPEG encoder; ESPHome converts RGB565 -> JPEG in software using PSRAM
+      pixel_format: RGB565
+      resolution: 640x480
+      jpeg_quality: 20
+      max_framerate: 2fps
+      idle_framerate: 0.1fps
+      agc_gain_ceiling: 8x
+      wb_mode: auto
+  device:
+    model: "M5Stack Core S3-Lite"
+    board: m5stack_core_s3lite
+    rmt_symbols_block: 48
+    rtc: "true"
+    psram: "true"
+    framework:
+      type: esp-idf
+    screen:
+      width: ${screen_width}
+      height: ${screen_height}
+  feature:
+    audio:
+      hardware_module: m5stack_core_s3_audio.yaml
+      volume_initial: "0.8"
+      volume_max: "0.9"
+
+esphome:
+  project:
+    name: "M5Stack.Core S3-Lite"
+    version: "1.0.0"
+  on_boot:
+    - priority: 800
+      then:
+        - bm8563.read_time:
+    - priority: 750
+      then:
+        # Power up AXP2101 LDO rails before DATA-priority (600) components run setup()
+        # (LTR-553 on ALDO3, GC0308 camera + 20MHz oscillator X2 on ALDO3/BLDO1/BLDO2,
+        # audio codecs on ALDO1/ALDO2). AXP2101BinaryOutput::setup() runs at DATA (600)
+        # and can race I2C/camera probing.
+        - lambda: |-
+            id(axp2101_pmu).setALDO1Voltage(1800);
+            id(axp2101_pmu).enableALDO1();
+            id(axp2101_pmu).setALDO2Voltage(3300);
+            id(axp2101_pmu).enableALDO2();
+            id(axp2101_pmu).setALDO3Voltage(3300);
+            id(axp2101_pmu).enableALDO3();
+            id(axp2101_pmu).setALDO4Voltage(3300);
+            id(axp2101_pmu).enableALDO4();
+            id(axp2101_pmu).setBLDO1Voltage(2800);
+            id(axp2101_pmu).enableBLDO1();
+            id(axp2101_pmu).setBLDO2Voltage(1500);
+            id(axp2101_pmu).enableBLDO2();
+        - delay: 20ms
+
+esp32:
+# ESP32-S3@Xtensa LX7 Dual-Core, 240MHz
+# PSRAM: 8MB Quad
+  variant: esp32s3
+  flash_size: 16MB
+  cpu_frequency: 240MHz
+  framework:
+    advanced:
+      compiler_optimization: PERF
+      execute_from_psram: true
+      flash_chip: generic
+    sdkconfig_options:
+      # Enable GC0308 camera sensor driver in espressif/esp32-camera
+      CONFIG_GC0308_SUPPORT: y
+      # Cache optimizations for display graphics
+      CONFIG_ESP32S3_DATA_CACHE_64KB: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: y
+      # Memory allocation rules for graphics buffers
+      CONFIG_SPIRAM_USE_CAPS_ALLOC: y
+      CONFIG_SPIRAM_USE_MALLOC: y
+    type: ${device.framework.type}
+
+psram:
+  mode: quad
+  speed: 80MHz
+
+wifi:
+  use_psram: true
+  enable_btm: true
+  enable_rrm: true
+
+logger:
+  deassert_rts_dtr: true
+
+time:
+  - platform: bm8563
+    i2c_id: ${module.internal.i2c_bus}
+    id: time_rtc
+    address: 0x51
+    update_interval: never
+  - id: !extend time_homeassistant
+    on_time_sync:
+      - then:
+          - bm8563.write_time:
+
+spi:
+  clk_pin: ${pin.int.spi.clk}
+  mosi_pin: ${pin.int.spi.mosi}
+  miso_pin: 
+    number: ${pin.int.spi.miso}
+    allow_other_uses: true
+
+#i2c:
+# Int
+#  - id: i2c_internal
+#    sda:
+#      number: ${pin.int.i2c.sda}
+#      allow_other_uses: ${mbus_i2c_shared}
+#    scl:
+#      number: ${pin.int.i2c.scl}
+#      allow_other_uses: ${mbus_i2c_shared}
+#    frequency: ${i2c_internal_frequency}
+#    scan: true
+# Ext PINs
+#  - id: i2c_bus
+#    sda: ${pin.ext.i2c.mbus.sda}
+#    scl: ${pin.ext.i2c.mbus.scl}
+#    frequency: 200kHz
+#    scan: true
+
+external_components:
+  - source: github://m5stack/esphome-yaml
+    components: [ axp2101, aw9523b ]
+
+# IO Expander
+aw9523b:
+  i2c_id: ${module.internal.i2c_bus}
+  id: aw9523b_hub
+  p0_drive_mode: PUSH_PULL
+  interrupt_pin: ${pin.int.i2c.int}
+
+# PMU
+axp2101:
+  id: axp2101_pmu
+  i2c_id: ${module.internal.i2c_bus}
+
+output:
+  - platform: axp2101
+    type: range
+    channel: DLDO1
+    id: backlight_output
+    min_voltage: 2600
+    max_voltage: 3300
+
+  - platform: axp2101
+    channel: ALDO1
+    voltage: 1800  # VDD_1V8 (AW88298 DVDD)
+
+  - platform: axp2101
+    channel: ALDO2
+    voltage: 3300  # VDDA_3V3 (ES7210 / MIC VDDA)
+
+  - platform: axp2101
+    channel: ALDO3
+    voltage: 3300  # VDDCAM_3V3 (GC0308 I/O + 20MHz X2 + LTR-553)
+
+  - platform: axp2101
+    channel: ALDO4
+    voltage: 3300  # VDD_3V3_SD (MicroSD)
+
+  - platform: axp2101
+    channel: BLDO1
+    voltage: 2800  # AVDD (GC0308 analog VDD)
+
+  - platform: axp2101
+    channel: BLDO2
+    voltage: 1500  # DVDD (GC0308 digital VDD)
+
+#  - platform: axp2101
+#    channel: DCDC1
+#    voltage: 3300
+
+#  - platform: axp2101
+#    channel: DCDC3
+#    voltage: 3300
+
+light:
+  # White
+  - platform: monochromatic
+    id: backlight_light
+    output: backlight_output
+    default_transition_length: 250ms
+    restore_mode: RESTORE_AND_ON
+    initial_state:
+      state: on
+      brightness: 25%
+    name: "Backlight"
+    entity_category: config
+
+display:
+  - platform: mipi_spi
+    id: display_lcd
+    model: ili9342
+    cs_pin:
+      number: ${pin.int.spi.disp.cs}
+      ignore_strapping_warning: true
+    dc_pin:
+      number: ${pin.int.spi.disp.dc}
+      allow_other_uses: true
+    reset_pin:
+      aw9523b_id: aw9523b_hub
+      number: 9
+    dimensions:
+      height: ${device.screen.height}
+      width: ${device.screen.width}
+    transform:
+      swap_xy: false
+      mirror_x: false
+      mirror_y: false
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 10s
+
+touchscreen:
+  - platform: ft63x6
+    i2c_id: ${module.internal.i2c_bus}
+    id: touchscreen_ft63x6
+#    update_interval: 20ms
+#    interrupt_pin:
+#      aw9523b_id: aw9523b_hub
+#      number: 10
+    reset_pin:
+      aw9523b_id: aw9523b_hub
+      number: 0
+    on_touch:
+      - then:
+          - lambda: |-
+                ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                    touch.x,
+                    touch.y,
+                    touch.x_raw,
+                    touch.y_raw
+                    );  
+          - if:
+              condition:
+                - light.is_off: backlight_light
+              then:
+                - light.turn_on:
+                    id: backlight_light
+                    brightness: 40%
+#    on_update:
+#      - logger.log:
+#          format: Touch %d at (%d, %d)
+#          args: [ 'touch->id', 'touch->x', 'touch->y' ]
+
+binary_sensor:
+  - platform: touchscreen
+    id: touch
+    name: Touchscreen
+    entity_category: diagnostic
+    x_min: 0
+    x_max: 320
+    y_min: 0
+    y_max: 240
+  # some aw9523b inputs (handle interrupts)
+  - platform: gpio
+    name: "TF_SW P0_4"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 4 
+    on_press:
+      then:
+        - logger.log: "TF_SW interrupt triggered"
+    internal: true
+  - platform: gpio
+    name: "TOUCH_INT P1_2"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 10
+    on_press:
+      then:
+        - logger.log: "TOUCH interrupt triggered"
+    internal: true
+
+switch:
+  - platform: gpio
+    id: sw_bus_out_en
+    name: "BUS_OUT_EN"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 1
+    # BUS_OUT_EN = 1
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: sw_usb_otg_en
+    name: "USB_OTG_EN"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 5
+    # USB_OTG_EN = 0
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: gpio
+    id: sw_boost_en
+    name: "BOOST_EN"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 15
+    # BOOST_EN = 1
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    disabled_by_default: true
+
+  # Camera module reset (AW9523B P1_0 = pin 8, active-high release).
+  # esp32_camera.reset_pin only accepts internal ESP32 GPIOs, so CAM_RST is
+  # released here at HARDWARE priority (800) before esp32_camera::setup() (DATA, 600).
+  - platform: gpio
+    id: sw_cam_rst
+    name: "CAM_RST P1_0"
+    pin:
+      aw9523b_id: aw9523b_hub
+      number: 8
+    internal: true
+    restore_mode: ALWAYS_ON
+
+motion:
+  # BMI270 SDO is pulled up to VDD_3V3 (R50) -> I2C address 0x69
+  - id: !extend motion_bmi270
+    address: 0x69
+    axis_map:
+      x: y
+      y: x
+      z: z
+
+sensor:
+  - platform: ltr_als_ps
+    i2c_id: ${module.internal.i2c_bus}
+    address: 0x23
+    id: ltr_als_ps_sensor
+    type: ALS_PS
+    auto_mode: true
+    gain: 4X
+    integration_time: 150ms
+    glass_attenuation_factor: 2.5
+    update_interval: 60s
+    # Ambient Light
+    ambient_light:
+      id: ambient_light
+      name: "Ambient light"
+      disabled_by_default: true
+    # Proximity Sensor
+    ps_cooldown: 5s
+    ps_high_threshold: 500
+    ps_counts:
+      id: ps_counts
+      name: "Proximity counts"
+      entity_category: diagnostic
+      disabled_by_default: true
+
+esp32_camera:
+  i2c_id: ${module.internal.i2c_bus}
+  id: espcam
+  # PINS
+  # CoreS3-Lite has a dedicated onboard 20MHz oscillator (X2) wired to CAM_MCLK.
+  # ESPHome's esp32_camera schema still requires external_clock.pin to be an internal
+  # GPIO, so ${pin.cam.m_clk} (GPIO6 / MBUS P21) is used as a dummy pin.
+  external_clock:
+    pin: ${pin.cam.m_clk}
+    frequency: 20MHz
+  data_pins:
+    - ${pin.cam.y2}
+    - ${pin.cam.y3}
+    - ${pin.cam.y4}
+    - ${pin.cam.y5}
+    - ${pin.cam.y6}
+    - ${pin.cam.y7}
+    - ${pin.cam.y8}
+    - ${pin.cam.y9}
+  vsync_pin:
+    number: ${pin.cam.vs}
+    ignore_strapping_warning: true
+  href_pin: ${pin.cam.hs}
+  pixel_clock_pin:
+    number: ${pin.cam.p_clk}
+    ignore_strapping_warning: true
+  # Image settings (pixel_format/resolution/jpeg_quality/framerates come from module/esp32_camera.yaml)
+  frame_buffer_count: 1
+  frame_buffer_location: PSRAM
+#  vertical_flip: true
+#  horizontal_mirror: true
+  # Exposure
+  aec2: true # defaults to false
+  ae_level: 2

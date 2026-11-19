@@ -1,6 +1,6 @@
 labels: [aw88298, es7210, audio]
 ---
-# Audio hardware definitions for M5Stack CoreS3 SE
+# Audio hardware definitions for M5Stack CoreS3 / CoreS3-SE / CoreS3-Lite
 # DAC / Amplifier: AW88298 on ${module.internal.i2c_bus}
 # ADC: ES7210 on ${module.internal.i2c_bus}
 
