@@ -28,7 +28,7 @@ packages:
 
 substitutions:
   common:
-    log_level: INFO
+#    log_level: DEBUG
 #    log_baud_rate: "0"
   device:
     name: m5s-c3se-e93464
