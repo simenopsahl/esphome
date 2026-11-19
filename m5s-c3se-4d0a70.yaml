@@ -98,7 +98,7 @@ lvgl:
     - <<: !include
         file: gui/pages/climate/page.yaml
         vars:
-          page_title: "Varmepumpe"
+          page_title: "Panelovn"
 
 binary_sensor:
   # Call sensors from HA.
