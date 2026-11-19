@@ -5,7 +5,6 @@ packages:
 
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_core_s3se.yaml
-  mbus_i2c: !include board/extension/mbus_i2c.yaml
 
   # --- FEATURE PACKAGES ---
   media_player: !include features/media_player.yaml
