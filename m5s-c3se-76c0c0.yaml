@@ -22,7 +22,7 @@ packages:
 
 substitutions:
   common:
-    log_level: INFO
+    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-76c0c0
