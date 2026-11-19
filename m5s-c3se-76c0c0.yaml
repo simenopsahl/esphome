@@ -24,16 +24,16 @@ packages:
   # --- LVGL WIDGET PACKAGES ---
   room_temperature_widget_sensors: !include { file: gui/functions/number_sensor.yaml, vars: {
     uid: room_temp_value,
-    entity_id: sensor.t22_temperature
+    entity_id: sensor.etg1_kjokken_temperature
   }}
 
 substitutions:
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-c3se-76c0c0
-    location: "Storage"
+    location: "Kjøkken"
     framework:
       type: esp-idf
   module:
