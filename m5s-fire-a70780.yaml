@@ -24,6 +24,7 @@ packages:
   }}
 
 substitutions:
+  chrome_footer: "false"
   common:
 #    log_level: DEBUG
 #    log_baud_rate: "115200"
