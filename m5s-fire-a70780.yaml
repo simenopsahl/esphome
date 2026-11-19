@@ -28,6 +28,7 @@ packages:
   }}
 
 substitutions:
+  text_fl: "84"
   common:
     log_level: WARN
 #    log_baud_rate: "115200"
