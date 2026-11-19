@@ -1,0 +1,30 @@
+# Board: M5Stack CoreS3 (M5Stack)
+# Definition: definitions/boards/m5stack-cores3/manifest.yaml
+
+esphome:
+  name: m5s-c3lite-74ee0c
+  friendly_name: m5s-c3lite-74ee0c
+
+esp32:
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+  encryption:
+    key: "ZborsNc1RSgeIOOcQuwOp4v4qLSDe0r2sLBJ7x6ph7U="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: m5s-c3lite-74ee Fallback Hotspot
+    password: "GnhtlFe1HNOk"
+
+captive_portal:
