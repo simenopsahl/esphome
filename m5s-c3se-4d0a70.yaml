@@ -59,7 +59,7 @@ lvgl:
 binary_sensor:
   # Call sensors from HA.
   - platform: homeassistant
-    entity_id: binary_sensor.etg1_bad_occupancy
+    entity_id: binary_sensor.etg1_stue_occupancy
     id: presence1
   - platform: homeassistant
     entity_id: binary_sensor.etg1_kjokken_occupancy
