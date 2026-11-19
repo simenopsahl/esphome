@@ -7,9 +7,8 @@ packages:
   board: !include board/m5stack_atom_s3_lite.yaml
   hat: !include board/extension/hat_i2c.yaml
   grove: !include board/extension/grove_i2c.yaml
-  env_iii: !include board/module/hat_env_iii.yaml
-  env_pro: !include board/module/unit_env_pro.yaml
-  co2: !include board/module/unit_co2.yaml
+  env_iii: !include board/module/unit_env_iii.yaml
+  tvoc: !include board/module/unit_tvoc.yaml
 
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
@@ -21,13 +20,15 @@ packages:
 
 substitutions:
   common:
-    log_level: WARN
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-as3-lite-953844
     location: "TV Stue"
     framework:
       type: esp-idf
+  module:
+    tvoc_i2c_bus: i2c_hat
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -49,41 +50,41 @@ sensor:
       # Base BTC
 #      - source: temperature_sht30_base_btc
       # HAT ENV III
-      - source: temperature_sht30_hat_env
-      - source: temperature_qmp6988_hat_env
+#      - source: temperature_sht30_hat_env
+#      - source: temperature_qmp6988_hat_env
       # Unit ENV III
-#      - source: temperature_sht30_unit_env
-#      - source: temperature_qmp6988_unit_env
+      - source: temperature_sht30_unit_env
+      - source: temperature_qmp6988_unit_env
       # Unit ENV IV
 #      - source: temperature_bmp280_unit_env
 #      - source: temperature_sht40_unit_env
       # Unit ENV Pro
-      - source: temperature_bme688
+#      - source: temperature_bme688
       # Unit CO2
-      - source: temperature_scd40_unit_co2
+#      - source: temperature_scd40_unit_co2
 
   - id: !extend humidity_local
     sources:
       # Base BTC
 #      - source: humidity_sht30_base_btc
       # HAT ENV III
-      - source: humidity_sht30_hat_env
+#      - source: humidity_sht30_hat_env
       # Unit ENV III
-#      - source: humidity_sht30_unit_env
+      - source: humidity_sht30_unit_env
       # Unit ENV IV
 #      - source: humidity_sht40_unit_env
       # Unit ENV Pro
-      - source: humidity_bme688
+#      - source: humidity_bme688
       # Unit CO2
-      - source: humidity_scd40_unit_co2
+#      - source: humidity_scd40_unit_co2
 
   - id: !extend pressure_local
     sources:
       # HAT ENV III
-      - source: pressure_qmp6988_hat_env
+#      - source: pressure_qmp6988_hat_env
       # Unit ENV III
-#      - source: pressure_qmp6988_unit_env
+      - source: pressure_qmp6988_unit_env
       # Unit ENV IV
 #      - source: pressure_bmp280_unit_env
       # Unit ENV Pro
-      - source: pressure_bme688
+#      - source: pressure_bme688
