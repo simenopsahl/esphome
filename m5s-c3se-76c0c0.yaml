@@ -125,3 +125,14 @@ sensor:
       - source: pressure_bmp280_unit_env
       # Unit ENV Pro
 #      - source: pressure_bme688
+
+  # extend sensors to update lvgl
+  - id: !extend unit_co2_scd40_sensor
+    co2:
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: lbl_co2_value
+              text:
+                format: "%.0f"
+                args: [ 'x' ]
