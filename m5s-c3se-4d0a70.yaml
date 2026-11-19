@@ -8,7 +8,7 @@ packages:
   mbus_uart: !include board/extension/mbus_uart.yaml
   module_air_quality: !include board/module/module_air_quality.yaml
   base_btc: !include board/module/base_btc.yaml
-  grove: !include board/extension/grove_i2c.yaml
+  grove_i2c: !include board/extension/grove_i2c.yaml
   env_pro: !include board/module/unit_env_pro.yaml
   unit_co2: !include board/module/unit_co2.yaml
 
