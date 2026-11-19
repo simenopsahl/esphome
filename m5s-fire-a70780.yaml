@@ -24,9 +24,8 @@ packages:
   }}
 
 substitutions:
-  text_fl: "84"
   common:
-    log_level: DEBUG
+#    log_level: DEBUG
 #    log_baud_rate: "115200"
   device:
     name: m5s-fire-a70780
