@@ -9,7 +9,6 @@ packages:
 
   # --- EPAPER DASHBOARD PACKAGES ---
   epaper_daily: !include gui/epaper/pages/content/sensors.yaml
-  epaper_weather: !include gui/epaper/pages/weather_station/sensors.yaml
   epaper_image: !include gui/epaper/pages/image/sensors.yaml
 
 substitutions:
@@ -41,7 +40,6 @@ wifi:
 lvgl:
   pages:
     - !include gui/epaper/pages/content/page.yaml
-    - !include gui/epaper/pages/weather_station/page.yaml
     - !include gui/epaper/pages/image/page.yaml
 
 # Check if person is home
