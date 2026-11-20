@@ -7,12 +7,12 @@ packages:
   board: !include board/zectrix_note4c.yaml
 
   # --- EPAPER DASHBOARD & FEATURE PACKAGES ---
-  epaper_content: !include gui/epaper/pages/weather_station/sensors.yaml
+  epaper_weather: !include gui/epaper/pages/weather_station/main.yaml
   media_player: !include features/media_player.yaml
 
 substitutions:
   display:
-    home_page: page_content
+    home_page: page_weather_station
     rotation: "270"
   common:
     log_level: DEBUG
@@ -35,10 +35,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.70.33
-
-lvgl:
-  pages:
-    - !include gui/epaper/pages/weather_station/page.yaml
 
 # Check if person is home
 binary_sensor:
