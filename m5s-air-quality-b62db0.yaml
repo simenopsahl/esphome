@@ -11,18 +11,24 @@ packages:
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
-  # --- E-PAPER PAGE BINDINGS ---
-  epaper_aq_sensors: !include gui/epaper/pages/air_quality/sensors.yaml
-  epaper_local_sensors: !include
+  # --- EPAPER DASHBOARD PACKAGES ---
+  epaper_local: !include
     file: gui/epaper/pages/temperature/local.yaml
     vars:
       uid: aq_local
+      page_id: page_local
+      area_label: "Enhet"
+      icon: "\U000F0510"
+      invert_colors: "true"
       sensor_id: temperature_local
       value_fmt: "%.0f"
-  epaper_room_series: !include
-    file: gui/epaper/sections/rolling_graph/remote_series.yaml
+  epaper_air_quality: !include gui/epaper/pages/air_quality/main.yaml
+  epaper_room: !include
+    file: gui/epaper/pages/temperature/remote.yaml
     vars:
       uid: aq_room
+      page_id: page_room
+      area_label: "Rom"
       entity_id: sensor.etg2_gang_temperature
       value_fmt: "%.0f"
       min_span: "2.0"
@@ -52,25 +58,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.50
-
-lvgl:
-  pages:
-    - !include
-      file: gui/epaper/pages/temperature/page.yaml
-      vars:
-        uid: aq_local
-        page_id: page_local
-        area_label: "Enhet"
-        icon: "\U000F0510"
-        invert_colors: "true"
-    - !include gui/epaper/pages/air_quality/page.yaml
-    - !include
-      file: gui/epaper/pages/temperature/page.yaml
-      vars:
-        uid: aq_room
-        page_id: page_room
-        area_label: "Rom"
-        show_graph: "true"
 
 # Check if person is home
 binary_sensor:
