@@ -8,8 +8,9 @@ packages:
   e1003: !include board/module/display_reterminal_e1003.yaml
 
   # --- EPAPER DASHBOARD PACKAGES ---
-  epaper_daily: !include gui/epaper/pages/content/sensors.yaml
-  epaper_image: !include gui/epaper/pages/image/sensors.yaml
+  epaper_daily: !include gui/epaper/pages/daily/main.yaml
+  epaper_weather: !include gui/epaper/pages/weather_station/main.yaml
+  epaper_image: !include gui/epaper/pages/image/main.yaml
 
 substitutions:
   common:
@@ -22,7 +23,7 @@ substitutions:
       type: esp-idf
   display:
     rotation: "0"
-    home_page: page_content
+    home_page: page_daily
 
 esphome:
   comment: ${device.model} @ ${device.location}
@@ -36,11 +37,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.70.32
-
-lvgl:
-  pages:
-    - !include gui/epaper/pages/content/page.yaml
-    - !include gui/epaper/pages/image/page.yaml
 
 # Check if person is home
 binary_sensor:
