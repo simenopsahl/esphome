@@ -8,7 +8,7 @@ packages:
   e1001: !include board/module/display_reterminal_e1001.yaml
 
   # --- EPAPER DASHBOARD PACKAGES ---
-  epaper_content: !include gui/epaper/pages/weather_station/sensors.yaml
+  epaper_weather: !include gui/epaper/pages/weather_station/main.yaml
 
 substitutions:
   common:
@@ -20,7 +20,7 @@ substitutions:
     framework:
       type: esp-idf
   display:
-    home_page: page_content
+    home_page: page_weather_station
     rotation: "270"
     chrome:
       header: "false"
@@ -37,10 +37,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.39
-
-lvgl:
-  pages:
-    - !include gui/epaper/pages/weather_station/page.yaml
 
 # Check if person is home
 binary_sensor:
