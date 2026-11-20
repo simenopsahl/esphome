@@ -5,11 +5,13 @@ packages:
   # --- BOARD AND MODULES ---
   board: !include board/m5stack_coreink.yaml
 
-  # --- E-PAPER PAGE BINDINGS ---
-  epaper_room_series: !include
-    file: gui/epaper/sections/rolling_graph/remote_series.yaml
+  # --- EPAPER DASHBOARD PACKAGES ---
+  epaper_room: !include
+    file: gui/epaper/pages/temperature/remote.yaml
     vars:
       uid: t22_room
+      page_id: page_room
+      area_label: "Rom"
       entity_id: sensor.t22_temperature
       value_fmt: "%.0f"
       min_span: "2.0"
@@ -39,16 +41,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.74
-
-lvgl:
-  pages:
-    - !include
-      file: gui/epaper/pages/temperature/page.yaml
-      vars:
-        uid: t22_room
-        page_id: page_room
-        area_label: "Rom"
-        show_graph: "true"
 
 # Check if person is home
 binary_sensor:
