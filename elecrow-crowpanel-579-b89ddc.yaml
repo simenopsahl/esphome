@@ -7,13 +7,13 @@ packages:
   board: !include board/elecrow_crowpanel_epaper.yaml
 
   # --- EPAPER DASHBOARD PACKAGES ---
-  epaper_content: !include gui/epaper/pages/weather_station/sensors.yaml
+  epaper_weather: !include gui/epaper/pages/weather_station/main.yaml
 
 substitutions:
   panel_width: "792"
   panel_height: "272"
   display:
-    home_page: page_content
+    home_page: page_weather_station
   common:
     log_level: debug
 #    log_baud_rate: "115200"
@@ -40,10 +40,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.70.31
-
-lvgl:
-  pages:
-    - !include gui/epaper/pages/weather_station/page.yaml
 
 # Check if person is home
 binary_sensor:
