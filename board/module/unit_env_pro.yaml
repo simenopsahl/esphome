@@ -121,6 +121,7 @@ sensor:
     id: combined_iaq_bme688
     name: "Combined IAQ BME688"
     device_class: aqi
+    unit_of_measurement: ""
     state_class: "measurement"
     entity_category: diagnostic
     sources:

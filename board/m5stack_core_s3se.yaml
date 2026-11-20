@@ -199,6 +199,7 @@ display:
     reset_pin:
       aw9523b_id: aw9523b_hub
       number: 9
+    data_rate: 40MHz
     dimensions:
       height: ${device.screen.height}
       width: ${device.screen.width}
