@@ -13,18 +13,23 @@ packages:
   # --- FEATURE PACKAGES ---
   combined_env_sensors: !include features/combined_env_sensors.yaml
 
-  # --- E-PAPER PAGE BINDINGS ---
-  epaper_room_series: !include
-    file: gui/epaper/sections/rolling_graph/remote_series.yaml
+  # --- EPAPER DASHBOARD PACKAGES ---
+  epaper_room: !include
+    file: gui/epaper/pages/temperature/remote.yaml
     vars:
       uid: simen_room
+      page_id: page_room
+      area_label: "Rom"
       entity_id: sensor.etg2_simen_temperature
       value_fmt: "%.0f"
       min_span: "2.0"
-  epaper_local_sensors: !include
+  epaper_local: !include
     file: gui/epaper/pages/temperature/local.yaml
     vars:
       uid: simen_local
+      page_id: page_local
+      area_label: "Enhet"
+      icon: "\U000F0510"
       sensor_id: temperature_local
       value_fmt: "%.0f"
 
@@ -57,23 +62,6 @@ wifi:
     gateway: 192.168.68.1
     subnet: 255.255.252.0
     static_ip: 192.168.71.41
-
-lvgl:
-  pages:
-    - !include
-      file: gui/epaper/pages/temperature/page.yaml
-      vars:
-        uid: simen_room
-        page_id: page_room
-        area_label: "Rom"
-        show_graph: "true"
-    - !include
-      file: gui/epaper/pages/temperature/page.yaml
-      vars:
-        uid: simen_local
-        page_id: page_local
-        area_label: "Enhet"
-        icon: "\U000F0510"
 
 # Check if person is home
 binary_sensor:
