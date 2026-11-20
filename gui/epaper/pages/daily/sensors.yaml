@@ -1,6 +1,6 @@
-# Composite sensor/script bundle for all 5 Bento dashboard sections.
-# Include this single package in devices using `gui/epaper/pages/content.yaml`
-# (or custom layouts combining all 5 sections such as `waveshare-display-board`).
+# Composite sensor/script bundle for all 5 Daily Bento dashboard sections.
+# Pulled automatically by `gui/epaper/pages/daily/main.yaml` (or include standalone
+# when building custom layouts that combine these 5 sections).
 
 packages:
   epaper_sec_weather: !include ../../sections/weather_forecast/sensors.yaml
@@ -8,3 +8,4 @@ packages:
   epaper_sec_nordpool: !include ../../sections/nordpool_graph/sensors.yaml
   epaper_sec_bus: !include ../../sections/bus_departures/sensors.yaml
   epaper_sec_car: !include ../../sections/car_status/sensors.yaml
+  epaper_sec_picture: !include ../../sections/picture/sensors.yaml

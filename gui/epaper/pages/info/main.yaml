@@ -1,0 +1,9 @@
+# Self-contained Device Info e-Paper page package (`gui/epaper/pages/info/main.yaml`)
+# Included automatically by `gui/epaper/base.yaml`.
+
+packages:
+  sensors: !include sensors.yaml
+
+lvgl:
+  pages:
+    - !include page.yaml

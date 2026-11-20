@@ -73,7 +73,7 @@ height=""
 
 if [[ "$enable_epaper" -eq 1 ]]; then
   if [[ -n "$layout" ]]; then
-    file="$REPO/gui/epaper/pages/$layout/page.yaml"
+    file="$REPO/gui/epaper/pages/$layout/main.yaml"
     if [[ ! -f "$file" ]]; then
       echo "Unknown e-Paper page '$layout' (no $file)" >&2
       exit 1

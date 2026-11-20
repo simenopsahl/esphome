@@ -1,0 +1,13 @@
+# Self-contained full-screen e-Paper photo page package (`gui/epaper/pages/image/main.yaml`)
+# Bundles image assets, cycling script + `page_image` LVGL page.
+#
+# Usage in device YAML:
+#   packages:
+#     epaper_image: !include gui/epaper/pages/image/main.yaml
+
+packages:
+  sensors: !include sensors.yaml
+
+lvgl:
+  pages:
+    - !include page.yaml

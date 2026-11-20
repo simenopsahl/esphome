@@ -1,0 +1,16 @@
+# Self-contained Daily Info Bento e-Paper page package (`gui/epaper/pages/daily/main.yaml`)
+# Bundles all Bento dashboard section sensors/scripts + `page_daily` LVGL page.
+# Automatically selects `page_large.yaml` (with rotating Picture bento) when
+# `max(panel_width, panel_height) > 960` (e.g. Seeed reTerminal E1003), and
+# `page.yaml` (compact 5-section layout) on smaller displays (`<= 960px`, e.g. E1002).
+#
+# Usage in device YAML:
+#   packages:
+#     epaper_daily: !include gui/epaper/pages/daily/main.yaml
+
+packages:
+  sensors: !include sensors.yaml
+
+lvgl:
+  pages:
+    - !include ${ "page_large.yaml" if ([screen_width|int, screen_height|int]|max) > 960 else "page.yaml" }

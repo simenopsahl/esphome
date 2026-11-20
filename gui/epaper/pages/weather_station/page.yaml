@@ -1,15 +1,15 @@
-# Responsive e-Paper Weather Station page (`gui/epaper/pages/weather_station.yaml`)
+# Responsive e-Paper Weather Station page (`gui/epaper/pages/weather_station/page.yaml`)
 # Replaces `waveshare-weather-station` across 300x400 (Zectrix Note4C), 400x300 (CrowPanel 4.2"),
-# 792x272 (CrowPanel 5.79"), and 800x480 (Seeed reTerminal E1001).
+# 792x272 (CrowPanel 5.79"), 800x480 (Seeed reTerminal E1001/E1002), and 1872x1404 (E1003).
 #
 # Adapts into 3 responsive layouts:
 #   - Portrait (W < H):                   Header top -> H-divider -> 3 stacked rows
 #   - Ultra-Wide Ribbon (W >= 600, H < 280): Header left -> V-divider -> 3 side-by-side columns
 #   - Landscape (W >= H, H >= 280):          Header left -> V-divider -> 3 stacked rows
 #
-# Companion package: `gui/epaper/pages/weather_station_sensors.yaml`
+# Self-contained package: `gui/epaper/pages/weather_station/main.yaml`
 
-id: ${epaper_ws_page_id | default("page_content")}
+id: ${epaper_ws_page_id | default("page_weather_station")}
 styles: epaper_page_style
 pad_top: ${ (epaper_header_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) + (epaper_nav_pad_top|int) }
 pad_bottom: ${ (epaper_footer_h|int) + (6 if ([screen_width|int, screen_height|int]|max) <= 960 else 14) + (epaper_nav_pad_bottom|int) }
@@ -20,7 +20,7 @@ on_load:
   - script.execute:
       id: set_page_title
       icon: "\U000F050F"
-      title: "Vær"
+      title: "${page_title | default('Vær')}"
   - script.execute: epaper_update_weather_header
   - script.execute: epaper_refresh_rolling_graphs
 widgets:
@@ -36,8 +36,8 @@ widgets:
         type: grid
         grid_columns: ${ ["FR(1)"] if ((screen_width|int) < (screen_height|int)) else ["CONTENT", "CONTENT", "FR(1)"] }
         grid_rows: ${ ["CONTENT", "CONTENT", "FR(1)"] if ((screen_width|int) < (screen_height|int)) else ["FR(1)"] }
-        pad_row: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else "10" }
-        pad_column: ${ "8" if ([screen_width|int, screen_height|int]|min) <= 300 else "14" }
+        pad_row: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else ("10" if ([screen_width|int, screen_height|int]|max) <= 960 else "24") }
+        pad_column: ${ "8" if ([screen_width|int, screen_height|int]|min) <= 300 else ("14" if ([screen_width|int, screen_height|int]|max) <= 960 else "28") }
       widgets:
         # Weather header (`now` or `now -> next`)
         - obj:
@@ -60,8 +60,8 @@ widgets:
             grid_cell_row_pos: ${ "1" if ((screen_width|int) < (screen_height|int)) else "0" }
             grid_cell_x_align: ${ "STRETCH" if ((screen_width|int) < (screen_height|int)) else "CENTER" }
             grid_cell_y_align: ${ "CENTER" if ((screen_width|int) < (screen_height|int)) else "STRETCH" }
-            width: ${ "100%" if ((screen_width|int) < (screen_height|int)) else "2" }
-            height: ${ "2" if ((screen_width|int) < (screen_height|int)) else "100%" }
+            width: ${ "100%" if ((screen_width|int) < (screen_height|int)) else ("2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4") }
+            height: ${ ("2" if ([screen_width|int, screen_height|int]|max) <= 960 else "4") if ((screen_width|int) < (screen_height|int)) else "100%" }
             styles: epaper_accent1_style
 
         # 3 Rolling 12-hour temperature graphs (`Ute`, `Foran`, `Bak`)
@@ -79,7 +79,7 @@ widgets:
               type: grid
               grid_columns: ${ ["FR(1)", "FR(1)", "FR(1)"] if ((screen_height|int) < 280 and (screen_width|int) >= 600) else ["FR(1)"] }
               grid_rows: ${ ["FR(1)"] if ((screen_height|int) < 280 and (screen_width|int) >= 600) else ["FR(1)", "FR(1)", "FR(1)"] }
-              pad_row: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else "12" }
+              pad_row: ${ "6" if ([screen_width|int, screen_height|int]|min) <= 300 else ("12" if ([screen_width|int, screen_height|int]|max) <= 960 else "24") }
               pad_column: ${ "12" if ((screen_height|int) < 280 and (screen_width|int) >= 600) else "0" }
             widgets:
               - obj:

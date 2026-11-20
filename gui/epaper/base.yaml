@@ -10,7 +10,7 @@ packages:
   epaper_fonts: !include fonts/${epaper.fonts}.yaml
   epaper_nav: !include chrome/nav_${epaper.nav}.yaml
   epaper_chrome: !include chrome/status_bar.yaml
-  epaper_info: !include pages/info/sensors.yaml
+  epaper_info: !include pages/info/main.yaml
   control_navigation: !include ../functions/control_navigation.yaml
 
 substitutions:
@@ -330,5 +330,3 @@ lvgl:
                 text: "${device.name}"
                 text_font: font_sm
                 styles: epaper_muted_style
-  pages:
-    - !include pages/info/page.yaml

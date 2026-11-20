@@ -36,15 +36,14 @@ gui/
   │     ├── fonts/            # Responsive 5-tier e-Paper font sizing (`bw.yaml` 1-bit & `color_gray.yaml` 4-bit)
   │     │     ├── _fonts.yaml          # Shared font size math (`font_xs`..`font_fl`, `mdi_sm`..`mdi_xl`)
   │     │     ├── bw.yaml              # 1-bit sharp monochrome wrapper (`epaper_font_bpp: "1"`)
-  │     │     ├── color_gray.yaml      # 4-bit anti-aliased wrapper (`epaper_font_bpp: "4"`)
-  │     │     └── glyphs.yaml          # e-Paper MDI glyph subset
-  │     ├── pages/            # Full-screen e-Paper pages (`page.yaml` + optional `sensors.yaml`)
+  │     │     └── color_gray.yaml      # 4-bit anti-aliased wrapper (`epaper_font_bpp: "4"`)
+  │     ├── pages/            # Self-contained e-Paper page packages (`main.yaml` + `page.yaml` + `sensors.yaml`)
   │     │     ├── info/                # Default diagnostic info page (`page_info`, included by `base.yaml`)
-  │     │     ├── temperature/         # Unified room/device temperature page (`page.yaml` + `local.yaml`)
+  │     │     ├── temperature/         # Unified room/device temperature page (`local.yaml`, `remote.yaml`, `page.yaml`)
   │     │     ├── air_quality/         # M5Stack Air Quality multi-sensor grid (`page_air_quality`)
-  │     │     ├── weather_station/     # 3-graph + forecast weather station (`page_content` for CrowPanel)
-  │     │     ├── content/             # Multi-column dashboard (`page_content` for reTerminal E1001/E1002/E1003)
-  │     │     └── image/               # Full-screen photo/art frame (`page_image_1`, `page_image_2`)
+  │     │     ├── weather_station/     # 3-graph + forecast weather station (`page_weather_station`)
+  │     │     ├── daily/               # Multi-column Daily Info Bento dashboard (`page_daily`)
+  │     │     └── image/               # Full-screen photo/art frame (`page_image`)
   │     ├── sections/         # Reusable e-Paper layout sections & data bindings
   │     │     ├── rolling_graph/       # 12-hour 36-slot polyline graph (`section`, `_core`, `remote_series`, `local`, `remote`, `ha_attr`, `ha_series`)
   │     │     ├── weather_header/      # Current weather icon + condition + high/low summary
@@ -52,7 +51,8 @@ gui/
   │     │     ├── nordpool_graph/      # 48-slot NordPool electricity price bar graph + stats
   │     │     ├── bus_departures/      # Real-time public transit departure rows
   │     │     ├── car_status/          # EV battery SoC, range, charging & lock status
-  │     │     └── folloren/            # Recycle bin collection schedule & status
+  │     │     ├── folloren/            # Recycle bin collection schedule & status
+  │     │     └── picture/             # Rotating 800×480 photo bento & shared photo assets (`> 960px` panels)
   │     ├── styles/
   │     │     └── main.yaml            # Shared e-Paper LVGL `style_definitions`
   │     └── themes/           # e-Paper color palettes & 5th-refresh anti-ghosting polarity inversion
@@ -249,7 +249,7 @@ Board configurations (e.g., [`board/m5stack_coreink.yaml`](file:///x:/esphome/bo
 
 2. **Display & Page Options (`display.*`)** — Mirrors the LCD LVGL substitution convention:
    - `display.rotation`: `"0"`, `"90"`, `"180"`, or `"270"`. Automatically swaps `_ep_w` / `_ep_h` logical canvas dimensions on `90°`/`270°` rotations.
-   - `display.home_page`: ID of the page shown on boot (default `"page_info"`, or `"page_local"` / `"page_room"` / `"page_content"`).
+   - `display.home_page`: ID of the page shown on boot (default `"page_info"`, or `"page_local"` / `"page_room"` / `"page_daily"` / `"page_weather_station"`).
    - `display.buffer_size`: LVGL draw buffer fraction (default `"100%"`).
    - `display.invert_every_5th`: `"true"` or `"false"` (periodic full-screen polarity inversion).
    - `display.invert_accents`: `"true"` or `"false"` (high-contrast black fill on cards/headers).
@@ -268,16 +268,17 @@ Board configurations (e.g., [`board/m5stack_coreink.yaml`](file:///x:/esphome/bo
 
 ### C. E-Paper Pages, Sections & Rolling Graphs
 
-1. **Built-in `page_info` (`gui/epaper/pages/info/`)**:
-   - Included automatically by `base.yaml` (`epaper_info_page` + `epaper_info_sensors`).
+1. **Built-in `page_info` (`gui/epaper/pages/info/main.yaml`)**:
+   - Included automatically by `base.yaml` (`epaper_info: !include pages/info/main.yaml`).
    - Displays device name, IP, MAC, RSSI, uptime, refresh counter, and board-configured battery/sensor/SD rows and physical button hints. Set `display.page.info.skip: "true"` on single-page devices to omit it from navigation.
 
-2. **Full-Screen Pages (`gui/epaper/pages/<name>/`)**:
-   - **`temperature/`**: Unified 200×200 temperature + humidity + 12h rolling graph layout (`page.yaml` + `local.yaml`) shared across CoreInk and AirQuality devices. Optionally displays a secondary top row (e.g., CO₂ ppm on AirQuality or secondary room sensor) and min/max/avg footer stats.
-   - **`air_quality/`**: Multi-metric indoor air quality page (`SEN55` / `SCD40` CO₂, PM, VOC, NOx, temp, humidity).
-   - **`weather_station/`**: Full 800×480 dashboard combining header, weather forecast, room temperature cards, NordPool electricity prices, and calendar/transit sections.
-   - **`content/`**: Composable container page (`gui/epaper/pages/content/page.yaml`) for medium/large panels (such as the 400×300 CrowPanel 4.2") where individual `gui/epaper/sections/*` widgets are placed via `lvgl: !extend` or package includes.
-   - **`image/`**: Full-screen image/poster viewer (`page.yaml` + `sd_card.yaml`).
+2. **Self-Contained Full-Screen Page Packages (`gui/epaper/pages/<name>/`)**:
+   Each page folder exposes a self-contained ESPHome package (`main.yaml`, or `local.yaml` / `remote.yaml` for `temperature/`) that bundles both its sensor/script bindings and its `lvgl: pages:` entry. Device YAMLs only need a single `!include` under `packages:` (in display order) — no duplicate `lvgl: pages:` block is required:
+   - **`daily/main.yaml`** (`page_daily`): Two-column Daily Info Bento dashboard combining weather forecast, FolloRen, EV car status, NordPool graph, and bus departures.
+   - **`weather_station/main.yaml`** (`page_weather_station`): Responsive weather header + 3 rolling 12-hour temperature graphs (`Ute`, `Foran`, `Bak`) adapting to portrait, landscape, and ultra-wide ribbon panels.
+   - **`image/main.yaml`** (`page_image`): Full-screen image/poster viewer with edge-to-edge chrome hiding.
+   - **`air_quality/main.yaml`** (`page_air_quality`): Multi-metric indoor air quality page (`SEN55` / `SCD40` CO₂, PM, VOC, NOx).
+   - **`temperature/{local,remote}.yaml`** (`page_room` / `page_local` / `page_out`): Unified temperature hero page with optional 12-hour rolling graph (`remote.yaml`) or local sensor binding (`local.yaml`).
 
 3. **Modular Sections (`gui/epaper/sections/<name>/`)**:
    - Reusable widget blocks (`clock`, `weather`, `temperatures`, `power_price`, `transport`, `calendar`, `sun`, `air_quality_bar`, `rolling_graph`) split into `section.yaml` (LVGL layout) and `sensors.yaml` (HA sensors & update scripts).

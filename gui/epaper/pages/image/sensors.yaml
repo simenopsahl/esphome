@@ -1,28 +1,16 @@
-# Companion image assets & cycling script for `gui/epaper/pages/image.yaml`
-# Override `epaper_image_dir` (e.g. `gui/img/eink/spectra6` on Spectra 6 boards).
+# Companion image assets & cycling script for `gui/epaper/pages/image/page.yaml`
+# Override `display.page.image.dir` (e.g. `gui/img/eink/spectra6` on Spectra 6 boards).
+
+packages:
+  picture_assets: !include
+    file: ../../sections/picture/assets.yaml
+    condition: ${ "false" if (epaper_image_assets_loaded | default("false")) == "true" else "true" }
 
 globals:
   - id: epaper_image_index
     type: int
     restore_value: no
     initial_value: "0"
-
-image:
-  - platform: file
-    id: i_selma_1
-    file: ${display.page.image.dir}/selma_1_480x800.${display.page.image.ext}
-    type: ${display.page.image.type}
-    invert_alpha: ${display.page.image.invert_alpha}
-  - platform: file
-    id: i_selma_2
-    file: ${display.page.image.dir}/selma_2_480x800.${display.page.image.ext}
-    type: ${display.page.image.type}
-    invert_alpha: ${display.page.image.invert_alpha}
-  - platform: file
-    id: i_selma_3
-    file: ${display.page.image.dir}/selma_3_480x800.${display.page.image.ext}
-    type: ${display.page.image.type}
-    invert_alpha: ${display.page.image.invert_alpha}
 
 script:
   - id: epaper_next_image

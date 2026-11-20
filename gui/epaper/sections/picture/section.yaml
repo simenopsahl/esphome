@@ -1,0 +1,38 @@
+# Reusable Bento section: Rotating photo frame (`gui/epaper/sections/picture/section.yaml`)
+# Displays one of `i_selma_1` .. `i_selma_3` (800x480 native landscape), cycling on each refresh.
+# Intended for large panels (`max(width, height) > 960`, e.g. Seeed reTerminal E1003).
+# Companion bindings: `gui/epaper/sections/picture/sensors.yaml`
+
+obj:
+  id: ep_sec_picture
+  width: 100%
+  height: SIZE_CONTENT
+  bg_opa: TRANSP
+  border_width: 0
+  pad_all: 0
+  scrollbar_mode: "OFF"
+  layout:
+    type: flex
+    flex_flow: COLUMN
+    flex_align_main: CENTER
+    flex_align_cross: CENTER
+    flex_align_track: CENTER
+  widgets:
+    - obj:
+        id: card_ep_daily_photo
+        width: SIZE_CONTENT
+        height: SIZE_CONTENT
+        bg_opa: TRANSP
+        border_width: 2
+        border_color: c_ep_divider
+        radius: 8
+        pad_all: 6
+        scrollbar_mode: "OFF"
+        widgets:
+          - image:
+              id: img_ep_daily_photo
+              src: i_selma_1
+              align: CENTER
+              pivot_x: 400
+              pivot_y: 240
+              scale: ${ ([(((screen_width|int) - 160) / 2.0) / 800.0, 1.0]|min) | round(3) }

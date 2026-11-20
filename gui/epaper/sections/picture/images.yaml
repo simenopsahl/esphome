@@ -1,0 +1,16 @@
+# List of photo image definitions (`i_selma_1` .. `i_selma_3`).
+- platform: file
+  id: i_selma_1
+  file: ${display.page.image.dir}/selma_1_480x800.${display.page.image.ext}
+  type: ${display.page.image.type}
+  invert_alpha: ${display.page.image.invert_alpha}
+- platform: file
+  id: i_selma_2
+  file: ${display.page.image.dir}/selma_2_480x800.${display.page.image.ext}
+  type: ${display.page.image.type}
+  invert_alpha: ${display.page.image.invert_alpha}
+- platform: file
+  id: i_selma_3
+  file: ${display.page.image.dir}/selma_3_480x800.${display.page.image.ext}
+  type: ${display.page.image.type}
+  invert_alpha: ${display.page.image.invert_alpha}

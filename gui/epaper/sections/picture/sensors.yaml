@@ -1,0 +1,18 @@
+# Companion bindings for `gui/epaper/sections/picture/section.yaml`.
+# Evaluated during `do_substitution_pass` (after all board & page packages have resolved
+# `screen_width`, `screen_height`, and `epaper_image_assets_loaded`):
+#   - On panels > 960px (e.g. E1003): loads `images.yaml` only if `page_image` did not already
+#     load them, and cycles `img_ep_daily_photo` through `i_selma_1..3` on every screen refresh.
+#   - On panels <= 960px (e.g. E1002): compiles zero images and a no-op refresh hook.
+
+globals:
+  - id: epaper_daily_image_index
+    type: int
+    restore_value: no
+    initial_value: "0"
+
+image: !include ${ "images.yaml" if (([screen_width|int, screen_height|int]|max) > 960 and (epaper_image_assets_loaded | default("false")) != "true") else "images_empty.yaml" }
+
+script:
+  - id: !extend epaper_refresh_status
+    then: !include ${ "refresh_action.yaml" if ([screen_width|int, screen_height|int]|max) > 960 else "refresh_noop.yaml" }

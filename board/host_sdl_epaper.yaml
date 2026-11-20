@@ -21,7 +21,7 @@ substitutions:
     nav: "coreink"
   display:
     rotation: "0"
-    home_page: "page_content"
+    home_page: "page_info"
   device:
     model: "Host SDL e-Paper"
     board: host_sdl

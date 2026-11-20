@@ -5,7 +5,7 @@
 obj:
   id: ep_sec_nordpool
   width: 100%
-  height: ${ "216" if ([screen_width|int, screen_height|int]|max) <= 960 else "640" }
+  height: ${ "216" if ([screen_width|int, screen_height|int]|max) <= 960 else "410" }
   bg_opa: TRANSP
   border_width: 0
   pad_all: 0

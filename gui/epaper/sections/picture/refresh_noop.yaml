@@ -1,0 +1,2 @@
+# No-op refresh action for panels <= 960px where `page_daily` omits the Picture bento.
+- lambda: ""

@@ -1,0 +1,13 @@
+# Self-contained Weather Station e-Paper page package (`gui/epaper/pages/weather_station/main.yaml`)
+# Bundles Weather Header + 3 Rolling 12h Temperature Graph bindings + `page_weather_station` LVGL page.
+#
+# Usage in device YAML:
+#   packages:
+#     epaper_weather: !include gui/epaper/pages/weather_station/main.yaml
+
+packages:
+  sensors: !include sensors.yaml
+
+lvgl:
+  pages:
+    - !include page.yaml

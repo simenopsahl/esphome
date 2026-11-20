@@ -1,0 +1,23 @@
+# Self-contained remote HA temperature + 12h rolling graph e-Paper page package
+# (`gui/epaper/pages/temperature/remote.yaml`).
+#
+# Required vars: `uid`, `entity_id`
+# Optional vars: `page_id` ("page_room"), `area_label` ("Rom"), `icon` ("\U000F050F"),
+#                `unit` ("°C"), `show_graph` ("true"), `value_fmt` ("%.0f"),
+#                `min_span` ("2.0"), `invert_colors` ("false")
+
+packages:
+  series: !include
+    file: ../../sections/rolling_graph/remote_series.yaml
+    vars:
+      uid: ${uid}
+      entity_id: ${entity_id}
+      value_fmt: ${value_fmt | default("%.0f")}
+      min_span: ${min_span | default("2.0")}
+
+lvgl:
+  pages:
+    - !include
+      file: page.yaml
+      vars:
+        show_graph: ${show_graph | default("true")}

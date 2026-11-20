@@ -110,5 +110,5 @@ obj:
                     id: ${uid}_unit
                     text: ${ unit | default("°C") }
                     text_font: ${ unit_font | default("font_sm" if ([screen_width|int, screen_height|int]|min) <= 300 else "font_md") }
-                    pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|min) <= 300 else "8" }
+                    pad_bottom: ${ "4" if ([screen_width|int, screen_height|int]|min) <= 300 else ("8" if ([screen_width|int, screen_height|int]|max) <= 960 else "14") }
                     styles: epaper_muted_style

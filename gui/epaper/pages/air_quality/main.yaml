@@ -1,0 +1,13 @@
+# Self-contained Air Quality e-Paper page package (`gui/epaper/pages/air_quality/main.yaml`)
+# Bundles SEN55 + SCD40 sensor bindings + `page_air_quality` LVGL page.
+#
+# Usage in device YAML:
+#   packages:
+#     epaper_air_quality: !include gui/epaper/pages/air_quality/main.yaml
+
+packages:
+  sensors: !include sensors.yaml
+
+lvgl:
+  pages:
+    - !include page.yaml

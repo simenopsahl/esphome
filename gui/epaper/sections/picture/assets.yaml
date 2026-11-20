@@ -1,0 +1,8 @@
+# Shared e-Paper photo assets package (`i_selma_1` .. `i_selma_3`).
+# Included by `gui/epaper/pages/image/sensors.yaml` and sets `epaper_image_assets_loaded: "true"`
+# so `gui/epaper/sections/picture/sensors.yaml` reuses these images without duplicating IDs.
+
+substitutions:
+  epaper_image_assets_loaded: "true"
+
+image: !include images.yaml

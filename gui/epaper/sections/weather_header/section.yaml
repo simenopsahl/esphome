@@ -6,7 +6,7 @@ obj:
   id: ep_sec_weather_header
   width: ${ "100%" if ((screen_width|int) < (screen_height|int)) else "SIZE_CONTENT" }
   height: ${ "SIZE_CONTENT" if ((screen_width|int) < (screen_height|int)) else "100%" }
-  min_width: ${ "0" if ((screen_width|int) < (screen_height|int)) else ("84" if ((screen_width|int) < 600) else ("108" if ((screen_height|int) < 280) else "132")) }
+  min_width: ${ "0" if ((screen_width|int) < (screen_height|int)) else ("84" if ((screen_width|int) < 600) else ("108" if ((screen_height|int) < 280) else ("132" if ((screen_width|int) <= 960) else "240"))) }
   bg_opa: TRANSP
   border_width: 0
   pad_all: 0
@@ -16,8 +16,8 @@ obj:
     flex_flow: ${ "ROW" if ((screen_width|int) < (screen_height|int)) else "COLUMN" }
     flex_align_main: CENTER
     flex_align_cross: CENTER
-    pad_column: ${ "10" if ((screen_width|int) < 600) else "16" }
-    pad_row: ${ "2" if ((screen_height|int) < 280) else "6" }
+    pad_column: ${ "10" if ((screen_width|int) < 600) else ("16" if ((screen_width|int) <= 960) else "28") }
+    pad_row: ${ "2" if ((screen_height|int) < 280) else ("6" if ((screen_height|int) <= 960) else "18") }
   widgets:
     - label:
         id: lbl_ep_wh_now
